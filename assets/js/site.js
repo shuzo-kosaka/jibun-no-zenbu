@@ -706,10 +706,32 @@
   }
   items.forEach(function(li, i){ li.setAttribute('tabindex','0'); li.setAttribute('role','button'); li.addEventListener('click', function(){ goStep(i+1); }); li.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); goStep(i+1); } }); });
 
-  /* ch4 annotation overlay */
-  var shown = false;
+  /* ch4 annotation overlay — v133: the labels belong to 世の中全部、デザインじゃん。 and must not be seen anywhere
+     else. They are position:fixed, so without this they simply stayed on the screen for their 3.8s while the
+     reader scrolled on, and were last seen floating over the closing screen. Now they follow the thing they
+     point at, hide when it leaves, and are cleared the moment ch4 is no longer the screen you are on. */
+  var shown = false, annoLive = [], annoRaf = 0, annoT = 0;
+  function annoClear(){
+    clearTimeout(annoT); annoT = 0;
+    if(annoRaf){ cancelAnimationFrame(annoRaf); annoRaf = 0; }
+    annoLive.forEach(function(o){ o.el.classList.remove('on'); var el = o.el; setTimeout(function(){ el.remove(); }, 600); });
+    annoLive = [];
+  }
+  function annoHere(){ var s = document.getElementById('ch4'); if(!s) return false; var r = s.getBoundingClientRect(), H = vh(); return r.top < H * .65 && r.bottom > H * .35; }
+  function annoFollow(){
+    if(!annoHere()){ annoClear(); return; }
+    var H = vh(), W = window.innerWidth;
+    annoLive.forEach(function(o){
+      var r = o.t.getBoundingClientRect();
+      o.el.style.left = Math.min(W - 240, Math.max(8, r.left + o.dx)) + 'px';
+      o.el.style.top = Math.max(8, r.top + o.dy) + 'px';
+      o.el.classList.toggle('gone', r.bottom < 8 || r.top > H - 8);   /* what it points at has left the screen */
+    });
+    annoRaf = requestAnimationFrame(annoFollow);
+  }
   function annotate(){
-    if(window.innerWidth < 1024) return;
+    if(window.innerWidth < 1024 || !annoHere()) return false;
+    annoClear();
     var targets = [
       [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],
       [document.querySelector('#ch4 .ttl'), 'Zen Old Mincho 700 · 見出し · X1', 0, -26],
@@ -717,17 +739,25 @@
       [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', -230, 0],
       [document.querySelector('#ch4 .marg img'), '図版 · 副次要素の欄', 0, -22]
     ];
-    var els = [];
     targets.forEach(function(t, i){
       if(!t[0]) return; var r = t[0].getBoundingClientRect(); if(r.bottom < 0 || r.top > vh()) return;
       var a = document.createElement('div'); a.className = 'anno'; a.textContent = t[1];
       a.style.left = Math.min(window.innerWidth - 240, Math.max(8, r.left + t[2])) + 'px'; a.style.top = Math.max(8, r.top + t[3]) + 'px';
-      body.appendChild(a); els.push(a); setTimeout(function(){ a.classList.add('on'); }, 120 + i*160);
+      body.appendChild(a); annoLive.push({el:a, t:t[0], dx:t[2], dy:t[3]}); setTimeout(function(){ a.classList.add('on'); }, 120 + i*160);
     });
-    setTimeout(function(){ els.forEach(function(a){ a.classList.remove('on'); setTimeout(function(){ a.remove(); }, 600); }); }, 3800);
+    if(!annoLive.length) return false;
+    annoRaf = requestAnimationFrame(annoFollow);
+    annoT = setTimeout(annoClear, 3800);
+    return true;
   }
+  /* the trigger: threshold 1 asked for the whole sentence to be on screen at once — with the page moving under
+     inertia that often never happened, and the one chance was spent anyway (shown was set before the labels were
+     drawn, so a run that drew nothing could never be retried). Now it fires when the sentence is in the middle
+     band of the screen, and the flag is only spent on a run that actually put labels up. */
   var trig = document.getElementById('annot-trigger');
-  new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting && !shown){ shown = true; setTimeout(annotate, 500); } }); }, {threshold:1}).observe(trig);
+  if(trig) new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting && !shown) setTimeout(function(){ if(!shown && annotate()) shown = true; }, 240); });
+  }, {threshold:0, rootMargin:'-25% 0px -25% 0px'}).observe(trig);
   var again = document.getElementById('annot-again'); if(again) again.addEventListener('click', annotate);   /* v126: the button itself is gone — the annotation runs when the sentence is reached */
 
   /* works shuffle */
