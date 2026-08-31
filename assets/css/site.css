@@ -1657,7 +1657,7 @@
     14%{clip-path:inset(0 0 calc(100% - var(--hdh,68px)) 0); animation-timing-function:cubic-bezier(.45,.02,.25,1)}
     100%{clip-path:inset(0)}
   }
-  .menu.open{transition:none; animation:menuDrop 1.34s both}
+  .menu.open{clip-path:inset(0); animation:menuDrop 1.34s}   /* v162: the open state is declared as well as animated (the animation wins while it runs), so removing .open leaves the base transition to sweep the sheet away again */
   .menu.open .menu-in{transition:transform 1.15s cubic-bezier(.45,.02,.25,1) .19s}
   #message .body .mh2{line-height:1.02}
   #message .body .mh2 .mx:first-child{margin-right:.28em}   /* the 、 at its end is counted in the centring */
