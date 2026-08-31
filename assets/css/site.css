@@ -1507,3 +1507,5 @@
   #message.gridon .lines .v,#message.gridon .lines .h,#message.gridon .lines .c{transform:none}
   #message.gridon .lines .frame{opacity:1}
   #message.gridgone .lines i,#message.gridgone .lines .frame{opacity:0}   /* v104b: like the opening screen, the grid is drawn, held, and then let go */
+  .ft-copy{display:block; margin-top:18px; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--fg3)}
+  footer.ft{padding-bottom:56px}
