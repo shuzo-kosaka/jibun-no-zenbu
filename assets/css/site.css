@@ -1473,11 +1473,10 @@
   .wkf:hover .fl,.wkf:focus-visible .fl{animation:wkGlow .62s ease-out forwards}
   @media (hover:none){ .wkf:hover .ph{animation:none} }
   /* v105: the seal that flies in lands like a seal — a quick rebound and a ring of ink spreading from under it */
-  #contents .stamp-pic::after{content:""; position:absolute; inset:2%; border:2px solid var(--acc); border-radius:50%; opacity:0}
-  #contents .stamp-pic.landed::after{animation:picRing .8s ease-out}
-  @keyframes picRing{0%{opacity:.45; transform:scale(.94)} 100%{opacity:0; transform:scale(1.26)}}
-  #contents .stamp-pic.landed img{animation:picPress .42s cubic-bezier(.2,.9,.3,1)}
-  @keyframes picPress{0%{transform:scale(1.07)} 52%{transform:scale(.965)} 100%{transform:scale(1)}}
+  /* v107: the press belongs to the ink, not the drawing around it — the 朱 face alone takes the weight, and no ring
+     (a circle inset in a 640×715 box came out as an ellipse) */
+  #contents .stamp-pic.landed .fc{animation:picPress .44s cubic-bezier(.2,.9,.3,1)}
+  @keyframes picPress{0%{transform:scale(1.06); filter:saturate(1.35) brightness(1.06)} 52%{transform:scale(.972)} 100%{transform:scale(1); filter:none}}
   body[data-scene="green"] .brand img{filter:brightness(0) invert(1)}   /* v106: the 朱 mark does not belong on the green; it reads as white there */
   /* v106: the rewind — the page winds back and the picture goes with it */
   .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s}
@@ -1486,7 +1485,12 @@
   @keyframes rewScan{to{transform:translateY(-10px)}}
   .rew::after{content:""; position:absolute; left:-2%; right:-2%; height:18vh; background:linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0)); mix-blend-mode:overlay; animation:rewHead .34s linear infinite}
   @keyframes rewHead{0%{top:104%} 100%{top:-22%}}
-  .rew .mk{position:absolute; right:5%; bottom:7%; font-family:var(--mono); font-size:12px; letter-spacing:.24em; color:var(--fg); opacity:.85; animation:rewBlink .34s steps(2) infinite}
+  .rew .mk{position:absolute; right:calc(var(--x1) - 30px + 92px + 16px); bottom:calc(26px + 46px - .6em); font-family:var(--mono); font-size:12px; letter-spacing:.24em; color:var(--fg); opacity:.85; white-space:nowrap; animation:rewBlink .34s steps(2) infinite}   /* level with the middle of the button it belongs to */
+  html.rewind *{transition:none !important}   /* the page's own eases would fight a fast wind and make it stutter */
+  html.rewind .rew{transition:opacity .22s}
+  html.fwd .rew::after{animation:fwdHead .34s linear infinite}
+  @keyframes fwdHead{0%{top:-22%} 100%{top:104%}}
+  html.fwd .rew .bands{animation-direction:reverse}
   @keyframes rewBlink{50%{opacity:.3}}
   #message .lines{opacity:0; z-index:0}
   #message .lines i{transition:transform 1s var(--ease), opacity .8s}

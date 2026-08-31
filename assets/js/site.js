@@ -1154,28 +1154,29 @@
     /* v106: the button at the end winds the page back like tape — a long spool that runs fast and eases out, the page stepping backwards a frame at a time */
     var dur = rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
     flying = true; document.documentElement.classList.add('flying');
-    if(rew) document.documentElement.classList.add('rewind');
+    if(rew){ document.documentElement.classList.add('rewind'); document.documentElement.classList.toggle('fwd', dist > 0); }   /* v107: the same tape, wound the other way when the button sends you down */
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
-    function land(){ flying = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); ticking = false; onScroll(); }
+    function land(){ flying = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); }
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
       var yy = start + dist * (rew ? easeRew(k) : ease(k));
-      if(rew && k < 1) yy = Math.round(yy / 26) * 26;   /* the frames flick past rather than glide */
       window.scrollTo({top: yy, behavior:'instant'});
       if(k < 1) flyRaf = requestAnimationFrame(step); else land();
     })(t0);
   }
   (function(){   /* the tape's own picture: tracking bands, a sweeping head, and the mark in the corner */
     var r = document.createElement('div'); r.className = 'rew'; r.setAttribute('aria-hidden', 'true');
-    r.innerHTML = '<i class="bands"></i><span class="mk">\u25c0\u25c0 REWIND</span>';
+    r.innerHTML = '<i class="bands"></i><span class="mk"></span>';
+    var mk = r.querySelector('.mk');
+    new MutationObserver(function(){ mk.textContent = document.documentElement.classList.contains('fwd') ? '\u25b6\u25b6 FORWARD' : '\u25c0\u25c0 REWIND'; }).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
     document.body.appendChild(r);
   })();
   function flyStop(){ if(!flying) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
-  function flyToEl(id){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY); return true; }
-  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, a.classList.contains('cta-fx')); } else if(!flyToEl(h)) flyTo(0); }); });
+  function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
+  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, a.classList.contains('cta-fx')); } else if(!flyToEl(h, a.classList.contains('cta-fx'))) flyTo(0, a.classList.contains('cta-fx')); }); });
 
   /* hamburger menu */
   var burger = document.getElementById('burger'), menu = document.getElementById('menu');
