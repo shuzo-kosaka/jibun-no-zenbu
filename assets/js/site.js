@@ -67,7 +67,7 @@
   ttlWords(true);
   /* ch7's two subheads (.mixed): set like a chapter title — split per character (the <br> kept), kanji gothic / kana mincho, the data-big words larger, kerned by pair, the lines optically aligned */
   function mixedSubs(ja){
-    document.querySelectorAll('#ch7 .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed').forEach(function(sub){
+    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed').forEach(function(sub){
       var w = sub.querySelector('.w'); if(!w) return;
       if(!w.querySelector('.ch')){
         var frag = document.createDocumentFragment(), i = 0;
@@ -928,13 +928,14 @@
   function fpUpdate(){
     if(!fpList.length) return;
     var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
-    var fresh = 0;   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
+    var fresh = 0, offs = [];   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
     fpList.forEach(function(o, i){
       var on = (i >= gone || i >= fpMainN) && o.y < front;
-      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (fresh * 75) + 'ms'; fresh++; }
+      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (fresh * 75) + 'ms'; fresh++; o.el.classList.add('on'); }
+      else if(!on && o.el.classList.contains('on')) offs.push(o);
       else if(!on) o.el.style.transitionDelay = '';
-      o.el.classList.toggle('on', on);
     });
+    offs.reverse().forEach(function(o, k){ o.el.style.transitionDelay = (k * 70) + 'ms'; o.el.classList.remove('on'); });   /* the walk is un-walked from its far end back */
   }
   /* the bridge: the walk resumes below the diagram — down the same rail, a gentle bend past the heading, and on toward CHECKPOINT 01 */
   function brBuild(){
@@ -1079,9 +1080,10 @@
   function wkBuild(){
     var sec = document.getElementById('ch7'), wk = document.getElementById('works'); if(!sec || !wk) return;
     var old = sec.querySelector(':scope > .wktrail'); if(old) old.remove(); window.__wkFps = [];
-    var r = sec.getBoundingClientRect(), W = r.width; if(W < 821) return;
-    var last = sec.querySelector('.solopin:last-of-type'), st = last && last.querySelector('.stick'), sq = last && last.querySelector('.sq'); if(!last || !st || !sq) return;
-    var lr = last.getBoundingClientRect(), sy = (lr.bottom - r.top) - st.offsetHeight + sq.offsetTop + sq.offsetHeight + 40, sx = W / 2;   /* where the text block sits once its screen has scrolled on */
+    var r = sec.getBoundingClientRect(), W = r.width; if(W < 1025) return;
+    var bd = sec.querySelector(':scope > .body'), lastEl = bd && bd.lastElementChild; if(!bd || !lastEl) return;
+    var br = bd.getBoundingClientRect(), lb = lastEl.getBoundingClientRect();
+    var sy = (lb.bottom - r.top) + 46, sx = (br.left + br.width / 2) - r.left;   /* under the last line of ch7, on that column's centre */
     var seal = wk.querySelector(':scope > .chseal'); if(!seal) return; var wr = wk.getBoundingClientRect();
     var ex = wr.left + seal.offsetLeft + seal.offsetWidth * .95 + 6 - r.left, ey = wr.top + seal.offsetTop + seal.offsetHeight * .5 - r.top; if(ey - sy < 200) return;   /* it arrives at the works' seal (v89: right up to the rim, aimed at its middle) — offsets, not rects: the seal is still scaled up before it is pressed */
     var d = 'M' + sx.toFixed(1) + ',' + sy.toFixed(1) + ' C' + sx.toFixed(1) + ',' + (sy + (ey - sy) * .62).toFixed(1) + ' ' + (ex + (sx - ex) * .5).toFixed(1) + ',' + ey.toFixed(1) + ' ' + ex.toFixed(1) + ',' + ey.toFixed(1);
@@ -1494,7 +1496,7 @@
 
   /* v88: beside the works' seal, on the empty right — 挑戦と失敗、その反復. A hand keeps drawing the works' frame freehand: each try is drawn with a live stroke, then fades to a trace while the next begins, a little steadier each time; the eighth is nearly true and in 朱; then the sheet clears and it starts over. A counter keeps the tally. Runs only while it is on screen */
   function wkTry(){
-    var box = document.querySelector('#works .wk-try'), vt = document.querySelector('#works .wk-vt'); if(!box || !vt || reduce) return; var svg = box.querySelector('svg'), num = box.querySelector('b'); if(!svg) return;
+    var box = document.querySelector('#works .wk-try'), vt = document.querySelector('#works .wk-vt'); if(!box || !vt || reduce) return; var svg = box.querySelector('svg'), num = document.querySelector('#works .wk-n b') || box.querySelector('b'); if(!svg) return;
     function fit(){   /* the box round the heading, with room for the hand's wander */
       var w = vt.offsetWidth, h = vt.offsetHeight, px = Math.max(26, w * .16), py = Math.max(22, h * .09);
       box.style.left = (vt.offsetLeft - px).toFixed(0) + 'px'; box.style.top = (vt.offsetTop - py).toFixed(0) + 'px'; box.style.width = (w + 2 * px).toFixed(0) + 'px'; box.style.height = (h + 2 * py).toFixed(0) + 'px';
