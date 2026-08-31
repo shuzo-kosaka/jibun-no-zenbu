@@ -1645,8 +1645,8 @@
   .cur.suck .cd{color:var(--acc)}
   .cur.suck .cd::after{border-color:currentColor !important; opacity:.32}
   .cur .cd b svg.cr text{fill:currentColor}
-  .menu.open{transition:clip-path 1.15s cubic-bezier(.45,.02,.25,1)}
-  .menu.open .menu-in{transition:transform 1.2s cubic-bezier(.45,.02,.25,1)}
+  .menu.open{transition:clip-path 1.2s cubic-bezier(.06,.22,.9,.3)}   /* v156: the sheet shows a hand's width at the top, hangs there, then runs the rest of the screen in the last moment */
+  .menu.open .menu-in{transition:transform 1.25s cubic-bezier(.06,.22,.9,.3)}
   .cur .cd b{color:inherit}
   #contact .oval .ovh{left:0; right:0; top:0; bottom:0; width:100%; height:100%; border-radius:0; clip-path:inset(2.69% 3.5% round 50% / 37.8%)}
   #message .body .mh2{transform-origin:50% 50%; transition:transform 1.1s var(--ease), opacity .9s var(--ease), filter .9s var(--ease)}
