@@ -1439,3 +1439,25 @@
   /* v96: `.cur` is the cursor overlay's class, and the touch-device rule `.cur{display:none}` also swallowed
      the hero rotator's current phrase (span.cur) — which is why the catch copy never showed on a real phone */
   @media (hover:none),(pointer:coarse){ #rot > span.cur{display:block} }
+  /* v99: the seal for the company this was made for — pressed, like the chapter seals, once the screen settles */
+  #ch7c .ca-seal{position:absolute; right:6%; top:auto; bottom:13vh; width:min(17vw,178px); aspect-ratio:1; opacity:0; transform:rotate(-13deg) scale(1.5); pointer-events:none; z-index:3}
+  #ch7c .ca-seal svg{width:100%; height:100%; display:block; overflow:visible}
+  #ch7c .ca-seal.in{animation:caStamp .62s cubic-bezier(.2,.9,.3,1) .45s forwards}
+  @keyframes caStamp{0%{opacity:0; transform:rotate(-13deg) scale(1.5)} 62%{opacity:.97; transform:rotate(-7deg) scale(.96)} 100%{opacity:.95; transform:rotate(-7deg) scale(1)}}
+  #ch7c .ca-seal::after{content:""; position:absolute; inset:-7%; border:2px solid var(--acc); border-radius:16px; opacity:0}
+  #ch7c .ca-seal.in::after{animation:caRing .8s ease-out .5s}
+  @keyframes caRing{0%{opacity:.5; transform:scale(1)} 100%{opacity:0; transform:scale(1.4)}}
+  @media (max-width:1024px){ #ch7c .ca-seal{right:auto; left:50%; top:63vh; bottom:auto; width:34vw; transform:translateX(-50%) rotate(-13deg) scale(1.5)}   /* clear of the fold, so the reveal observer sees it */
+    #ch7c .solopin:not(.solo) .ca-seal{animation:none; opacity:0; transition:opacity .45s}   /* on a phone the paragraphs run over this spot: the seal has its moment on the solo screen, then goes */
+    @keyframes caStamp{0%{opacity:0; transform:translateX(-50%) rotate(-13deg) scale(1.5)} 62%{opacity:.97; transform:translateX(-50%) rotate(-7deg) scale(.96)} 100%{opacity:.95; transform:translateX(-50%) rotate(-7deg) scale(1)}} }
+
+  /* v99b: TRIAL sits right beside SELECTED WORKS, not a column away */
+  .wk-side .wk-n{margin-right:-9px}
+
+  /* v99c: the frames flicker awake under the cursor, like a bulb finding its current, before the colour holds */
+  @keyframes wkFlick{0%{filter:url(#wkink2)} 8%{filter:none} 14%{filter:url(#wkink2)} 22%{filter:none} 28%{filter:url(#wkink2)} 33%{filter:none} 41%{filter:url(#wkink2)} 48%,100%{filter:none}}
+  @keyframes wkGlow{0%{opacity:0} 10%{opacity:.5} 18%{opacity:.05} 30%{opacity:.42} 44%{opacity:.06} 60%{opacity:.2} 100%{opacity:0}}
+  .wkf .fl{fill:#FFF6E2; opacity:0; pointer-events:none}
+  .wkf:hover .ph,.wkf:focus-visible .ph{animation:wkFlick .62s steps(1,end) forwards}
+  .wkf:hover .fl,.wkf:focus-visible .fl{animation:wkGlow .62s ease-out forwards}
+  @media (hover:none){ .wkf:hover .ph{animation:none} }

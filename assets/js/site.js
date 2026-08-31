@@ -931,11 +931,11 @@
     var fresh = 0, offs = [];   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
     fpList.forEach(function(o, i){
       var on = (i >= gone || i >= fpMainN) && o.y < front;
-      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (fresh * 75) + 'ms'; fresh++; o.el.classList.add('on'); }
+      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (Math.min(fresh, 10) * 55) + 'ms'; fresh++; o.el.classList.add('on'); }
       else if(!on && o.el.classList.contains('on')) offs.push(o);
       else if(!on) o.el.style.transitionDelay = '';
     });
-    offs.reverse().forEach(function(o, k){ o.el.style.transitionDelay = (k * 70) + 'ms'; o.el.classList.remove('on'); });   /* the walk is un-walked from its far end back */
+    offs.reverse().forEach(function(o, k){ o.el.style.transitionDelay = (Math.min(k, 10) * 55) + 'ms'; o.el.classList.remove('on'); });   /* the walk is un-walked from its far end back */
   }
   /* the bridge: the walk resumes below the diagram — down the same rail, a gentle bend past the heading, and on toward CHECKPOINT 01 */
   function brBuild(){
@@ -1023,6 +1023,13 @@
       '<text x="78" y="' + (jp.length > 3 ? 92 : 94) + '" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (jp.length > 3 ? 20 : 26) + '" fill="var(--acc)" stroke="none">' + jp + '</text>' +
       '<text x="78" y="124" text-anchor="middle" font-family="var(--mono)" font-size="6.5" letter-spacing="1.6" fill="var(--acc)" stroke="none">KOSAKA \u00b7 PORTFOLIO</text></g>';
     return sv;
+  }
+  /* v99: the seal of who this was made for, on the last screen */
+  var caSeal = document.querySelector('#ch7c .ca-seal');
+  if(caSeal && !caSeal.firstChild){
+    var caSv = kakuSvg('FOR CYBERAGENT', '新しい力', 71);
+    var caT = caSv.querySelector('text'); if(caT){ caT.setAttribute('font-size', '8.2'); caT.setAttribute('letter-spacing', '1.1'); }   /* the longer line has to fit inside the rule */
+    caSeal.appendChild(caSv);
   }
   document.querySelectorAll('#mlinks > a, .menu .mmsg').forEach(function(a, i){ var st = a.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg(a.getAttribute('data-en') || '', a.getAttribute('data-jp') || '', 60 + i * 9)); });
   /* the menu's seven seals */
