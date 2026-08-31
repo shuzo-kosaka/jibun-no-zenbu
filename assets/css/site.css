@@ -12,6 +12,7 @@
     --ease:cubic-bezier(.2,.7,.2,1);
   }
   body[data-scene="shu"]{ --bg:#E84518; --fg:#FBF7F2; --fg2:rgba(251,247,242,.84); --fg3:rgba(251,247,242,.62); --line:rgba(251,247,242,.35); --card:rgba(255,255,255,.08); --mk:rgba(255,255,255,.34); --ul:#FBF7F2; --acc:#FBF7F2; --l-red:#FBF7F2; --l-yellow:rgba(255,255,255,.6); --l-green:rgba(255,255,255,.6) }
+  body[data-scene="green"]{ --bg:#82BE28; --fg:#16220A; --fg2:rgba(22,34,10,.82); --fg3:rgba(22,34,10,.56); --line:rgba(22,34,10,.26); --card:rgba(255,255,255,.16); --mk:rgba(255,255,255,.55); --ul:#16220A; --acc:#1C1B19; --l-red:#16220A; --l-yellow:rgba(22,34,10,.45); --l-green:rgba(22,34,10,.45) }
   body[data-scene="ink"]{ --bg:#15151A; --fg:#F2F2EE; --fg2:#BDBBB3; --fg3:#7E7C76; --line:#33333A; --card:#1E1E24; --mk:rgba(232,69,24,.55); --ul:#F0603E; --acc:#E84518 }
   body[data-scene="night"]{ --bg:#0E1826; --fg:#F2F2EE; --fg2:#B9C0CB; --fg3:#7F8895; --line:#233246; --card:#152238; --mk:rgba(232,69,24,.5); --ul:#F0603E; --acc:#F0603E }
   html[lang="en"] .ttl{font-family:var(--optima); font-weight:400; letter-spacing:.005em; font-feature-settings:normal; line-height:1.1; font-size:clamp(28px,4vw,54px)}
@@ -1177,6 +1178,9 @@
   /* ---------- video facade ---------- */
   .vid iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
   .vid.play img.th,.vid.play .t,.vid.play .p2,.vid.play .s,.vid.play .badge{display:none}
+  .vid.play::before{opacity:0; pointer-events:none}
+  .vid.play iframe{z-index:3}
+  .vid.play{cursor:default}
   .vid{display:block; text-decoration:none; margin:1.6em 0 3.4em; border:1px solid var(--fg); background:var(--card) center/cover no-repeat; aspect-ratio:16/9; position:relative; overflow:hidden; color:#F2F2EE}
   .vid::before{content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(21,21,26,.78), rgba(21,21,26,.14) 40%, rgba(21,21,26,.1) 60%, rgba(21,21,26,.8)); transition:opacity .4s}
   .vid:hover::before{opacity:.75}
@@ -1403,7 +1407,7 @@
     #gridbtn{display:none}
     #mkbtn{display:none}
     html.cpopen #mkbtn{display:inline-block}
-    .lab{white-space:normal; font-size:12px}   /* one line again on a narrow screen; the big number keeps its own size */
+    .lab{white-space:normal; font-size:12px; padding-right:5%}   /* the kicker ended flush against the screen edge */   /* one line again on a narrow screen; the big number keeps its own size */
     .ttl small,.ttl.vert small{white-space:normal}
     #works{grid-template-rows:22vh minmax(18vh,auto) auto !important}   /* the inline rows put MAKING under the fixed header */
     #ch5{grid-template-rows:12vh auto auto auto}

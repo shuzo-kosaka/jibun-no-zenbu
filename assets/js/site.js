@@ -1560,7 +1560,7 @@
     if(!m) return;
     if(vidLocal){ var s = a.querySelector('.s'); if(s) s.textContent = 'YOUTUBE · 公開版ではこの場所で再生'; return; }
     a.addEventListener('click', function(e){
-      if(a.classList.contains('play')) return;   /* the iframe owns the box now */
+      if(a.classList.contains('play')){ e.preventDefault(); return; }   /* v97: the player owns the box — a stray click must never follow the href to YouTube */
       e.preventDefault();
       var f = document.createElement('iframe');
       f.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&rel=0');
