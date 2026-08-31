@@ -1471,3 +1471,15 @@
   .wkf:hover .ph,.wkf:focus-visible .ph{animation:wkFlick .62s steps(1,end) forwards}
   .wkf:hover .fl,.wkf:focus-visible .fl{animation:wkGlow .62s ease-out forwards}
   @media (hover:none){ .wkf:hover .ph{animation:none} }
+  #message .lines{opacity:0; z-index:0}
+  #message .lines i{transition:transform 1s var(--ease), opacity .8s}
+  #message .lines .v{transform:scaleY(0); transform-origin:top}
+  #message .lines .h{transform:scaleX(0); transform-origin:left}
+  #message .lines .c{transform:scaleY(0); transform-origin:top}
+  #message .lines .frame{opacity:0}
+  #message .lines s{opacity:0; transition:opacity .5s .8s}
+  #message.gridon .lines{opacity:1}
+  #message.gridon .lines .v,#message.gridon .lines .h,#message.gridon .lines .c{transform:none}
+  #message.gridon .lines .frame{opacity:1}
+  #message.gridon .lines s{opacity:1}
+  @media (max-width:1024px){ #message .lines s{display:none} }

@@ -507,7 +507,8 @@
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .26);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .48);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .48);
+        pin.classList.toggle('gridon', p >= .72);   /* v104: the grid is drawn as the page says it loves grids */   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
   }
