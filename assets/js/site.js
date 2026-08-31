@@ -396,10 +396,18 @@
   document.querySelectorAll('.cnt').forEach(function(el){ ioCnt.observe(el); });
 
   /* ---------- scenes: the section under the viewport centre sets body[data-scene] ---------- */
-  var curScene = 'paper', curSec = null, secList = Array.prototype.slice.call(secs);
+  var curScene = 'paper', curSec = null, curTop = null, curBot = null, secList = Array.prototype.slice.call(secs);
   function sceneUpdate(){
-    var mid = vh()*.5, hit = null;
-    for(var i=0;i<secList.length;i++){ var r = secList[i].getBoundingClientRect(); if(r.top <= mid && r.bottom > mid){ hit = secList[i]; break; } }
+    var H = vh(), mid = H*.5, hit = null, tp = null, bt = null;
+    for(var i=0;i<secList.length;i++){ var r = secList[i].getBoundingClientRect();
+      if(r.top <= 2 && r.bottom > 2) tp = secList[i];
+      if(r.top <= mid && r.bottom > mid) hit = secList[i];
+      if(r.top <= H - 2 && r.bottom > H - 2){ bt = secList[i]; break; }   /* the sections are in document order, so the one under the foot of the screen is the last that can matter */
+    }
+    /* v123: on the phone every chapter paints its own ground, so the middle of the screen is no longer the whole
+       truth — the header takes the colour of the chapter behind it, the year and the badge the one at the foot */
+    var st = tp && (tp.getAttribute('data-scene') || 'paper'); if(st && st !== curTop){ curTop = st; body.setAttribute('data-scene-top', st); }
+    var sb = bt && (bt.getAttribute('data-scene') || 'paper'); if(sb && sb !== curBot){ curBot = sb; body.setAttribute('data-scene-bot', sb); }
     if(!hit || hit === curSec) return; curSec = hit;
     var sc = hit.getAttribute('data-scene') || 'paper';
     if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc); }
@@ -705,7 +713,7 @@
   }
   var trig = document.getElementById('annot-trigger');
   new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting && !shown){ shown = true; setTimeout(annotate, 500); } }); }, {threshold:1}).observe(trig);
-  document.getElementById('annot-again').addEventListener('click', annotate);
+  var again = document.getElementById('annot-again'); if(again) again.addEventListener('click', annotate);   /* v126: the button itself is gone — the annotation runs when the sentence is reached */
 
   /* works shuffle */
   var wk = document.getElementById('wk'), tiles = wk ? Array.prototype.slice.call(wk.querySelectorAll('a:not(.wkf)')) : [];   /* the old shuffling grid; the flowing frames of v74 are left alone */
@@ -1046,7 +1054,7 @@
       '<feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="41" result="g"/>' +
       '<feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 3.6 -.2" result="ga"/>' +
       '<feComposite in="d" in2="ga" operator="in"/></filter>' +
-      '<path id="thxA" d="M 38,150 a 112,112 0 0 1 224,0"/><path id="thxB" d="M 46,150 a 104,104 0 0 0 208,0"/></defs>' +
+      '<path id="thxA" d="M 38,150 a 112,112 0 0 1 224,0"/><path id="thxB" d="M 24,150 a 126,126 0 0 0 252,0"/></defs>' +
       '<g filter="url(#' + tid + ')" fill="none" stroke="var(--acc)">' +
       '<circle cx="150" cy="150" r="141" stroke-width="5.6"/><circle cx="150" cy="150" r="126" stroke-width="1.7"/>' +
       '<text font-family="' + T.rf + '" font-weight="700" font-size="' + T.rs + '" letter-spacing="' + T.rl + '" fill="var(--acc)" stroke="none"><textPath href="#thxA" startOffset="50%" text-anchor="middle">' + T.ring + '</textPath></text>' +
@@ -1204,7 +1212,7 @@
       return flying || h.classList.contains('cpopen') || body.classList.contains('menuopen') || h.classList.contains('lbopen') || body.classList.contains('opening');
     }
     function loop(){
-      cur += (target - cur) * .32;   /* light — it follows the wheel closely and only takes the edge off */
+      cur += (target - cur) * .13;   /* v128: heavier still — .32 followed the wheel almost exactly, .20 was closer, this one carries a good half-second past the last notch */
       if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo({top:Math.round(cur), behavior:'instant'}); return; }
       window.scrollTo({top:Math.round(cur), behavior:'instant'});   /* v113: html{scroll-behavior:smooth} would otherwise animate every one of these, and the two eases stacked into a long lag */
       raf = requestAnimationFrame(loop);
@@ -1233,6 +1241,13 @@
   document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
     if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
 
+  /* v126: the photographs are not offered for saving — the context menu and dragging are turned off over
+     images, figures and video. This is a deterrent, not protection: anything the browser can display can still
+     be reached through developer tools, the network panel or a screenshot. */
+  var PIC = 'img, svg, video, figure, picture, .wkf, .lb, #lb';
+  document.addEventListener('contextmenu', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
+  document.addEventListener('dragstart', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
+
   /* hamburger menu */
   var burger = document.getElementById('burger'), menu = document.getElementById('menu');
   var menuCloseT;
@@ -1260,6 +1275,8 @@
     clearTimeout(menuShownT); if(open) menu.classList.add('shown'); else menuShownT = setTimeout(function(){ menu.classList.remove('shown'); }, 850);
     clearTimeout(menuCloseT); if(!open){ body.classList.add('menuclosing'); menuCloseT = setTimeout(function(){ body.classList.remove('menuclosing'); }, 900); } else body.classList.remove('menuclosing'); }
   burger.addEventListener('click', function(){ setMenu(!menu.classList.contains('open')); });
+  /* v123: the sheet is paper — pressing anywhere on it that is not a link or a button puts it away */
+  menu.addEventListener('click', function(e){ if(!e.target.closest('a, button, input, textarea, [role="group"]')) setMenu(false); });
   /* v96: the menu's grid toggle (phone) simply presses the header's hidden one */
   var mgrid = document.querySelector('.mgrid'); if(mgrid) mgrid.addEventListener('click', function(){ var g = document.getElementById('gridbtn'); if(g) g.click(); });
   /* v117: a phone or tablet can be asked to lay the page out as the desktop does — the viewport is told a fixed
@@ -1784,7 +1801,11 @@
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 })();
 
-/* dist: the works frames' photos load after the page is up (their <image> hrefs wait in data-lzhref) */
+/* dist: the works frames' photos load after the page is up (their <image> hrefs wait in data-lzhref).
+   WebKit does not rebuild a <use> when the element it points at changes, so every frame stayed empty on
+   iPhone and iPad — after the hrefs are in, each <use> is replaced by a copy of itself to force it. */
 window.addEventListener('load', function(){ setTimeout(function(){
   document.querySelectorAll('image[data-lzhref]').forEach(function(el){ el.setAttribute('href', el.getAttribute('data-lzhref')); el.removeAttribute('data-lzhref'); });
+  document.querySelectorAll('use').forEach(function(u){ var h = u.getAttribute('href') || '';
+    if(h.indexOf('#wkp_') === 0 && u.parentNode) u.parentNode.replaceChild(u.cloneNode(true), u); });
 }, 600); });

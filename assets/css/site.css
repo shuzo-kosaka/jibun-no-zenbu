@@ -1454,7 +1454,7 @@
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-3%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .8s ease-out .1s}
   @keyframes caRing{0%{opacity:.4; transform:scale(.97)} 100%{opacity:0; transform:scale(1.22)}}
-  #ch7c .solopin{min-height:330vh}   /* v105: room to actually read the two paragraphs before the seal comes down */
+  #ch7c .solopin{min-height:460vh}   /* v105: room to actually read the two paragraphs before the seal comes down; v125: the run after the seal is now about a screen and a half — one screenful still went by too quickly */
   #ch7c .solopin .sq{position:relative; z-index:6; transition:opacity .55s var(--ease)}
   #ch7c .solopin:has(.ca-seal.on) .sq{opacity:.3}   /* the page steps back so the seal is what you read */
   @media (max-width:1024px){ #ch7c .ca-seal{width:76vw; top:54%} }
@@ -1531,3 +1531,37 @@
   @media (max-width:1024px){ .lgsw .bar{width:52vw} .lgsw .tag{font-size:11px; letter-spacing:.16em} }
   .stick.dim .hw{filter:none}   /* a blur over the whole screen, on a layer already at 16% opacity: invisible, and expensive everywhere */
   html.is-webkit .fp,html.is-webkit .dgfp,html.is-webkit .chfp,html.is-webkit [filter="url(#fpink)"],html.is-webkit [filter="url(#chfpink)"],html.is-webkit [filter="url(#dgfpink)"]{filter:none}   /* Safari: the walk keeps its shape, without the ink grain */
+  @media (max-width:1024px){ body,body::after{transition-duration:0s} }   /* the phone changes scene in one cut: half a second of it still stuttered on the real device, and colour is inherited, so every eased frame restyles the whole document. 1024 written out — this block is appended after the 820→1024 sweep */
+  @media (max-width:1024px){
+    section[data-scene="asia"]{--acc:#FF6A3D;--bg:#4B2C78;--card:rgba(255,255,255,.08);--fg:#F6F1F9;--fg2:rgba(246,241,249,.84);--fg3:rgba(246,241,249,.58);--l-red:#FF6A3D;--line:rgba(246,241,249,.26);--mk:rgba(240,96,62,.5);--ul:#FF7A50}
+    section[data-scene="green"]{--acc:#1C1B19;--bg:#82BE28;--card:rgba(255,255,255,.16);--fg:#16220A;--fg2:rgba(22,34,10,.82);--fg3:rgba(22,34,10,.56);--l-green:rgba(22,34,10,.45);--l-red:#16220A;--l-yellow:rgba(22,34,10,.45);--line:rgba(22,34,10,.26);--mk:rgba(255,255,255,.55);--ul:#16220A}
+    section[data-scene="ink"]{--acc:#E84518;--bg:#15151A;--card:#1E1E24;--fg:#F2F2EE;--fg2:#BDBBB3;--fg3:#7E7C76;--line:#33333A;--mk:rgba(232,69,24,.55);--ul:#F0603E}
+    section[data-scene="night"]{--acc:#F0603E;--bg:#0E1826;--card:#152238;--fg:#F2F2EE;--fg2:#B9C0CB;--fg3:#7F8895;--line:#233246;--mk:rgba(232,69,24,.5);--ul:#F0603E}
+    section[data-scene="paper"]{--acc:#E84518;--bg:#F2F2EE;--card:#FAFAF8;--fg:#1C1B19;--fg2:#5A5853;--fg3:#8E8B84;--l-green:#2F8F5B;--l-red:#D9251C;--l-yellow:#E1BD2B;--line:#D6D4CE;--mk:rgba(232,69,24,.30);--ul:#E84518}
+    section[data-scene="shu"]{--acc:#FBF7F2;--bg:#E84518;--card:rgba(255,255,255,.08);--fg:#FBF7F2;--fg2:rgba(251,247,242,.84);--fg3:rgba(251,247,242,.62);--l-green:rgba(255,255,255,.6);--l-red:#FBF7F2;--l-yellow:rgba(255,255,255,.6);--line:rgba(251,247,242,.35);--mk:rgba(255,255,255,.34);--ul:#FBF7F2}
+    section[data-scene]{background-color:var(--bg); color:var(--fg)}   /* background-color, not the shorthand: the chapters that carry a photographic ground keep it */
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="asia"] .hd{--acc:#FF6A3D;--bg:#4B2C78;--card:rgba(255,255,255,.08);--fg:#F6F1F9;--fg2:rgba(246,241,249,.84);--fg3:rgba(246,241,249,.58);--l-red:#FF6A3D;--line:rgba(246,241,249,.26);--mk:rgba(240,96,62,.5);--ul:#FF7A50}
+    body[data-scene-bot="asia"] .yr,body[data-scene-bot="asia"] .cta-fx{--acc:#FF6A3D;--bg:#4B2C78;--card:rgba(255,255,255,.08);--fg:#F6F1F9;--fg2:rgba(246,241,249,.84);--fg3:rgba(246,241,249,.58);--l-red:#FF6A3D;--line:rgba(246,241,249,.26);--mk:rgba(240,96,62,.5);--ul:#FF7A50}
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="green"] .hd{--acc:#1C1B19;--bg:#82BE28;--card:rgba(255,255,255,.16);--fg:#16220A;--fg2:rgba(22,34,10,.82);--fg3:rgba(22,34,10,.56);--l-green:rgba(22,34,10,.45);--l-red:#16220A;--l-yellow:rgba(22,34,10,.45);--line:rgba(22,34,10,.26);--mk:rgba(255,255,255,.55);--ul:#16220A}
+    body[data-scene-bot="green"] .yr,body[data-scene-bot="green"] .cta-fx{--acc:#1C1B19;--bg:#82BE28;--card:rgba(255,255,255,.16);--fg:#16220A;--fg2:rgba(22,34,10,.82);--fg3:rgba(22,34,10,.56);--l-green:rgba(22,34,10,.45);--l-red:#16220A;--l-yellow:rgba(22,34,10,.45);--line:rgba(22,34,10,.26);--mk:rgba(255,255,255,.55);--ul:#16220A}
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="ink"] .hd{--acc:#E84518;--bg:#15151A;--card:#1E1E24;--fg:#F2F2EE;--fg2:#BDBBB3;--fg3:#7E7C76;--line:#33333A;--mk:rgba(232,69,24,.55);--ul:#F0603E}
+    body[data-scene-bot="ink"] .yr,body[data-scene-bot="ink"] .cta-fx{--acc:#E84518;--bg:#15151A;--card:#1E1E24;--fg:#F2F2EE;--fg2:#BDBBB3;--fg3:#7E7C76;--line:#33333A;--mk:rgba(232,69,24,.55);--ul:#F0603E}
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="night"] .hd{--acc:#F0603E;--bg:#0E1826;--card:#152238;--fg:#F2F2EE;--fg2:#B9C0CB;--fg3:#7F8895;--line:#233246;--mk:rgba(232,69,24,.5);--ul:#F0603E}
+    body[data-scene-bot="night"] .yr,body[data-scene-bot="night"] .cta-fx{--acc:#F0603E;--bg:#0E1826;--card:#152238;--fg:#F2F2EE;--fg2:#B9C0CB;--fg3:#7F8895;--line:#233246;--mk:rgba(232,69,24,.5);--ul:#F0603E}
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="paper"] .hd{--acc:#E84518;--bg:#F2F2EE;--card:#FAFAF8;--fg:#1C1B19;--fg2:#5A5853;--fg3:#8E8B84;--l-green:#2F8F5B;--l-red:#D9251C;--l-yellow:#E1BD2B;--line:#D6D4CE;--mk:rgba(232,69,24,.30);--ul:#E84518}
+    body[data-scene-bot="paper"] .yr,body[data-scene-bot="paper"] .cta-fx{--acc:#E84518;--bg:#F2F2EE;--card:#FAFAF8;--fg:#1C1B19;--fg2:#5A5853;--fg3:#8E8B84;--l-green:#2F8F5B;--l-red:#D9251C;--l-yellow:#E1BD2B;--line:#D6D4CE;--mk:rgba(232,69,24,.30);--ul:#E84518}
+    html:not(.cpopen) body:not(.menuopen)[data-scene-top="shu"] .hd{--acc:#FBF7F2;--bg:#E84518;--card:rgba(255,255,255,.08);--fg:#FBF7F2;--fg2:rgba(251,247,242,.84);--fg3:rgba(251,247,242,.62);--l-green:rgba(255,255,255,.6);--l-red:#FBF7F2;--l-yellow:rgba(255,255,255,.6);--line:rgba(251,247,242,.35);--mk:rgba(255,255,255,.34);--ul:#FBF7F2}
+    body[data-scene-bot="shu"] .yr,body[data-scene-bot="shu"] .cta-fx{--acc:#FBF7F2;--bg:#E84518;--card:rgba(255,255,255,.08);--fg:#FBF7F2;--fg2:rgba(251,247,242,.84);--fg3:rgba(251,247,242,.62);--l-green:rgba(255,255,255,.6);--l-red:#FBF7F2;--l-yellow:rgba(255,255,255,.6);--line:rgba(251,247,242,.35);--mk:rgba(255,255,255,.34);--ul:#FBF7F2}
+    .hd,.yr{color:var(--fg)}
+    body[data-scene][data-scene-top] .brand img{filter:none}
+    body[data-scene][data-scene-top="shu"] .brand img{filter:brightness(0) invert(1)}
+    body[data-scene][data-scene-top="green"] .brand img{filter:brightness(0)}
+    body[data-scene][data-scene-bot] .cta-fx .c{background:var(--acc); color:#FBF7F2}
+    body[data-scene][data-scene-bot="shu"] .cta-fx .c{background:#FBF7F2; color:#E84518}   /* the badge on 朱: the disc turns to paper, as it does when the whole page is 朱 */
+  }
+  #ch7b .solopin{min-height:300vh}   /* v125: about a screen and a third after the last paragraph lands */
+  img,svg,video,figure,picture{-webkit-user-drag:none; -khtml-user-drag:none; -moz-user-drag:none; user-drag:none; -webkit-touch-callout:none}
+  img,video{user-select:none; -webkit-user-select:none}
+  #contact{padding-bottom:3.5vh !important}
+  footer.ft{padding-top:42px; padding-bottom:40px}
+  @media (max-width:1024px){ footer.ft{padding-top:32px; padding-bottom:44px} }   /* the phone keeps a little more under the last line: the BACK TO TOP badge sits there */
