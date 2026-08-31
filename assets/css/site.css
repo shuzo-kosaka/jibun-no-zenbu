@@ -1481,7 +1481,18 @@
   .ld .lab i{background:#FFFFFF}
   body[data-scene="green"] .brand img{filter:brightness(0)}   /* on the green the mark reads in ink, like the text beside it */
   /* v106: the rewind — the page winds back and the picture goes with it */
-  .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s, backdrop-filter .3s, -webkit-backdrop-filter .3s}
+  /* the tape: bands across the picture, the head sweeping through, and the mark beside the button */
+  .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s}
+  html.rewind .rew{opacity:1}
+  .rew .bands{position:absolute; inset:-10% 0; background:repeating-linear-gradient(180deg, rgba(255,255,255,.13) 0 2px, rgba(0,0,0,.05) 2px 5px); mix-blend-mode:overlay; animation:rewScan .28s linear infinite}
+  @keyframes rewScan{to{transform:translateY(-10px)}}
+  .rew::after{content:""; position:absolute; left:-2%; right:-2%; height:18vh; background:linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0)); mix-blend-mode:overlay; animation:rewHead .34s linear infinite}
+  @keyframes rewHead{0%{top:104%} 100%{top:-22%}}
+  .rew .mk{position:absolute; right:calc(var(--x1) - 30px + 92px + 16px); bottom:calc(26px + 46px - .6em); font-family:var(--mono); font-size:12px; letter-spacing:.24em; color:var(--fg); opacity:.85; white-space:nowrap; animation:rewBlink .34s steps(2) infinite}
+  @keyframes rewBlink{50%{opacity:.3}}
+  html.rewind *{transition:none !important}   /* the page's own eases would fight a fast wind */
+  html.rewind .rew{transition:opacity .22s}
+  @keyframes fwdHead{0%{top:-22%} 100%{top:104%}}
   html.fwd .rew::after{animation:fwdHead .34s linear infinite}
   @keyframes fwdHead{0%{top:-22%} 100%{top:104%}}
   html.fwd .rew .bands{animation-direction:reverse}
