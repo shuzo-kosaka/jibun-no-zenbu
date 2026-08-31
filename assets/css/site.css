@@ -1479,7 +1479,7 @@
   @keyframes picPress{0%{transform:scale(1.06); filter:saturate(1.35) brightness(1.06)} 52%{transform:scale(.972)} 100%{transform:scale(1); filter:none}}
   .ld .lab{opacity:1; color:#FFFFFF}   /* v108: the loading line sat at .8 over the 朱 and read as grey — it is white now */
   .ld .lab i{background:#FFFFFF}
-  body[data-scene="green"] .brand img{filter:brightness(0) invert(1)}   /* v106: the 朱 mark does not belong on the green; it reads as white there */
+  body[data-scene="green"] .brand img{filter:brightness(0)}   /* v110: on the green the mark reads in ink, like the text beside it */
   /* v106: the rewind — the page winds back and the picture goes with it */
   .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s, backdrop-filter .3s, -webkit-backdrop-filter .3s}
   html.fwd .rew::after{animation:fwdHead .34s linear infinite}

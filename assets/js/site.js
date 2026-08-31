@@ -1173,6 +1173,42 @@
     new MutationObserver(function(){ mk.textContent = document.documentElement.classList.contains('fwd') ? '\u25b6\u25b6 FORWARD' : '\u25c0\u25c0 REWIND'; }).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
     document.body.appendChild(r);
   })();
+  /* v110: 慣性スクロール — the wheel sets a target and the page eases toward it, so the whole thing moves like
+     something with weight rather than jumping line by line. Only where there is a real pointer; touch devices
+     already have their own inertia, and anything that scrolls inside itself (the menu, the contact page, the
+     lightbox) is left alone. */
+  (function(){
+    if(reduce || !fine) return;
+    var target = window.scrollY, cur = target, active = false, raf = 0;
+    function limit(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+    function busy(){
+      var h = document.documentElement;
+      return flying || h.classList.contains('cpopen') || body.classList.contains('menuopen') || h.classList.contains('lbopen') || body.classList.contains('opening');
+    }
+    function loop(){
+      cur += (target - cur) * .14;
+      if(Math.abs(target - cur) < .6){ cur = target; active = false; raf = 0; window.scrollTo(0, Math.round(cur)); return; }
+      window.scrollTo(0, Math.round(cur));
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('wheel', function(e){
+      if(e.ctrlKey) return;
+      var sc = e.target && e.target.closest ? e.target.closest('.menu, .cpage, #lb, .cp-sheet') : null;
+      if(sc){   /* those scroll on their own — but the page must not take over when they reach their end */
+        var up = sc.scrollTop > 1, dn = sc.scrollTop + sc.clientHeight < sc.scrollHeight - 1;
+        if((e.deltaY < 0 && !up) || (e.deltaY > 0 && !dn)) e.preventDefault();
+        return;
+      }
+      if(busy()){ if(!flying && !body.classList.contains('opening')) e.preventDefault(); return; }   /* a sheet is open over the page: it holds still underneath */
+      e.preventDefault();
+      var d = e.deltaY * (e.deltaMode === 1 ? 34 : e.deltaMode === 2 ? window.innerHeight : 1);
+      target = Math.max(0, Math.min(limit(), (active ? target : window.scrollY) + d));
+      if(!active){ active = true; cur = window.scrollY; raf = requestAnimationFrame(loop); }
+    }, {passive:false});
+    /* anything else that moves the page — a flight, a keypress, a hash — becomes the new truth */
+    window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
+    window.addEventListener('keydown', function(){ if(active){ active = false; cancelAnimationFrame(raf); raf = 0; } }, {passive:true});
+  })();
   function flyStop(){ if(!flying) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
