@@ -1620,3 +1620,13 @@
   .cur .cd b em{font-style:normal; font-family:var(--mono); font-weight:500; font-size:8.5px; letter-spacing:.26em; color:#FBF7F2; opacity:.92; text-indent:.26em}
   .cur.suck .cd{box-shadow:0 8px 26px rgba(232,69,24,.22)}
   .cur.suck .cd::after{content:""; position:absolute; inset:10px; border-radius:50%; border:1px solid rgba(251,247,242,.3)}
+  .cur.suck .cd{width:132px !important; height:132px !important; margin:-66px 0 0 -66px !important; background:transparent !important; border:3px solid var(--acc) !important; box-shadow:none}
+  .cur.suck .cd::after{inset:8px; border-color:rgba(232,69,24,.28)}
+  .cur .cd b svg.ar{width:26px; height:30px; stroke:var(--acc)}
+  .cur .cd b svg.cr{position:absolute; left:50%; top:50%; width:184px; height:184px; margin:-92px 0 0 -92px; overflow:visible; opacity:0; transition:opacity .25s var(--ease)}
+  .cur .cd b svg.cr text{font-family:var(--mono); font-size:9.5px; font-weight:500; letter-spacing:.06em; fill:var(--acc)}
+  .cur.suck .cd b svg.cr{opacity:1; transition-delay:.12s; animation:spin 18s linear infinite}
+  .cur.upward .cd b svg.cr{animation-direction:reverse}
+  .cur .cd b svg.cr text{stroke:none; stroke-width:0; paint-order:normal}
+  .cur .cd b svg.ar{display:none}
+  .cur .cd b{gap:0}

@@ -345,14 +345,19 @@
     var ctaFx = document.querySelector('.cta-fx'), cdLab = document.createElement('b'), suckOn = false;
     /* v147: a drawn arrow and one word set in the page's own mono, inside a ring — the same furniture as the
        seals and the labels, rather than a sentence printed on a disc */
-    cdLab.innerHTML = '<svg viewBox="0 0 26 30" aria-hidden="true"><path d="M13 3 V21.5 M5.5 15 L13 23 L20.5 15"/></svg><em></em>';
+    /* v148: a heavy ring with nothing inside it, the arrow at its centre, and the errand written round the
+       outside in both tongues — the same furniture as the badge it is standing on */
+    cdLab.innerHTML = '<svg class="cr" viewBox="0 0 160 160" aria-hidden="true"><defs><path id="curring" d="M80,80 m-66,0 a66,66 0 1,1 132,0 a66,66 0 1,1 -132,0"/></defs>' +
+      '<text><textPath href="#curring" startOffset="0%" textLength="414" lengthAdjust="spacing"></textPath></text></svg>' +
+      '<svg class="ar" viewBox="0 0 26 30" aria-hidden="true"><path d="M13 3 V21.5 M5.5 15 L13 23 L20.5 15"/></svg>';
     cd.appendChild(cdLab);
     function suckSet(on){
       suckOn = on; cur.classList.toggle('suck', on);
       if(!on) return;
       var up = body.classList.contains('atend');
       cur.classList.toggle('upward', up);
-      var em = cdLab.querySelector('em'); if(em) em.textContent = up ? 'BACK TO TOP' : 'CONTACT';
+      var tp = cdLab.querySelector('textPath');
+      if(tp) tp.textContent = up ? 'ページの先頭へ戻ります \u00b7 BACK TO THE TOP \u00b7 ' : '画面下部へ移動します \u00b7 TO THE FOOT OF THE PAGE \u00b7 ';
     }
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
@@ -372,7 +377,10 @@
     document.documentElement.addEventListener('mouseenter', function(){ cur.classList.add('on'); });
     (function loop(){
       lx += (mx - lx) * .18; ly += (my - ly) * .18; dx += (mx - dx) * .55; dy += (my - dy) * .55;
-      if(suckOn && ctaFx){ var br = ctaFx.getBoundingClientRect(); dx += (br.left + br.width / 2 - dx) * .14; dy += (br.top + br.height / 2 - dy) * .14; }   /* drawn in toward the badge */
+      if(suckOn && ctaFx){   /* v148: it really sticks — the dot is pulled onto the badge, and the crosshair follows it in */
+        var br = ctaFx.getBoundingClientRect(), bx = br.left + br.width / 2, by = br.top + br.height / 2;
+        dx += (bx - dx) * .34; dy += (by - dy) * .34; lx += (bx - lx) * .18; ly += (by - ly) * .18;
+      }
       cv.style.transform = 'translateX(' + lx.toFixed(1) + 'px)';
       chh.style.transform = 'translateY(' + ly.toFixed(1) + 'px)';
       cd.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
@@ -1310,17 +1318,22 @@
     var seams = [];
     function seamScan(){
       seams = [];
-      Array.prototype.forEach.call(document.querySelectorAll('.pin, .solopin'), function(el){
+      /* v149: #seq — the eight steps of the research — holds the screen the same way but is neither .pin nor
+         .solopin, so its two seams (the stage taking hold at 対象を選ぶ, and letting go as the sheet rises) were
+         missing from this list */
+      Array.prototype.forEach.call(document.querySelectorAll('.pin, .solopin, #seq'), function(el){
         var top = el.getBoundingClientRect().top + window.scrollY, h = el.offsetHeight, v = window.innerHeight;
         seams.push(top); if(h > v + 8) seams.push(top + h - v);
       });
     }
     seamScan(); window.addEventListener('resize', seamScan, {passive:true});
     function damp(y){
-      var D = 520, k = 1;   /* v146: 340px / half speed was too polite to feel — the run-in is longer and slower now */
+      var D = 560, k = 1;
       for(var i = 0; i < seams.length; i++){
         var d = Math.abs(seams[i] - y);
-        if(d < D){ var q = d / D, s = .28 + .72 * (q * q); if(s < k) k = s; }   /* eased, so the slowing is felt as weight rather than as a brake */
+        /* v148: barely touched while the seam is still far off, then a real drag in the last stretch —
+           at 100px out the page moves at a third of its speed, and at the seam itself at an eighth */
+        if(d < D){ var q = d / D, s = 1 - .88 * Math.pow(1 - q, 3); if(s < k) k = s; }
       }
       return k;
     }
