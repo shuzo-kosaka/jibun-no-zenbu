@@ -844,7 +844,7 @@
   .sr li.now .st{--ox:0px; --oy:0px}   /* いま sits exactly on its slot (the pulse ring is centred there) */
   .sr .st svg{width:100%; height:100%; display:block; overflow:visible}
   .sr li.stp .st{animation:stamp .5s cubic-bezier(.2,.9,.3,1) forwards}
-  @keyframes stamp{0%{opacity:0; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(calc(var(--rot,-6deg) - 5deg)) scale(1.45)} 60%{opacity:.96; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(var(--rot,-6deg)) scale(.97)} 100%{opacity:.92; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(var(--rot,-6deg)) scale(1)}}
+  @keyframes stamp{0%{opacity:0; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(calc(var(--rot,-6deg) - 8deg)) scale(1.66)} 55%{opacity:.96; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(var(--rot,-6deg)) scale(.92)} 78%{opacity:.94; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(var(--rot,-6deg)) scale(1.05)} 100%{opacity:.92; transform:translate(var(--ox,4px),var(--oy,-3px)) rotate(var(--rot,-6deg)) scale(1)}}
   .sr .meta{display:flex; justify-content:center; align-items:baseline; gap:10px; font-family:var(--mono); font-size:11px; color:var(--fg3); letter-spacing:.06em}
   .sr .meta .y{font-size:15px; color:var(--fg); font-variant-numeric:tabular-nums} .sr .q{color:var(--l-blue)}
   .sr .t{display:block; margin-top:6px; font-family:var(--mincho); font-weight:700; font-size:16.5px; line-height:1.55; transition:color .3s, transform .4s var(--ease)}
@@ -1182,6 +1182,7 @@
   .vid.play::before{opacity:0; pointer-events:none}
   .vid.play iframe{z-index:3}
   .vid.play{cursor:default}
+  .cur.away{opacity:0 !important}
   .vid{display:block; text-decoration:none; margin:1.6em 0 3.4em; border:1px solid var(--fg); background:var(--card) center/cover no-repeat; aspect-ratio:16/9; position:relative; overflow:hidden; color:#F2F2EE}
   .vid::before{content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(21,21,26,.78), rgba(21,21,26,.14) 40%, rgba(21,21,26,.1) 60%, rgba(21,21,26,.8)); transition:opacity .4s}
   .vid:hover::before{opacity:.75}
@@ -1440,17 +1441,22 @@
      the hero rotator's current phrase (span.cur) — which is why the catch copy never showed on a real phone */
   @media (hover:none),(pointer:coarse){ #rot > span.cur{display:block} }
   /* v100: the closing seal — pressed over the heading and the text once the last screen has been read */
-  #ch7c .ca-seal{position:absolute; left:50%; top:46%; width:min(44vw,470px); aspect-ratio:1; opacity:0; transform:translate(-50%,-50%) rotate(-14deg) scale(1.9); pointer-events:none; z-index:5}
+  #ch7c .ca-seal{position:absolute; left:50%; top:57%; width:min(40vw,430px); aspect-ratio:1; opacity:0; transform:translate(-50%,-50%) rotate(-7deg) scale(1.16); pointer-events:none; z-index:5; transition:opacity .5s var(--ease), transform .55s cubic-bezier(.3,.7,.3,1)}   /* the base state is the exit too: lifted back off the paper */
   #ch7c .ca-seal svg{width:100%; height:100%; display:block; overflow:visible}
   #ch7c .ca-seal.on{animation:caStamp .5s cubic-bezier(.16,.9,.28,1) forwards}
+  #ch7c .solopin .sq{position:relative; z-index:6}   /* the paragraphs stay readable through the ink */
   @keyframes caStamp{0%{opacity:0; transform:translate(-50%,-50%) rotate(-14deg) scale(1.9)} 55%{opacity:.95; transform:translate(-50%,-50%) rotate(-7deg) scale(.94)} 78%{transform:translate(-50%,-50%) rotate(-7deg) scale(1.03)} 100%{opacity:.93; transform:translate(-50%,-50%) rotate(-7deg) scale(1)}}
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-4%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .75s ease-out .12s}
   @keyframes caRing{0%{opacity:.45; transform:scale(.96)} 100%{opacity:0; transform:scale(1.32)}}
-  @media (max-width:1024px){ #ch7c .ca-seal{width:78vw; top:44%} }
+  @media (max-width:1024px){ #ch7c .ca-seal{width:76vw; top:54%} }
 
   /* v99b: TRIAL sits right beside SELECTED WORKS, not a column away */
   .wk-side .wk-n{margin-right:-9px}
+
+  /* v101: the light the flicker switches on — a warm wash over the band, fading as the cursor leaves */
+  #works .wk-lit{position:absolute; inset:-6vh -10vw; z-index:0; pointer-events:none; opacity:0; transition:opacity .75s var(--ease); background:radial-gradient(58% 50% at var(--gx,50%) var(--gy,50%), rgba(255,226,150,.32), rgba(255,206,110,.14) 42%, rgba(255,200,100,0) 72%)}
+  #works.lit .wk-lit{opacity:1; transition:opacity .5s var(--ease) .34s}
 
   /* v99c: the frames flicker awake under the cursor, like a bulb finding its current, before the colour holds */
   @keyframes wkFlick{0%{filter:url(#wkink2)} 8%{filter:none} 14%{filter:url(#wkink2)} 22%{filter:none} 28%{filter:url(#wkink2)} 33%{filter:none} 41%{filter:url(#wkink2)} 48%,100%{filter:none}}

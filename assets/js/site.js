@@ -506,8 +506,8 @@
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .30);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .32);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .26);
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .48);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
   }
@@ -1568,6 +1568,21 @@
   wkTry();
   /* v86: the works' frames do nothing when clicked (they used to carry href="#", which went to the top) */
   document.querySelectorAll('.wkf').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }); });
+  /* v101: when a frame has finished flickering on, the room warms up around it; it cools again as the cursor leaves */
+  (function(){
+    var wkSec = document.getElementById('works'); if(!wkSec) return;
+    var lit = document.createElement('i'); lit.className = 'wk-lit'; lit.setAttribute('aria-hidden', 'true');
+    var wkm = document.getElementById('wk'); if(wkm) wkm.appendChild(lit);
+    document.querySelectorAll('.wkf').forEach(function(a){
+      a.addEventListener('mouseenter', function(){
+        var r = a.getBoundingClientRect(), w = wkm.getBoundingClientRect();
+        wkm.style.setProperty('--gx', (r.left + r.width / 2 - w.left).toFixed(0) + 'px');
+        wkm.style.setProperty('--gy', (r.top + r.height / 2 - w.top).toFixed(0) + 'px');
+        wkSec.classList.add('lit');
+      });
+      a.addEventListener('mouseleave', function(){ wkSec.classList.remove('lit'); });
+    });
+  })();
   /* (v95: the frames' ink moved to an svg filter in the defs — see build5_v74 DEFS/wkink2 — because WebKit never paints CSS filter functions on an svg <use>.) */
   /* video facades: the real YouTube thumbnail replaces the placeholder when it can be loaded (blocked in the preview sandbox, fine on the public site) */
   document.querySelectorAll('a.vid[href*="youtu"]').forEach(function(a){
@@ -1598,6 +1613,8 @@
       f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
       f.setAttribute('allowfullscreen', '');
       a.classList.add('play'); a.appendChild(f);
+      a.addEventListener('mouseenter', function(){ cur.classList.add('away'); });
+      a.addEventListener('mouseleave', function(){ cur.classList.remove('away'); });   /* v101: the player owns the pointer; a frozen crosshair over it just looks broken */
     });
   });
 
