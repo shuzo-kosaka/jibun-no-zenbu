@@ -782,10 +782,8 @@
   #message{min-height:260vh}
   #message{min-height:400vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
-  #message .hw .hwbox{position:relative; display:block; opacity:0; transition:opacity .6s}
-  #message .hw.on .hwbox{opacity:1}
-  #message .hw video{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw}
-  #message .hw .hwb{position:absolute; inset:0; background:var(--bg); mix-blend-mode:screen; pointer-events:none}
+  #message .hw .hwa{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; opacity:0; transition:opacity .6s}
+  #message .hw.on .hwa{opacity:1}
   #message .stick.dim .hw{opacity:.16; transform:translateY(-6vh) scale(.92); filter:blur(1.5px)}
   #message .body{grid-column:3/5; grid-row:1/5; position:relative; padding:0; max-width:none; z-index:3}
   #message .pg{position:absolute; left:0; right:6%; top:9vh; bottom:6vh; display:flex; flex-direction:column; justify-content:center; max-width:38em; container-type:inline-size}
@@ -810,7 +808,7 @@
   #message .lab{z-index:3}
   #message .marg p{opacity:0; transition:opacity .8s 1s} #message .marg.in p{opacity:1}
   .draft{display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--fg3); border:1px solid var(--line); border-radius:2px; padding:0 6px; margin-bottom:10px; vertical-align:middle}
-  @media (max-width:1024px){ #message .hw video{height:auto; width:88vw} #message .body{grid-column:2/6; grid-row:1/5} #message .pg{top:12vh; width:90%} #message .body p{font-size:14px; line-height:1.8} }
+  @media (max-width:1024px){ #message .hw .hwa{height:auto; width:88vw} #message .body{grid-column:2/6; grid-row:1/5} #message .pg{top:12vh; width:90%} #message .body p{font-size:14px; line-height:1.8} }
 
   /* ---------- contents ---------- */
   #contents .body{grid-column:2/5; max-width:none; font-family:var(--sans); padding-right:0}

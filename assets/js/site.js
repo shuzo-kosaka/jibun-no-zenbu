@@ -258,7 +258,8 @@
     });
     var t0 = performance.now(), last = t0, MIN = 1400, CAP = 3000, fontsOk = false, videoOk = false, disp = 0, phase = 'run', stopT = 0, speed = 0, finished = false;
     if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ fontsOk = true; lanes.forEach(function(l){ var w = l.el.firstElementChild.getBoundingClientRect().width; if(w > 10){ l.pos = l.pos * w / l.w; l.w = w; } }); }); } else { fontsOk = true; }
-    var v = document.getElementById('hwv');
+    var v = document.querySelector('#message video');   /* the handwriting is an image now — with no video to wait for, the counter is free to finish as soon as the fonts are in */
+    if(!v) videoOk = true;
     if(v){ if(v.readyState >= 3) videoOk = true; else { v.addEventListener('canplaythrough', function(){ videoOk = true; }, {once:true}); v.addEventListener('error', function(){ videoOk = true; }, {once:true}); } }
     setTimeout(function(){ videoOk = true; }, 2300);
     /* the phrase is typed with a Japanese IME: romaji appear, turn into kana, get converted (underlined) and confirmed — line by line */
@@ -503,7 +504,7 @@
       if(pin.id === 'ch5pin'){ pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
-        if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); if(!reduce){ try{ hwv.currentTime = 0; var pr = hwv.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){} } }
+        if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .26);
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .5);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
