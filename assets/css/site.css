@@ -1456,9 +1456,14 @@
   /* v99b: TRIAL sits right beside SELECTED WORKS, not a column away */
   .wk-side .wk-n{margin-right:-9px}
 
-  /* v102: the bulb lights the photo it is over — a warm halo on the frame itself, so it travels with the marquee */
+  /* v102/v103: the bulb lights the photo it is over — a halo on the frame itself, so it travels with the marquee.
+     The row clips the marquee (overflow + a horizontal mask), which cut the halo off above and below; the clip box
+     grows by 40px on both sides and the margins take that back, so the light bleeds but nothing moves. */
   .wkf{transition:filter .7s var(--ease)}
-  .wkf:hover,.wkf:focus-visible{filter:drop-shadow(0 0 26px rgba(255,222,150,.55)) drop-shadow(0 0 70px rgba(255,201,110,.38)); transition:filter .5s var(--ease) .34s}
+  .wkf:hover,.wkf:focus-visible{filter:drop-shadow(0 0 12px rgba(255,224,155,.5)) drop-shadow(0 0 30px rgba(255,203,112,.34)); transition:filter .45s var(--ease) .34s}
+  .wkm .wkr{padding-top:84px; padding-bottom:66px; margin-top:-40px; margin-bottom:-40px}
+  .wkm .wkr.l{margin-bottom:calc(-12vh - 40px)}
+  .wkm .wkr.r{margin-top:calc(-12vh - 40px)}
   /* v99c: the frames flicker awake under the cursor, like a bulb finding its current, before the colour holds */
   @keyframes wkFlick{0%{filter:url(#wkink2)} 8%{filter:none} 14%{filter:url(#wkink2)} 22%{filter:none} 28%{filter:url(#wkink2)} 33%{filter:none} 41%{filter:url(#wkink2)} 48%,100%{filter:none}}
   @keyframes wkGlow{0%{opacity:0} 10%{opacity:.5} 18%{opacity:.05} 30%{opacity:.42} 44%{opacity:.06} 60%{opacity:.2} 100%{opacity:0}}
