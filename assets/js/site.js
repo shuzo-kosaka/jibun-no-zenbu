@@ -568,8 +568,8 @@
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         ms.classList.toggle('solo2', p >= .60 && p < .776);   /* v155: the second address holds the middle of the screen */
         ms.classList.toggle('away2', p >= .776);              /* and then recedes, and the paragraphs come in behind it */
-        pin.classList.toggle('gridon', p >= .60);   /* v104: the grid is drawn as the page says it loves grids. v155: with the address itself, which now stands in the middle of the screen */
-        if(p >= .60){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
+        pin.classList.toggle('gridon', p >= .627);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
+        if(p >= .627){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
