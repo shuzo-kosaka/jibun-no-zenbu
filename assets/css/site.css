@@ -863,7 +863,7 @@
   /* past NEXT the route keeps going toward the next screen: dots march down it, and it is uncovered as the rally completes */
   .sr .route .tail{stroke:none; fill:none}
   /* footprints: one sole per step of the scroll; they vanish once WHAT I'M MADE OF is reached */
-  .fp,.dgfp{fill:var(--fg2); opacity:0; transition:opacity .25s}
+  .fp,.dgfp{fill:var(--fg2); opacity:0; transition:opacity .3s ease-out}
   .fp.on,.dgfp.on{opacity:.85}
   .sr-note{margin-top:34px}
   @media (max-width:820px){
@@ -1426,6 +1426,9 @@
     #message .body{grid-column:1/7; padding:0}
     #message .pg{left:0; right:0; width:88%; margin:0 auto}   /* truly centred: full-width body, the panel centres itself */
     #message h3.mh{font-size:clamp(28px,7.6vw,38px); line-height:1.55}
+    #message h3.mh.for-ca{font-size:4.6vw; line-height:1.9}   /* the address: compact once settled — solo scales it to the full width, then it settles down into this */
+    #message .body .mh{transition:transform .9s var(--ease)}
+    .wipe .ja{will-change:clip-path; transition:clip-path .5s cubic-bezier(.25,.6,.35,1)}   /* ch3's scrawl wipe repaints in steps on sparse touch scrolls — its own layer, and a longer glide */
     .stick.dim .hw{filter:none}
   }
   /* v96: `.cur` is the cursor overlay's class, and the touch-device rule `.cur{display:none}` also swallowed

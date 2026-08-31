@@ -517,7 +517,8 @@
     var x = 0, y = 0, el = mh; while(el && el !== st){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
     var W = st.clientWidth, H = st.clientHeight, tw = 0;
     mh.querySelectorAll(':scope > span').forEach(function(sp){ tw = Math.max(tw, sp.offsetWidth); }); if(!tw) tw = mh.offsetWidth;
-    var s = Math.max(1, Math.min(1.5, (W * .71 - 16) / Math.max(1, tw)));
+    var ph = window.innerWidth <= 820;   /* v96: on the phone the solo address fills the width edge to edge, then settles */
+    var s = Math.max(1, Math.min(1.5, (W * (ph ? .97 : .71) - 16) / Math.max(1, tw)));
     mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px'); mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
     msgFitDone = true;
   }
@@ -926,7 +927,13 @@
   function fpUpdate(){
     if(!fpList.length) return;
     var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
-    fpList.forEach(function(o, i){ o.el.classList.toggle('on', (i >= gone || i >= fpMainN) && o.y < front); });
+    var fresh = 0;   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
+    fpList.forEach(function(o, i){
+      var on = (i >= gone || i >= fpMainN) && o.y < front;
+      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (fresh * 75) + 'ms'; fresh++; }
+      else if(!on) o.el.style.transitionDelay = '';
+      o.el.classList.toggle('on', on);
+    });
   }
   /* the bridge: the walk resumes below the diagram — down the same rail, a gentle bend past the heading, and on toward CHECKPOINT 01 */
   function brBuild(){
