@@ -1070,7 +1070,7 @@
       if(c.sec === 'ch6') tx += 7;   /* 間を、測る。: a touch to the right of the column */
       var tsvg = svgEl('svg', {class:'chtrail', viewBox:'0 0 ' + hr.width.toFixed(0) + ' ' + hr.height.toFixed(0), width:hr.width.toFixed(0), height:hr.height.toFixed(0)});
       /* no two trails alike: they lean left or right in turn, some with a second bend, and run different lengths */
-      var TR = {ch1:[1, 34, 400, 0], ch2:[-1, 46, 440, 1], ch3:[1, 22, 300, 0], ch4:[-1, 40, 420, 2], ch5intern:[1, 46, 290, 1], ch6:[-1, 26, 300, 0], ch7:[1, 36, 240, 2]}, tr = TR[c.sec] || [1, 30, 260, 0], sg = tr[0], amp = tr[1], len = tr[2], kind = tr[3];
+      var TR = {ch1:[1, 38, 560, 0], ch2:[-1, 52, 610, 1], ch3:[1, 22, 300, 0], ch4:[-1, 44, 580, 2], ch5intern:[1, 46, 290, 1], ch6:[-1, 26, 300, 0], ch7:[1, 36, 240, 2]}, tr = TR[c.sec] || [1, 30, 260, 0], sg = tr[0], amp = tr[1], len = tr[2], kind = tr[3];
       var d = kind === 1
         ? 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' C' + (tx + sg * amp * 1.4).toFixed(1) + ',' + (ty + len * .3).toFixed(1) + ' ' + (tx - sg * amp * .6).toFixed(1) + ',' + (ty + len * .6).toFixed(1) + ' ' + (tx + sg * amp * .5).toFixed(1) + ',' + (ty + len).toFixed(1)
         : kind === 2
