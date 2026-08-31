@@ -563,8 +563,10 @@
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .20);
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .38);
-        pin.classList.toggle('gridon', p >= .78);   /* v104: the grid is drawn as the page says it loves grids */
-        if(p >= .78){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 4800); }   /* held as long as the opening screen holds it, then let go */
+        ms.classList.toggle('solo2', p >= .60 && p < .776);   /* v155: the second address holds the middle of the screen */
+        ms.classList.toggle('away2', p >= .776);              /* and then recedes, and the paragraphs come in behind it */
+        pin.classList.toggle('gridon', p >= .60);   /* v104: the grid is drawn as the page says it loves grids. v155: with the address itself, which now stands in the middle of the screen */
+        if(p >= .60){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
@@ -573,13 +575,18 @@
   /* where the large, solo address sits: centred on the screen, a little above the middle; scaled to fit between X1 and X4 */
   var msgFitDone = false;
   function msgSoloFit(){
-    var st = document.getElementById('msgstick'), mh = st && st.querySelector('.mh'); if(!st || !mh) return;
-    var x = 0, y = 0, el = mh; while(el && el !== st){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
-    var W = st.clientWidth, H = st.clientHeight, tw = 0;
-    mh.querySelectorAll(':scope > span').forEach(function(sp){ tw = Math.max(tw, sp.offsetWidth); }); if(!tw) tw = mh.offsetWidth;
-    var ph = window.innerWidth <= 1024;   /* v96: on the phone and portrait tablet the solo address fills the width edge to edge, then settles */
-    var s = Math.max(1, Math.min(1.5, (W * (ph ? .97 : .71) - 16) / Math.max(1, tw)));
-    mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px'); mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
+    var st = document.getElementById('msgstick'); if(!st) return;
+    var mhs = st.querySelectorAll('.mh'); if(!mhs.length) return;
+    /* v155: both addresses are measured — the second one (わたしは、グリッドシステムが、大好きです。) takes the
+       middle of the screen the same way the first does, and is then drawn back into the distance */
+    Array.prototype.forEach.call(mhs, function(mh){
+      var x = 0, y = 0, el = mh; while(el && el !== st){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+      var W = st.clientWidth, H = st.clientHeight, tw = 0;
+      mh.querySelectorAll(':scope > span').forEach(function(sp){ tw = Math.max(tw, sp.offsetWidth); }); if(!tw) tw = mh.offsetWidth;
+      var ph = window.innerWidth <= 1024;   /* v96: on the phone and portrait tablet the solo address fills the width edge to edge, then settles */
+      var s = Math.max(1, Math.min(1.5, (W * (ph ? .97 : .71) - 16) / Math.max(1, tw)));
+      mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px'); mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
+    });
     msgFitDone = true;
   }
   window.addEventListener('resize', function(){ msgFitDone = false; soloReset(); });

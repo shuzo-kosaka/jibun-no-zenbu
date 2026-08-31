@@ -782,7 +782,7 @@
   .pin{display:block; min-height:200vh}
   .pin .stick{position:sticky; top:0; height:100vh; display:grid; grid-template-columns:12% 16% 30% 25% 17%; grid-template-rows:14vh minmax(18vh,auto) minmax(39vh,auto) minmax(14vh,auto); overflow:hidden}
   #message{min-height:260vh}
-  #message{min-height:620vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
+  #message{min-height:840vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
   #message .hw .hwa{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; opacity:0; transition:opacity .6s}
   #message .hw.on .hwa{opacity:1}
@@ -1649,3 +1649,6 @@
   .menu.open .menu-in{transition:transform 1.2s cubic-bezier(.45,.02,.25,1)}
   .cur .cd b{color:inherit}
   #contact .oval .ovh{left:0; right:0; top:0; bottom:0; width:100%; height:100%; border-radius:0; clip-path:inset(2.69% 3.5% round 50% / 37.8%)}
+  #message .body .mh2{transform-origin:50% 50%; transition:transform 1.1s var(--ease), opacity .9s var(--ease), filter .9s var(--ease)}
+  #message .stick.solo2 .mh2{transform:translate(var(--sdx,0px), var(--sdy,0px)) scale(var(--ss,1.4))}
+  #message .stick.away2 .mh2{transform:translate(var(--sdx,0px), calc(var(--sdy,0px) - 3vh)) scale(.3); opacity:0; filter:blur(4px)}
