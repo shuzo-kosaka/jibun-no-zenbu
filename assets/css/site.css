@@ -1272,8 +1272,8 @@
   #seq.s2 .g-h .rd{animation:readA 2.2s cubic-bezier(.4,0,.2,1) .1s both}
   #seq.s2 .g-k .rd{animation:readB 2.2s cubic-bezier(.4,0,.2,1) 1.1s both}
   #seq.s2 .g-t .rd{animation:readB 2.2s cubic-bezier(.4,0,.2,1) 2.1s both}
-  @keyframes readA{0%{transform:translateX(0); opacity:.32} 85%{opacity:.32} 100%{transform:translateX(274px); opacity:0}}
-  @keyframes readB{0%{transform:translateX(0); opacity:.32} 85%{opacity:.32} 100%{transform:translateX(514px); opacity:0}}
+  @keyframes readA{0%{transform:translateX(0); opacity:0} 9%{opacity:.32} 85%{opacity:.32} 100%{transform:translateX(274px); opacity:0}}   /* v122: the band comes up rather than appearing whole */
+  @keyframes readB{0%{transform:translateX(0); opacity:0} 9%{opacity:.32} 85%{opacity:.32} 100%{transform:translateX(514px); opacity:0}}
   /* 03 凡例を作る — a three-layer table over the whole figure area */
   #seq .legend{position:absolute; inset:0; opacity:0; transition:opacity .7s var(--ease); pointer-events:none; font-family:var(--sans); color:var(--fg); display:flex; flex-direction:column; justify-content:center}
   #seq .legend .lg-head{display:flex; align-items:baseline; gap:18px; margin-bottom:14px}
@@ -1323,7 +1323,7 @@
   #seq .meas .scan{fill:var(--l-yellow); opacity:0}
   #seq.s5 .meas{opacity:1} #seq.s5 .meas .dl{stroke-dashoffset:0}
   #seq.s5 .meas .scan{animation:scan 1.3s cubic-bezier(.4,0,.2,1) .1s both}
-  @keyframes scan{0%{transform:translateX(0); opacity:.55} 90%{opacity:.55} 100%{transform:translateX(274px); opacity:0}}
+  @keyframes scan{0%{transform:translateX(0); opacity:0} 10%{opacity:.55} 90%{opacity:.55} 100%{transform:translateX(274px); opacity:0}}
   #seq.s5 .g-h .ln{stroke-width:2}
   #seq.s5 text.pct{opacity:1} #seq.s5 .g-h text.lbl{opacity:.25}
   #seq.s5 text.name{opacity:0}   /* v92: from 測る on, the three figures' captions (作品A／B／C) are gone — the measurements need the room */
@@ -1331,7 +1331,7 @@
   #seq.s5 .g-k .meas{transition-delay:.6s} #seq.s5 .g-t .meas{transition-delay:1s}
   #seq.s5 .g-k .meas .dl{transition-delay:.7s} #seq.s5 .g-t .meas .dl{transition-delay:1.1s}
   #seq.s5 .g-k .meas .scan{animation:scanw 1.3s cubic-bezier(.4,0,.2,1) .7s both} #seq.s5 .g-t .meas .scan{animation:scanw 1.3s cubic-bezier(.4,0,.2,1) 1.1s both}
-  @keyframes scanw{0%{transform:translateX(0); opacity:.55} 90%{opacity:.55} 100%{transform:translateX(514px); opacity:0}}
+  @keyframes scanw{0%{transform:translateX(0); opacity:0} 10%{opacity:.55} 90%{opacity:.55} 100%{transform:translateX(514px); opacity:0}}
   #seq.s6 .meas{opacity:0} #seq.s6 text.pct{opacity:0} #seq.s6 text.lbl{opacity:0} #seq.s6 text.name{opacity:0} #seq.s6 .g-h .ln{stroke-width:1.2}
   /* 06 対応させる — same-role lines light up in the same colour, one role at a time */
   #seq.s6 .g-k,#seq.s6 .g-t{opacity:1} #seq.s6 .g-k .ln,#seq.s6 .g-t .ln{stroke-dashoffset:0}
