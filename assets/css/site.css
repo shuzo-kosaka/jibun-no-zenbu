@@ -1514,3 +1514,18 @@
   #message.gridgone .lines i,#message.gridgone .lines .frame{opacity:0}   /* v104b: like the opening screen, the grid is drawn, held, and then let go */
   .ft-copy{display:block; margin-top:18px; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--fg3)}
   footer.ft{padding-bottom:56px}
+  .lgsw{position:fixed; inset:0; z-index:94; pointer-events:none; opacity:0}
+  .lgsw.run{animation:lgFade .9s linear}
+  @keyframes lgFade{0%,92%{opacity:1} 100%{opacity:0}}
+  .lgsw .bar{position:absolute; top:0; bottom:0; width:30vw; left:-30vw; background:linear-gradient(90deg, rgba(232,69,24,0), rgba(232,69,24,.12) 46%, rgba(232,69,24,.22) 78%, rgba(232,69,24,.30)); border-right:2px solid var(--acc); box-shadow:0 0 60px rgba(232,69,24,.30)}
+  .lgsw.run .bar{animation:lgBar .9s cubic-bezier(.5,0,.2,1)}
+  @keyframes lgBar{0%{left:-30vw} 100%{left:104vw}}
+  /* the chip rides just behind the leading rule, so the pair of languages is legible as it passes */
+  .lgsw .tag{position:absolute; top:50%; left:-4vw; transform:translate(-100%,-50%); display:flex; align-items:center; gap:9px; font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:.2em; color:#FBF7F2; background:var(--acc); white-space:nowrap; padding:9px 14px; box-shadow:0 6px 24px rgba(0,0,0,.22)}
+  .lgsw.run .tag{animation:lgTag .9s cubic-bezier(.5,0,.2,1)}
+  @keyframes lgTag{0%{left:-4vw} 100%{left:130vw}}
+  .lgsw .tag em{font-style:normal; opacity:.75}
+  .lgsw .tag b{font-weight:500}
+  .lgsw .tag b.to{position:relative}
+  .lgsw .tag b.to::after{content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px; background:#FBF7F2}
+  @media (max-width:1024px){ .lgsw .bar{width:52vw} .lgsw .tag{font-size:11px; letter-spacing:.16em} }

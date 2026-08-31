@@ -1705,7 +1705,18 @@
     })(t0);
   }
   function setLang(lang, quiet){
-    var en = lang === 'en'; if(lang === curLang) return; curLang = lang;
+    var en = lang === 'en'; if(lang === curLang) return;
+    /* v120: the switch is a pass of the translator's rule — a ruled band sweeps the screen, carrying the pair of
+       languages with it, and the page changes tongue as it goes by. The text swap below happens under the band. */
+    (function(){
+      var sw = document.getElementById('lgsw');
+      if(!sw){ sw = document.createElement('div'); sw.id = 'lgsw'; sw.className = 'lgsw'; sw.setAttribute('aria-hidden', 'true');
+        sw.innerHTML = '<i class="bar"></i><span class="tag"><b></b><em>\u2192</em><b class="to"></b></span>'; document.body.appendChild(sw); }
+      sw.querySelector('.tag b').textContent = en ? 'JA' : 'EN';
+      sw.querySelector('.tag b.to').textContent = en ? 'EN' : 'JA';
+      sw.classList.remove('run'); void sw.offsetWidth; sw.classList.add('run');
+    })();
+    curLang = lang;
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; if(cpage) cpage.classList.remove('surhid'); }
     var changed = [];
     i18nEls.forEach(function(el){
