@@ -351,20 +351,30 @@
       '<text><textPath href="#curring" startOffset="0%" textLength="414" lengthAdjust="spacing"></textPath></text></svg>' +
       '<svg class="ar" viewBox="0 0 26 30" aria-hidden="true"><path d="M13 3 V21.5 M5.5 15 L13 23 L20.5 15"/></svg>';
     cd.appendChild(cdLab);
+    function suckHold(t){   /* v153: caught by the badge, and held until the pointer is well clear of it */
+      var over = !!(t && t.closest && t.closest('.cta-fx'));
+      if(!ctaFx) return suckSet(over);
+      var br = ctaFx.getBoundingClientRect(), cx = br.left + br.width / 2, cy = br.top + br.height / 2;
+      var d = Math.sqrt((mx - cx) * (mx - cx) + (my - cy) * (my - cy)), R = Math.max(br.width, br.height) / 2;
+      suckSet(over || (suckOn && d < R * 2.8));
+    }
     function suckSet(on){
+      if(on === suckOn) return;
       suckOn = on; cur.classList.toggle('suck', on);
       if(!on) return;
       var up = body.classList.contains('atend');
       cur.classList.toggle('upward', up);
       var tp = cdLab.querySelector('textPath');
-      if(tp) tp.textContent = up ? 'ページの先頭へ戻ります \u00b7 BACK TO THE TOP \u00b7 ' : '画面下部へ移動します \u00b7 TO THE FOOT OF THE PAGE \u00b7 ';
+      /* v150: the trailing space is stripped in SVG text, so the dot at the seam of the loop sat against the
+         first Japanese glyph — non-breaking spaces hold it in the middle, as the other dot is */
+      if(tp) tp.textContent = up ? 'ページの先頭へ戻ります \u00b7 BACK TO THE TOP\u00a0\u00b7\u00a0' : '画面下部へ移動します \u00b7 TO THE FOOT OF THE PAGE\u00a0\u00b7\u00a0';
     }
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
       var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null;
       cur.classList.toggle('hov', !!hov);
       cur.classList.toggle('onmedia', !!(t && t.closest && t.closest('.vid, .wkf, .marg figure, .hw, #ch5pin .bgph, .wk-mid')));   /* v100: ink-on-ink is invisible over a photo or a video thumbnail */
-      suckSet(!!(t && t.closest && t.closest('.cta-fx')));
+      suckHold(t);
       if(!body.classList.contains('opening')){ top.style.setProperty('--mx', (mx / window.innerWidth - .5).toFixed(3)); top.style.setProperty('--my', (my / vh() - .5).toFixed(3)); }
       if(my < vh() * 1.2){ var tr = top.getBoundingClientRect(); top.style.setProperty('--px', (mx - tr.left).toFixed(0) + 'px'); top.style.setProperty('--py', (my - tr.top).toFixed(0) + 'px'); }
     }, {passive:true});
@@ -372,7 +382,7 @@
     (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
     var c5 = document.getElementById('ch5pin');
     window.addEventListener('mousemove', function(e){ if(c5){ c5.style.setProperty('--sx', (e.clientX / window.innerWidth * 100).toFixed(1) + '%'); c5.style.setProperty('--sy', (e.clientY / vh() * 100).toFixed(1) + '%'); } }, {passive:true});
-    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); suckSet(!!(t && t.closest && t.closest('.cta-fx'))); }, {passive:true});
+    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); suckHold(t); }, {passive:true});
     document.documentElement.addEventListener('mouseleave', function(){ cur.classList.remove('on'); });
     document.documentElement.addEventListener('mouseenter', function(){ cur.classList.add('on'); });
     (function loop(){
