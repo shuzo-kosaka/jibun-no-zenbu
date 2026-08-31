@@ -561,8 +561,11 @@
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .20);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .38);
+        /* v157: these two were fractions of the old 620vh screen. The screen is 840vh now, so in real distance
+           the handwriting was still bright when the address arrived (they printed over each other) and the first
+           paragraph came while the address was still standing in the middle. Both are back where they were. */
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         ms.classList.toggle('solo2', p >= .60 && p < .776);   /* v155: the second address holds the middle of the screen */
         ms.classList.toggle('away2', p >= .776);              /* and then recedes, and the paragraphs come in behind it */
         pin.classList.toggle('gridon', p >= .60);   /* v104: the grid is drawn as the page says it loves grids. v155: with the address itself, which now stands in the middle of the screen */
