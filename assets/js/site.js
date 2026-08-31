@@ -8,6 +8,9 @@
   /* EN toggle: every translatable container keeps its Japanese innerHTML from before any splitting or re-setting; the English lives in I18N (keyed by that Japanese) */
   var curLang = 'ja', PLACE_EN = {'岡崎':'Okazaki', 'ミシガン':'Michigan', '帰国':'Back to|Japan', '名古屋':'Nagoya', 'バー／|海外':'Bar /|abroad', 'バーと|海外':'Bar &|abroad', '大学院':'Grad|school', 'いま':'Now', 'バンコク':'Bangkok', 'バー':'Bar', '海外':'Abroad', 'バンコク|インターン':'Bangkok|internship', '作品':'Works', '制作':'Making', '連絡':'Contact', 'ジブンの|ゼンブを':'All of|myself'};
   var I18N = {}; (function(raw){ Object.keys(raw).forEach(function(k){ I18N[k.replace(/\s+/g, ' ').trim()] = raw[k]; }); })(window.I18N || {});
+  /* v121: Safari pays far more for SVG filters than the others — a turbulence texture spread over the whole
+     walk cost it 120ms frames while Chromium shrugged. The engine is marked here so the sheet can spare it. */
+  if(/^((?!chrome|android|crios|edg).)*safari/i.test(navigator.userAgent)) document.documentElement.classList.add('wk');
   var I18N_SEL = 'p, h3, figcaption, li, dd, .toc a, .sr .t, .sr .p2, .sr .a, #mseals .t, em.tag, .lab, .mlab, .tip, .msg, .lg-k, .lg-t, .legend strong, .legend span, .mp-cap b, .mp-cap span, .mp-key span, .gridbtn span, .mmsg .mx, #mlinks .txt, .menu .ml span, .wrap, .cap, .note, .br-cap, .again, .pdf, .cta, .x, footer span, footer a, footer a span, .cta span, .ft-name, .cp-ttl .w, .wk-vt .w, .cp-form label span, .cp-send b, .wk-side span, text, tspan, textPath, .ttl .split, .ttl small, #top .vt .split, #top .rb, #top .rot span, #top .tag span, .sub .w, .vid .t, .vid .s, .vid .badge, .wk em, .lines s, .page s, #ch5pin .wm span, #top .mean';
   var i18nEls = Array.prototype.slice.call(document.querySelectorAll(I18N_SEL)); i18nEls.forEach(function(el){ el.__ja = el.innerHTML; });
   /* split text into characters */
@@ -1029,7 +1032,12 @@
     return sv;
   }
   /* v100: the seal that closes the site — pressed over the heading once the last paragraphs have been read */
+  var THX = {
+    ja: {ring:'サイバーエージェントの皆様 · ここまでご覧いただき', a:'ありがとう', b:'ございました', rf:'var(--sans)', rs:'12.5', rl:'.8', cf:'var(--mincho)', cs:'40'},
+    en: {ring:'TO EVERYONE AT CYBERAGENT · FOR READING THIS FAR', a:'THANK', b:'YOU', rf:'var(--mono)', rs:'10', rl:'.4', cf:'var(--optima)', cs:'50'}
+  };
   function thanksSeal(){
+    var T = THX[curLang === 'en' ? 'en' : 'ja'];
     stampSvg.n = (stampSvg.n || 0) + 1; var tid = 'ink' + stampSvg.n;
     var sv = svgEl('svg', {viewBox:'0 0 300 300'});
     sv.innerHTML = '<defs><filter id="' + tid + '" x="-10%" y="-10%" width="120%" height="120%">' +
@@ -1041,13 +1049,15 @@
       '<path id="thxA" d="M 38,150 a 112,112 0 0 1 224,0"/><path id="thxB" d="M 46,150 a 104,104 0 0 0 208,0"/></defs>' +
       '<g filter="url(#' + tid + ')" fill="none" stroke="var(--acc)">' +
       '<circle cx="150" cy="150" r="141" stroke-width="5.6"/><circle cx="150" cy="150" r="126" stroke-width="1.7"/>' +
-      '<text font-family="var(--sans)" font-weight="700" font-size="12.5" letter-spacing=".8" fill="var(--acc)" stroke="none"><textPath href="#thxA" startOffset="50%" text-anchor="middle">サイバーエージェントの皆様 · ここまでご覧いただき</textPath></text>' +
-      '<text font-family="var(--mincho)" font-weight="900" font-size="40" fill="var(--acc)" stroke="none" text-anchor="middle"><tspan x="150" y="142">ありがとう</tspan><tspan x="150" y="190">ございました</tspan></text>' +
+      '<text font-family="' + T.rf + '" font-weight="700" font-size="' + T.rs + '" letter-spacing="' + T.rl + '" fill="var(--acc)" stroke="none"><textPath href="#thxA" startOffset="50%" text-anchor="middle">' + T.ring + '</textPath></text>' +
+      '<text font-family="' + T.cf + '" font-weight="900" font-size="' + T.cs + '" fill="var(--acc)" stroke="none" text-anchor="middle"><tspan x="150" y="142">' + T.a + '</tspan><tspan x="150" y="190">' + T.b + '</tspan></text>' +
       '<text font-family="var(--mono)" font-size="10" letter-spacing="1.6" fill="var(--acc)" stroke="none"><textPath href="#thxB" startOffset="50%" text-anchor="middle">KOSAKA SHUZO · PORTFOLIO 2026</textPath></text></g>';
     return sv;
   }
   var caSeal = document.querySelector('#ch7c .ca-seal');
-  if(caSeal && !caSeal.firstChild) caSeal.appendChild(thanksSeal());
+  function renderThanks(){ if(!caSeal) return; while(caSeal.firstChild) caSeal.removeChild(caSeal.firstChild); caSeal.appendChild(thanksSeal()); }
+  window.__renderThanks = renderThanks;
+  renderThanks();
   document.querySelectorAll('#mlinks > a, .menu .mmsg').forEach(function(a, i){ var st = a.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg(a.getAttribute('data-en') || '', a.getAttribute('data-jp') || '', 60 + i * 9)); });
   /* the menu's seven seals */
   document.querySelectorAll('#mseals > li').forEach(function(li, i){ var st = li.querySelector('.st'); if(st && !st.firstChild) st.appendChild(stampSvg(li, i)); });
@@ -1675,13 +1685,19 @@
 
   /* language toggle: JA ⇄ EN for every text on the page. Each container swaps between its captured Japanese and the English in I18N; split headings are re-split, the Japanese mixed setting and kerning are applied only in JA, and the optical alignment runs for both. */
   /* the switch types the new text in — quickly — for whatever is on screen; the rest just swaps */
+  var NZ_JA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン';
+  var NZ_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  function nz(ch){   /* a stand-in glyph of the same script, for the characters still turning over */
+    if(/[\s、。「」『』・…\-—:;,.!?（）()]/.test(ch)) return ch;
+    return /[ -~]/.test(ch) ? NZ_EN.charAt(Math.random() * 26 | 0) : NZ_JA.charAt(Math.random() * NZ_JA.length | 0);
+  }
   function typeEls(els){
     var vhh = vh(), jobs = [];
     els.forEach(function(el){
       if(!el.isConnected || el.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
       var r = el.getBoundingClientRect(); if(!r.width || r.bottom < -40 || r.top > vhh + 40) return;
       var units = [];
-      if(el.querySelector('.ch')){ el.querySelectorAll('.ch').forEach(function(c){ units.push({ch:c}); }); }
+      if(el.querySelector('.ch')){ el.querySelectorAll('.ch').forEach(function(c){ units.push({ch:c, t:c.textContent}); }); }
       else { var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), n; while((n = w.nextNode())){ if(n.nodeValue.trim()) units.push({node:n, full:n.nodeValue}); } }
       if(!units.length) return;
       var total = 0; units.forEach(function(u){ total += u.ch ? 1 : u.full.length; });
@@ -1696,10 +1712,24 @@
         if(j.done) return;
         var k = Math.min(1, t / j.dur), shown = Math.ceil(k * j.total), acc = 0;
         j.units.forEach(function(u){
-          if(u.ch){ u.ch.style.visibility = acc < shown ? '' : 'hidden'; acc += 1; }
-          else { var take = Math.max(0, Math.min(u.full.length, shown - acc)), want = u.full.slice(0, take); if(u.node.nodeValue !== want) u.node.nodeValue = want; acc += u.full.length; }
+          if(u.ch){
+            if(acc < shown){ if(u.ch.textContent !== u.t) u.ch.textContent = u.t; u.ch.style.visibility = ''; }
+            else if(acc < shown + 2){ u.ch.style.visibility = ''; u.ch.textContent = nz(u.t); }   /* two characters ahead of the front are still turning over */
+            else u.ch.style.visibility = 'hidden';
+            acc += 1;
+          }
+          else {
+            var take = Math.max(0, Math.min(u.full.length, shown - acc)), want = u.full.slice(0, take);
+            var span = Math.min(3, u.full.length - take), tail = '';
+            for(var q = 0; q < span; q++) tail += nz(u.full.charAt(take + q));   /* the next letters flicker through their alphabet before settling */
+            if(u.node.nodeValue !== want + tail) u.node.nodeValue = want + tail;
+            acc += u.full.length;
+          }
         });
-        if(k >= 1){ j.done = true; j.el.classList.remove('typing'); j.el.style.minHeight = ''; } else alive = true;
+        if(k >= 1){
+          j.units.forEach(function(u){ if(u.ch){ u.ch.textContent = u.t; u.ch.style.visibility = ''; } else if(u.node.nodeValue !== u.full) u.node.nodeValue = u.full; });
+          j.done = true; j.el.classList.remove('typing'); j.el.style.minHeight = '';
+        } else alive = true;
       });
       if(alive) requestAnimationFrame(frame);
     })(t0);
@@ -1738,7 +1768,8 @@
     meanWrap(); hugLine(); tagAlign(); ftFit(); ovalFit(); msgFitDone = false;
     document.querySelectorAll('[data-en][data-ja]').forEach(function(el){ if(el.querySelector('.ch') || el.__ja !== undefined || el.children.length) return; el.textContent = el.getAttribute(en ? 'data-en' : 'data-ja'); });   /* only the plain two-way labels: the menu's cards carry data-en for their seals and must keep their children */
     document.querySelectorAll('.lang button').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-lang') === lang ? 'true' : 'false'); });
-    if(curSec && curSec.getAttribute('data-year')){ curY = ''; setYear(curSec.getAttribute('data-year')); }   /* the year box's word follows the language */
+    if(curSec && curSec.getAttribute('data-year')){ curY = ''; setYear(curSec.getAttribute('data-year')); }
+    if(window.__renderThanks) window.__renderThanks();   /* the closing seal is drawn text, so it is redrawn in the other language */   /* the year box's word follows the language */
     document.documentElement.lang = lang; body.classList.toggle('en', en); curHd = null; chapUpdate();
     if(!quiet) typeEls(changed);
     document.querySelectorAll('.sr li .st, #mseals li .st').forEach(function(st){ while(st.firstChild) st.removeChild(st.firstChild); });
