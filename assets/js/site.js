@@ -588,7 +588,15 @@
       mh.querySelectorAll(':scope > span').forEach(function(sp){ tw = Math.max(tw, sp.offsetWidth); }); if(!tw) tw = mh.offsetWidth;
       var ph = window.innerWidth <= 1024;   /* v96: on the phone and portrait tablet the solo address fills the width edge to edge, then settles */
       var s = Math.max(1, Math.min(1.5, (W * (ph ? .97 : .71) - 16) / Math.max(1, tw)));
-      mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px'); mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
+      mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px');
+      if(mh.classList.contains('mh2')){
+        /* v160: this one hangs from the grid's own second rule — the page is talking about grids, so it sits on one.
+           It scales about its middle, so the visual top is centre − s·h/2. */
+        var y2 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--y2')) || 32, h2 = mh.offsetHeight;
+        mh.style.setProperty('--sdy', (H * (y2 / 100) - y + h2 * (s - 1) / 2).toFixed(1) + 'px');
+      } else {
+        mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
+      }
     });
     msgFitDone = true;
   }
@@ -1397,6 +1405,14 @@
   var PIC = 'img, svg, video, figure, picture, .wkf, .lb, #lb';
   document.addEventListener('contextmenu', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
   document.addEventListener('dragstart', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
+
+  /* v158: the header's own height, so the menu can show exactly that much of itself before it runs */
+  (function(){
+    var hd = document.querySelector('.hd');
+    function hdh(){ if(hd) document.documentElement.style.setProperty('--hdh', hd.offsetHeight + 'px'); }
+    hdh(); window.addEventListener('resize', hdh, {passive:true});
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(hdh);
+  })();
 
   /* hamburger menu */
   var burger = document.getElementById('burger'), menu = document.getElementById('menu');
