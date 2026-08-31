@@ -1598,3 +1598,18 @@
   .cur.suck .cv,.cur.suck .chh{opacity:.05}
   .cur.suck .cc{opacity:0}
   body.atend .cur.suck .cd{background:var(--acc) !important}
+  .anno{width:0; height:0}
+  .anno i{left:0; right:auto; top:0; width:38px; margin-top:-.75px; transform-origin:left center}
+  .anno.lft i{left:auto; right:0; transform-origin:right center}
+  .anno i::before{left:-4.5px; right:auto}
+  .anno.lft i::before{left:auto; right:-4.5px}
+  .anno span{position:absolute; left:46px; right:auto; top:0; transform:translateY(-50%)}
+  .anno.lft span{left:auto; right:46px; clip-path:inset(0 0 0 100%)}
+  .anno.lft.on span{clip-path:inset(0)}
+  .anno.up i{left:0; right:auto; top:-30px; width:1.5px; height:30px; margin-top:0; transform:scaleY(0); transform-origin:bottom center}
+  .anno.up.on i{transform:scaleY(1)}
+  .anno.up i::before{left:-4.5px; right:auto; top:auto; bottom:-4.5px; margin-top:0}
+  .anno.up span{left:-9px; right:auto; top:-36px; transform:translateY(-100%)}
+  .anno.far i{width:104px}
+  .anno.far span{left:112px}
+  .anno.far.lft span{left:auto; right:112px}

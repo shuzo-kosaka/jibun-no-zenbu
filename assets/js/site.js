@@ -729,15 +729,34 @@
     annoLive.forEach(function(o){ o.el.classList.remove('on'); var el = o.el; setTimeout(function(){ el.remove(); }, 600); });
     annoLive = [];
   }
-  function annoHere(){ var s = document.getElementById('ch4'); if(!s) return false; var r = s.getBoundingClientRect(), H = vh(); return r.top < H * .65 && r.bottom > H * .35; }
+  function annoHere(){
+    if(body.classList.contains('opening') || document.getElementById('ld')) return false;   /* v140: a reload keeps the scroll position, so the opening was being annotated */
+    var s = document.getElementById('ch4'); if(!s) return false; var r = s.getBoundingClientRect(), H = vh(); return r.top < H * .65 && r.bottom > H * .35;
+  }
+  /* v140: the point is pricked on the thing itself — centre for a mark, the first line for a block of text */
+  function annoAt(el, mode){
+    var r = el.getBoundingClientRect();
+    if(mode === 'line') return {x: r.left + 4, y: r.top + Math.min(20, r.height / 2)};
+    if(mode === 'corner') return {x: r.left + r.width / 2, y: r.top + 12};
+    /* 'far' and 'centre' are both the middle of the mark; only the length of the leader differs */
+    return {x: r.left + r.width / 2, y: r.top + r.height / 2};
+  }
+  /* v140: reaching this chapter, the page shows its own grid for a few seconds — the lines and their names */
+  var gridTemp = 0;
+  function gridFlash(){
+    var h = document.documentElement;
+    if(h.classList.contains('grid') || gridTemp) return;
+    h.classList.add('grid'); if(typeof togFit === 'function') togFit();
+    gridTemp = setTimeout(function(){ gridTemp = 0; h.classList.remove('grid'); if(typeof togFit === 'function') togFit(); }, 5200);
+  }
   function annoFollow(){
     if(!annoHere()){ annoClear(); return; }
     var H = vh(), W = window.innerWidth;
     annoLive.forEach(function(o){
-      var r = o.t.getBoundingClientRect();
-      o.el.style.left = Math.min(W - 240, Math.max(8, r.left + o.dx)) + 'px';
-      o.el.style.top = Math.max(8, r.top + o.dy) + 'px';
-      o.el.classList.toggle('gone', r.bottom < 8 || r.top > H - 8);   /* what it points at has left the screen */
+      var r = o.t.getBoundingClientRect(), p = annoAt(o.t, o.m);
+      o.el.style.left = p.x.toFixed(1) + 'px'; o.el.style.top = p.y.toFixed(1) + 'px';
+      if(o.m === 'centre' || o.m === 'far') o.el.classList.toggle('lft', p.x > W * .55);   /* a mark: the card is laid out to whichever side has room */
+      o.el.classList.toggle('gone', r.bottom < 8 || r.top > H - 8 || p.y < 26 || p.y > H - 14);   /* what it points at has left the screen */
     });
     annoRaf = requestAnimationFrame(annoFollow);
   }
@@ -754,11 +773,11 @@
     var figs = Array.prototype.slice.call(document.querySelectorAll('#ch4 .marg img, #ch4 figure img')).filter(seen)
       .sort(function(a, b){ var d = function(e){ var r = e.getBoundingClientRect(); return Math.abs(r.top + r.height / 2 - mid); }; return d(a) - d(b); });
     var targets = [
-      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],   /* beside the mark; the card now sits above the header rather than behind it */
-      [pick(['#ch4 .ttl', '#ch4 .sub', '#ch4 h3']), 'Zen Old Mincho 700 · 見出し · X1', 0, -38],
-      [pick([trigP, '#ch4 .body p']), '本文 17px · 行間 2.05 · X2', 0, -38],   /* the cards are taller now: -22 sat on the first line */
-      [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', -240, 0],
-      [figs[0] || null, '図版 · 副次要素の欄', 0, -38]
+      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 'far'],   /* the leader runs past the name, so the card hides nothing */
+      [pick(['#ch4 .ttl', '#ch4 .sub', '#ch4 h3']), 'Zen Old Mincho 700 · 見出し · X1', 'line'],
+      [pick([trigP, '#ch4 .body p']), '本文 17px · 行間 2.05 · X2', 'line'],
+      [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', 'centre'],
+      [figs[0] || null, '図版 · 副次要素の欄', 'corner']
     ];
     targets.forEach(function(t, i){
       if(!t[0]) return; var r = t[0].getBoundingClientRect(); if(r.bottom < 0 || r.top > vh()) return;
@@ -767,10 +786,14 @@
       var a = document.createElement('div'); a.className = 'anno';
       a.appendChild(document.createElement('i'));
       var tx = document.createElement('span'); tx.textContent = t[1]; a.appendChild(tx);
-      a.style.left = Math.min(window.innerWidth - 240, Math.max(8, r.left + t[2])) + 'px'; a.style.top = Math.max(8, r.top + t[3]) + 'px';
-      body.appendChild(a); annoLive.push({el:a, t:t[0], dx:t[2], dy:t[3]}); setTimeout(function(){ a.classList.add('on'); }, 120 + i*160);
+      var p = annoAt(t[0], t[2]);
+      a.style.left = p.x.toFixed(1) + 'px'; a.style.top = p.y.toFixed(1) + 'px';
+      if(t[2] === 'centre' || t[2] === 'far'){ if(p.x > window.innerWidth * .55) a.classList.add('lft'); if(t[2] === 'far') a.classList.add('far'); }
+      else a.classList.add('up');   /* over text and figures the card stands above the point, so nothing is covered */
+      body.appendChild(a); annoLive.push({el:a, t:t[0], m:t[2]}); setTimeout(function(){ a.classList.add('on'); }, 120 + i*160);
     });
     if(!annoLive.length) return false;
+    gridFlash();
     annoRaf = requestAnimationFrame(annoFollow);
     annoT = setTimeout(annoClear, 7000);   /* v136: 3.8s was gone before it was noticed */
     return true;
