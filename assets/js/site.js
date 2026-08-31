@@ -581,7 +581,8 @@
     solos.forEach(function(sp){
       var r = sp.getBoundingClientRect(), total = Math.max(1, r.height - vh()), p = (-r.top) / total; p = Math.max(0, Math.min(1, p)); if(reduce) p = 1;
       if(!sp.__fit) soloFit(sp);
-      sp.classList.toggle('solo', p < .5);
+      var soloAt = parseFloat(sp.getAttribute('data-solo')); if(isNaN(soloAt)) soloAt = .5;
+      sp.classList.toggle('solo', p < soloAt);   /* v131: the section can say where its heading settles — the length of these screens is not the same any more */
       sp.querySelectorAll('[data-at]').forEach(function(el){
         /* v117: a little hysteresis — right on the threshold the smallest nudge of the wheel was switching these
            on and off again, and the seal blinked. Once shown, it takes a clear step back to put it away. */
@@ -592,7 +593,8 @@
       var fx = sp.getAttribute('data-fx');
       if(fx === 'scramble' && sp.__chs){
         /* AIとツクる: the heading is found among glyphs that keep changing (the options AI throws up); with the scroll they are settled one by one, left to right, and the choice stands */
-        var n = sp.__chs.length, res = (reduce || p >= .4) ? n : Math.floor(p / .4 * n), H = vh(), st = sp.querySelector('.stick'), stTop = st ? st.getBoundingClientRect().top : r.top;
+        var resAt = parseFloat(sp.getAttribute('data-res')); if(isNaN(resAt)) resAt = .4;
+        var n = sp.__chs.length, res = (reduce || p >= resAt) ? n : Math.floor(p / resAt * n), H = vh(), st = sp.querySelector('.stick'), stTop = st ? st.getBoundingClientRect().top : r.top;
         var q = Math.max(0, Math.min(1, (H - r.top) / (H * .7))), leave = Math.max(0, Math.min(1, -stTop / (H * .45))), vis = r.top < H && r.bottom > 0 && q > 0 && leave < 1;   /* the code comes in with the scroll as the heading approaches, stays through the text, and goes as the screen is pushed off by ゼンブ持って */
         if(res !== sp.__res){ sp.__res = res; scrambleSet(sp, res); }
         sp.__cq = q * (1 - leave) * (res >= n ? .75 : 1);
@@ -600,7 +602,10 @@
         if(vis && !sp.__tick) sp.__tick = setInterval(function(){ if(sp.__res < n) scrambleSet(sp, sp.__res); codeDraw(sp, sp.__res, n); }, 90);
         if(!vis && sp.__tick){ clearInterval(sp.__tick); sp.__tick = 0; scrambleSet(sp, sp.__res); }
       }
-      if(fx === 'seals'){ sp.querySelectorAll('.seals i').forEach(function(it, i){ it.classList.toggle('in', reduce || p >= .22 + i * .03); }); }   /* a quick run of eight, once the previous text has left the screen */
+      if(fx === 'seals'){
+        var s0 = parseFloat(sp.getAttribute('data-seal0')); if(isNaN(s0)) s0 = .22;
+        var sstep = parseFloat(sp.getAttribute('data-sealstep')); if(isNaN(sstep)) sstep = .03;
+        sp.querySelectorAll('.seals i').forEach(function(it, i){ it.classList.toggle('in', reduce || p >= s0 + i * sstep); }); }   /* a quick run of eight, once the previous text has left the screen */
     });
   }
   /* code runs over the whole screen while AIとツクる is still undecided: lines of make-believe source, rewritten a few at a time on each tick of the scramble */
