@@ -732,12 +732,21 @@
   function annotate(){
     if(window.innerWidth < 1024 || !annoHere()) return false;
     annoClear();
+    /* v134: the five were fixed picks, and by the time the sentence came round the title and the first
+       paragraph had usually gone off the top — their labels were clamped to y=8, behind the header, and only
+       one or two were ever seen. Each label now takes the first of its candidates that is actually on screen. */
+    var H = vh();
+    function seen(el){ if(!el) return null; var r = el.getBoundingClientRect(); return (r.width && r.top > 64 && r.bottom < H - 24) ? el : null; }
+    function pick(list){ for(var i = 0; i < list.length; i++){ var el = seen(typeof list[i] === 'string' ? document.querySelector(list[i]) : list[i]); if(el) return el; } return null; }
+    var trigP = trig ? (trig.closest('p') || trig) : null, mid = H / 2;
+    var figs = Array.prototype.slice.call(document.querySelectorAll('#ch4 .marg img, #ch4 figure img')).filter(seen)
+      .sort(function(a, b){ var d = function(e){ var r = e.getBoundingClientRect(); return Math.abs(r.top + r.height / 2 - mid); }; return d(a) - d(b); });
     var targets = [
-      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],
-      [document.querySelector('#ch4 .ttl'), 'Zen Old Mincho 700 · 見出し · X1', 0, -26],
-      [document.querySelector('#ch4 .body p'), '本文 17px · 行間 2.05 · X2', 0, -22],
+      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],   /* in the header, always there */
+      [pick(['#ch4 .ttl', '#ch4 .sub', '#ch4 h3']), 'Zen Old Mincho 700 · 見出し · X1', 0, -26],
+      [pick([trigP, '#ch4 .body p']), '本文 17px · 行間 2.05 · X2', 0, -22],
       [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', -230, 0],
-      [document.querySelector('#ch4 .marg img'), '図版 · 副次要素の欄', 0, -22]
+      [figs[0] || null, '図版 · 副次要素の欄', 0, -22]
     ];
     targets.forEach(function(t, i){
       if(!t[0]) return; var r = t[0].getBoundingClientRect(); if(r.bottom < 0 || r.top > vh()) return;
@@ -1661,7 +1670,7 @@
     if(err) err.textContent = '';
     var subject = subj || ((en ? 'From the portfolio site' : 'ポートフォリオサイトより') + ' — ' + name);
     var bodyTxt = msg + '\n\n' + (en ? 'Name: ' : 'お名前：') + name + '\n' + (en ? 'Email: ' : 'メールアドレス：') + mail;
-    var href = 'mailto:shuzo.kosaka1018@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyTxt);
+    var href = 'mailto:' + ['shuzo.kosaka1018', 'gmail.com'].join('@') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyTxt);   /* v134: the address is not written anywhere in the page — it is put together here, only when the send has failed */
     var btn = cpform.querySelector('.cp-send'), lab = btn ? btn.querySelector('b') : null, labWas = lab ? lab.textContent : '';
     var done = document.getElementById('cpdone');
 
@@ -1670,11 +1679,11 @@
     function openMail(){ var a = document.createElement('a'); a.href = href; a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); }, 1000); }   /* a link click rather than location.href: the page stays where it is */
     function fallback(){   /* the page could not send it — hand it to the mail app, and say so */
       release(); openMail();
-      show(en ? 'Could not send from the page, so your mail app has been opened instead. If nothing happened, please write to the address below.'
-             : 'ページからは送れなかったため、お使いのメールソフトを開きました。何も起きないときは、下の宛先へ直接お送りください。');
+      show(en ? 'Could not send from the page, so your mail app has been opened instead. If nothing happened, please try again in a little while.'
+             : 'ページからは送れなかったため、お使いのメールソフトを開きました。何も起きないときは、少し時間をおいてもう一度お試しください。');
     }
 
-    if(!CONTACT_URL){ openMail(); show(en ? 'Your mail app has been opened. If nothing happened, please write to the address below.' : 'メールソフトを開きました。届かないときは、下の宛先へ直接お送りください。'); return; }
+    if(!CONTACT_URL){ openMail(); show(en ? 'Your mail app has been opened. If nothing happened, please try again in a little while.' : 'メールソフトを開きました。何も起きないときは、少し時間をおいてもう一度お試しください。'); return; }
 
     if(btn) btn.disabled = true; if(lab) lab.textContent = en ? 'Sending…' : '送信中…';
     var settled = false, giveUp = setTimeout(function(){ if(!settled){ settled = true; fallback(); } }, 12000);

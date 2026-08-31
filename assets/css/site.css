@@ -1575,3 +1575,4 @@
   .cp-hp{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none}
   .cp-send[disabled]{opacity:.55; cursor:default}
   .anno.gone{opacity:0 !important}
+  .anno{z-index:90}   /* above the header (88): two of the five were being drawn behind it */
