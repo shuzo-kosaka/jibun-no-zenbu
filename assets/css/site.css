@@ -1417,10 +1417,10 @@
     .hd .lang{display:none}   /* JA/EN moved into the menu on the phone */
     #top .toc{display:none}
     #top .name b.vt{font-size:min(7vh,44px); right:4.5%; z-index:4}
-    #top .ovals{left:42%; right:auto; top:auto; bottom:26vh; transform:translateX(-50%); gap:4vw; z-index:2}
+    #top .ovals{left:42%; right:auto; top:47%; bottom:auto; transform:translate(-50%,-50%); gap:4vw; z-index:2}   /* the pair sits at the centre of the screen */
     #top .oval{width:33vw}
     #top .oval .word{font-size:26px}
-    #top .rot{left:5%; top:auto; bottom:10vh; width:90%; font-size:20px; z-index:3}
+    #top .rot{left:5%; top:auto; bottom:9vh; width:90%; font-size:6vw; z-index:3}
     #top .sub{left:5%; top:auto; bottom:20vh}
     /* v96: MESSAGE — the text block truly centred, the heading with weight; the blur behind pinned text is jank on a phone */
     #message .body{grid-column:1/7; padding:0}
