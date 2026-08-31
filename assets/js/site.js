@@ -1186,8 +1186,8 @@
       return flying || h.classList.contains('cpopen') || body.classList.contains('menuopen') || h.classList.contains('lbopen') || body.classList.contains('opening');
     }
     function loop(){
-      cur += (target - cur) * .14;
-      if(Math.abs(target - cur) < .6){ cur = target; active = false; raf = 0; window.scrollTo(0, Math.round(cur)); return; }
+      cur += (target - cur) * .32;   /* v112: light — it follows the wheel closely and only takes the edge off */
+      if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo(0, Math.round(cur)); return; }
       window.scrollTo(0, Math.round(cur));
       raf = requestAnimationFrame(loop);
     }
