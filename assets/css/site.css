@@ -1449,6 +1449,7 @@
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-3%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .8s ease-out .1s}
   @keyframes caRing{0%{opacity:.4; transform:scale(.97)} 100%{opacity:0; transform:scale(1.22)}}
+  #ch7c .solopin{min-height:330vh}   /* v105: room to actually read the two paragraphs before the seal comes down */
   #ch7c .solopin .sq{position:relative; z-index:6; transition:opacity .55s var(--ease)}
   #ch7c .solopin:has(.ca-seal.on) .sq{opacity:.3}   /* the page steps back so the seal is what you read */
   @media (max-width:1024px){ #ch7c .ca-seal{width:76vw; top:54%} }
