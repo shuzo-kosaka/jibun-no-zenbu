@@ -341,6 +341,7 @@
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
       var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null;
       cur.classList.toggle('hov', !!hov);
+      cur.classList.toggle('onmedia', !!(t && t.closest && t.closest('.vid, .wkf, .marg figure, .hw, #ch5pin .bgph, .wk-mid')));   /* v100: ink-on-ink is invisible over a photo or a video thumbnail */
       if(!body.classList.contains('opening')){ top.style.setProperty('--mx', (mx / window.innerWidth - .5).toFixed(3)); top.style.setProperty('--my', (my / vh() - .5).toFixed(3)); }
       if(my < vh() * 1.2){ var tr = top.getBoundingClientRect(); top.style.setProperty('--px', (mx - tr.left).toFixed(0) + 'px'); top.style.setProperty('--py', (my - tr.top).toFixed(0) + 'px'); }
     }, {passive:true});
@@ -505,8 +506,8 @@
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .26);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .5);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .30);
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .32);   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
   }
@@ -1024,13 +1025,26 @@
       '<text x="78" y="124" text-anchor="middle" font-family="var(--mono)" font-size="6.5" letter-spacing="1.6" fill="var(--acc)" stroke="none">KOSAKA \u00b7 PORTFOLIO</text></g>';
     return sv;
   }
-  /* v99: the seal of who this was made for, on the last screen */
-  var caSeal = document.querySelector('#ch7c .ca-seal');
-  if(caSeal && !caSeal.firstChild){
-    var caSv = kakuSvg('FOR CYBERAGENT', '新しい力', 71);
-    var caT = caSv.querySelector('text'); if(caT){ caT.setAttribute('font-size', '8.2'); caT.setAttribute('letter-spacing', '1.1'); }   /* the longer line has to fit inside the rule */
-    caSeal.appendChild(caSv);
+  /* v100: the seal that closes the site — pressed over the heading once the last paragraphs have been read */
+  function thanksSeal(){
+    stampSvg.n = (stampSvg.n || 0) + 1; var tid = 'ink' + stampSvg.n;
+    var sv = svgEl('svg', {viewBox:'0 0 300 300'});
+    sv.innerHTML = '<defs><filter id="' + tid + '" x="-10%" y="-10%" width="120%" height="120%">' +
+      '<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="37" result="n"/>' +
+      '<feDisplacementMap in="SourceGraphic" in2="n" scale="2.8" xChannelSelector="R" yChannelSelector="G" result="d"/>' +
+      '<feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="41" result="g"/>' +
+      '<feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 3.6 -.2" result="ga"/>' +
+      '<feComposite in="d" in2="ga" operator="in"/></filter>' +
+      '<path id="thxA" d="M 38,150 a 112,112 0 0 1 224,0"/><path id="thxB" d="M 46,150 a 104,104 0 0 0 208,0"/></defs>' +
+      '<g filter="url(#' + tid + ')" fill="none" stroke="var(--acc)">' +
+      '<circle cx="150" cy="150" r="141" stroke-width="5.6"/><circle cx="150" cy="150" r="126" stroke-width="1.7"/>' +
+      '<text font-family="var(--sans)" font-weight="700" font-size="12.5" letter-spacing=".8" fill="var(--acc)" stroke="none"><textPath href="#thxA" startOffset="50%" text-anchor="middle">サイバーエージェントの皆様 · ここまでご覧いただき</textPath></text>' +
+      '<text font-family="var(--mincho)" font-weight="900" font-size="40" fill="var(--acc)" stroke="none" text-anchor="middle"><tspan x="150" y="142">ありがとう</tspan><tspan x="150" y="190">ございました</tspan></text>' +
+      '<text font-family="var(--mono)" font-size="10" letter-spacing="1.6" fill="var(--acc)" stroke="none"><textPath href="#thxB" startOffset="50%" text-anchor="middle">KOSAKA SHUZO · PORTFOLIO 2026</textPath></text></g>';
+    return sv;
   }
+  var caSeal = document.querySelector('#ch7c .ca-seal');
+  if(caSeal && !caSeal.firstChild) caSeal.appendChild(thanksSeal());
   document.querySelectorAll('#mlinks > a, .menu .mmsg').forEach(function(a, i){ var st = a.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg(a.getAttribute('data-en') || '', a.getAttribute('data-jp') || '', 60 + i * 9)); });
   /* the menu's seven seals */
   document.querySelectorAll('#mseals > li').forEach(function(li, i){ var st = li.querySelector('.st'); if(st && !st.firstChild) st.appendChild(stampSvg(li, i)); });
@@ -1065,6 +1079,13 @@
         : kind === 2
         ? 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' C' + tx.toFixed(1) + ',' + (ty + len * .25).toFixed(1) + ' ' + (tx + sg * amp * 1.5).toFixed(1) + ',' + (ty + len * .45).toFixed(1) + ' ' + (tx + sg * amp).toFixed(1) + ',' + (ty + len).toFixed(1)
         : 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' C' + tx.toFixed(1) + ',' + (ty + len * .33).toFixed(1) + ' ' + (tx + sg * amp * 1.15).toFixed(1) + ',' + (ty + len * .48).toFixed(1) + ' ' + (tx + sg * amp).toFixed(1) + ',' + (ty + len).toFixed(1);
+      if(c.sec === 'ch7'){   /* v100: the walk leaves the seal and bends across to where the text begins */
+        var bd7 = sec.querySelector(':scope > .body');
+        if(bd7){ var ex7 = bd7.offsetLeft - 12, ey7 = bd7.offsetTop + Math.min(320, bd7.offsetHeight * .5);
+          if(ex7 > tx + 40 && ey7 > ty + 90){
+            d = 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' C' + (tx - 16).toFixed(1) + ',' + (ty + (ey7 - ty) * .44).toFixed(1) + ' ' + (tx + (ex7 - tx) * .30).toFixed(1) + ',' + (ey7 - 6).toFixed(1) + ' ' + ex7.toFixed(1) + ',' + ey7.toFixed(1);
+          } }
+      }
       if(c.sec === 'ch5intern'){ d = 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' C' + (tx + 24).toFixed(1) + ',' + (ty + 190).toFixed(1) + ' ' + (tx - 70).toFixed(1) + ',' + (ty + 330).toFixed(1) + ' ' + (tx - 40).toFixed(1) + ',' + (ty + 430).toFixed(1) + ' C' + (tx - 20).toFixed(1) + ',' + (ty + 500).toFixed(1) + ' ' + (tx - 150).toFixed(1) + ',' + (ty + 540).toFixed(1) + ' -90,' + (ty + 600).toFixed(1); }   /* the cat wanders further, and off the left edge of the page */
       var path = svgEl('path', {d:d, fill:'none', stroke:'none'}); tsvg.appendChild(path);
       footprints(tsvg, path, 'chfp', 1, vt ? 12 : 22, k % 2, undefined, c.sec === 'ch5intern');   /* the internship's trail is a cat's */

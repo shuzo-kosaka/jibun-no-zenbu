@@ -1357,7 +1357,7 @@
   #seq .page{position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .9s .2s}
   #seq.s8 .page{opacity:1}
   #seq .page i{position:absolute; display:block; background:var(--l-red)}
-  #seq .page .v{top:0; bottom:-26vh; width:1px; transform:scaleY(0); transform-origin:top; transition:transform 1.2s var(--ease); -webkit-mask-image:linear-gradient(#000 66%, transparent); mask-image:linear-gradient(#000 66%, transparent)}   /* the verticals run on past the screen and thin out, instead of stopping at its edge */
+  #seq .page .v{top:0; bottom:-26vh; width:1px; background:linear-gradient(var(--l-red) 66%, transparent); transform:scaleY(0); transform-origin:top; transition:transform 1.2s var(--ease)}   /* v100: the fade is drawn, not masked — a mask clips to the 1px line and took the X labels with it */   /* the verticals run on past the screen and thin out, instead of stopping at its edge */
   #seq .page .h{left:0; right:0; height:1px; transform:scaleX(0); transform-origin:left; transition:transform 1.2s var(--ease)}
   #seq.s8 .page i{transform:none}
   #seq .page s{position:absolute; font-family:var(--mono); font-size:9.5px; color:var(--l-red); text-decoration:none; background:var(--bg); padding:0 3px; white-space:nowrap}
@@ -1439,17 +1439,15 @@
   /* v96: `.cur` is the cursor overlay's class, and the touch-device rule `.cur{display:none}` also swallowed
      the hero rotator's current phrase (span.cur) — which is why the catch copy never showed on a real phone */
   @media (hover:none),(pointer:coarse){ #rot > span.cur{display:block} }
-  /* v99: the seal for the company this was made for — pressed, like the chapter seals, once the screen settles */
-  #ch7c .ca-seal{position:absolute; right:6%; top:auto; bottom:13vh; width:min(17vw,178px); aspect-ratio:1; opacity:0; transform:rotate(-13deg) scale(1.5); pointer-events:none; z-index:3}
+  /* v100: the closing seal — pressed over the heading and the text once the last screen has been read */
+  #ch7c .ca-seal{position:absolute; left:50%; top:46%; width:min(44vw,470px); aspect-ratio:1; opacity:0; transform:translate(-50%,-50%) rotate(-14deg) scale(1.9); pointer-events:none; z-index:5}
   #ch7c .ca-seal svg{width:100%; height:100%; display:block; overflow:visible}
-  #ch7c .ca-seal.in{animation:caStamp .62s cubic-bezier(.2,.9,.3,1) .45s forwards}
-  @keyframes caStamp{0%{opacity:0; transform:rotate(-13deg) scale(1.5)} 62%{opacity:.97; transform:rotate(-7deg) scale(.96)} 100%{opacity:.95; transform:rotate(-7deg) scale(1)}}
-  #ch7c .ca-seal::after{content:""; position:absolute; inset:-7%; border:2px solid var(--acc); border-radius:16px; opacity:0}
-  #ch7c .ca-seal.in::after{animation:caRing .8s ease-out .5s}
-  @keyframes caRing{0%{opacity:.5; transform:scale(1)} 100%{opacity:0; transform:scale(1.4)}}
-  @media (max-width:1024px){ #ch7c .ca-seal{right:auto; left:50%; top:63vh; bottom:auto; width:34vw; transform:translateX(-50%) rotate(-13deg) scale(1.5)}   /* clear of the fold, so the reveal observer sees it */
-    #ch7c .solopin:not(.solo) .ca-seal{animation:none; opacity:0; transition:opacity .45s}   /* on a phone the paragraphs run over this spot: the seal has its moment on the solo screen, then goes */
-    @keyframes caStamp{0%{opacity:0; transform:translateX(-50%) rotate(-13deg) scale(1.5)} 62%{opacity:.97; transform:translateX(-50%) rotate(-7deg) scale(.96)} 100%{opacity:.95; transform:translateX(-50%) rotate(-7deg) scale(1)}} }
+  #ch7c .ca-seal.on{animation:caStamp .5s cubic-bezier(.16,.9,.28,1) forwards}
+  @keyframes caStamp{0%{opacity:0; transform:translate(-50%,-50%) rotate(-14deg) scale(1.9)} 55%{opacity:.95; transform:translate(-50%,-50%) rotate(-7deg) scale(.94)} 78%{transform:translate(-50%,-50%) rotate(-7deg) scale(1.03)} 100%{opacity:.93; transform:translate(-50%,-50%) rotate(-7deg) scale(1)}}
+  #ch7c .ca-seal::after{content:""; position:absolute; inset:-4%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
+  #ch7c .ca-seal.on::after{animation:caRing .75s ease-out .12s}
+  @keyframes caRing{0%{opacity:.45; transform:scale(.96)} 100%{opacity:0; transform:scale(1.32)}}
+  @media (max-width:1024px){ #ch7c .ca-seal{width:78vw; top:44%} }
 
   /* v99b: TRIAL sits right beside SELECTED WORKS, not a column away */
   .wk-side .wk-n{margin-right:-9px}
