@@ -1176,7 +1176,8 @@
   function flyStop(){ if(!flying) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
-  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, a.classList.contains('cta-fx')); } else if(!flyToEl(h, a.classList.contains('cta-fx'))) flyTo(0, a.classList.contains('cta-fx')); }); });
+  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
+    if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
 
   /* hamburger menu */
   var burger = document.getElementById('burger'), menu = document.getElementById('menu');
