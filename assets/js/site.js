@@ -972,8 +972,8 @@
   (function orbit(now){
     if(dgSat && dgOn){
       var a = ((now / 18000) * 360) % 360, rad = a * Math.PI / 180;
-      dgSat.setAttribute('cx', (500 + 300 * Math.cos(rad)).toFixed(1)); dgSat.setAttribute('cy', (440 + 300 * Math.sin(rad)).toFixed(1));
-      DG_ANG.forEach(function(t, i){ var tt = (t + 360) % 360, prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
+      dgSat.setAttribute('cx', (500 + 300 * Math.cos(rad)).toFixed(1)); dgSat.setAttribute('cy', (440 - 300 * Math.sin(rad)).toFixed(1));   /* v119: the dot travels anticlockwise now — the y of the screen runs downward, so its sine is negated */
+      DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
       dgLastA = a;
     }
     requestAnimationFrame(orbit);
