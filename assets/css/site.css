@@ -1445,6 +1445,7 @@
     transform:translate(-50%,-50%) rotate(-14deg) scale(1.5);
     transition:opacity .4s var(--ease), transform .55s cubic-bezier(.2,1.5,.34,1)}   /* one movement, both ways: it lands with a bounce and lifts back off */
   #ch7c .ca-seal.on{opacity:.96; transform:translate(-50%,-50%) rotate(-7deg) scale(1)}
+  #ch7c .ca-seal{--acc:#1E3606}   /* v115: the seal is pressed in a deeper green than the ground it lands on */
   #ch7c .ca-seal svg{width:100%; height:100%; display:block; overflow:visible}
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-3%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .8s ease-out .1s}
