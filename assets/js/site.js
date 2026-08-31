@@ -561,7 +561,13 @@
       var r = sp.getBoundingClientRect(), total = Math.max(1, r.height - vh()), p = (-r.top) / total; p = Math.max(0, Math.min(1, p)); if(reduce) p = 1;
       if(!sp.__fit) soloFit(sp);
       sp.classList.toggle('solo', p < .5);
-      sp.querySelectorAll('[data-at]').forEach(function(el){ var on = p >= parseFloat(el.getAttribute('data-at')); el.classList.toggle('in', on); el.classList.toggle('on', on); });
+      sp.querySelectorAll('[data-at]').forEach(function(el){
+        /* v117: a little hysteresis — right on the threshold the smallest nudge of the wheel was switching these
+           on and off again, and the seal blinked. Once shown, it takes a clear step back to put it away. */
+        var at = parseFloat(el.getAttribute('data-at')), was = el.classList.contains('on');
+        var on = was ? p >= at - .035 : p >= at;
+        el.classList.toggle('in', on); el.classList.toggle('on', on);
+      });
       var fx = sp.getAttribute('data-fx');
       if(fx === 'scramble' && sp.__chs){
         /* AIとツクる: the heading is found among glyphs that keep changing (the options AI throws up); with the scroll they are settled one by one, left to right, and the choice stands */
@@ -1115,7 +1121,9 @@
     var hg = ey + 60, svg = svgEl('svg', {class:'wktrail', viewBox:'0 0 ' + W.toFixed(0) + ' ' + hg.toFixed(0), width:W.toFixed(0), height:hg.toFixed(0)});
     var path = svgEl('path', {d:d, fill:'none', stroke:'none'}); svg.appendChild(path);
     footprints(svg, path, 'chfp', 1, 18, 1, path.getTotalLength() - 30);   /* only the last step left out: the walk comes right up to the seal */
-    window.__wkFps = Array.prototype.slice.call(svg.querySelectorAll('.chfp'));
+    var wfs = svg.querySelectorAll('.chfp'), wn = wfs.length;
+    wfs.forEach(function(f, i){ var q = (i + 1) / wn; f.style.setProperty('--fade', q > .55 ? Math.max(0, 1 - (q - .55) / .45 * .92).toFixed(2) : '1'); });   /* the last steps thin out, as they do on every other trail */
+    window.__wkFps = Array.prototype.slice.call(wfs);
     sec.appendChild(svg);
   }
   function rallyBuild(){ srBuild(); dgBuild(); brBuild(); chsealBuild(); soloSealsBuild(); wkBuild(); fpMeasure(); fpUpdate(); passPlace(); }
@@ -1244,6 +1252,21 @@
   burger.addEventListener('click', function(){ setMenu(!menu.classList.contains('open')); });
   /* v96: the menu's grid toggle (phone) simply presses the header's hidden one */
   var mgrid = document.querySelector('.mgrid'); if(mgrid) mgrid.addEventListener('click', function(){ var g = document.getElementById('gridbtn'); if(g) g.click(); });
+  /* v117: a phone or tablet can be asked to lay the page out as the desktop does — the viewport is told a fixed
+     width and the browser scales the whole thing down. Remembered, so it survives the next visit. */
+  (function(){
+    var vp = document.querySelector('meta[name="viewport"]'), btn = document.getElementById('mdesk');
+    if(!vp || !btn) return;
+    var RESP = 'width=device-width,initial-scale=1', DESK = 'width=1440';
+    function apply(on){
+      document.documentElement.classList.toggle('deskview', on);
+      vp.setAttribute('content', on ? DESK : RESP);
+      try{ localStorage.setItem('kosaka-deskview', on ? '1' : '0'); }catch(e){}
+      setTimeout(function(){ if(window.__wkTryFit) window.__wkTryFit(); soloReset(); msgFitDone = false; onScroll(); }, 260);
+    }
+    try{ if(localStorage.getItem('kosaka-deskview') === '1') apply(true); }catch(e){}
+    btn.addEventListener('click', function(){ apply(!document.documentElement.classList.contains('deskview')); });
+  })();
   menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } setTimeout(function(){ flyToEl(id); }, 350); }); });   /* v85: the CONTACT card opens the contact page */
   window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && menu.classList.contains('open')) setMenu(false); });
 

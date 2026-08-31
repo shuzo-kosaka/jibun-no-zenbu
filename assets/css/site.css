@@ -1158,6 +1158,10 @@
     .menu .mopt .gridbtn .on,.menu .mopt .gridbtn .off{position:static; display:none; opacity:1; transform:none; filter:none}
     html:not(.grid) .menu .mopt .gridbtn .off{display:inline}
     html.grid .menu .mopt .gridbtn .on{display:inline}
+    .menu .mopt .mdesk .on{display:none}
+    html.deskview .menu .mopt .mdesk .on{display:inline}
+    html.deskview .menu .mopt .mdesk .off{display:none}
+    html:not(.deskview) .menu .mopt .mdesk .off{display:inline}
   }
 
   @media (max-width:1024px){ .tl li{grid-template-columns:4.5em 1fr; grid-template-areas:"y t" "y p"; row-gap:2px} .tl .a{display:none} .tl .y{grid-area:y} .tl .p2{grid-area:p} .tl li a{grid-area:t} }
