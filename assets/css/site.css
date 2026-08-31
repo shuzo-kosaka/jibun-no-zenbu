@@ -1579,3 +1579,6 @@
   #contact{grid-template-rows:8vh minmax(12vh,auto) auto !important; padding-bottom:10vh !important}
   @media (max-width:1024px){ #contact{grid-template-rows:9vh minmax(10vh,auto) auto !important; padding-bottom:9vh !important} }
   @media (max-height:800px){ #contact{grid-template-rows:6vh minmax(9vh,auto) auto !important; padding-bottom:7.5vh !important} }
+  .anno{font-size:12.5px; letter-spacing:.06em; padding:5px 10px; background:var(--l-red); color:#FBF7F2; border-color:var(--l-red); border-radius:3px; box-shadow:0 6px 18px rgba(0,0,0,.20); transform:translateY(6px) scale(.96); transition:opacity .45s var(--ease), transform .45s cubic-bezier(.2,.9,.3,1)}
+  .anno::before{left:-8px; width:8px; height:8px; margin-top:-4px; background:var(--l-red); box-shadow:0 0 0 3px rgba(217,37,28,.22)}
+  .anno.on{transform:none}

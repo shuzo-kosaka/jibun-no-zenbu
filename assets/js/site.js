@@ -730,7 +730,7 @@
     annoRaf = requestAnimationFrame(annoFollow);
   }
   function annotate(){
-    if(window.innerWidth < 1024 || !annoHere()) return false;
+    if(window.innerWidth < 768 || !annoHere()) return false;   /* v136: tablets see them too — they were shut out at 1024, which is most of an iPad held upright */
     annoClear();
     /* v134: the five were fixed picks, and by the time the sentence came round the title and the first
        paragraph had usually gone off the top — their labels were clamped to y=8, behind the header, and only
@@ -742,11 +742,11 @@
     var figs = Array.prototype.slice.call(document.querySelectorAll('#ch4 .marg img, #ch4 figure img')).filter(seen)
       .sort(function(a, b){ var d = function(e){ var r = e.getBoundingClientRect(); return Math.abs(r.top + r.height / 2 - mid); }; return d(a) - d(b); });
     var targets = [
-      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],   /* in the header, always there */
-      [pick(['#ch4 .ttl', '#ch4 .sub', '#ch4 h3']), 'Zen Old Mincho 700 · 見出し · X1', 0, -26],
-      [pick([trigP, '#ch4 .body p']), '本文 17px · 行間 2.05 · X2', 0, -22],
-      [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', -230, 0],
-      [figs[0] || null, '図版 · 副次要素の欄', 0, -22]
+      [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],   /* beside the mark; the card now sits above the header rather than behind it */
+      [pick(['#ch4 .ttl', '#ch4 .sub', '#ch4 h3']), 'Zen Old Mincho 700 · 見出し · X1', 0, -38],
+      [pick([trigP, '#ch4 .body p']), '本文 17px · 行間 2.05 · X2', 0, -38],   /* the cards are taller now: -22 sat on the first line */
+      [document.getElementById('od'), 'IBM Plex Mono · 副次要素 X4', -240, 0],
+      [figs[0] || null, '図版 · 副次要素の欄', 0, -38]
     ];
     targets.forEach(function(t, i){
       if(!t[0]) return; var r = t[0].getBoundingClientRect(); if(r.bottom < 0 || r.top > vh()) return;
@@ -756,7 +756,7 @@
     });
     if(!annoLive.length) return false;
     annoRaf = requestAnimationFrame(annoFollow);
-    annoT = setTimeout(annoClear, 3800);
+    annoT = setTimeout(annoClear, 7000);   /* v136: 3.8s was gone before it was noticed */
     return true;
   }
   /* the trigger: threshold 1 asked for the whole sentence to be on screen at once — with the page moving under
