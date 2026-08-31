@@ -1650,7 +1650,7 @@
   /* v132: the letter is sent from the page itself. CONTACT_URL is a Google Apps Script of my own (site/src/
      contact/Code.gs) that receives the fields and mails them on; nothing of the sender's mail app is opened.
      While it is empty — or if the send fails — the old behaviour stands in, so the form is never a dead end. */
-  var CONTACT_URL = '';
+  var CONTACT_URL = 'https://script.google.com/macros/s/AKfycbzjgfgMCWU5BFw2ULcJq1PZbLyQ1vmqFwcmYUkrmsvQfGAFpReXAbjScdmg25PS-Wa8vw/exec';
   if(cpform) cpform.addEventListener('submit', function(e){
     e.preventDefault();
     var en = curLang === 'en', g = function(n){ var el = cpform.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; }, name = g('name'), mail = g('email'), subj = g('subject'), msg = g('msg'), err = document.getElementById('cperr'), bad = [];
