@@ -506,8 +506,8 @@
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .22);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .40);
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .20);
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .38);
         pin.classList.toggle('gridon', p >= .78);   /* v104: the grid is drawn as the page says it loves grids */
         if(p >= .78){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 4800); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
@@ -1168,7 +1168,7 @@
   }
   (function(){   /* the tape's own picture: tracking bands, a sweeping head, and the mark in the corner */
     var r = document.createElement('div'); r.className = 'rew'; r.setAttribute('aria-hidden', 'true');
-    r.innerHTML = '<i class="warm"></i><i class="bands"></i><span class="mk"></span>';
+    r.innerHTML = '<i class="bands"></i><span class="mk"></span>';
     var mk = r.querySelector('.mk');
     new MutationObserver(function(){ mk.textContent = document.documentElement.classList.contains('fwd') ? '\u25b6\u25b6 FORWARD' : '\u25c0\u25c0 REWIND'; }).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
     document.body.appendChild(r);

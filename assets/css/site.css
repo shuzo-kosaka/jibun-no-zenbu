@@ -782,7 +782,7 @@
   .pin{display:block; min-height:200vh}
   .pin .stick{position:sticky; top:0; height:100vh; display:grid; grid-template-columns:12% 16% 30% 25% 17%; grid-template-rows:14vh minmax(18vh,auto) minmax(39vh,auto) minmax(14vh,auto); overflow:hidden}
   #message{min-height:260vh}
-  #message{min-height:500vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
+  #message{min-height:620vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
   #message .hw .hwa{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; opacity:0; transition:opacity .6s}
   #message .hw.on .hwa{opacity:1}
@@ -1482,14 +1482,6 @@
   body[data-scene="green"] .brand img{filter:brightness(0) invert(1)}   /* v106: the 朱 mark does not belong on the green; it reads as white there */
   /* v106: the rewind — the page winds back and the picture goes with it */
   .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s, backdrop-filter .3s, -webkit-backdrop-filter .3s}
-  /* v109: while the tape runs the picture turns to old film — one warm filter over everything behind the
-     overlay. A backdrop filter is the only thing that reaches the scene's own colour layer, so it is kept to
-     two functions to stay light on a fast wind. */
-  html.rewind .rew{-webkit-backdrop-filter:sepia(1) saturate(1.25); backdrop-filter:sepia(1) saturate(1.25)}
-  html.rewind body::after{filter:sepia(1) saturate(1.25)}   /* the scene's colour sits on its own fixed layer, which a backdrop filter never reaches — it is toned directly */
-  html.rewind .hd,html.rewind .cta-fx,html.rewind .yr,html.rewind .cur{filter:sepia(1) saturate(1.25)}   /* the fixed furniture rides its own layers too */
-  .rew .warm{position:absolute; inset:0; background:radial-gradient(120% 92% at 50% 46%, rgba(255,214,150,.10), rgba(90,52,14,.34)); opacity:0; transition:opacity .3s}
-  html.rewind .rew .warm{opacity:1}
   html.fwd .rew::after{animation:fwdHead .34s linear infinite}
   @keyframes fwdHead{0%{top:-22%} 100%{top:104%}}
   html.fwd .rew .bands{animation-direction:reverse}
