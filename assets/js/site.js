@@ -1168,7 +1168,7 @@
   }
   (function(){   /* the tape's own picture: tracking bands, a sweeping head, and the mark in the corner */
     var r = document.createElement('div'); r.className = 'rew'; r.setAttribute('aria-hidden', 'true');
-    r.innerHTML = '<i class="bands"></i><span class="mk"></span>';
+    r.innerHTML = '<i class="warm"></i><i class="bands"></i><span class="mk"></span>';
     var mk = r.querySelector('.mk');
     new MutationObserver(function(){ mk.textContent = document.documentElement.classList.contains('fwd') ? '\u25b6\u25b6 FORWARD' : '\u25c0\u25c0 REWIND'; }).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
     document.body.appendChild(r);
