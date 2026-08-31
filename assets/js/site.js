@@ -501,6 +501,15 @@
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
   var pins = document.querySelectorAll('.pin'), hw = document.getElementById('hw'), hwv = document.getElementById('hwv'), hwPlayed = false;
+  /* v130: the bar screen changes photograph as you go down it — a row of dots says how many there are and
+     which one you are on, the way a counter does */
+  pins.forEach(function(pin){
+    var n = pin.querySelectorAll('.bgph img').length, st = pin.querySelector('.stick');
+    if(!n || !st) return;
+    var row = document.createElement('div'); row.className = 'bgdot'; row.setAttribute('aria-hidden', 'true');
+    for(var i = 0; i < n; i++) row.appendChild(document.createElement('i'));
+    st.appendChild(row);
+  });
   function pinUpdate(){
     pins.forEach(function(pin){
       var r = pin.getBoundingClientRect(); var total = r.height - vh();
@@ -508,7 +517,8 @@
       pin.querySelectorAll('[data-at]').forEach(function(el){ var at = parseFloat(el.getAttribute('data-at')), off = el.getAttribute('data-off'); var on = p >= at && (off === null || p < parseFloat(off)); el.classList.toggle('in', on); el.classList.toggle('on', on); });
       var imgs = pin.querySelectorAll('.bgph img');
       if(imgs.length){ var idx = Math.min(imgs.length-1, Math.floor(p * imgs.length * .999)); imgs.forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
-        pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); }); }
+        pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
+        pin.querySelectorAll('.bgdot i').forEach(function(d,i){ d.classList.toggle('on', i === idx); }); }
       if(r.top <= 0 && r.bottom >= vh()){ pin.querySelectorAll('.marg').forEach(function(m){ m.classList.add('in'); }); }
       var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 3.4 >= 1); st.classList.toggle('drawing', p * 3.4 > .012); dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0;
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
