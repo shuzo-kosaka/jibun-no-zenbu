@@ -1617,6 +1617,10 @@
     if(e.key === 'Escape'){ e.preventDefault(); cpClose(); return; }
     if(e.key === 'Tab'){ var f = Array.prototype.filter.call(cpage.querySelectorAll('button, input, textarea, a[href]'), function(x){ return !x.disabled && x.offsetParent !== null && !x.closest('.sur'); }); if(!f.length) return; var first = f[0], last = f[f.length - 1]; if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); } }   /* the focus stays on the page */
   });
+  /* v132: the letter is sent from the page itself. CONTACT_URL is a Google Apps Script of my own (site/src/
+     contact/Code.gs) that receives the fields and mails them on; nothing of the sender's mail app is opened.
+     While it is empty — or if the send fails — the old behaviour stands in, so the form is never a dead end. */
+  var CONTACT_URL = '';
   if(cpform) cpform.addEventListener('submit', function(e){
     e.preventDefault();
     var en = curLang === 'en', g = function(n){ var el = cpform.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; }, name = g('name'), mail = g('email'), subj = g('subject'), msg = g('msg'), err = document.getElementById('cperr'), bad = [];
@@ -1628,8 +1632,34 @@
     var subject = subj || ((en ? 'From the portfolio site' : 'ポートフォリオサイトより') + ' — ' + name);
     var bodyTxt = msg + '\n\n' + (en ? 'Name: ' : 'お名前：') + name + '\n' + (en ? 'Email: ' : 'メールアドレス：') + mail;
     var href = 'mailto:shuzo.kosaka1018@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyTxt);
-    var a = document.createElement('a'); a.href = href; a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); }, 1000);   /* a link click rather than location.href: the page stays where it is */
-    var done = document.getElementById('cpdone'); if(done){ done.hidden = false; done.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+    var btn = cpform.querySelector('.cp-send'), lab = btn ? btn.querySelector('b') : null, labWas = lab ? lab.textContent : '';
+    var done = document.getElementById('cpdone');
+
+    function show(txt){ if(done){ done.textContent = txt; done.hidden = false; done.scrollIntoView({block:'nearest', behavior:'smooth'}); } }
+    function release(){ if(btn) btn.disabled = false; if(lab) lab.textContent = labWas; }
+    function openMail(){ var a = document.createElement('a'); a.href = href; a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); }, 1000); }   /* a link click rather than location.href: the page stays where it is */
+    function fallback(){   /* the page could not send it — hand it to the mail app, and say so */
+      release(); openMail();
+      show(en ? 'Could not send from the page, so your mail app has been opened instead. If nothing happened, please write to the address below.'
+             : 'ページからは送れなかったため、お使いのメールソフトを開きました。何も起きないときは、下の宛先へ直接お送りください。');
+    }
+
+    if(!CONTACT_URL){ openMail(); show(en ? 'Your mail app has been opened. If nothing happened, please write to the address below.' : 'メールソフトを開きました。届かないときは、下の宛先へ直接お送りください。'); return; }
+
+    if(btn) btn.disabled = true; if(lab) lab.textContent = en ? 'Sending…' : '送信中…';
+    var settled = false, giveUp = setTimeout(function(){ if(!settled){ settled = true; fallback(); } }, 12000);
+    /* text/plain keeps this a simple request: Apps Script answers no preflight */
+    fetch(CONTACT_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({
+      name:name, email:mail, subject:subj, msg:msg, company:g('company'), lang: en ? 'en' : 'ja'
+    })}).then(function(r){ return r.json().catch(function(){ return {ok: r.ok}; }); })
+      .then(function(res){
+        if(settled) return; settled = true; clearTimeout(giveUp);
+        if(res && res.ok){
+          release(); cpform.reset();
+          show(en ? 'Sent — thank you. I will write back within a few days.' : '送信しました。ありがとうございます。数日のうちにお返事します。');
+        } else fallback();
+      })
+      .catch(function(){ if(settled) return; settled = true; clearTimeout(giveUp); fallback(); });
   });
   window.addEventListener('keydown', function(e){ var ae = document.activeElement, typing = ae && (/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) || ae.isContentEditable); if(e.key === 'g' && !e.metaKey && !e.ctrlKey && !typing && !(cpage && !cpage.hidden)){ document.documentElement.classList.toggle('grid'); togFit(); } });
 
