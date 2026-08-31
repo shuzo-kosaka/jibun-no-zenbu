@@ -456,7 +456,7 @@
         yrRoll = setTimeout(tick, 1080);
       }, 800); };   /* the works' years: 2020 → 2026 → 2020…, the ones digit clicking on like a counter wheel */ if(od.classList.contains('arrow')) wordOut(run); else run(); return; }   /* a span: the works, 2020 → 2026 */
     if(!/^\d{4}$/.test(String(y))){   /* a word instead of a year; two words go on two lines (THANK / YOU) */
-      var w = String(y), two = w.length > 4 && w.indexOf(' ') > 0, show = function(){ od.classList.remove('out'); od.classList.add('arrow'); od.classList.toggle('long', w.length > 4); od.classList.toggle('two', two); ar.textContent = two ? w.replace(' ', '\n') : w; };
+      var w = String(y), two = w.length > 4 && w.indexOf(' ') > 0, show = function(){ od.classList.remove('out'); od.classList.add('arrow'); od.classList.toggle('long', w.length > 3); od.classList.toggle('two', two); ar.textContent = two ? w.replace(' ', '\n') : w; };
       if(od.classList.contains('arrow')){ if(y !== curY){ ar.classList.add('bye'); odT = setTimeout(function(){ ar.classList.remove('bye'); show(); }, 300); } }
       else { od.classList.add('out'); odT = setTimeout(show, 360); }   /* the digits roll up and out first */
       curY = y; return;
@@ -1727,6 +1727,7 @@
     meanWrap(); hugLine(); tagAlign(); ftFit(); ovalFit(); msgFitDone = false;
     document.querySelectorAll('[data-en][data-ja]').forEach(function(el){ if(el.querySelector('.ch') || el.__ja !== undefined || el.children.length) return; el.textContent = el.getAttribute(en ? 'data-en' : 'data-ja'); });   /* only the plain two-way labels: the menu's cards carry data-en for their seals and must keep their children */
     document.querySelectorAll('.lang button').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-lang') === lang ? 'true' : 'false'); });
+    if(curSec && curSec.getAttribute('data-year')){ curY = ''; setYear(curSec.getAttribute('data-year')); }   /* the year box's word follows the language */
     document.documentElement.lang = lang; body.classList.toggle('en', en); curHd = null; chapUpdate();
     if(!quiet) typeEls(changed);
     document.querySelectorAll('.sr li .st, #mseals li .st').forEach(function(st){ while(st.firstChild) st.removeChild(st.firstChild); });
