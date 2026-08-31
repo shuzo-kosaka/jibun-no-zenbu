@@ -1582,3 +1582,19 @@
   .anno{font-size:12.5px; letter-spacing:.06em; padding:5px 10px; background:var(--l-red); color:#FBF7F2; border-color:var(--l-red); border-radius:3px; box-shadow:0 6px 18px rgba(0,0,0,.20); transform:translateY(6px) scale(.96); transition:opacity .45s var(--ease), transform .45s cubic-bezier(.2,.9,.3,1)}
   .anno::before{left:-8px; width:8px; height:8px; margin-top:-4px; background:var(--l-red); box-shadow:0 0 0 3px rgba(217,37,28,.22)}
   .anno.on{transform:none}
+  .anno{background:none !important; border:0 !important; padding:0 !important; box-shadow:none !important; border-radius:0 !important; opacity:1; transform:none; transition:opacity .3s var(--ease)}
+  .anno::before{display:none}
+  .anno i{position:absolute; left:-36px; top:50%; width:36px; height:1.5px; margin-top:-.75px; background:var(--l-red); transform:scaleX(0); transform-origin:left center; transition:transform .3s var(--ease) .14s}
+  .anno i::before{content:""; position:absolute; left:-4px; top:50%; width:9px; height:9px; margin-top:-4.5px; border-radius:50%; background:var(--l-red); transform:scale(0); transition:transform .26s cubic-bezier(.2,1.6,.4,1) .26s}
+  .anno span{display:block; background:var(--l-red); color:#FBF7F2; font-family:var(--mono); font-size:12.5px; letter-spacing:.06em; line-height:1.5; padding:5px 10px; border-radius:3px; box-shadow:0 6px 18px rgba(0,0,0,.18); white-space:nowrap;
+    clip-path:inset(0 100% 0 0); opacity:0; transition:clip-path .34s cubic-bezier(.2,.9,.3,1), opacity .16s}
+  .anno.on i{transform:scaleX(1); transition-delay:.12s}
+  .anno.on i::before{transform:scale(1); transition-delay:.02s; animation:annoPing .9s ease-out .06s}
+  .anno.on span{clip-path:inset(0 0 0 0); opacity:1; transition-delay:.26s}
+  @keyframes annoPing{0%{box-shadow:0 0 0 0 rgba(217,37,28,.42)} 100%{box-shadow:0 0 0 13px rgba(217,37,28,0)}}
+  .cur .cd b{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.92); font-family:var(--mono); font-weight:500; font-size:11px; letter-spacing:.08em; color:#FBF7F2; white-space:nowrap; opacity:0; transition:opacity .18s var(--ease), transform .28s var(--ease)}
+  .cur.suck .cd{width:112px !important; height:112px !important; margin:-56px 0 0 -56px !important; background:var(--acc) !important; border-color:transparent !important; box-shadow:0 10px 34px rgba(232,69,24,.28)}
+  .cur.suck .cd b{opacity:1; transform:translate(-50%,-50%); transition-delay:.1s}
+  .cur.suck .cv,.cur.suck .chh{opacity:.05}
+  .cur.suck .cc{opacity:0}
+  body.atend .cur.suck .cd{background:var(--acc) !important}

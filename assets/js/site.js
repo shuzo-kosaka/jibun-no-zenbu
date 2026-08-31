@@ -340,11 +340,22 @@
     body.classList.add('hasmouse');
     var cv = cur.querySelector('.cv'), chh = cur.querySelector('.chh'), cd = cur.querySelector('.cd'), cc = cur.querySelector('.cc');
     var mx = window.innerWidth/2, my = vh()/2, lx = mx, ly = my, dx = mx, dy = my, lastTxt = '';
+    /* v139: over the round badge at the foot of the screen the dot swells and takes the cursor with it — the
+       page is about to be moved, and it says where to. */
+    var ctaFx = document.querySelector('.cta-fx'), cdLab = document.createElement('b'), suckOn = false;
+    cd.appendChild(cdLab);
+    function suckSet(on){
+      suckOn = on; cur.classList.toggle('suck', on);
+      if(!on) return;
+      var up = body.classList.contains('atend'), en = curLang === 'en';
+      cdLab.textContent = en ? (up ? '\u2191 TO THE TOP' : '\u2193 TO THE FOOT') : (up ? '\u2191 ページ先頭へ' : '\u2193 ページ下部へ');
+    }
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
       var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null;
       cur.classList.toggle('hov', !!hov);
       cur.classList.toggle('onmedia', !!(t && t.closest && t.closest('.vid, .wkf, .marg figure, .hw, #ch5pin .bgph, .wk-mid')));   /* v100: ink-on-ink is invisible over a photo or a video thumbnail */
+      suckSet(!!(t && t.closest && t.closest('.cta-fx')));
       if(!body.classList.contains('opening')){ top.style.setProperty('--mx', (mx / window.innerWidth - .5).toFixed(3)); top.style.setProperty('--my', (my / vh() - .5).toFixed(3)); }
       if(my < vh() * 1.2){ var tr = top.getBoundingClientRect(); top.style.setProperty('--px', (mx - tr.left).toFixed(0) + 'px'); top.style.setProperty('--py', (my - tr.top).toFixed(0) + 'px'); }
     }, {passive:true});
@@ -352,11 +363,12 @@
     (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
     var c5 = document.getElementById('ch5pin');
     window.addEventListener('mousemove', function(e){ if(c5){ c5.style.setProperty('--sx', (e.clientX / window.innerWidth * 100).toFixed(1) + '%'); c5.style.setProperty('--sy', (e.clientY / vh() * 100).toFixed(1) + '%'); } }, {passive:true});
-    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); }, {passive:true});
+    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); suckSet(!!(t && t.closest && t.closest('.cta-fx'))); }, {passive:true});
     document.documentElement.addEventListener('mouseleave', function(){ cur.classList.remove('on'); });
     document.documentElement.addEventListener('mouseenter', function(){ cur.classList.add('on'); });
     (function loop(){
       lx += (mx - lx) * .18; ly += (my - ly) * .18; dx += (mx - dx) * .55; dy += (my - dy) * .55;
+      if(suckOn && ctaFx){ var br = ctaFx.getBoundingClientRect(); dx += (br.left + br.width / 2 - dx) * .14; dy += (br.top + br.height / 2 - dy) * .14; }   /* drawn in toward the badge */
       cv.style.transform = 'translateX(' + lx.toFixed(1) + 'px)';
       chh.style.transform = 'translateY(' + ly.toFixed(1) + 'px)';
       cd.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
@@ -750,7 +762,11 @@
     ];
     targets.forEach(function(t, i){
       if(!t[0]) return; var r = t[0].getBoundingClientRect(); if(r.bottom < 0 || r.top > vh()) return;
-      var a = document.createElement('div'); a.className = 'anno'; a.textContent = t[1];
+      /* v137: the label is drawn the way a note is made on a proof — a point is pricked on the thing itself,
+         a leader is ruled out from it, and the card opens along that line. It closes in the reverse order. */
+      var a = document.createElement('div'); a.className = 'anno';
+      a.appendChild(document.createElement('i'));
+      var tx = document.createElement('span'); tx.textContent = t[1]; a.appendChild(tx);
       a.style.left = Math.min(window.innerWidth - 240, Math.max(8, r.left + t[2])) + 'px'; a.style.top = Math.max(8, r.top + t[3]) + 'px';
       body.appendChild(a); annoLive.push({el:a, t:t[0], dx:t[2], dy:t[3]}); setTimeout(function(){ a.classList.add('on'); }, 120 + i*160);
     });
@@ -1261,12 +1277,29 @@
     if(reduce || !fine) return;
     var target = window.scrollY, cur = target, active = false, raf = 0;
     function limit(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+    /* v138: the seams — where a pinned screen takes hold of the page, and where it lets go again. Crossing one at
+       full speed reads as running into something, because the picture stops dead while the wheel is still turning.
+       Coming up to a seam the page takes smaller steps, so it arrives slowing rather than colliding. */
+    var seams = [];
+    function seamScan(){
+      seams = [];
+      Array.prototype.forEach.call(document.querySelectorAll('.pin, .solopin'), function(el){
+        var top = el.getBoundingClientRect().top + window.scrollY, h = el.offsetHeight, v = window.innerHeight;
+        seams.push(top); if(h > v + 8) seams.push(top + h - v);
+      });
+    }
+    seamScan(); window.addEventListener('resize', seamScan, {passive:true});
+    function damp(y){
+      var D = 340, k = 1;
+      for(var i = 0; i < seams.length; i++){ var d = Math.abs(seams[i] - y); if(d < D){ var s = .5 + .5 * (d / D); if(s < k) k = s; } }
+      return k;
+    }
     function busy(){
       var h = document.documentElement;
       return flying || h.classList.contains('cpopen') || body.classList.contains('menuopen') || h.classList.contains('lbopen') || body.classList.contains('opening');
     }
     function loop(){
-      cur += (target - cur) * .13;   /* v128: heavier still — .32 followed the wheel almost exactly, .20 was closer, this one carries a good half-second past the last notch */
+      cur += (target - cur) * .13 * damp(cur);   /* v128: heavier — .32 followed the wheel almost exactly. v138: and gentler still as a seam comes up */
       if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo({top:Math.round(cur), behavior:'instant'}); return; }
       window.scrollTo({top:Math.round(cur), behavior:'instant'});   /* v113: html{scroll-behavior:smooth} would otherwise animate every one of these, and the two eases stacked into a long lag */
       raf = requestAnimationFrame(loop);
@@ -1283,7 +1316,7 @@
       e.preventDefault();
       var d = e.deltaY * (e.deltaMode === 1 ? 34 : e.deltaMode === 2 ? window.innerHeight : 1);
       target = Math.max(0, Math.min(limit(), (active ? target : window.scrollY) + d));
-      if(!active){ active = true; cur = window.scrollY; raf = requestAnimationFrame(loop); }
+      if(!active){ active = true; cur = window.scrollY; seamScan(); raf = requestAnimationFrame(loop); }   /* the seams move as images settle, so they are measured again at the start of each run */
     }, {passive:false});
     /* anything else that moves the page — a flight, a keypress, a hash — becomes the new truth */
     window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
