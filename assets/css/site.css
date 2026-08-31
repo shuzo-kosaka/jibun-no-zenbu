@@ -1454,7 +1454,7 @@
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-3%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .8s ease-out .1s}
   @keyframes caRing{0%{opacity:.4; transform:scale(.97)} 100%{opacity:0; transform:scale(1.22)}}
-  #ch7c .solopin{min-height:460vh}   /* v105: room to actually read the two paragraphs before the seal comes down; v125: the run after the seal is now about a screen and a half — one screenful still went by too quickly */
+  #ch7c .solopin{min-height:410vh}   /* v105: room to actually read the two paragraphs before the seal comes down; v125: the run after the seal is now about a screen and a half — one screenful still went by too quickly */
   #ch7c .solopin .sq{position:relative; z-index:6; transition:opacity .55s var(--ease)}
   #ch7c .solopin:has(.ca-seal.on) .sq{opacity:.3}   /* the page steps back so the seal is what you read */
   @media (max-width:1024px){ #ch7c .ca-seal{width:76vw; top:54%} }
@@ -1576,3 +1576,6 @@
   .cp-send[disabled]{opacity:.55; cursor:default}
   .anno.gone{opacity:0 !important}
   .anno{z-index:90}   /* above the header (88): two of the five were being drawn behind it */
+  #contact{grid-template-rows:8vh minmax(12vh,auto) auto !important; padding-bottom:10vh !important}
+  @media (max-width:1024px){ #contact{grid-template-rows:9vh minmax(10vh,auto) auto !important; padding-bottom:9vh !important} }
+  @media (max-height:800px){ #contact{grid-template-rows:6vh minmax(9vh,auto) auto !important; padding-bottom:7.5vh !important} }
