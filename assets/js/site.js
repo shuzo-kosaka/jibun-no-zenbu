@@ -506,10 +506,10 @@
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .26);
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .48);
-        pin.classList.toggle('gridon', p >= .72);   /* v104: the grid is drawn as the page says it loves grids */
-        if(p >= .72){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 4800); }   /* held as long as the opening screen holds it, then let go */
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .22);
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .40);
+        pin.classList.toggle('gridon', p >= .78);   /* v104: the grid is drawn as the page says it loves grids */
+        if(p >= .78){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 4800); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
@@ -917,7 +917,7 @@
     if(window.__srTail){ var t = window.__srTail, q = Math.max(0, Math.min(1, (p - .86) / .14)); t.rect.setAttribute('height', (t.top + (t.bottom - t.top) * q + 20).toFixed(1)); }
   }
   /* the footprints are one walk from NEXT down into the diagram, driven only by the scroll: a print shows once it has risen above the walking front (two thirds down the screen), and every print is gone once the diagram's ring starts to draw. Natural page positions are measured once (the diagram's prints are measured against the section, so the sticky screen doesn't matter). */
-  var fpList = [], fpFade = 0, fpMainN = 0, fpLastY = 0;
+  var fpList = [], fpFade = 0, fpMainN = 0;
   function fpMeasure(){
     fpList = [];
     var sy = window.scrollY;
@@ -931,18 +931,10 @@
   }
   function fpUpdate(){
     if(!fpList.length) return;
-    var sy = window.scrollY, up = sy < fpLastY - 1; if(Math.abs(sy - fpLastY) > 1) fpLastY = sy;
-    var front = sy + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
-    var fresh = 0, offs = [];   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
-    fpList.forEach(function(o, i){
-      var on = (i >= gone || i >= fpMainN) && o.y < front;
-      if(up && on && !o.el.classList.contains('on')){ return; }   /* v103: walking back up, nothing lights again — the prints only leave. Coming down once more, the walk is laid out afresh toward the diagram */
-      if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (Math.min(fresh, 10) * 55) + 'ms'; fresh++; o.el.classList.add('on'); }
-      else if(!on && o.el.classList.contains('on')) offs.push(o);
-      else if(!on) o.el.style.transitionDelay = '';
-    });
-    offs.reverse().forEach(function(o, k){ o.el.style.transitionDelay = (Math.min(k, 10) * 55) + 'ms'; o.el.classList.remove('on'); });   /* the walk is un-walked from its far end back */
+    var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
+    fpList.forEach(function(o, i){ o.el.classList.toggle('on', (i >= gone || i >= fpMainN) && o.y < front); });
   }
+
   /* the bridge: the walk resumes below the diagram — down the same rail, a gentle bend past the heading, and on toward CHECKPOINT 01 */
   function brBuild(){
     var sec = document.getElementById('bridge'), svg = document.getElementById('brsvg'); if(!sec || !svg) return;
@@ -1146,6 +1138,7 @@
     stampPic.style.setProperty('--fs', (.3 + .7 * t).toFixed(3));   /* small as it sets out, full size as it lands */
     stampPic.style.setProperty('--ol', p > 0 ? '1' : '0');
     stampPic.style.setProperty('--ink', Math.max(0, Math.min(1, (p - .72) / .28)).toFixed(3));
+    if(p >= .72) stampPic.classList.add('landed'); else if(p < .66) stampPic.classList.remove('landed');   /* v105: pressed on landing, and armed again if you walk back up */
   }
   function onScroll(){ if(ticking) return; ticking = true; requestAnimationFrame(function(){ ticking = false; if(flying){ chapUpdate(); ctaUpdate(); return; } sceneUpdate(); chapUpdate(); ctaUpdate(); pinUpdate(); soloUpdate(); wipeUpdate(); seqUpdate(); srUpdate(); fpUpdate(); stampUpdate(); }); }
   window.addEventListener('scroll', onScroll, {passive:true}); window.addEventListener('resize', onScroll); onScroll();
@@ -1153,26 +1146,36 @@
 
   /* in-page flights (the logo back to the top, contents, menu, the 小 button): one smooth run on requestAnimationFrame with a fixed short duration, whatever the distance. The heavy scroll-driven work of the pinned screens waits until landing, so the page glides instead of stuttering through them. A wheel, touch or key cancels the flight. */
   var flying = false, flyRaf = 0;
-  function flyTo(y){
+  function flyTo(y, rew){
     y = Math.max(0, Math.round(y)); var start = window.scrollY, dist = y - start;
     if(Math.abs(dist) < 2) return;
     if(reduce){ window.scrollTo({top:y, behavior:'instant'}); return; }
     cancelAnimationFrame(flyRaf);
-    var dur = Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
+    /* v106: the button at the end winds the page back like tape — a long spool that runs fast and eases out, the page stepping backwards a frame at a time */
+    var dur = rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
     flying = true; document.documentElement.classList.add('flying');
+    if(rew) document.documentElement.classList.add('rewind');
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-    function land(){ flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
+    function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
+    function land(){ flying = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); ticking = false; onScroll(); }
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
-      window.scrollTo({top: start + dist * ease(k), behavior:'instant'});
+      var yy = start + dist * (rew ? easeRew(k) : ease(k));
+      if(rew && k < 1) yy = Math.round(yy / 26) * 26;   /* the frames flick past rather than glide */
+      window.scrollTo({top: yy, behavior:'instant'});
       if(k < 1) flyRaf = requestAnimationFrame(step); else land();
     })(t0);
   }
+  (function(){   /* the tape's own picture: tracking bands, a sweeping head, and the mark in the corner */
+    var r = document.createElement('div'); r.className = 'rew'; r.setAttribute('aria-hidden', 'true');
+    r.innerHTML = '<i class="bands"></i><span class="mk">\u25c0\u25c0 REWIND</span>';
+    document.body.appendChild(r);
+  })();
   function flyStop(){ if(!flying) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY); return true; }
-  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0); } else if(!flyToEl(h)) flyTo(0); }); });
+  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, a.classList.contains('cta-fx')); } else if(!flyToEl(h)) flyTo(0); }); });
 
   /* hamburger menu */
   var burger = document.getElementById('burger'), menu = document.getElementById('menu');

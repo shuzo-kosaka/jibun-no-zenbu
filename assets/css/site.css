@@ -782,7 +782,7 @@
   .pin{display:block; min-height:200vh}
   .pin .stick{position:sticky; top:0; height:100vh; display:grid; grid-template-columns:12% 16% 30% 25% 17%; grid-template-rows:14vh minmax(18vh,auto) minmax(39vh,auto) minmax(14vh,auto); overflow:hidden}
   #message{min-height:260vh}
-  #message{min-height:400vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
+  #message{min-height:500vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
   #message .hw .hwa{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; opacity:0; transition:opacity .6s}
   #message .hw.on .hwa{opacity:1}
@@ -1472,6 +1472,22 @@
   .wkf:hover .ph,.wkf:focus-visible .ph{animation:wkFlick .62s steps(1,end) forwards}
   .wkf:hover .fl,.wkf:focus-visible .fl{animation:wkGlow .62s ease-out forwards}
   @media (hover:none){ .wkf:hover .ph{animation:none} }
+  /* v105: the seal that flies in lands like a seal — a quick rebound and a ring of ink spreading from under it */
+  #contents .stamp-pic::after{content:""; position:absolute; inset:2%; border:2px solid var(--acc); border-radius:50%; opacity:0}
+  #contents .stamp-pic.landed::after{animation:picRing .8s ease-out}
+  @keyframes picRing{0%{opacity:.45; transform:scale(.94)} 100%{opacity:0; transform:scale(1.26)}}
+  #contents .stamp-pic.landed img{animation:picPress .42s cubic-bezier(.2,.9,.3,1)}
+  @keyframes picPress{0%{transform:scale(1.07)} 52%{transform:scale(.965)} 100%{transform:scale(1)}}
+  body[data-scene="green"] .brand img{filter:brightness(0) invert(1)}   /* v106: the 朱 mark does not belong on the green; it reads as white there */
+  /* v106: the rewind — the page winds back and the picture goes with it */
+  .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s}
+  html.rewind .rew{opacity:1}
+  .rew .bands{position:absolute; inset:-10% 0; background:repeating-linear-gradient(180deg, rgba(255,255,255,.13) 0 2px, rgba(0,0,0,.05) 2px 5px); animation:rewScan .28s linear infinite; mix-blend-mode:overlay}
+  @keyframes rewScan{to{transform:translateY(-10px)}}
+  .rew::after{content:""; position:absolute; left:-2%; right:-2%; height:18vh; background:linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0)); mix-blend-mode:overlay; animation:rewHead .34s linear infinite}
+  @keyframes rewHead{0%{top:104%} 100%{top:-22%}}
+  .rew .mk{position:absolute; right:5%; bottom:7%; font-family:var(--mono); font-size:12px; letter-spacing:.24em; color:var(--fg); opacity:.85; animation:rewBlink .34s steps(2) infinite}
+  @keyframes rewBlink{50%{opacity:.3}}
   #message .lines{opacity:0; z-index:0}
   #message .lines i{transition:transform 1s var(--ease), opacity .8s}
   #message .lines .v{transform:scaleY(0); transform-origin:top}
@@ -1481,4 +1497,4 @@
   #message.gridon .lines{opacity:1}
   #message.gridon .lines .v,#message.gridon .lines .h,#message.gridon .lines .c{transform:none}
   #message.gridon .lines .frame{opacity:1}
-  #message.gridgone .lines i{opacity:0}   /* v104b: like the opening screen, the grid is drawn, held, and then let go */
+  #message.gridgone .lines i,#message.gridgone .lines .frame{opacity:0}   /* v104b: like the opening screen, the grid is drawn, held, and then let go */
