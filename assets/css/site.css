@@ -1530,4 +1530,4 @@
   .lgsw .tag b.to::after{content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px; background:#FBF7F2}
   @media (max-width:1024px){ .lgsw .bar{width:52vw} .lgsw .tag{font-size:11px; letter-spacing:.16em} }
   .stick.dim .hw{filter:none}   /* a blur over the whole screen, on a layer already at 16% opacity: invisible, and expensive everywhere */
-  html.wk .fp,html.wk .dgfp,html.wk .chfp,html.wk [filter="url(#fpink)"],html.wk [filter="url(#chfpink)"],html.wk [filter="url(#dgfpink)"]{filter:none}   /* Safari: the walk keeps its shape, without the ink grain */
+  html.is-webkit .fp,html.is-webkit .dgfp,html.is-webkit .chfp,html.is-webkit [filter="url(#fpink)"],html.is-webkit [filter="url(#chfpink)"],html.is-webkit [filter="url(#dgfpink)"]{filter:none}   /* Safari: the walk keeps its shape, without the ink grain */
