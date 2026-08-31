@@ -780,8 +780,10 @@
   #message{min-height:260vh}
   #message{min-height:400vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
-  #message .hw video{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; mix-blend-mode:screen; opacity:0; transition:opacity .6s}
-  #message .hw.on video{opacity:1}
+  #message .hw .hwbox{position:relative; display:block; opacity:0; transition:opacity .6s}
+  #message .hw.on .hwbox{opacity:1}
+  #message .hw video{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw}
+  #message .hw .hwb{position:absolute; inset:0; background:var(--bg); mix-blend-mode:screen; pointer-events:none}
   #message .stick.dim .hw{opacity:.16; transform:translateY(-6vh) scale(.92); filter:blur(1.5px)}
   #message .body{grid-column:3/5; grid-row:1/5; position:relative; padding:0; max-width:none; z-index:3}
   #message .pg{position:absolute; left:0; right:6%; top:9vh; bottom:6vh; display:flex; flex-direction:column; justify-content:center; max-width:38em; container-type:inline-size}
@@ -1145,6 +1147,16 @@
   .menu .mmsg .kslot .flag{right:-8px; top:-28px; width:44px; height:57px}
   @keyframes mflag{from{transform:scale(0) rotate(-14deg)} to{transform:scale(1) rotate(13deg)}}   /* v92: it leans a little to the right, as a planted flag does */
   .menu .mlinks .txt small{display:block; font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.06em; color:var(--fg3); margin-top:5px}   /* v93: the contact card's note */
+  /* v96: on the phone the header keeps only the mark and the burger — JA/EN and the grid toggle live here */
+  .menu .mopt{display:none}
+  @media (max-width:820px){
+    .menu .mopt{display:flex; align-items:center; gap:16px; margin-top:6vh; padding-top:22px; border-top:1px solid var(--line)}
+    .menu .mopt .gridbtn{display:inline-block; width:auto !important; font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--ink); background:none; border:1px solid var(--ink); border-radius:2px; padding:7px 12px; cursor:pointer}
+    /* the header button's labels are revealed by #gridbtn-scoped rules; this copy shows its own the plain way */
+    .menu .mopt .gridbtn .on,.menu .mopt .gridbtn .off{position:static; display:none; opacity:1; transform:none; filter:none}
+    html:not(.grid) .menu .mopt .gridbtn .off{display:inline}
+    html.grid .menu .mopt .gridbtn .on{display:inline}
+  }
 
   @media (max-width:820px){ .tl li{grid-template-columns:4.5em 1fr; grid-template-areas:"y t" "y p"; row-gap:2px} .tl .a{display:none} .tl .y{grid-area:y} .tl .p2{grid-area:p} .tl li a{grid-area:t} }
 
@@ -1400,4 +1412,22 @@
     #ch5pin .ttl{font-size:clamp(22px,6.6vw,30px)}
     #ch1pin{min-height:160vh !important}   /* the footprints scene: less empty walking on a phone */
     .wk-vt{writing-mode:vertical-rl; max-height:none; justify-self:center}   /* 挑戦と失敗、その反復。— vertical on the phone too, as on the desktop */
+    /* v96: the phone hero, after the reference magazine cover — the vertical title stands clear at the right,
+       the two portraits sit smaller as a centred pair, the rotating catch copy gets real presence, CONTENTS leaves */
+    .hd .lang{display:none}   /* JA/EN moved into the menu on the phone */
+    #top .toc{display:none}
+    #top .name b.vt{font-size:min(7vh,44px); right:4.5%; z-index:4}
+    #top .ovals{left:42%; right:auto; top:auto; bottom:26vh; transform:translateX(-50%); gap:4vw; z-index:2}
+    #top .oval{width:33vw}
+    #top .oval .word{font-size:26px}
+    #top .rot{left:5%; top:auto; bottom:10vh; width:90%; font-size:20px; z-index:3}
+    #top .sub{left:5%; top:auto; bottom:20vh}
+    /* v96: MESSAGE — the text block truly centred, the heading with weight; the blur behind pinned text is jank on a phone */
+    #message .body{grid-column:1/7; padding:0}
+    #message .pg{left:0; right:0; width:88%; margin:0 auto}   /* truly centred: full-width body, the panel centres itself */
+    #message h3.mh{font-size:clamp(28px,7.6vw,38px); line-height:1.55}
+    .stick.dim .hw{filter:none}
   }
+  /* v96: `.cur` is the cursor overlay's class, and the touch-device rule `.cur{display:none}` also swallowed
+     the hero rotator's current phrase (span.cur) — which is why the catch copy never showed on a real phone */
+  @media (hover:none),(pointer:coarse){ #rot > span.cur{display:block} }

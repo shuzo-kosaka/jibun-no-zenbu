@@ -57,6 +57,10 @@
       <a href="#contact" style="--i:10; --rot:-2deg" data-en="PROFILE" data-jp="素性"><span class="kslot"><span class="st"></span></span><span class="txt"><b>PROFILE</b>プロフィール</span></a>
       <a href="#write" class="mcontact" style="--i:11; --rot:4deg" data-en="CONTACT" data-jp="連絡"><span class="kslot"><span class="st"></span></span><span class="txt"><b>CONTACT</b>メールを送る<small>文字の演出で遊べる仕掛けつき</small></span></a>
     </div>
+    <div class="mopt">
+      <span class="lang" role="group" aria-label="言語"><button type="button" data-lang="ja" aria-pressed="true">JA</button><button type="button" data-lang="en" aria-pressed="false">EN</button></span>
+      <button class="gridbtn mgrid" type="button" title="平均グリッドの表示／非表示"><span class="off">グリッドを表示</span><span class="on">グリッドを非表示</span></button>
+    </div>
   </div>
 </div>
 
@@ -167,7 +171,7 @@
 <!-- ============ MESSAGE (朱・固定・手書きが画面いっぱい → 文字が浮かぶ) ============ -->
 <section class="pin" id="message" data-year="2026" data-place="MESSAGE" data-scene="shu" data-hd="MESSAGE">
   <div class="stick" id="msgstick">
-    <div class="hw" id="hw"><video id="hwv" muted playsinline preload="auto" poster="assets/img/HW_POSTER.webp"><source src="assets/media/HW_WEBM.webm" type="video/webm"><source src="assets/media/HW_MP4.mp4" type="video/mp4"></video></div>
+    <div class="hw" id="hw"><span class="hwbox"><video id="hwv" muted playsinline preload="auto" poster="assets/img/HW_POSTER.webp"><source src="assets/media/HW_WEBM.webm" type="video/webm"><source src="assets/media/HW_MP4.mp4" type="video/mp4"></video><i class="hwb" aria-hidden="true"></i></span></div>
     <div class="lab rise" style="--i:0">MESSAGE</div>
     <div class="body">
       <div class="pg">

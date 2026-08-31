@@ -1158,6 +1158,8 @@
     clearTimeout(menuShownT); if(open) menu.classList.add('shown'); else menuShownT = setTimeout(function(){ menu.classList.remove('shown'); }, 850);
     clearTimeout(menuCloseT); if(!open){ body.classList.add('menuclosing'); menuCloseT = setTimeout(function(){ body.classList.remove('menuclosing'); }, 900); } else body.classList.remove('menuclosing'); }
   burger.addEventListener('click', function(){ setMenu(!menu.classList.contains('open')); });
+  /* v96: the menu's grid toggle (phone) simply presses the header's hidden one */
+  var mgrid = document.querySelector('.mgrid'); if(mgrid) mgrid.addEventListener('click', function(){ var g = document.getElementById('gridbtn'); if(g) g.click(); });
   menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } setTimeout(function(){ flyToEl(id); }, 350); }); });   /* v85: the CONTACT card opens the contact page */
   window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && menu.classList.contains('open')) setMenu(false); });
 
