@@ -1477,9 +1477,7 @@
   #message .lines .h{transform:scaleX(0); transform-origin:left}
   #message .lines .c{transform:scaleY(0); transform-origin:top}
   #message .lines .frame{opacity:0}
-  #message .lines s{opacity:0; transition:opacity .5s .8s}
   #message.gridon .lines{opacity:1}
   #message.gridon .lines .v,#message.gridon .lines .h,#message.gridon .lines .c{transform:none}
   #message.gridon .lines .frame{opacity:1}
-  #message.gridon .lines s{opacity:1}
-  @media (max-width:1024px){ #message .lines s{display:none} }
+  #message.gridgone .lines i{opacity:0}   /* v104b: like the opening screen, the grid is drawn, held, and then let go */
