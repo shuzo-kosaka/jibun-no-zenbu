@@ -12,7 +12,7 @@
     --ease:cubic-bezier(.2,.7,.2,1);
   }
   body[data-scene="shu"]{ --bg:#E84518; --fg:#FBF7F2; --fg2:rgba(251,247,242,.84); --fg3:rgba(251,247,242,.62); --line:rgba(251,247,242,.35); --card:rgba(255,255,255,.08); --mk:rgba(255,255,255,.34); --ul:#FBF7F2; --acc:#FBF7F2; --l-red:#FBF7F2; --l-yellow:rgba(255,255,255,.6); --l-green:rgba(255,255,255,.6) }
-  body[data-scene="green"]{ --bg:#82BE28; --fg:#16220A; --fg2:rgba(22,34,10,.82); --fg3:rgba(22,34,10,.56); --line:rgba(22,34,10,.26); --card:rgba(255,255,255,.16); --mk:rgba(255,255,255,.55); --ul:#16220A; --acc:#1E3606; --l-red:#16220A; --l-yellow:rgba(22,34,10,.45); --l-green:rgba(22,34,10,.45) }
+  body[data-scene="green"]{ --bg:#82BE28; --fg:#16220A; --fg2:rgba(22,34,10,.82); --fg3:rgba(22,34,10,.56); --line:rgba(22,34,10,.26); --card:rgba(255,255,255,.16); --mk:rgba(255,255,255,.55); --ul:#16220A; --acc:#1C1B19; --l-red:#16220A; --l-yellow:rgba(22,34,10,.45); --l-green:rgba(22,34,10,.45) }
   body[data-scene="ink"]{ --bg:#15151A; --fg:#F2F2EE; --fg2:#BDBBB3; --fg3:#7E7C76; --line:#33333A; --card:#1E1E24; --mk:rgba(232,69,24,.55); --ul:#F0603E; --acc:#E84518 }
   body[data-scene="night"]{ --bg:#0E1826; --fg:#F2F2EE; --fg2:#B9C0CB; --fg3:#7F8895; --line:#233246; --card:#152238; --mk:rgba(232,69,24,.5); --ul:#F0603E; --acc:#F0603E }
   html[lang="en"] .ttl{font-family:var(--optima); font-weight:400; letter-spacing:.005em; font-feature-settings:normal; line-height:1.1; font-size:clamp(28px,4vw,54px)}
@@ -1444,7 +1444,7 @@
   #ch7c .ca-seal{position:absolute; left:50%; top:53%; width:min(74vw,780px); aspect-ratio:1; opacity:0; pointer-events:none; z-index:5;
     transform:translate(-50%,-50%) rotate(-14deg) scale(1.5);
     transition:opacity .4s var(--ease), transform .55s cubic-bezier(.2,1.5,.34,1)}   /* one movement, both ways: it lands with a bounce and lifts back off */
-  #ch7c .ca-seal.on{opacity:1; transform:translate(-50%,-50%) rotate(-7deg) scale(1)}
+  #ch7c .ca-seal.on{opacity:.96; transform:translate(-50%,-50%) rotate(-7deg) scale(1)}
   #ch7c .ca-seal svg{width:100%; height:100%; display:block; overflow:visible}
   #ch7c .ca-seal::after{content:""; position:absolute; inset:-3%; border:2.5px solid var(--acc); border-radius:50%; opacity:0}
   #ch7c .ca-seal.on::after{animation:caRing .8s ease-out .1s}
@@ -1479,9 +1479,7 @@
   @keyframes picPress{0%{transform:scale(1.06); filter:saturate(1.35) brightness(1.06)} 52%{transform:scale(.972)} 100%{transform:scale(1); filter:none}}
   .ld .lab{opacity:1; color:#FFFFFF}   /* v108: the loading line sat at .8 over the 朱 and read as grey — it is white now */
   .ld .lab i{background:#FFFFFF}
-  .brand .gm{display:none}
-  body[data-scene="green"] .brand img.mk0{display:none}
-  body[data-scene="green"] .brand .gm{display:block}   /* v111: on CyberAgent's green the mark is drawn in a deeper green of its own */
+  body[data-scene="green"] .brand img{filter:brightness(0)}   /* on the green the mark reads in ink, like the text beside it */
   /* v106: the rewind — the page winds back and the picture goes with it */
   .rew{position:fixed; inset:0; z-index:97; pointer-events:none; opacity:0; transition:opacity .22s, backdrop-filter .3s, -webkit-backdrop-filter .3s}
   html.fwd .rew::after{animation:fwdHead .34s linear infinite}

@@ -1187,8 +1187,8 @@
     }
     function loop(){
       cur += (target - cur) * .32;   /* v112: light — it follows the wheel closely and only takes the edge off */
-      if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo(0, Math.round(cur)); return; }
-      window.scrollTo(0, Math.round(cur));
+      if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo({top:Math.round(cur), behavior:'instant'}); return; }
+      window.scrollTo({top:Math.round(cur), behavior:'instant'});   /* v113: html{scroll-behavior:smooth} would otherwise animate every one of these, and the two eases stacked into a long lag */
       raf = requestAnimationFrame(loop);
     }
     window.addEventListener('wheel', function(e){
