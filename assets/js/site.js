@@ -914,7 +914,7 @@
     if(window.__srTail){ var t = window.__srTail, q = Math.max(0, Math.min(1, (p - .86) / .14)); t.rect.setAttribute('height', (t.top + (t.bottom - t.top) * q + 20).toFixed(1)); }
   }
   /* the footprints are one walk from NEXT down into the diagram, driven only by the scroll: a print shows once it has risen above the walking front (two thirds down the screen), and every print is gone once the diagram's ring starts to draw. Natural page positions are measured once (the diagram's prints are measured against the section, so the sticky screen doesn't matter). */
-  var fpList = [], fpFade = 0, fpMainN = 0;
+  var fpList = [], fpFade = 0, fpMainN = 0, fpLastY = 0;
   function fpMeasure(){
     fpList = [];
     var sy = window.scrollY;
@@ -928,10 +928,12 @@
   }
   function fpUpdate(){
     if(!fpList.length) return;
-    var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
+    var sy = window.scrollY, up = sy < fpLastY - 1; if(Math.abs(sy - fpLastY) > 1) fpLastY = sy;
+    var front = sy + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
     var fresh = 0, offs = [];   /* v96: momentum scrolling delivers events sparsely, so several prints cross the line at once — staggered delays let them step in one after another instead of as a clump */
     fpList.forEach(function(o, i){
       var on = (i >= gone || i >= fpMainN) && o.y < front;
+      if(up && on && !o.el.classList.contains('on')){ return; }   /* v103: walking back up, nothing lights again — the prints only leave. Coming down once more, the walk is laid out afresh toward the diagram */
       if(on && !o.el.classList.contains('on')){ o.el.style.transitionDelay = (Math.min(fresh, 10) * 55) + 'ms'; fresh++; o.el.classList.add('on'); }
       else if(!on && o.el.classList.contains('on')) offs.push(o);
       else if(!on) o.el.style.transitionDelay = '';
