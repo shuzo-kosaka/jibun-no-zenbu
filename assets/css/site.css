@@ -1613,3 +1613,10 @@
   .anno.far i{width:104px}
   .anno.far span{left:112px}
   .anno.far.lft span{left:auto; right:112px}
+  .sur .stmc{position:absolute; left:0; top:0; pointer-events:none; mix-blend-mode:multiply}
+  .cur .cd b{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-size:0; letter-spacing:0}
+  .cur .cd b svg{width:23px; height:27px; display:block; fill:none; stroke:#FBF7F2; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; transition:transform .34s var(--ease)}
+  .cur.upward .cd b svg{transform:rotate(180deg)}
+  .cur .cd b em{font-style:normal; font-family:var(--mono); font-weight:500; font-size:8.5px; letter-spacing:.26em; color:#FBF7F2; opacity:.92; text-indent:.26em}
+  .cur.suck .cd{box-shadow:0 8px 26px rgba(232,69,24,.22)}
+  .cur.suck .cd::after{content:""; position:absolute; inset:10px; border-radius:50%; border:1px solid rgba(251,247,242,.3)}

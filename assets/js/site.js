@@ -343,12 +343,16 @@
     /* v139: over the round badge at the foot of the screen the dot swells and takes the cursor with it — the
        page is about to be moved, and it says where to. */
     var ctaFx = document.querySelector('.cta-fx'), cdLab = document.createElement('b'), suckOn = false;
+    /* v147: a drawn arrow and one word set in the page's own mono, inside a ring — the same furniture as the
+       seals and the labels, rather than a sentence printed on a disc */
+    cdLab.innerHTML = '<svg viewBox="0 0 26 30" aria-hidden="true"><path d="M13 3 V21.5 M5.5 15 L13 23 L20.5 15"/></svg><em></em>';
     cd.appendChild(cdLab);
     function suckSet(on){
       suckOn = on; cur.classList.toggle('suck', on);
       if(!on) return;
-      var up = body.classList.contains('atend'), en = curLang === 'en';
-      cdLab.textContent = en ? (up ? '\u2191 TO THE TOP' : '\u2193 TO THE FOOT') : (up ? '\u2191 ページ先頭へ' : '\u2193 ページ下部へ');
+      var up = body.classList.contains('atend');
+      cur.classList.toggle('upward', up);
+      var em = cdLab.querySelector('em'); if(em) em.textContent = up ? 'BACK TO TOP' : 'CONTACT';
     }
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
@@ -1313,8 +1317,11 @@
     }
     seamScan(); window.addEventListener('resize', seamScan, {passive:true});
     function damp(y){
-      var D = 340, k = 1;
-      for(var i = 0; i < seams.length; i++){ var d = Math.abs(seams[i] - y); if(d < D){ var s = .5 + .5 * (d / D); if(s < k) k = s; } }
+      var D = 520, k = 1;   /* v146: 340px / half speed was too polite to feel — the run-in is longer and slower now */
+      for(var i = 0; i < seams.length; i++){
+        var d = Math.abs(seams[i] - y);
+        if(d < D){ var q = d / D, s = .28 + .72 * (q * q); if(s < k) k = s; }   /* eased, so the slowing is felt as weight rather than as a brake */
+      }
       return k;
     }
     function busy(){
@@ -1469,16 +1476,88 @@
     list.push({li:mk('ALL OF ME', 'ジブンの|ゼンブを', '2026', 'JIBUN NO ZENBU WO · ALL OF ME · KOSAKA SHUZO · 2026'), i:10});
     return list;
   }
+  /* v145: the storm of seals is painted into a canvas, not built as one filtered SVG per seal. Each design is
+     drawn once into a small bitmap with its ink grain baked in, and every press after that is a single blit —
+     so the screen carries two canvas layers instead of ninety filtered, blended ones. That is what made both
+     the pressing and the clearing heavy; it also means far more seals can fall. */
+  var sealBmp = {}, sealNoise = null;
+  function inkNoise(){
+    if(sealNoise) return sealNoise;
+    var c = document.createElement('canvas'), S = 128; c.width = c.height = S;
+    var g = c.getContext('2d'), im = g.createImageData(S, S), d = im.data;
+    for(var i = 0; i < S * S; i++){
+      var v = Math.random(), a = v < .62 ? 0 : Math.min(255, (v - .62) / .38 * 300);   /* mostly clear, with worn patches */
+      d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = 0; d[i * 4 + 3] = a;
+    }
+    g.putImageData(im, 0, 0); sealNoise = c; return c;
+  }
+  function sealBitmap(spec, px){
+    var key = spec.i + ':' + px + ':' + curLang;
+    if(sealBmp[key]) return sealBmp[key];
+    var cs = getComputedStyle(document.documentElement);
+    var acc = (cs.getPropertyValue('--acc') || '#E84518').trim(), mono = (cs.getPropertyValue('--mono') || 'monospace').trim(), sans = (cs.getPropertyValue('--sans') || 'sans-serif').trim();
+    var c = document.createElement('canvas'); c.width = c.height = px;
+    var g = c.getContext('2d'), k = px / 156;
+    g.scale(k, k); g.translate(78, 78);
+    g.strokeStyle = acc; g.fillStyle = acc; g.lineJoin = 'round';
+    g.lineWidth = 3.4; g.beginPath(); g.arc(0, 0, 70, 0, Math.PI * 2); g.stroke();
+    g.lineWidth = 1.4; g.beginPath(); g.arc(0, 0, 46, 0, Math.PI * 2); g.stroke();
+    var li = spec.li, en = li.getAttribute('data-en') || '', num = ('0' + (spec.i + 1)).slice(-2);
+    var year = (li.getAttribute('data-year') || ((li.querySelector('.y') || {}).textContent || '')).replace('?', '');
+    var ring = li.getAttribute('data-ring') || ('CHECKPOINT ' + num + ' \u00b7 ' + en + ' \u00b7 ' + year + ' \u00b7 KOSAKA');
+    g.font = '500 9.6px ' + mono; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    var R = 57, th = -Math.PI / 2 + .06;   /* from the left, clockwise over the top, as the text path runs */
+    for(var i = 0; i < ring.length; i++){
+      var ch = ring.charAt(i), w = g.measureText(ch).width + 2;
+      th += (w / 2) / R;
+      g.save(); g.rotate(th); g.translate(0, -R); g.fillText(ch, 0, 0); g.restore();
+      th += (w / 2) / R;
+    }
+    var placeJa = li.getAttribute('data-place') || '', place = ((curLang === 'en' && PLACE_EN[placeJa]) ? PLACE_EN[placeJa] : placeJa).split('|');
+    if(place.length > 1){
+      g.font = '700 ' + (curLang === 'en' ? 14 : 17) + 'px ' + sans;
+      g.fillText(place[0], 0, -6); g.fillText(place[1], 0, 14);
+    } else {
+      g.font = '700 ' + (curLang === 'en' ? (place[0].length > 6 ? 15 : 19) : (place[0].length > 3 ? 20 : 26)) + 'px ' + sans;
+      g.fillText(place[0], 0, 9);
+    }
+    g.setTransform(1, 0, 0, 1, 0, 0);   /* the ink is eaten away in patches, the way a rubber stamp prints */
+    g.globalCompositeOperation = 'destination-out';
+    var nz = inkNoise(), off = (spec.i * 37) % 128;
+    for(var yy = -off; yy < px; yy += 128) for(var xx = -off; xx < px; xx += 128) g.drawImage(nz, xx, yy, 128, 128);
+    g.globalCompositeOperation = 'source-over';
+    sealBmp[key] = c; return c;
+  }
   function surSeals(layer, W, H, top){
-    var list = surSealList(), n = 0, N = 38, gap = 420;
+    var dpr = Math.min(2, window.devicePixelRatio || 1), cvs = [];
+    for(var q = 0; q < 2; q++){
+      var c = document.createElement('canvas'); c.className = 'stmc';
+      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+      c.style.width = W + 'px'; c.style.height = H + 'px';
+      layer.appendChild(c); cvs.push(c.getContext('2d')); cvs[q].scale(dpr, dpr);
+    }
+    var bg = cvs[0], lg = cvs[1]; bg.globalCompositeOperation = 'multiply';
+    var list = surSealList(), n = 0, N = 96, gap = 380;
+    function put(g, spec, x, y, size, rot, alpha, scale){
+      var bmp = sealBitmap(spec, 240);
+      g.save(); g.globalAlpha = alpha; g.translate(x + size / 2, y + size / 2); g.rotate(rot); g.scale(scale, scale);
+      g.drawImage(bmp, -size / 2, -size / 2, size, size); g.restore();
+    }
     function press(){
       if(surLayer !== layer) return;
-      var spec = list[Math.floor(Math.random() * list.length)], size = 84 + Math.random() * 96, x = 10 + Math.random() * Math.max(10, W - size - 20), y = top + 6 + Math.random() * Math.max(10, H - top - size - 12);
-      var it = document.createElement('i'); it.className = 'stm'; it.style.cssText = 'left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px;width:' + size.toFixed(0) + 'px;height:' + size.toFixed(0) + 'px;--rot:' + ((Math.random() - .5) * 44).toFixed(0) + 'deg';
-      it.appendChild(stampSvg(spec.li, spec.i)); layer.appendChild(it); void it.offsetWidth; it.classList.add('in');
-      n++; if(n < N){ gap = Math.max(105, gap * .92); surSealT = setTimeout(press, gap); }   /* faster and faster */
+      var spec = list[Math.floor(Math.random() * list.length)], size = 76 + Math.random() * 104;
+      var x = 10 + Math.random() * Math.max(10, W - size - 20), y = top + 6 + Math.random() * Math.max(10, H - top - size - 12);
+      var rot = (Math.random() - .5) * .78, t0 = performance.now(), DUR = 170;
+      (function land(now){
+        if(surLayer !== layer) return;
+        var p = Math.min(1, ((now || performance.now()) - t0) / DUR), e = 1 - Math.pow(1 - p, 3);
+        lg.clearRect(0, 0, W, H);
+        if(p < 1){ put(lg, spec, x, y, size, rot, .5 + .38 * e, 1.45 - .45 * e); requestAnimationFrame(land); }
+        else put(bg, spec, x, y, size, rot, .88, 1);
+      })(t0);
+      n++; if(n < N){ gap = Math.max(62, gap * .93); surSealT = setTimeout(press, gap); }   /* faster and faster */
     }
-    surSealT = setTimeout(press, 260);
+    surSealT = setTimeout(press, 240);
   }
   /* 3d: the page's letters and fields stand at different depths — the heading nearest, the note furthest — each letter a solid block, and the whole stage turns after the cursor (and sways by itself when the cursor is still) */
   function sur3d(layer, pieces, W, H, top){
@@ -1654,10 +1733,10 @@
     if(!surLayer) return; cancelAnimationFrame(surRaf); surRaf = 0; clearTimeout(surT); clearTimeout(surSealT);
     var layer = surLayer, pieces = surPieces, kind = surKind, end = surEnd; surLayer = null; surPieces = []; surKind = ''; surEnd = null;
     if(instant || !cpage || cpage.hidden){ layer.remove(); cpage && cpage.classList.remove('surhid'); return; }
-    if(kind === 'seals'){   /* the seals lift off in the order they came */
-      var stms = Array.prototype.slice.call(layer.querySelectorAll('.stm'));
-      stms.forEach(function(it, i){ it.style.transitionDelay = (i * 28) + 'ms'; it.classList.add('bye'); });
-      surOld = layer; surT = setTimeout(function(){ layer.remove(); if(surOld === layer) surOld = null; }, stms.length * 28 + 500); return;
+    if(kind === 'seals'){   /* the sheet of seals lifts off as one — ninety separate transitions is what made this heavy */
+      layer.style.transition = 'opacity .5s var(--ease), transform .5s var(--ease)'; layer.style.transformOrigin = '50% 42%';
+      void layer.offsetWidth; layer.style.opacity = '0'; layer.style.transform = 'scale(1.04)';
+      surOld = layer; surT = setTimeout(function(){ layer.remove(); if(surOld === layer) surOld = null; }, 620); return;
     }
     if(end){ var ms = end(); surOld = layer; surT = setTimeout(function(){ layer.remove(); if(surOld === layer) surOld = null; cpage.classList.remove('surhid'); }, ms); return; }
     /* back to their places — measured again, in case the sheet was scrolled meanwhile */
@@ -1830,7 +1909,18 @@
       if(a.classList.contains('play')){ e.preventDefault(); return; }   /* v97: the player owns the box — a stray click must never follow the href to YouTube */
       e.preventDefault();
       var f = document.createElement('iframe');
-      f.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&rel=0');
+      f.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&rel=0&enablejsapi=1');
+      /* v146: the film starts at half volume. The player is told through the iframe API, so no script of
+         YouTube's is loaded; the command is repeated for a few seconds because the player answers only once it
+         is ready. On a phone or tablet the volume belongs to the hardware and the command is ignored — that is
+         YouTube's own rule, and there is nothing on our side that changes it. */
+      f.addEventListener('load', function(){
+        var w = f.contentWindow; if(!w) return; var tries = 0;
+        var tick = setInterval(function(){
+          try{ w.postMessage(JSON.stringify({event:'command', func:'setVolume', args:[50]}), '*'); }catch(err){}
+          if(++tries > 10) clearInterval(tick);
+        }, 400);
+      });
       var t = a.querySelector('.t'); f.setAttribute('title', t ? t.textContent : 'YouTube');
       f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
       f.setAttribute('allowfullscreen', '');
