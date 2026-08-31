@@ -517,7 +517,7 @@
     var x = 0, y = 0, el = mh; while(el && el !== st){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
     var W = st.clientWidth, H = st.clientHeight, tw = 0;
     mh.querySelectorAll(':scope > span').forEach(function(sp){ tw = Math.max(tw, sp.offsetWidth); }); if(!tw) tw = mh.offsetWidth;
-    var ph = window.innerWidth <= 820;   /* v96: on the phone the solo address fills the width edge to edge, then settles */
+    var ph = window.innerWidth <= 1024;   /* v96: on the phone and portrait tablet the solo address fills the width edge to edge, then settles */
     var s = Math.max(1, Math.min(1.5, (W * (ph ? .97 : .71) - 16) / Math.max(1, tw)));
     mh.style.setProperty('--ss', s.toFixed(3)); mh.style.setProperty('--sdx', (W / 2 - (x + mh.offsetWidth / 2)).toFixed(1) + 'px'); mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
     msgFitDone = true;
@@ -614,7 +614,7 @@
   var wipes = Array.prototype.slice.call(document.querySelectorAll('.wipe'));
   function wipeUpdate(){
     var start = vh()*.85, end = vh()*.3;
-    if(window.innerWidth <= 820){ start = vh()*.95; end = vh()*.62; }   /* v95: on a phone the sweep starts at the fold and finishes early — the half-translated state is brief */
+    if(window.innerWidth <= 1024){ start = vh()*.95; end = vh()*.62; }   /* v95: on a phone the sweep starts at the fold and finishes early — the half-translated state is brief */
     wipes.forEach(function(wipe){
       var ja = wipe.querySelector('.ja'); if(!ja) return;
       var r = wipe.getBoundingClientRect(), p = (start - r.top) / (start - end); p = Math.max(0, Math.min(1, p)); if(reduce) p = 1;
@@ -672,7 +672,7 @@
   /* ch4 annotation overlay */
   var shown = false;
   function annotate(){
-    if(window.innerWidth < 820) return;
+    if(window.innerWidth < 1024) return;
     var targets = [
       [document.querySelector('.brand img'), 'ロゴ「小」 朱 #E84518', 34, 0],
       [document.querySelector('#ch4 .ttl'), 'Zen Old Mincho 700 · 見出し · X1', 0, -26],
@@ -805,7 +805,7 @@
     /* v95: on a phone the map is larger than the screen and the camera follows the plane (a nod to the horizontally travelling magazine spreads) */
     var svg = document.getElementById('mpsvg');
     if(svg){
-      if(window.innerWidth <= 820){
+      if(window.innerWidth <= 1024){
         var vb = svg.viewBox.baseVal, sw = svg.clientWidth, sh = svg.clientHeight;
         if(vb && vb.width && sw){
           var px = (q.x - vb.x) * (sw / vb.width), py = (q.y - vb.y) * (sh / vb.height);
