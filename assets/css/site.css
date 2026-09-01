@@ -1813,3 +1813,4 @@
   html.is-webkit [filter^="url(#flagf"]{filter:none !important}   /* 実機 Safari では生の feTurbulence がほぼ見えない濃さになる（判と同じ）。旗の三角が消えて、切れているように見えていた */
   body.menuopen .hd::before{opacity:0}   /* 紙のシートの上に、章の地色のグラデーションが一帯だけ乗っていた。旗の頭もこれに隠れていた */
   .menu .menu-in{padding-top:max(11vh, calc(var(--hdh, 68px) + 40px))}   /* 旗はいちばん上の判から 33px 伸び上がる。ヘッダーに重ならない高さから始める */
+  .menu.open{transition:none; animation-fill-mode:forwards}
