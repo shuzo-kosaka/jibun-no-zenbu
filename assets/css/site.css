@@ -1698,3 +1698,16 @@
     -webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
   #message .stick.mtail .mh3{transform:translateY(calc(-50% - var(--mup,0px))) !important; transition:none}
   #message .stick.mtail .mdown{transform:translateY(calc(0px - var(--mup,0px))) !important; transition:none}
+  .sr-note{margin-top:22px}   /* 判の並びとの間を詰めて、案内文を少し上へ */
+  #ch7c .solopin{min-height:330vh}   /* 締めの判から下までのスクロールを短く（410vh → 330vh） */
+  /* 画面下の中央にあった枚数の丸を、MESSAGE の残り項目と同じ場所（画面左・縦並び）へ */
+  #ch5pin .bgdot{position:fixed; left:calc(var(--x1) / 2 - 13px); top:50%; bottom:auto;
+    transform:translateY(-50%); flex-direction:column; gap:0; z-index:40}
+  #ch5pin .bgdot i{width:26px; height:22px; border:0; border-radius:0; opacity:1; position:relative; background:none}
+  #ch5pin .bgdot i::before{content:""; position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px 0 0 -3.5px;
+    border-radius:50%; border:1px solid var(--fg3); opacity:.75;
+    transition:background .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease), opacity .3s var(--ease)}
+  #ch5pin .bgdot i.on{transform:none}
+  #ch5pin .bgdot i.on::before{background:var(--acc); border-color:var(--acc); opacity:1; transform:scale(1.4)}
+  body.menuopen #ch5pin .bgdot,html.cpopen #ch5pin .bgdot,body.opening #ch5pin .bgdot{opacity:0}
+  @media (max-width:1024px){ #ch5pin .bgdot{left:0} #ch5pin .bgdot i{width:24px; height:20px} #ch5pin .bgdot i::before{width:6px; height:6px; margin:-3px 0 0 -3px} }

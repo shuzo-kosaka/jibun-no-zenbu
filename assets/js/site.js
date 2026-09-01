@@ -575,9 +575,9 @@
         /* v193: 薄くして消すのはよくない、とのことなので、最後の一割は**紙面と同じ速さで上へ流す**。
            見え方はそのままに、ふつうの本文と同じように画面の上へ抜けていく。pin が外れる頃にはもう画面の外。 */
         var mrun = pin.offsetHeight - vh();
-        var mup = Math.max(0, (p - .90)) * mrun;
-        ms.classList.toggle('mtail', p >= .90);
-        if(p >= .90) ms.style.setProperty('--mup', Math.round(mup) + 'px');   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        var mup = Math.max(0, (p - .93)) * mrun;   /* v195: 出てから半分は動かさず、読み終わるころに動きはじめる */
+        ms.classList.toggle('mtail', p >= .93);
+        if(p >= .93) ms.style.setProperty('--mup', Math.round(mup) + 'px');   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -945,6 +945,9 @@
     document.querySelectorAll('#dgsvg .seal, #mpsvg .seal').forEach(function(g){ targets.push(g); });
     document.querySelectorAll('.oval .seal').forEach(function(g){
       g.querySelectorAll('path').forEach(function(q){ targets.push(q); });
+      /* 文字にも同じ紙目を掛けるが、抜けきらないように下限を持たせる（そのまま掛けると小さな曲線文字が読めない）。
+         a' = .58 + .42a なので、いちばん薄いところでも 58% は残る。 */
+      g.querySelectorAll('text').forEach(function(q){ q.setAttribute('data-sealsoft', '1'); targets.push(q); });
       if(g.getAttribute('data-sealtex')){ g.removeAttribute('data-sealtex'); g.removeAttribute('filter'); }
     });
     targets.forEach(function(g){
@@ -966,7 +969,14 @@
         var im = svgEl('feImage', {preserveAspectRatio:'none', result:'i'});
         im.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url); im.setAttribute('href', url);
         f.appendChild(im);
-        f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'i', operator:'in'}));
+        if(g.getAttribute('data-sealsoft')){
+          var ct = svgEl('feComponentTransfer', {'in':'i', result:'s'});
+          ct.appendChild(svgEl('feFuncA', {type:'linear', slope:'.42', intercept:'.58'}));
+          f.appendChild(ct);
+          f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'s', operator:'in'}));
+        } else {
+          f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'i', operator:'in'}));
+        }
         defs.appendChild(f);
       }
       var im2 = svg.querySelector('filter[id="' + id + '"] feImage');
@@ -1389,7 +1399,7 @@
   setTimeout(onScroll, 300);
 
   /* in-page flights (the logo back to the top, contents, menu, the 小 button): one smooth run on requestAnimationFrame with a fixed short duration, whatever the distance. The heavy scroll-driven work of the pinned screens waits until landing, so the page glides instead of stuttering through them. A wheel, touch or key cancels the flight. */
-  var flying = false, flyRaf = 0;
+  var flying = false, flyRaf = 0, snapping = false;   /* v196: 丸から丸へ送っている最中は、続くホイールで飛行を止めない */
   function flyTo(y, rew){
     y = Math.max(0, Math.round(y)); var start = window.scrollY, dist = y - start;
     if(Math.abs(dist) < 2) return;
@@ -1401,7 +1411,7 @@
     if(rew){ document.documentElement.classList.add('rewind'); document.documentElement.classList.toggle('fwd', dist > 0); }   /* v107: the same tape, wound the other way when the button sends you down */
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
-    function land(){ flying = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); }
+    function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); }
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
@@ -1428,7 +1438,7 @@
     /* v138: the seams — where a pinned screen takes hold of the page, and where it lets go again. Crossing one at
        full speed reads as running into something, because the picture stops dead while the wheel is still turning.
        Coming up to a seam the page takes smaller steps, so it arrives slowing rather than colliding. */
-    var seams = [];
+    var seams = [], snapLock = 0;
     function seamScan(){
       seams = [];
       /* v149: #seq — the eight steps of the research — holds the screen the same way but is neither .pin nor
@@ -1470,6 +1480,14 @@
       }
       if(busy()){ if(!flying && !body.classList.contains('opening')) e.preventDefault(); return; }   /* a sheet is open over the page: it holds still underneath */
       e.preventDefault();
+      /* v196: MESSAGE の中では、ひと振りのスクロールで必ず「次の丸」の内容へ進む。
+         振り幅が小さくても大きくても、飛ばしたり手前で止まったりしない。端に来たらふつうのスクロールに戻す。 */
+      if(window.__msgStops){
+        var nowT = performance.now();
+        if(nowT < snapLock) return;                       /* 同じひと振りの続きは捨てる */
+        var ty = window.__msgStops(e.deltaY > 0 ? 1 : -1);
+        if(ty !== null){ snapLock = nowT + 780; snapping = true; flyTo(ty); return; }
+      }
       var d = e.deltaY * (e.deltaMode === 1 ? 34 : e.deltaMode === 2 ? window.innerHeight : 1);
       target = Math.max(0, Math.min(limit(), (active ? target : window.scrollY) + d));
       if(!active){ active = true; cur = window.scrollY; seamScan(); raf = requestAnimationFrame(loop); }   /* the seams move as images settle, so they are measured again at the start of each run */
@@ -1478,7 +1496,7 @@
     window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
     window.addEventListener('keydown', function(){ if(active){ active = false; cancelAnimationFrame(raf); raf = 0; } }, {passive:true});
   })();
-  function flyStop(){ if(!flying) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
+  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
   document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
@@ -1507,6 +1525,16 @@
     all.sort(function(a, b){ return parseFloat(a.getAttribute('data-at')) - parseFloat(b.getAttribute('data-at')); });
     all.forEach(function(el){ var k = el.getAttribute('data-at'); if(!seen[k]){ seen[k] = 1; items.push(el); } });   /* v169: pieces that arrive together count as one */
     if(items.length < 2) return;
+    /* v196: ひと振りで次の丸へ。pin の外や端では null を返し、ふつうのスクロールに任せる */
+    window.__msgStops = function(dir){
+      var r = sec.getBoundingClientRect(), run = sec.offsetHeight - vh();
+      if(run <= 0 || !(r.top <= 0 && r.bottom >= vh())) return null;
+      var p = Math.max(0, Math.min(1, (-r.top) / run)), i;
+      var ats = items.map(function(el){ return parseFloat(el.getAttribute('data-at')) || 0; });
+      if(dir > 0){ for(i = 0; i < ats.length; i++){ if(ats[i] > p + .006) break; } if(i >= ats.length) return null; }
+      else { for(i = ats.length - 1; i >= 0; i--){ if(ats[i] < p - .006) break; } if(i < 0) return null; }
+      return r.top + window.scrollY + run * ats[i] + 6;
+    };
     var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-label', 'このページの目次');
     items.forEach(function(el, i){
       /* v176: each dot is a button — pressing it takes the reader to the moment that piece arrives */
