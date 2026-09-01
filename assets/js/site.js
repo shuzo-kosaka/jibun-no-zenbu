@@ -596,7 +596,7 @@
         /* v160: this one hangs from the grid's own second rule — the page is talking about grids, so it sits on one.
            It scales about its middle, so the visual top is centre − s·h/2. */
         var y2 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--y2')) || 32, h2 = mh.offsetHeight;
-        mh.style.setProperty('--sdy', (H * (y2 / 100) - y + h2 * (s - 1) / 2).toFixed(1) + 'px');
+        mh.style.setProperty('--sdy', (H * (y2 / 100 + .06) - y + h2 * (s - 1) / 2).toFixed(1) + 'px');   /* v181: a little below the rule, not hanging from it */
       } else {
         mh.style.setProperty('--sdy', (H * .46 - s * mh.offsetHeight / 2 - y).toFixed(1) + 'px');   /* centred on the screen; it scales about its own centre, so it settles straight down */
       }
