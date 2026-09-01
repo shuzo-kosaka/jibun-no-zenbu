@@ -352,9 +352,15 @@
     if(land.matches){ hide(); startOpening(); }                                  /* すでに横向きなら、お願いする必要がない */
     else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);  /* 回さないまま置かれても止まらない */
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
+    /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
+       回り終わってから始める。 */
     function onOrient(e){
-      if(e.matches){ muted = false; hide(); startOpening(); }
-      else if(started) show();
+      var m = e.matches;
+      clearTimeout(onOrient.t);
+      onOrient.t = setTimeout(function(){
+        if(m){ muted = false; hide(); startOpening(); }
+        else if(started) show();
+      }, 190);
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);
     else if(land.addListener) land.addListener(onOrient);

@@ -1713,18 +1713,27 @@
   @media (max-width:1024px){ #ch5pin .bgdot{left:0} #ch5pin .bgdot i{width:24px; height:20px} #ch5pin .bgdot i::before{width:6px; height:6px; margin:-3px 0 0 -3px} }
   /* 横持ちのお願い。端末が携帯・タブレットのときだけ出る（画面の幅では判定しない） */
   .rotv{display:none}
+  /* 地（朱）と中身を別々に動かす。入るときは地がひらいてから中身が順に降りてくる、
+     出るときは中身がそろって浮き上がり、地が最後に消えて幕へ渡す。
+     端末の回転そのものにアニメーションが飲まれないよう、切り替えは少し遅らせて始める（JS 側）。 */
   html.handheld .rotv{position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:2.2vw; text-align:center; padding:6vh 8vw; box-sizing:border-box; background:var(--shu); color:#FBF7F2;
-    opacity:1; transform:none; -webkit-user-select:none; user-select:none; cursor:pointer;
-    transition:opacity .6s var(--ease), transform .8s var(--ease)}
-  html.handheld .rotv.gone{opacity:0; transform:translateY(-2.6vh) scale(1.015); pointer-events:none}
+    opacity:1; -webkit-user-select:none; user-select:none; cursor:pointer;
+    transition:opacity .42s var(--ease)}
+  html.handheld .rotv > *{opacity:1; transform:none; transition:opacity .5s var(--ease), transform .72s cubic-bezier(.2,.8,.2,1)}
+  html.handheld .rotv:not(.gone) > svg{transition-delay:.12s}
+  html.handheld .rotv:not(.gone) > small{transition-delay:.20s}
+  html.handheld .rotv:not(.gone) > b{transition-delay:.28s}
+  html.handheld .rotv:not(.gone) > .rnote{transition-delay:.36s}
+  html.handheld .rotv.gone{opacity:0; pointer-events:none; transition:opacity .5s var(--ease) .18s}
+  html.handheld .rotv.gone > *{opacity:0; transform:translateY(-26px); transition-delay:0s; transition-duration:.36s, .46s}
   .rotv svg{width:min(26vw, 30vh); height:min(26vw, 30vh); display:block}
   .rotv .ph{transform-origin:100px 100px; animation:rotph 3.2s cubic-bezier(.45,0,.15,1) infinite}
   .rotv .ar{opacity:.5; animation:rotar 3.2s cubic-bezier(.45,0,.15,1) infinite}
   @keyframes rotph{0%,16%{transform:rotate(0deg); opacity:1} 46%,84%{transform:rotate(-90deg); opacity:1}
     93%{transform:rotate(-90deg); opacity:0} 94%{transform:rotate(0deg); opacity:0} 100%{transform:rotate(0deg); opacity:1}}
   @keyframes rotar{0%,10%{opacity:0} 20%,50%{opacity:.55} 72%,100%{opacity:0}}
-  .rotv small{font-family:var(--mono); font-size:min(2.9vw, 3.4vh); letter-spacing:.2em; opacity:.72; margin-top:1.4vw}
+  .rotv small{font-family:var(--mincho); font-weight:400; font-size:min(3vw, 3.6vh); letter-spacing:.12em; opacity:.76; margin-top:1.4vw}
   /* 見出しはほかの見出しと同じ混植（漢字ゴシック／かな明朝、要の語は大きく、ペアカーニング） */
   .rotv b{display:block; font-family:var(--mincho); font-weight:900; font-size:min(6.6vw, 8vh); line-height:1.42;
     letter-spacing:-.005em; font-feature-settings:"palt"}
@@ -1735,7 +1744,7 @@
   .rotv .rtl .ch.big{font-size:1.26em}
   html[lang="en"] .rotv b{font-family:var(--optima); font-weight:400; letter-spacing:.005em; font-feature-settings:normal; line-height:1.2}
   html[lang="en"] .rotv .rtl .ch{font-family:inherit; font-weight:inherit; font-size:1em; margin:0}
-  .rotv .rnote{font-family:var(--sans); font-size:min(3.2vw, 3.8vh); line-height:1.9; opacity:.78}
+  .rotv .rnote{font-family:var(--mincho); font-weight:400; font-size:min(2.95vw, 3.5vh); line-height:1.9; letter-spacing:.03em; opacity:.8; white-space:nowrap}   /* 一行に収める（「す。」だけ折り返していた） */
   @media (prefers-reduced-motion:reduce){ .rotv .ph{animation:none; transform:rotate(-90deg)} .rotv .ar{animation:none; opacity:.5} }
 
   /* 写真の枚数の丸は、その章が画面をつかんでいるあいだだけ（画面に固定したので、章の外にも出てしまっていた） */
@@ -1774,4 +1783,10 @@
   .rotv svg{width:min(34vw, 26vh); height:min(34vw, 26vh)}
   html.handheld .rotv{gap:1.4vw}
   .rotv small{margin-top:2.6vw}
+  /* タブレットは画面が広いぶん、そのままだと大きすぎる。七掛けほどに */
+  html.tablet .rotv svg{width:min(19vw, 19vh); height:min(19vw, 19vh)}
+  html.tablet .rotv b{font-size:min(4.4vw, 5.4vh)}
+  html.tablet .rotv small{font-size:min(2.1vw, 2.5vh)}
+  html.tablet .rotv .rnote{font-size:min(2.3vw, 2.7vh)}
+  html.tablet .rotv{gap:1.6vw}
   html.is-webkit .menu:not(.open):not(.shown){visibility:hidden}
