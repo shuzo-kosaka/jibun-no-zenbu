@@ -1664,3 +1664,4 @@
   #message .body .mh2 .mx.big{margin-top:.12em}
   #message .stick.away2 .mh2{transform:none; opacity:1; filter:none}
   #message .body .mh2 .mx:nth-of-type(2){position:relative; top:.1em}
+  #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em}
