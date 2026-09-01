@@ -917,6 +917,49 @@
   /* ---------- 人生のチェックポイント = スタンプラリー: the route fills and 朱 stamps are pressed as you scroll ---------- */
   var sr = document.getElementById('sr'), srItems = [], srAt = [], srL = 0, srProg = null, srHead = null, srSvg = null, srn = document.getElementById('srn'), srdone = document.getElementById('srdone');
   function svgEl(n, at){ var e = document.createElementNS('http://www.w3.org/2000/svg', n); for(var k in at) e.setAttribute(k, at[k]); return e; }
+  /* v190: Safari は SVG の *中* の要素に CSS の mask を掛けても描かない（HTML の要素や <svg> 自体には効く。
+     実機 26.4 で確認）。図・地図・扉の判は SVG の <g> なので、同じ紙目を SVG の <mask> として組み立てて掛ける。
+     紙目の粗さは HTML の判（96px）に合わせたいので、その SVG の拡大率から逆算する。 */
+  var inkmN = 0;
+  function inkSealTex(){
+    if(!document.documentElement.classList.contains('is-webkit')) return;
+    var probe = document.querySelector('.chseal, #mseals .st, .sr .st'); if(!probe) return;
+    var cs = getComputedStyle(probe), mi = cs.maskImage || cs.webkitMaskImage || '';
+    var mm = mi.match(/url\(["']?([^"')]+)["']?\)/); if(!mm) return;   /* 1 枚版はデータ URI、公開版は assets/img/…。解決済みの絶対 URL がここで手に入る */
+    var url = mm[1];
+    document.querySelectorAll('#dgsvg .seal, #mpsvg .seal, .oval .seal').forEach(function(g){
+      var svg = g.ownerSVGElement; if(!svg) return;
+      var vb = svg.viewBox && svg.viewBox.baseVal, w = svg.getBoundingClientRect().width;
+      var tile = ((vb && vb.width && w) ? 96 * vb.width / w : 96).toFixed(2);
+      var id = svg.getAttribute('data-sealtex');
+      if(!id){
+        /* SVG ひとつにつきフィルタひとつ。領域は判の外形に対する割合なので、同じ SVG の判で使い回せる。
+           SVG の <mask> でも同じ絵にはなるが、地図のように毎フレーム描き直される SVG では
+           判ひとつごとに裏画面を作ることになり、17ms が 26ms（半分の滑らかさ）まで落ちた。
+           feImage + feTile は入力が変わらないので結果が使い回され、実測でほぼ元のまま。 */
+        id = 'sealtex' + (++inkmN); svg.setAttribute('data-sealtex', id);
+        var defs = svg.querySelector('defs');
+        if(!defs){ defs = svgEl('defs', {}); svg.insertBefore(defs, svg.firstChild); }
+        var f = svgEl('filter', {id:id, x:'-12%', y:'-12%', width:'124%', height:'124%'});
+        var im = svgEl('feImage', {x:0, y:0, result:'i'});
+        im.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url); im.setAttribute('href', url);
+        f.appendChild(im);
+        f.appendChild(svgEl('feTile', {'in':'i', result:'t'}));
+        f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'t', operator:'in'}));
+        defs.appendChild(f);
+      }
+      var im2 = svg.querySelector('filter[id="' + id + '"] feImage');
+      if(im2){ im2.setAttribute('width', tile); im2.setAttribute('height', tile); }
+      if(g.getAttribute('mask')) g.removeAttribute('mask');
+      /* 元の filter は html.is-webkit の規則で none にされている（生の feTurbulence が重いため）。
+         id を差し替えればその規則に当たらなくなり、こちらが効く。id を ink… にしないこと。 */
+      if(g.getAttribute('filter') !== 'url(#' + id + ')') g.setAttribute('filter', 'url(#' + id + ')');
+    });
+  }
+  window.__inkSealTex = inkSealTex;
+  window.addEventListener('load', inkSealTex);
+  var inkmT; window.addEventListener('resize', function(){ clearTimeout(inkmT); inkmT = setTimeout(inkSealTex, 200); }, {passive:true});
+  setTimeout(inkSealTex, 0);
   function stampSvg(li, idx){
     var en = li.getAttribute('data-en') || '', placeJa = li.getAttribute('data-place') || '', place = ((curLang === 'en' && PLACE_EN[placeJa]) ? PLACE_EN[placeJa] : placeJa).split('|'), num = ('0' + (idx + 1)).slice(-2), year = li.getAttribute('data-year') || ((li.querySelector('.y') || {}).textContent || '');
     year = year.replace('?', '');
@@ -955,7 +998,7 @@
     mpL = mpProg.getTotalLength();
     /* distance along the route at which each stop is reached: nearest point search */
     mpStopAt = Array.prototype.map.call(mpStops, function(st){ var c = st.querySelector('circle'), cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy'), best = 0, bd = 1e9; for(var l = 0; l <= mpL; l += 4){ var q = mpProg.getPointAtLength(l), d = (q.x - cx) * (q.x - cx) + (q.y - cy) * (q.y - cy); if(d < bd){ bd = d; best = l; } } return best; });
-    window.__mapStamp = function(){ var stampHost = document.getElementById('mpstamp'); if(!stampHost) return; while(stampHost.firstChild) stampHost.removeChild(stampHost.firstChild); stampHost.appendChild(svgEl('circle', {r:80, class:'mp-back'})); stampHost.appendChild(stampG(72, 'BANGKOK \u00b7 INTERNSHIP \u00b7 3 MONTHS \u00b7 2025 \u00b7 ', curLang === 'en' ? 'Bangkok' : 'バンコク', 'INTERN', 21)); };   /* a faint paper disc quiets the seals piling up under it */
+    window.__mapStamp = function(){ var stampHost = document.getElementById('mpstamp'); if(!stampHost) return; while(stampHost.firstChild) stampHost.removeChild(stampHost.firstChild); stampHost.appendChild(svgEl('circle', {r:80, class:'mp-back'})); stampHost.appendChild(stampG(72, 'BANGKOK \u00b7 INTERNSHIP \u00b7 3 MONTHS \u00b7 2025 \u00b7 ', curLang === 'en' ? 'Bangkok' : 'バンコク', 'INTERN', 21));  if(window.__inkSealTex) window.__inkSealTex();};   /* a faint paper disc quiets the seals piling up under it */
     window.__mapStamp();
     /* arrival seals: one per country (the start has none) */
     var CTRY = [null, ['KOREA', 'KR'], ['THAILAND', 'TH'], ['VIETNAM', 'VN'], ['CAMBODIA', 'KH'], ['SINGAPORE', 'SG'], ['MALDIVES', 'MV']];
