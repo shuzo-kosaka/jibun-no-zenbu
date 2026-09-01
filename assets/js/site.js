@@ -340,6 +340,8 @@
   (function(){
     var rv = document.getElementById('rotv');
     if(!document.documentElement.classList.contains('handheld') || !rv){ if(rv && rv.parentNode) rv.parentNode.removeChild(rv); loader(); return; }
+    var land = window.matchMedia('(orientation:landscape)');
+    if(land.matches){ if(rv.parentNode) rv.parentNode.removeChild(rv); loader(); return; }   /* すでに横向きなら、お願いする必要がない */
     var went = false;
     function go(){
       if(went) return; went = true;
@@ -349,7 +351,10 @@
     }
     rv.addEventListener('click', go);
     rv.addEventListener('touchstart', go, {passive:true});
-    setTimeout(go, 3600);
+    /* 横に回した時点で用は済む。回さないまま置かれても止まらないよう、5 秒で自分から閉じる */
+    if(land.addEventListener) land.addEventListener('change', function(e){ if(e.matches) go(); });
+    else if(land.addListener) land.addListener(function(e){ if(e.matches) go(); });
+    setTimeout(go, 5000);
   })();
 
   /* ---------- mouse: crosshair + dot + coordinates, hero parallax (persists through the page) ---------- */
@@ -575,7 +580,7 @@
       var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 3.4 >= 1); st.classList.toggle('drawing', p * 3.4 > .012); dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0;
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
         fpFade = Math.max(0, Math.min(1, p / .16)); } if(pin.id === 'ch5map') mapUpdate(p); }
-      if(pin.id === 'ch5pin'){ pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
+      if(pin.id === 'ch5pin'){ pin.classList.toggle('dotson', r.top <= 0 && r.bottom >= vh()); pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
       if(pin.id === 'message'){
         var vis = r.top < vh()*.6 && r.bottom > vh()*.4;
         if(vis && !hwPlayed){ hwPlayed = true; hw.classList.add('on'); /* v96f: the handwriting is an animated alpha WebP — assigning the src is what starts it, so it draws itself just as the screen is reached (and nothing is fetched before that) */ if(hwv && hwv.dataset && hwv.dataset.src){ hwv.src = hwv.dataset.src; hwv.removeAttribute('data-src'); } }
@@ -589,6 +594,11 @@
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
         /* v193: 薄くして消すのはよくない、とのことなので、最後の一割は**紙面と同じ速さで上へ流す**。
            見え方はそのままに、ふつうの本文と同じように画面の上へ抜けていく。pin が外れる頃にはもう画面の外。 */
+        var mfs = window.__mFps;
+        if(mfs && mfs.length){   /* 一文が出たすぐあとから、章が入れ替わるまでに歩き切る */
+          var mq = Math.max(0, Math.min(1, (p - .872) / .118)), mn = Math.round(mq * mfs.length);
+          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('on', mi < mn);
+        }
         var mrun = pin.offsetHeight - vh();
         var mup = Math.max(0, (p - .93)) * mrun;   /* v195: 出てから半分は動かさず、読み終わるころに動きはじめる */
         ms.classList.toggle('mtail', p >= .93);
@@ -1387,7 +1397,34 @@
     window.__wkFps = Array.prototype.slice.call(wfs);
     sec.appendChild(svg);
   }
-  function rallyBuild(){ srBuild(); dgBuild(); brBuild(); chsealBuild(); soloSealsBuild(); wkBuild(); fpMeasure(); fpUpdate(); passPlace(); }
+  /* v198: 引き継ぎの一文のあと、足跡が人生のチェックポイントの方へ伸びていく。
+     まっすぐではなく少し揺らぎ、進むにつれて画面の中央に収束する。章が入れ替わると同時に消える。 */
+  function msgTrail(){
+    var sec = document.getElementById('message'); if(!sec) return;
+    var host = sec.querySelector('.stick'); if(!host) return;
+    var old = host.querySelector('.mtrail'); if(old) old.remove();
+    window.__mFps = null;
+    var W = host.clientWidth, H = host.clientHeight;
+    if(!W || !H) return;
+    var sv = svgEl('svg', {'class':'mtrail', viewBox:'0 0 ' + W + ' ' + H, width:W, height:H, 'aria-hidden':'true'});
+    var cx = W / 2, sy = H * .60, ey = H * 1.12, run = ey - sy;
+    /* 右にひとつ、左にひとつ揺れてから中央へ。最後は画面の下へ抜けていく */
+    var d = 'M' + (cx + 32).toFixed(1) + ',' + sy.toFixed(1)
+          + ' C' + (cx + 66).toFixed(1) + ',' + (sy + run * .18).toFixed(1)
+          + ' ' + (cx - 58).toFixed(1) + ',' + (sy + run * .38).toFixed(1)
+          + ' ' + (cx - 14).toFixed(1) + ',' + (sy + run * .60).toFixed(1)
+          + ' S' + (cx + 24).toFixed(1) + ',' + (ey - run * .10).toFixed(1)
+          + ' ' + cx.toFixed(1) + ',' + ey.toFixed(1);
+    var path = svgEl('path', {d:d, fill:'none', stroke:'none'});
+    sv.appendChild(path);
+    footprints(sv, path, 'mfp', 1, 12, 0);
+    host.appendChild(sv);
+    var fs = sv.querySelectorAll('.mfp');
+    fs.forEach(function(f, i){ var q = (i + 1) / fs.length; f.style.setProperty('--fade', q > .6 ? Math.max(.1, 1 - (q - .6) / .4 * .8).toFixed(2) : '1'); });
+    window.__mFps = fs;
+  }
+  window.addEventListener('resize', function(){ clearTimeout(msgTrail.t); msgTrail.t = setTimeout(msgTrail, 220); }, {passive:true});
+  function rallyBuild(){ srBuild(); dgBuild(); brBuild(); chsealBuild(); soloSealsBuild(); wkBuild(); fpMeasure(); fpUpdate(); passPlace(); msgTrail(); }
   if(window.ResizeObserver && document.getElementById('contents')){ var roT, roH = 0; new ResizeObserver(function(es){ var h = es[0].contentRect.height; if(Math.abs(h - roH) < 1) return; roH = h; clearTimeout(roT); roT = setTimeout(rallyBuild, 80); }).observe(document.getElementById('contents')); }
   if(sr){ rallyBuild(); if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(rallyBuild, 50); }); window.addEventListener('load', function(){ setTimeout(rallyBuild, 100); setTimeout(fpMeasure, 1500); }); var srT; window.addEventListener('resize', function(){ clearTimeout(srT); srT = setTimeout(rallyBuild, 120); }); }
 

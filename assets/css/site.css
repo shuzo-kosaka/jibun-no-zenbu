@@ -1714,15 +1714,47 @@
   /* 横持ちのお願い。端末が携帯・タブレットのときだけ出る（画面の幅では判定しない） */
   .rotv{display:none}
   html.handheld .rotv{position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:18px; text-align:center; padding:6vh 8vw; box-sizing:border-box; background:#F5F2EC; color:#1C1B19;
-    transition:opacity .7s var(--ease); -webkit-user-select:none; user-select:none}
+    gap:2.2vw; text-align:center; padding:6vh 8vw; box-sizing:border-box; background:var(--shu); color:#FBF7F2;
+    transition:opacity .7s var(--ease); -webkit-user-select:none; user-select:none; cursor:pointer}
   html.handheld .rotv.gone{opacity:0; pointer-events:none}
-  .rotv svg{width:104px; height:104px; color:#E84518}
-  .rotv .ph{transform-origin:60px 60px; animation:rotph 3.2s cubic-bezier(.5,0,.2,1) infinite}
-  .rotv .ar{opacity:.42}
-  @keyframes rotph{0%,14%{transform:rotate(0deg); opacity:1} 44%,84%{transform:rotate(-90deg); opacity:1}
-    94%{transform:rotate(-90deg); opacity:0} 95%{transform:rotate(0deg); opacity:0} 100%{transform:rotate(0deg); opacity:1}}
-  .rotv small{font-family:var(--mono); font-size:11px; letter-spacing:.2em; color:#7E7C76}
-  .rotv b{font-family:var(--mincho); font-weight:700; font-size:26px; line-height:1.5; letter-spacing:.02em}
-  .rotv span{font-family:var(--sans); font-size:13px; line-height:1.9; color:#57544E}
-  @media (prefers-reduced-motion:reduce){ .rotv .ph{animation:none; transform:rotate(-90deg)} }
+  .rotv svg{width:min(26vw, 30vh); height:min(26vw, 30vh); display:block}
+  .rotv .ph{transform-origin:100px 100px; animation:rotph 3.2s cubic-bezier(.45,0,.15,1) infinite}
+  .rotv .ar{opacity:.5; animation:rotar 3.2s cubic-bezier(.45,0,.15,1) infinite}
+  @keyframes rotph{0%,16%{transform:rotate(0deg); opacity:1} 46%,84%{transform:rotate(-90deg); opacity:1}
+    93%{transform:rotate(-90deg); opacity:0} 94%{transform:rotate(0deg); opacity:0} 100%{transform:rotate(0deg); opacity:1}}
+  @keyframes rotar{0%,10%{opacity:0} 20%,50%{opacity:.55} 72%,100%{opacity:0}}
+  .rotv small{font-family:var(--mono); font-size:min(2.9vw, 3.4vh); letter-spacing:.2em; opacity:.72; margin-top:1.4vw}
+  .rotv b{font-family:var(--mincho); font-weight:700; font-size:min(7vw, 8.4vh); line-height:1.45; letter-spacing:.02em}
+  .rotv span{font-family:var(--sans); font-size:min(3.2vw, 3.8vh); line-height:1.9; opacity:.78}
+  @media (prefers-reduced-motion:reduce){ .rotv .ph{animation:none; transform:rotate(-90deg)} .rotv .ar{animation:none; opacity:.5} }
+
+  /* 写真の枚数の丸は、その章が画面をつかんでいるあいだだけ（画面に固定したので、章の外にも出てしまっていた） */
+  #ch5pin .bgdot{opacity:0; transition:opacity .45s var(--ease)}
+  #ch5pin.dotson .bgdot{opacity:1}
+
+  /* スマホ・タブレットで PC 版を出すときは、触るところを大きく。
+     表示が 1280 幅に縮まっている分（横持ちの実機でおよそ 0.66 倍）を見越して寸法を上げる。
+     ヘッダーの上余白も増やし、画面のいちばん上を触らずに済むようにする（タブバーが降りてくるため）。 */
+  html.pcview .hd{padding:32px var(--x1) 28px; column-gap:26px}
+  html.pcview .brand{font-size:24px} html.pcview .brand img{height:40px}
+  html.pcview .hd .chap{font-size:18px; gap:18px}
+  html.pcview .nav{gap:32px; font-size:22px}
+  html.pcview .nav .gridbtn{font-size:19px; letter-spacing:.05em; padding:8px 0}
+  html.pcview .lang{font-size:19px}
+  html.pcview .lang button{padding:9px 15px}
+  html.pcview .burger{width:76px; height:64px; margin-left:12px}
+  html.pcview .burger i{height:2.8px}
+  html.pcview .cta-fx{width:132px; height:132px; right:calc(var(--x1) - 42px); bottom:34px}
+  html.pcview .cta-fx .c{width:60px; height:60px; font-size:27px}
+  html.pcview .cta-fx svg text{font-size:7.4px}
+  html.pcview .remain .i{width:44px; height:38px}
+  html.pcview #ch5pin .bgdot i{width:44px; height:38px}
+  #message .mtrail{position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:2;
+    transition:opacity .5s var(--ease)}
+  #message .stick:not(.hold) .mtrail{opacity:0}
+  #message .mfp{fill:#FBF7F2; opacity:0; transition:opacity .3s var(--ease)}
+  #message .mfp.on{opacity:calc(.8 * var(--fade,1))}
+  html.is-webkit [filter="url(#mfpink)"],html.is-webkit .mfp{filter:none !important}   /* 足跡の質感は他と揃える（WebKit では生のフィルタを切る） */
+  .rotv svg{width:min(34vw, 26vh); height:min(34vw, 26vh)}
+  html.handheld .rotv{gap:1.4vw}
+  .rotv small{margin-top:2.6vw}
