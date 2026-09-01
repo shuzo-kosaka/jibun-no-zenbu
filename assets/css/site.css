@@ -1686,3 +1686,4 @@
   .remain.on .i:hover::before,.remain.on .i:focus-visible::before{border-color:var(--acc); background:var(--acc); transform:scale(2.1); opacity:1}
   .remain .i:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
   #message .stick:not(.hold) .mh3,#message .stick:not(.hold) .mdown{opacity:0 !important; visibility:hidden}
+  body.hasmouse:not(.nocur) .remain .i{cursor:none}
