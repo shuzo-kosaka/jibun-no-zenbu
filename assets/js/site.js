@@ -1426,11 +1426,11 @@
     body.appendChild(nav);
     var dots = nav.querySelectorAll('i');
     window.__tailUpdate = function(){
-      var H = vh(), r = sec.getBoundingClientRect(), on = r.top < H * .5 && r.bottom > H * .5;
-      nav.classList.toggle('on', on);
-      if(!on) return;
+      var H = vh(), r = sec.getBoundingClientRect(), here = r.top < H * .5 && r.bottom > H * .5;
       var p = Math.max(0, Math.min(1, (-r.top) / Math.max(1, sec.offsetHeight - H))), cur = -1;
       items.forEach(function(el, i){ if(p >= parseFloat(el.getAttribute('data-at'))) cur = i; });
+      nav.classList.toggle('on', here && cur >= 0);   /* v168: nothing to count while the handwriting still has the screen to itself */
+      if(!here) return;
       dots.forEach(function(d, i){ d.classList.toggle('now', i === cur); d.classList.toggle('past', i < cur); });
     };
   })();
