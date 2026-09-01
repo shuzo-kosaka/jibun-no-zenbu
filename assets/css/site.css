@@ -1664,13 +1664,14 @@
   #message .stick.away2 .mh2{transform:none; filter:none}   /* v169: no forced opacity — the heading leaves with its own block at data-off */
   #message .body .mh2 .mx:nth-of-type(2){position:relative; top:.1em; left:.26em}
   #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em; left:.26em}
-  .remain{position:fixed; left:calc(var(--x1) / 2); top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:13px; opacity:0; pointer-events:none; transition:opacity .55s var(--ease)}
+  .remain{position:fixed; left:calc(var(--x1) / 2 - 13px); top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:0; opacity:0; pointer-events:none; transition:opacity .55s var(--ease)}
   .remain.on{opacity:1}
-  .remain .i{display:block; width:7px; height:7px; border-radius:50%; border:1px solid var(--fg3); transition:background .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease), opacity .35s}
-  .remain .i.past{background:var(--fg3); border-color:var(--fg3); opacity:.45}
-  .remain .i.now{background:var(--acc); border-color:var(--acc); transform:scale(1.4)}
+  .remain .i{display:block; position:relative; width:26px; height:22px; border:0; border-radius:0}   /* v178: the mark is small, but the thing you press is not */
+  .remain .i::before{content:""; position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px 0 0 -3.5px; border-radius:50%; border:1px solid var(--fg3); transition:background .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease), opacity .3s}
+  .remain .i.past::before{background:var(--fg3); border-color:var(--fg3); opacity:.45}
+  .remain .i.now::before{background:var(--acc); border-color:var(--acc); transform:scale(1.4)}
   body.menuopen .remain,html.cpopen .remain,body.opening .remain{opacity:0 !important}
-  @media (max-width:1024px){ .tail{left:13px; gap:11px} .remain i{width:6px; height:6px} }
+  @media (max-width:1024px){ .remain{left:0; gap:0} .remain .i{width:24px; height:20px} .remain .i::before{width:6px; height:6px; margin:-3px 0 0 -3px} }
   #message .body .mh3{position:fixed; left:0; right:0; margin:0; text-align:center; transform:none !important}   /* v177: absolute here meant the column, not the screen — the pinned screen is the viewport, so fixed centres it properly */
   #message .body .mh3{top:31%; line-height:1.72; font-size:min(3.1vw, 41px); max-width:none; width:auto}   /* v176: .p caps the width at 32em — with nowrap the lines were spilling out to the right of the box, so the block read as off-centre */
   #message .body .mh3 .mx{white-space:nowrap}   /* v174: the sentence keeps to two lines — it is set to the width, not wrapped by it */
@@ -1682,5 +1683,6 @@
   @keyframes mdrop{0%{transform:scaleY(0); opacity:0} 25%{opacity:.7} 100%{transform:scaleY(1); opacity:0}}
   .remain{pointer-events:none}
   .remain .i{pointer-events:auto; padding:0; background:none; cursor:pointer; -webkit-appearance:none; appearance:none}
-  .remain.on .i:hover,.remain.on .i:focus-visible{border-color:var(--acc); transform:scale(1.5); opacity:1}
+  .remain.on .i:hover::before,.remain.on .i:focus-visible::before{border-color:var(--acc); background:var(--acc); transform:scale(2.1); opacity:1}
   .remain .i:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
+  #message .stick:not(.hold) .mh3,#message .stick:not(.hold) .mdown{opacity:0 !important; visibility:hidden}

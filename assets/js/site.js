@@ -565,6 +565,7 @@
            the handwriting was still bright when the address arrived (they printed over each other) and the first
            paragraph came while the address was still standing in the middle. Both are back where they were. */
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
+        ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
