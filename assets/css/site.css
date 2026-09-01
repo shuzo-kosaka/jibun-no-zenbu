@@ -1651,7 +1651,6 @@
   #contact .oval .ovh{left:0; right:0; top:0; bottom:0; width:100%; height:100%; border-radius:0; clip-path:inset(2.69% 3.5% round 50% / 37.8%)}
   #message .body .mh2{transform-origin:50% 50%; transition:transform 1.1s var(--ease), opacity .9s var(--ease), filter .9s var(--ease)}
   #message .stick.solo2 .mh2{transform:translate(var(--sdx,0px), var(--sdy,0px)) scale(var(--ss,1.4))}
-  #message .stick.away2 .mh2{transform:translate(var(--sdx,0px), calc(var(--sdy,0px) - 3vh)) scale(.3); opacity:0; filter:blur(4px)}
   @keyframes menuDrop{
     0%{clip-path:inset(0 0 100% 0); animation-timing-function:cubic-bezier(.2,.85,.3,1)}
     14%{clip-path:inset(0 0 calc(100% - var(--hdh,68px)) 0); animation-timing-function:cubic-bezier(.45,.02,.25,1)}
@@ -1662,7 +1661,7 @@
   #message .body .mh2{line-height:1.02}
   #message .body .mh2 .mx:first-child{margin-right:.28em; position:relative; top:-.17em}   /* the 、 at its end is counted in the centring; and the line stands a little higher than the two under it */
   #message .body .mh2 .mx.big{margin-top:.12em}
-  #message .stick.away2 .mh2{transform:none; opacity:1; filter:none}
+  #message .stick.away2 .mh2{transform:none; filter:none}   /* v169: no forced opacity — the heading leaves with its own block at data-off */
   #message .body .mh2 .mx:nth-of-type(2){position:relative; top:.1em}
   #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em; left:.045em}
   .remain{position:fixed; left:calc(var(--x1) / 2); top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:13px; opacity:0; pointer-events:none; transition:opacity .55s var(--ease)}
@@ -1672,3 +1671,7 @@
   .remain i.now{background:var(--acc); border-color:var(--acc); transform:scale(1.4)}
   body.menuopen .remain,html.cpopen .remain,body.opening .remain{opacity:0 !important}
   @media (max-width:1024px){ .tail{left:13px; gap:11px} .remain i{width:6px; height:6px} }
+  #message .body .mh3,#message .body .mh4{position:absolute; left:6%; right:6%; margin:0; text-align:center; transform:none !important}
+  #message .body .mh3{top:38%; font-size:clamp(16px,min(1.9vw,4cqw),25px); line-height:2}
+  #message .body .mh4{top:42%}
+  @media (max-width:1024px){ #message .body .mh3{top:36%; font-size:clamp(15px,4.4vw,20px); line-height:2.05} #message .body .mh4{top:42%} }

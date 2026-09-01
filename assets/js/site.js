@@ -566,10 +566,10 @@
            paragraph came while the address was still standing in the middle. Both are back where they were. */
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
-        ms.classList.toggle('solo2', p >= .60 && p < .776);   /* v155: the second address holds the middle of the screen */
-        ms.classList.toggle('away2', p >= .776);              /* and then recedes, and the paragraphs come in behind it */
-        pin.classList.toggle('gridon', p >= .615);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
-        if(p >= .615){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
+        ms.classList.toggle('solo2', p >= .46 && p < .585);   /* v155: the second address holds the middle of the screen */
+        ms.classList.toggle('away2', p >= .585);              /* and then recedes, and the paragraphs come in behind it */
+        pin.classList.toggle('gridon', p >= .48);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
+        if(p >= .48){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
@@ -1418,8 +1418,9 @@
      of its pieces are still to come, and which one has just arrived */
   (function(){
     var sec = document.getElementById('message'); if(!sec) return;
-    var items = Array.prototype.slice.call(sec.querySelectorAll('.pg [data-at]'));
-    items.sort(function(a, b){ return parseFloat(a.getAttribute('data-at')) - parseFloat(b.getAttribute('data-at')); });
+    var all = Array.prototype.slice.call(sec.querySelectorAll('.pg [data-at]')), seen = {}, items = [];
+    all.sort(function(a, b){ return parseFloat(a.getAttribute('data-at')) - parseFloat(b.getAttribute('data-at')); });
+    all.forEach(function(el){ var k = el.getAttribute('data-at'); if(!seen[k]){ seen[k] = 1; items.push(el); } });   /* v169: pieces that arrive together count as one */
     if(items.length < 2) return;
     var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-hidden', 'true');
     items.forEach(function(){ nav.appendChild(document.createElement('i')); });
