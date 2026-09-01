@@ -1414,22 +1414,23 @@
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(hdh);
   })();
 
-  /* v166: from やっぱり、デザインで人を楽しませたい。 to the end, a column of dots at the left edge says how
-     many screens are still to come, and which one is under the reader now */
+  /* v167: the MESSAGE screen is long and holds still while it plays — the dots at the left edge say how many
+     of its pieces are still to come, and which one has just arrived */
   (function(){
-    var ids = ['ch7', 'works', 'ch7b', 'ch7c', 'contact'];
-    var secs = []; ids.forEach(function(id){ var el = document.getElementById(id); if(el) secs.push(el); });
-    if(secs.length < 2) return;
-    var nav = document.createElement('nav'); nav.className = 'remain';   /* v166b: an SVG path in the illustrations is already called .tail */ nav.setAttribute('aria-hidden', 'true');
-    secs.forEach(function(){ nav.appendChild(document.createElement('i')); });
+    var sec = document.getElementById('message'); if(!sec) return;
+    var items = Array.prototype.slice.call(sec.querySelectorAll('.pg [data-at]'));
+    items.sort(function(a, b){ return parseFloat(a.getAttribute('data-at')) - parseFloat(b.getAttribute('data-at')); });
+    if(items.length < 2) return;
+    var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-hidden', 'true');
+    items.forEach(function(){ nav.appendChild(document.createElement('i')); });
     body.appendChild(nav);
     var dots = nav.querySelectorAll('i');
     window.__tailUpdate = function(){
-      var H = vh(), on = secs[0].getBoundingClientRect().top < H * .5;
+      var H = vh(), r = sec.getBoundingClientRect(), on = r.top < H * .5 && r.bottom > H * .5;
       nav.classList.toggle('on', on);
       if(!on) return;
-      var cur = 0;
-      secs.forEach(function(s, i){ if(s.getBoundingClientRect().top < H * .5) cur = i; });
+      var p = Math.max(0, Math.min(1, (-r.top) / Math.max(1, sec.offsetHeight - H))), cur = -1;
+      items.forEach(function(el, i){ if(p >= parseFloat(el.getAttribute('data-at'))) cur = i; });
       dots.forEach(function(d, i){ d.classList.toggle('now', i === cur); d.classList.toggle('past', i < cur); });
     };
   })();
