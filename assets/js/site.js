@@ -568,8 +568,8 @@
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         ms.classList.toggle('solo2', p >= .60 && p < .776);   /* v155: the second address holds the middle of the screen */
         ms.classList.toggle('away2', p >= .776);              /* and then recedes, and the paragraphs come in behind it */
-        pin.classList.toggle('gridon', p >= .627);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
-        if(p >= .627){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
+        pin.classList.toggle('gridon', p >= .615);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
+        if(p >= .615){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });
@@ -1299,7 +1299,7 @@
     stampPic.style.setProperty('--ink', Math.max(0, Math.min(1, (p - .72) / .28)).toFixed(3));
     if(p >= .72) stampPic.classList.add('landed'); else if(p < .66) stampPic.classList.remove('landed');   /* v105: pressed on landing, and armed again if you walk back up */
   }
-  function onScroll(){ if(ticking) return; ticking = true; requestAnimationFrame(function(){ ticking = false; if(flying){ chapUpdate(); ctaUpdate(); return; } sceneUpdate(); chapUpdate(); ctaUpdate(); pinUpdate(); soloUpdate(); wipeUpdate(); seqUpdate(); srUpdate(); fpUpdate(); stampUpdate(); }); }
+  function onScroll(){ if(ticking) return; ticking = true; requestAnimationFrame(function(){ ticking = false; if(flying){ chapUpdate(); ctaUpdate(); return; } sceneUpdate(); chapUpdate(); ctaUpdate(); pinUpdate(); soloUpdate(); wipeUpdate(); seqUpdate(); srUpdate(); fpUpdate(); stampUpdate(); if(window.__tailUpdate) window.__tailUpdate(); }); }
   window.addEventListener('scroll', onScroll, {passive:true}); window.addEventListener('resize', onScroll); onScroll();
   setTimeout(onScroll, 300);
 
@@ -1412,6 +1412,26 @@
     function hdh(){ if(hd) document.documentElement.style.setProperty('--hdh', hd.offsetHeight + 'px'); }
     hdh(); window.addEventListener('resize', hdh, {passive:true});
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(hdh);
+  })();
+
+  /* v166: from やっぱり、デザインで人を楽しませたい。 to the end, a column of dots at the left edge says how
+     many screens are still to come, and which one is under the reader now */
+  (function(){
+    var ids = ['ch7', 'works', 'ch7b', 'ch7c', 'contact'];
+    var secs = []; ids.forEach(function(id){ var el = document.getElementById(id); if(el) secs.push(el); });
+    if(secs.length < 2) return;
+    var nav = document.createElement('nav'); nav.className = 'remain';   /* v166b: an SVG path in the illustrations is already called .tail */ nav.setAttribute('aria-hidden', 'true');
+    secs.forEach(function(){ nav.appendChild(document.createElement('i')); });
+    body.appendChild(nav);
+    var dots = nav.querySelectorAll('i');
+    window.__tailUpdate = function(){
+      var H = vh(), on = secs[0].getBoundingClientRect().top < H * .5;
+      nav.classList.toggle('on', on);
+      if(!on) return;
+      var cur = 0;
+      secs.forEach(function(s, i){ if(s.getBoundingClientRect().top < H * .5) cur = i; });
+      dots.forEach(function(d, i){ d.classList.toggle('now', i === cur); d.classList.toggle('past', i < cur); });
+    };
   })();
 
   /* hamburger menu */
