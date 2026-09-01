@@ -572,9 +572,12 @@
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
-        var mt = Math.max(0, Math.min(1, (1 - p) / .07));
-        ms.classList.toggle('mtail', p >= .93);
-        if(p >= .93) ms.style.setProperty('--mtail', mt.toFixed(3));   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        /* v193: 薄くして消すのはよくない、とのことなので、最後の一割は**紙面と同じ速さで上へ流す**。
+           見え方はそのままに、ふつうの本文と同じように画面の上へ抜けていく。pin が外れる頃にはもう画面の外。 */
+        var mrun = pin.offsetHeight - vh();
+        var mup = Math.max(0, (p - .90)) * mrun;
+        ms.classList.toggle('mtail', p >= .90);
+        if(p >= .90) ms.style.setProperty('--mup', Math.round(mup) + 'px');   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -936,7 +939,15 @@
     var cs = getComputedStyle(probe), mi = cs.maskImage || cs.webkitMaskImage || '';
     var mm = mi.match(/url\(["']?([^"')]+)["']?\)/); if(!mm) return;   /* 1 枚版はデータ URI、公開版は assets/img/…。解決済みの絶対 URL がここで手に入る */
     var url = mm[1];
-    document.querySelectorAll('#dgsvg .seal, #mpsvg .seal, .oval .seal').forEach(function(g){
+    /* .oval の「seal」は判ではなく、楕円の枠と、その縁に沿った文字（デザイナーとして／こさか しゅうぞう）。
+       群ごと紙目を掛けると小さな文字が潰れて読めなくなるので、枠の線だけに掛ける。 */
+    var targets = [];
+    document.querySelectorAll('#dgsvg .seal, #mpsvg .seal').forEach(function(g){ targets.push(g); });
+    document.querySelectorAll('.oval .seal').forEach(function(g){
+      g.querySelectorAll('path').forEach(function(q){ targets.push(q); });
+      if(g.getAttribute('data-sealtex')){ g.removeAttribute('data-sealtex'); g.removeAttribute('filter'); }
+    });
+    targets.forEach(function(g){
       var svg = g.ownerSVGElement; if(!svg) return;
       var bb; try{ bb = g.getBBox(); }catch(e){ return; }
       if(!bb || !bb.width || !bb.height) return;
