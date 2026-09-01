@@ -929,30 +929,32 @@
     var url = mm[1];
     document.querySelectorAll('#dgsvg .seal, #mpsvg .seal, .oval .seal').forEach(function(g){
       var svg = g.ownerSVGElement; if(!svg) return;
-      var vb = svg.viewBox && svg.viewBox.baseVal, w = svg.getBoundingClientRect().width;
-      var tile = ((vb && vb.width && w) ? 96 * vb.width / w : 96).toFixed(2);
-      var id = svg.getAttribute('data-sealtex');
+      var bb; try{ bb = g.getBBox(); }catch(e){ return; }
+      if(!bb || !bb.width || !bb.height) return;
+      /* 判ひとつにつきフィルタひとつ。紙目は「その判の枠いっぱいに伸ばした一枚」で、feTile は使わない。
+         ・feTile だと、貼る位置を原点に置いた版では判が原点から遠いと切り取られて丸ごと消え（デザイン・ヒト）、
+           位置を合わせても継ぎ目が白い十字になって出た。一枚に伸ばせば継ぎ目そのものが無い。
+         ・SVG の <mask> でも同じ絵になるが、地図のように毎フレーム描き直される SVG では判ごとに裏画面を作る
+           ことになり、17ms が 26ms（半分の滑らかさ）まで落ちた。フィルタは入力が変わらないので使い回される。 */
+      var px = bb.width * .12, py = bb.height * .12;
+      var id = g.getAttribute('data-sealtex');
       if(!id){
-        /* SVG ひとつにつきフィルタひとつ。領域は判の外形に対する割合なので、同じ SVG の判で使い回せる。
-           SVG の <mask> でも同じ絵にはなるが、地図のように毎フレーム描き直される SVG では
-           判ひとつごとに裏画面を作ることになり、17ms が 26ms（半分の滑らかさ）まで落ちた。
-           feImage + feTile は入力が変わらないので結果が使い回され、実測でほぼ元のまま。 */
-        id = 'sealtex' + (++inkmN); svg.setAttribute('data-sealtex', id);
+        id = 'sealtex' + (++inkmN); g.setAttribute('data-sealtex', id);
         var defs = svg.querySelector('defs');
         if(!defs){ defs = svgEl('defs', {}); svg.insertBefore(defs, svg.firstChild); }
         var f = svgEl('filter', {id:id, x:'-12%', y:'-12%', width:'124%', height:'124%'});
-        var im = svgEl('feImage', {x:0, y:0, result:'i'});
+        var im = svgEl('feImage', {preserveAspectRatio:'none', result:'i'});
         im.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url); im.setAttribute('href', url);
         f.appendChild(im);
-        f.appendChild(svgEl('feTile', {'in':'i', result:'t'}));
-        f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'t', operator:'in'}));
+        f.appendChild(svgEl('feComposite', {'in':'SourceGraphic', in2:'i', operator:'in'}));
         defs.appendChild(f);
       }
       var im2 = svg.querySelector('filter[id="' + id + '"] feImage');
-      if(im2){ im2.setAttribute('width', tile); im2.setAttribute('height', tile); }
+      if(im2){ im2.setAttribute('x', (bb.x - px).toFixed(1)); im2.setAttribute('y', (bb.y - py).toFixed(1));
+               im2.setAttribute('width', (bb.width + px * 2).toFixed(1)); im2.setAttribute('height', (bb.height + py * 2).toFixed(1)); }
       if(g.getAttribute('mask')) g.removeAttribute('mask');
       /* 元の filter は html.is-webkit の規則で none にされている（生の feTurbulence が重いため）。
-         id を差し替えればその規則に当たらなくなり、こちらが効く。id を ink… にしないこと。 */
+         id を差し替えればその規則に当たらなくなり、こちらが効く。id を ink… で始めないこと。 */
       if(g.getAttribute('filter') !== 'url(#' + id + ')') g.setAttribute('filter', 'url(#' + id + ')');
     });
   }
