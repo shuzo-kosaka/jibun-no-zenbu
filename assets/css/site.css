@@ -1687,3 +1687,6 @@
   .remain .i:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
   #message .stick:not(.hold) .mh3,#message .stick:not(.hold) .mdown{opacity:0 !important; visibility:hidden}
   body.hasmouse:not(.nocur) .remain .i{cursor:none}
+  html.is-webkit [filter^="url(#ink"],html.is-webkit [filter^="url(#sealf"],html.is-webkit [filter^="url(#illoink"],html.is-webkit [filter^="url(#ovink"],html.is-webkit [filter^="url(#dgink"]{filter:none !important}
+  html.is-webkit .sr li .st,html.is-webkit .chseal,html.is-webkit #mseals .st,html.is-webkit .mlinks .st,html.is-webkit .mmsg .st,html.is-webkit #ch7c .ca-seal,html.is-webkit .pass .st,html.is-webkit .oval .seal,html.is-webkit .sr .st{
+    -webkit-mask-image:url({{INKMASK}}); mask-image:url({{INKMASK}}); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
