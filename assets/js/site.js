@@ -1424,10 +1424,21 @@
     all.sort(function(a, b){ return parseFloat(a.getAttribute('data-at')) - parseFloat(b.getAttribute('data-at')); });
     all.forEach(function(el){ var k = el.getAttribute('data-at'); if(!seen[k]){ seen[k] = 1; items.push(el); } });   /* v169: pieces that arrive together count as one */
     if(items.length < 2) return;
-    var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-hidden', 'true');
-    items.forEach(function(){ nav.appendChild(document.createElement('i')); });
+    var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-label', 'このページの目次');
+    items.forEach(function(el, i){
+      /* v176: each dot is a button — pressing it takes the reader to the moment that piece arrives */
+      var d = document.createElement('button'); d.type = 'button'; d.className = 'i';
+      var t = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 24);
+      d.setAttribute('aria-label', (i + 1) + '. ' + t);
+      d.addEventListener('click', function(){
+        var at = parseFloat(el.getAttribute('data-at')) || 0;
+        var y = sec.getBoundingClientRect().top + window.scrollY + (sec.offsetHeight - vh()) * at + 6;
+        if(typeof flyTo === 'function') flyTo(y); else window.scrollTo({top:y, behavior:'smooth'});
+      });
+      nav.appendChild(d);
+    });
     body.appendChild(nav);
-    var dots = nav.querySelectorAll('i');
+    var dots = nav.querySelectorAll('.i');
     window.__tailUpdate = function(){
       var H = vh(), r = sec.getBoundingClientRect(), here = r.top < H * .5 && r.bottom > H * .5;
       var p = Math.max(0, Math.min(1, (-r.top) / Math.max(1, sec.offsetHeight - H))), cur = -1;

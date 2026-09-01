@@ -1666,17 +1666,21 @@
   #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em; left:.26em}
   .remain{position:fixed; left:calc(var(--x1) / 2); top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:13px; opacity:0; pointer-events:none; transition:opacity .55s var(--ease)}
   .remain.on{opacity:1}
-  .remain i{display:block; width:7px; height:7px; border-radius:50%; border:1px solid var(--fg3); transition:background .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease), opacity .35s}
-  .remain i.past{background:var(--fg3); border-color:var(--fg3); opacity:.45}
-  .remain i.now{background:var(--acc); border-color:var(--acc); transform:scale(1.4)}
+  .remain .i{display:block; width:7px; height:7px; border-radius:50%; border:1px solid var(--fg3); transition:background .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease), opacity .35s}
+  .remain .i.past{background:var(--fg3); border-color:var(--fg3); opacity:.45}
+  .remain .i.now{background:var(--acc); border-color:var(--acc); transform:scale(1.4)}
   body.menuopen .remain,html.cpopen .remain,body.opening .remain{opacity:0 !important}
   @media (max-width:1024px){ .tail{left:13px; gap:11px} .remain i{width:6px; height:6px} }
-  #message .body .mh3,#message .body .mh4{position:absolute; left:6%; right:6%; margin:0; text-align:center; transform:none !important}
-  #message .body .mh3{top:31%; line-height:1.72; font-size:min(3.1vw, 41px)}
+  #message .body .mh3{position:fixed; left:0; right:0; margin:0; text-align:center; transform:none !important}   /* v177: absolute here meant the column, not the screen — the pinned screen is the viewport, so fixed centres it properly */
+  #message .body .mh3{top:31%; line-height:1.72; font-size:min(3.1vw, 41px); max-width:none; width:auto}   /* v176: .p caps the width at 32em — with nowrap the lines were spilling out to the right of the box, so the block read as off-centre */
   #message .body .mh3 .mx{white-space:nowrap}   /* v174: the sentence keeps to two lines — it is set to the width, not wrapped by it */
   #message .body .mh4{top:42%}
   @media (max-width:1024px){ #message .body .mh3{top:29%; line-height:1.85; font-size:min(3.5vw, 20px)} }
-  #message .body .mdown{position:absolute; left:0; right:0; top:62%; margin:0; text-align:center; font-family:var(--mono); font-weight:500; font-size:15px; letter-spacing:.34em; color:var(--fg2)}
+  #message .body .mdown{position:fixed; left:0; right:0; top:62%; margin:0; text-align:center; font-family:var(--mono); font-weight:500; font-size:15px; letter-spacing:.34em; color:var(--fg2)}
   #message .body .mdown i{display:block; width:2px; height:78px; margin:20px auto 0; background:currentColor; transform-origin:top center; animation:mdrop 1.9s ease-in-out infinite}
   @media (max-width:1024px){ #message .body .mdown{font-size:12px; letter-spacing:.28em} #message .body .mdown i{height:56px; margin-top:16px} }
   @keyframes mdrop{0%{transform:scaleY(0); opacity:0} 25%{opacity:.7} 100%{transform:scaleY(1); opacity:0}}
+  .remain{pointer-events:none}
+  .remain .i{pointer-events:auto; padding:0; background:none; cursor:pointer; -webkit-appearance:none; appearance:none}
+  .remain.on .i:hover,.remain.on .i:focus-visible{border-color:var(--acc); transform:scale(1.5); opacity:1}
+  .remain .i:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
