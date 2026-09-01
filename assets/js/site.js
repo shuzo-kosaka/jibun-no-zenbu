@@ -360,7 +360,7 @@
       onOrient.t = setTimeout(function(){
         if(m){ muted = false; hide(); startOpening(); }
         else if(started) show();
-      }, 190);
+      }, 430);
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);
     else if(land.addListener) land.addListener(onOrient);
@@ -605,11 +605,11 @@
            見え方はそのままに、ふつうの本文と同じように画面の上へ抜けていく。pin が外れる頃にはもう画面の外。 */
         var mfs = window.__mFps;
         if(mfs && mfs.length){
-          /* 一文が出たすぐあとに上から下へ伸び、そのあとは歩いた分だけ上から順に消えていく。
-             章が入れ替わる瞬間にまとめて消えるのではなく、スクロールに連れて一歩ずつ引いていく。 */
-          var mIn = Math.round(Math.max(0, Math.min(1, (p - .872) / .052)) * mfs.length);
-          var mOut = Math.round(Math.max(0, Math.min(1, (p - .928) / .072)) * mfs.length);
-          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('on', mi < mIn && mi >= mOut);
+          /* v202: 足跡は SCROLL の縦棒の代わりなので、スクロールしなくても歩き続ける（CSS のループ）。
+             ここでは「一文の画面に居るか」の出し入れと、終盤に上から一歩ずつ消していく分だけを持つ。 */
+          ms.classList.toggle('mwalkon', p >= .858);
+          var mOut = Math.round(Math.max(0, Math.min(1, (p - .93) / .07)) * mfs.length);
+          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
         ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
@@ -1644,6 +1644,10 @@
     return sv;
   }
   function setMenu(open){
+    /* v202: 実機ではツールバーの出入りで画面の高さが開閉の最中に変わる。clip-path は要素の高さへの
+       割合なので、幕が下まで行ってから戻るように見えていた。動いているあいだだけ px で留める。 */
+    menu.style.height = window.innerHeight + 'px';
+    clearTimeout(setMenu.ht); setMenu.ht = setTimeout(function(){ menu.style.height = ''; }, open ? 1500 : 950);
     if(!open && menu.classList.contains('open')){
       /* v163: closed while the sheet is still coming down. Removing .open takes the running animation with it, and
          the closing transition is then left without a value to start from — so the sheet is pinned where it stands
