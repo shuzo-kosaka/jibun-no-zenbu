@@ -255,7 +255,7 @@
     setTimeout(function(){ body.classList.remove('opening'); }, 1200);
     setTimeout(function(){ top.classList.add('gone'); }, 4800);
   }
-  (function loader(){
+  function loader(){
     if(!ld) return;
     if(reduce){ ld.remove(); top.classList.remove('scat'); scxEls.forEach(function(e){ e.classList.add('dec'); }); top.classList.add('in'); body.classList.remove('opening'); return; }
     var lanes = Array.prototype.map.call(ld.querySelectorAll('.lane'), function(el, i){
@@ -335,6 +335,21 @@
       if(phase === 'stop' && now - stopT >= 900){ ldn.textContent = '100'; finish(); return; }
       requestAnimationFrame(frame);
     })(t0);
+  }
+  /* v197: スマホ・タブレットには先に「横に持ち替えて」の案内を出し、それが終わってからオープニングを始める */
+  (function(){
+    var rv = document.getElementById('rotv');
+    if(!document.documentElement.classList.contains('handheld') || !rv){ if(rv && rv.parentNode) rv.parentNode.removeChild(rv); loader(); return; }
+    var went = false;
+    function go(){
+      if(went) return; went = true;
+      rv.classList.add('gone');
+      setTimeout(function(){ if(rv.parentNode) rv.parentNode.removeChild(rv); }, 800);
+      loader();
+    }
+    rv.addEventListener('click', go);
+    rv.addEventListener('touchstart', go, {passive:true});
+    setTimeout(go, 3600);
   })();
 
   /* ---------- mouse: crosshair + dot + coordinates, hero parallax (persists through the page) ---------- */

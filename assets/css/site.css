@@ -1711,3 +1711,18 @@
   #ch5pin .bgdot i.on::before{background:var(--acc); border-color:var(--acc); opacity:1; transform:scale(1.4)}
   body.menuopen #ch5pin .bgdot,html.cpopen #ch5pin .bgdot,body.opening #ch5pin .bgdot{opacity:0}
   @media (max-width:1024px){ #ch5pin .bgdot{left:0} #ch5pin .bgdot i{width:24px; height:20px} #ch5pin .bgdot i::before{width:6px; height:6px; margin:-3px 0 0 -3px} }
+  /* 横持ちのお願い。端末が携帯・タブレットのときだけ出る（画面の幅では判定しない） */
+  .rotv{display:none}
+  html.handheld .rotv{position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:18px; text-align:center; padding:6vh 8vw; box-sizing:border-box; background:#F5F2EC; color:#1C1B19;
+    transition:opacity .7s var(--ease); -webkit-user-select:none; user-select:none}
+  html.handheld .rotv.gone{opacity:0; pointer-events:none}
+  .rotv svg{width:104px; height:104px; color:#E84518}
+  .rotv .ph{transform-origin:60px 60px; animation:rotph 3.2s cubic-bezier(.5,0,.2,1) infinite}
+  .rotv .ar{opacity:.42}
+  @keyframes rotph{0%,14%{transform:rotate(0deg); opacity:1} 44%,84%{transform:rotate(-90deg); opacity:1}
+    94%{transform:rotate(-90deg); opacity:0} 95%{transform:rotate(0deg); opacity:0} 100%{transform:rotate(0deg); opacity:1}}
+  .rotv small{font-family:var(--mono); font-size:11px; letter-spacing:.2em; color:#7E7C76}
+  .rotv b{font-family:var(--mincho); font-weight:700; font-size:26px; line-height:1.5; letter-spacing:.02em}
+  .rotv span{font-family:var(--sans); font-size:13px; line-height:1.9; color:#57544E}
+  @media (prefers-reduced-motion:reduce){ .rotv .ph{animation:none; transform:rotate(-90deg)} }
