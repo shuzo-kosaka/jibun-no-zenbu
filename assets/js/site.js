@@ -604,14 +604,14 @@
         /* v193: 薄くして消すのはよくない、とのことなので、最後の一割は**紙面と同じ速さで上へ流す**。
            見え方はそのままに、ふつうの本文と同じように画面の上へ抜けていく。pin が外れる頃にはもう画面の外。 */
         var mfs = window.__mFps;
-        if(mfs && mfs.length){   /* 一文が出たすぐあとから、章が入れ替わるまでに歩き切る */
-          var mq = Math.max(0, Math.min(1, (p - .872) / .118)), mn = Math.round(mq * mfs.length);
-          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('on', mi < mn);
+        if(mfs && mfs.length){
+          /* 一文が出たすぐあとに上から下へ伸び、そのあとは歩いた分だけ上から順に消えていく。
+             章が入れ替わる瞬間にまとめて消えるのではなく、スクロールに連れて一歩ずつ引いていく。 */
+          var mIn = Math.round(Math.max(0, Math.min(1, (p - .872) / .052)) * mfs.length);
+          var mOut = Math.round(Math.max(0, Math.min(1, (p - .928) / .072)) * mfs.length);
+          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('on', mi < mIn && mi >= mOut);
         }
-        var mrun = pin.offsetHeight - vh();
-        var mup = Math.max(0, (p - .93)) * mrun;   /* v195: 出てから半分は動かさず、読み終わるころに動きはじめる */
-        ms.classList.toggle('mtail', p >= .93);
-        if(p >= .93) ms.style.setProperty('--mup', Math.round(mup) + 'px');   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -1416,7 +1416,7 @@
     var W = host.clientWidth, H = host.clientHeight;
     if(!W || !H) return;
     var sv = svgEl('svg', {'class':'mtrail', viewBox:'0 0 ' + W + ' ' + H, width:W, height:H, 'aria-hidden':'true'});
-    var cx = W / 2, sy = H * .60, ey = H * 1.12, run = ey - sy;
+    var cx = W / 2, sy = H * .74, ey = H * 1.16, run = ey - sy;   /* SCROLL の字のすぐ下から。縦棒の代わりに歩き出す */
     /* 右にひとつ、左にひとつ揺れてから中央へ。最後は画面の下へ抜けていく */
     var d = 'M' + (cx + 32).toFixed(1) + ',' + sy.toFixed(1)
           + ' C' + (cx + 66).toFixed(1) + ',' + (sy + run * .18).toFixed(1)

@@ -1790,3 +1790,23 @@
   html.tablet .rotv .rnote{font-size:min(2.3vw, 2.7vh)}
   html.tablet .rotv{gap:1.6vw}
   html.is-webkit .menu:not(.open):not(.shown){visibility:hidden}
+  html.pcview.phone .menu-in{padding:calc(var(--hdh, 116px) + 14px) 3.4% 3.4vh}   /* 見出しがヘッダーの下に潜っていた */
+  html.pcview.phone .menu .mmsg{margin-bottom:2.4vh; gap:16px}
+  html.pcview.phone .menu .mmsg .kslot{width:min(6vw,80px)}
+  html.pcview.phone .menu .mmsg .txt{font-size:clamp(20px,2.6vw,36px)}
+  html.pcview.phone .menu .mmsg .txt b{font-size:9.5px; margin-bottom:5px}
+  html.pcview.phone .menu .ml{padding-top:4px; font-size:9.5px}
+  html.pcview.phone .menu .mseals .slot{width:min(6.6vw,88px); margin-bottom:9px}
+  html.pcview.phone .menu .mseals::before{top:calc(min(6.6vw,88px) / 2)}
+  html.pcview.phone .menu .mseals .cp b{font-size:13px}
+  html.pcview.phone .menu .mseals .cp{font-size:8px}
+  html.pcview.phone .menu .mseals .t{font-size:clamp(10.5px,.95vw,13px); line-height:1.5}
+  html.pcview.phone .menu .mseals .y{font-size:8.5px; margin-top:5px}
+  html.pcview.phone .menu .mlinks .kslot{width:min(5vw,66px)}
+  html.pcview.phone .menu .mlinks{margin-top:2.2vh}
+  /* 一文は動かさず画面に留める。章が入れ替わるところで短く消えるだけ（演出はつけない） */
+  #message .stick.mtail .mh3{transform:translateY(-50%) !important; transition:none}
+  #message .stick.mtail .mdown{transform:none !important; transition:none}
+  #message .stick:not(.hold) .mh3,#message .stick:not(.hold) .mdown{transition:opacity .25s var(--ease)}
+  /* SCROLL の縦棒は足跡が引き受ける */
+  #message .body .mdown i{display:none}
