@@ -1644,10 +1644,15 @@
     return sv;
   }
   function setMenu(open){
-    /* v202: 実機ではツールバーの出入りで画面の高さが開閉の最中に変わる。clip-path は要素の高さへの
-       割合なので、幕が下まで行ってから戻るように見えていた。動いているあいだだけ px で留める。 */
+    /* v203: 開閉の最中、幕の高さを px で留める。clip-path は要素の高さへの割合なので、
+       実機でツールバーが出入りして高さが動くと、幕の端が引き戻されて見える。
+       ただし押した瞬間はツールバーが見えていて画面が低く、直後に隠れて伸びることがある。
+       そのとき留めた高さのままだと幕の下に紙面が一帯残るので、伸びた分にはすぐ追随させる
+       （高さは増える方向にだけ動かす。端は進行方向へ僅かに跳ぶだけで、巻き戻りは起きない）。 */
     menu.style.height = window.innerHeight + 'px';
-    clearTimeout(setMenu.ht); setMenu.ht = setTimeout(function(){ menu.style.height = ''; }, open ? 1500 : 950);
+    if(!setMenu.grow){ setMenu.grow = function(){ var h = parseFloat(menu.style.height) || 0; if(h && window.innerHeight > h) menu.style.height = window.innerHeight + 'px'; }; }
+    window.addEventListener('resize', setMenu.grow, {passive:true});
+    clearTimeout(setMenu.ht); setMenu.ht = setTimeout(function(){ menu.style.height = ''; window.removeEventListener('resize', setMenu.grow); }, open ? 1500 : 950);
     if(!open && menu.classList.contains('open')){
       /* v163: closed while the sheet is still coming down. Removing .open takes the running animation with it, and
          the closing transition is then left without a value to start from — so the sheet is pinned where it stands

@@ -1810,3 +1810,6 @@
   #message .mfp{transition:none; animation:mwalk 3.4s linear infinite; animation-delay:calc(var(--k,0) * .16s)}
   @keyframes mwalk{0%{opacity:0} 8%{opacity:calc(.85 * var(--fade,1))} 48%{opacity:calc(.85 * var(--fade,1))} 62%{opacity:0} 100%{opacity:0}}
   #message .mfp.off{animation:none; opacity:0 !important; transition:opacity .4s var(--ease)}
+  html.is-webkit [filter^="url(#flagf"]{filter:none !important}   /* 実機 Safari では生の feTurbulence がほぼ見えない濃さになる（判と同じ）。旗の三角が消えて、切れているように見えていた */
+  body.menuopen .hd::before{opacity:0}   /* 紙のシートの上に、章の地色のグラデーションが一帯だけ乗っていた。旗の頭もこれに隠れていた */
+  .menu .menu-in{padding-top:max(11vh, calc(var(--hdh, 68px) + 40px))}   /* 旗はいちばん上の判から 33px 伸び上がる。ヘッダーに重ならない高さから始める */
