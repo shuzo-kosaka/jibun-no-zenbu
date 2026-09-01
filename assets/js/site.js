@@ -73,7 +73,7 @@
   ttlWords(true);
   /* ch7's two subheads (.mixed): set like a chapter title — split per character (the <br> kept), kanji gothic / kana mincho, the data-big words larger, kerned by pair, the lines optically aligned */
   function mixedSubs(ja){
-    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed').forEach(function(sub){
+    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed, .rotv .rtl.mixed').forEach(function(sub){
       var w = sub.querySelector('.w'); if(!w) return;
       if(!w.querySelector('.ch')){
         var frag = document.createDocumentFragment(), i = 0;
@@ -340,21 +340,24 @@
   (function(){
     var rv = document.getElementById('rotv');
     if(!document.documentElement.classList.contains('handheld') || !rv){ if(rv && rv.parentNode) rv.parentNode.removeChild(rv); loader(); return; }
+    /* v199: 案内は取り除かず、向きに合わせて出し入れする。
+       ・横になったら滑らかに退場し、そのあとで幕（オープニング）が始まる（地色が同じなのでつながる）
+       ・途中で縦に戻したら、また滑らかに入ってくる
+       ・触れば引っ込む。次に横→縦と回せばまた出る */
     var land = window.matchMedia('(orientation:landscape)');
-    if(land.matches){ if(rv.parentNode) rv.parentNode.removeChild(rv); loader(); return; }   /* すでに横向きなら、お願いする必要がない */
-    var went = false;
-    function go(){
-      if(went) return; went = true;
-      rv.classList.add('gone');
-      setTimeout(function(){ if(rv.parentNode) rv.parentNode.removeChild(rv); }, 800);
-      loader();
+    var started = false, muted = false;
+    function startOpening(){ if(started) return; started = true; setTimeout(loader, 280); }   /* 案内が薄くなりはじめてから幕を動かす */
+    function hide(){ rv.classList.add('gone'); }
+    function show(){ if(!muted) rv.classList.remove('gone'); }
+    if(land.matches){ hide(); startOpening(); }                                  /* すでに横向きなら、お願いする必要がない */
+    else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);  /* 回さないまま置かれても止まらない */
+    rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
+    function onOrient(e){
+      if(e.matches){ muted = false; hide(); startOpening(); }
+      else if(started) show();
     }
-    rv.addEventListener('click', go);
-    rv.addEventListener('touchstart', go, {passive:true});
-    /* 横に回した時点で用は済む。回さないまま置かれても止まらないよう、5 秒で自分から閉じる */
-    if(land.addEventListener) land.addEventListener('change', function(e){ if(e.matches) go(); });
-    else if(land.addListener) land.addListener(function(e){ if(e.matches) go(); });
-    setTimeout(go, 5000);
+    if(land.addEventListener) land.addEventListener('change', onOrient);
+    else if(land.addListener) land.addListener(onOrient);
   })();
 
   /* ---------- mouse: crosshair + dot + coordinates, hero parallax (persists through the page) ---------- */
