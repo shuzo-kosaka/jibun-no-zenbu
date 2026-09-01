@@ -566,10 +566,12 @@
            paragraph came while the address was still standing in the middle. Both are back where they were. */
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
-        ms.classList.toggle('solo2', p >= .46 && p < .585);   /* v155: the second address holds the middle of the screen */
-        ms.classList.toggle('away2', p >= .585);              /* and then recedes, and the paragraphs come in behind it */
-        pin.classList.toggle('gridon', p >= .48);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
-        if(p >= .48){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
+        var s2 = p >= .548 && p < .698;
+        if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
+        ms.classList.toggle('solo2', s2);   /* v155: the second address holds the middle of the screen */
+        ms.classList.toggle('away2', p >= .698);              /* and then recedes, and the paragraphs come in behind it */
+        pin.classList.toggle('gridon', p >= .573);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
+        if(p >= .573){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }
     });

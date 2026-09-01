@@ -782,7 +782,7 @@
   .pin{display:block; min-height:200vh}
   .pin .stick{position:sticky; top:0; height:100vh; display:grid; grid-template-columns:12% 16% 30% 25% 17%; grid-template-rows:14vh minmax(18vh,auto) minmax(39vh,auto) minmax(14vh,auto); overflow:hidden}
   #message{min-height:260vh}
-  #message{min-height:840vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
+  #message{min-height:720vh}   /* the address alone gets a good two thirds of a screen of scrolling before the text comes */
   #message .hw{position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease); pointer-events:none}
   #message .hw .hwa{display:block; height:min(74vh, 66vw); width:auto; max-width:92vw; opacity:0; transition:opacity .6s}
   #message .hw.on .hwa{opacity:1}
@@ -1659,11 +1659,11 @@
   .menu.open{clip-path:inset(0); animation:menuDrop 1.34s}   /* v162: the open state is declared as well as animated (the animation wins while it runs), so removing .open leaves the base transition to sweep the sheet away again */
   .menu.open .menu-in{transition:transform 1.15s cubic-bezier(.45,.02,.25,1) .19s}
   #message .body .mh2{line-height:1.02}
-  #message .body .mh2 .mx:first-child{margin-right:.28em; position:relative; top:-.17em}   /* the 、 at its end is counted in the centring; and the line stands a little higher than the two under it */
+  #message .body .mh2 .mx:first-child{position:relative; top:-.17em; left:.24em}   /* each line is centred on its ink, not on its box: the 、 and 。 at the ends are half a glyph of air */
   #message .body .mh2 .mx.big{margin-top:.12em}
   #message .stick.away2 .mh2{transform:none; filter:none}   /* v169: no forced opacity — the heading leaves with its own block at data-off */
-  #message .body .mh2 .mx:nth-of-type(2){position:relative; top:.1em}
-  #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em; left:.045em}
+  #message .body .mh2 .mx:nth-of-type(2){position:relative; top:.1em; left:.26em}
+  #message .body .mh2 .mx:nth-of-type(3){position:relative; top:.05em; left:.26em}
   .remain{position:fixed; left:calc(var(--x1) / 2); top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:13px; opacity:0; pointer-events:none; transition:opacity .55s var(--ease)}
   .remain.on{opacity:1}
   .remain i{display:block; width:7px; height:7px; border-radius:50%; border:1px solid var(--fg3); transition:background .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease), opacity .35s}
@@ -1672,6 +1672,9 @@
   body.menuopen .remain,html.cpopen .remain,body.opening .remain{opacity:0 !important}
   @media (max-width:1024px){ .tail{left:13px; gap:11px} .remain i{width:6px; height:6px} }
   #message .body .mh3,#message .body .mh4{position:absolute; left:6%; right:6%; margin:0; text-align:center; transform:none !important}
-  #message .body .mh3{top:38%; font-size:clamp(16px,min(1.9vw,4cqw),25px); line-height:2}
+  #message .body .mh3{top:31%; line-height:1.72}
   #message .body .mh4{top:42%}
-  @media (max-width:1024px){ #message .body .mh3{top:36%; font-size:clamp(15px,4.4vw,20px); line-height:2.05} #message .body .mh4{top:42%} }
+  @media (max-width:1024px){ #message .body .mh3{top:29%; line-height:1.8} }
+  #message .body .mdown{position:absolute; left:0; right:0; top:66%; margin:0; text-align:center; font-family:var(--mono); font-size:10.5px; letter-spacing:.24em; color:var(--fg2)}
+  #message .body .mdown i{display:block; width:1px; height:38px; margin:12px auto 0; background:currentColor; transform-origin:top center; animation:mdrop 1.9s ease-in-out infinite}
+  @keyframes mdrop{0%{transform:scaleY(0); opacity:0} 25%{opacity:.7} 100%{transform:scaleY(1); opacity:0}}
