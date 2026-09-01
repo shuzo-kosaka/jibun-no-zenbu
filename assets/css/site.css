@@ -1369,6 +1369,9 @@
   #seq .page .v s{top:calc(var(--y1) + 10px); left:4px; writing-mode:vertical-rl} #seq .page .h s{left:14px; top:3px}
   #seq .page .msg{position:absolute; left:calc(var(--x2) + 30px); top:calc(var(--y2) + 18px); padding-bottom:12px; font-family:var(--mincho); font-weight:700; font-size:clamp(26px,3vw,42px); line-height:1.4; white-space:nowrap; text-shadow:0 0 12px var(--bg), 0 0 5px var(--bg), 0 0 2px var(--bg)}   /* X2 の線ラベル（密度転換線）を避けて右へ、地の色のにじみで線の上でも読める */
   .pdf{display:inline-block; margin-top:12px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--acc); text-decoration:none; border-bottom:1px solid var(--acc); padding-bottom:1px}
+  /* ---- v186 ---- */
+  #seq{--sc:1; --sc4:4}
+  #seq .ln,#seq .meas .dl,#seq .cor .hl,#seq .cor .cp{stroke-dasharray:var(--sc) var(--sc4); stroke-dashoffset:var(--sc)}
   @media (max-width:900px){
     #seq{height:calc(8 * 95vh)}
     #seq .stage{grid-template-columns:6% 88% 6%; grid-template-rows:44vh 1fr; align-items:start; padding-top:8vh}
@@ -1689,4 +1692,4 @@
   body.hasmouse:not(.nocur) .remain .i{cursor:none}
   html.is-webkit [filter^="url(#ink"],html.is-webkit [filter^="url(#sealf"],html.is-webkit [filter^="url(#illoink"],html.is-webkit [filter^="url(#ovink"],html.is-webkit [filter^="url(#dgink"]{filter:none !important}
   html.is-webkit .sr li .st,html.is-webkit .chseal,html.is-webkit #mseals .st,html.is-webkit .mlinks .st,html.is-webkit .mmsg .st,html.is-webkit #ch7c .ca-seal,html.is-webkit .pass .st,html.is-webkit .oval .seal,html.is-webkit .sr .st{
-    -webkit-mask-image:url({{INKMASK}}); mask-image:url({{INKMASK}}); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
+    -webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}

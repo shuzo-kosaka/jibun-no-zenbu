@@ -759,6 +759,23 @@
     var y = window.scrollY + r.top + total * ((n - 1) / STEPS + .5 / STEPS);
     window.scrollTo({top: Math.round(y), behavior: reduce ? 'auto' : 'smooth'});
   }
+  /* v186: the grid lines are drawn by shrinking stroke-dashoffset over a stroke-dasharray of 1 against
+     pathLength="1" — one dash the length of the whole line. But the stroke is vector-effect:non-scaling-stroke,
+     and Blink measures that dash in the figure's own units while stroking it in screen pixels. On a wide screen
+     (an iMac) the figure is scaled up past 1, so the dash is shorter than the line it has to cover: the drawn
+     line stops before the frame, and the *next* dash of the repeat pokes out at the far end while the line is
+     still meant to be hidden. Feeding the figure's real scale in as --sc makes the dash the line's own screen
+     length again, at any size; --sc4 keeps the following dash four lengths away, well off the figure. */
+  function seqScale(){
+    var svg = seq.querySelector('.fig svg'); if(!svg) return;
+    var m = svg.getScreenCTM && svg.getScreenCTM(), s = 0;
+    if(m && m.a) s = Math.abs(m.a);
+    if(!s){ var r = svg.getBoundingClientRect(); s = Math.min(r.width / 1000, r.height / 620); }
+    if(!(s > 0) || !isFinite(s)) return;
+    seq.style.setProperty('--sc', s.toFixed(3)); seq.style.setProperty('--sc4', (s * 4).toFixed(3));
+  }
+  seqScale(); window.addEventListener('resize', seqScale, {passive:true}); window.addEventListener('load', seqScale);
+
   items.forEach(function(li, i){ li.setAttribute('tabindex','0'); li.setAttribute('role','button'); li.addEventListener('click', function(){ goStep(i+1); }); li.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); goStep(i+1); } }); });
 
   /* ch4 annotation overlay — v133: the labels belong to 世の中全部、デザインじゃん。 and must not be seen anywhere
