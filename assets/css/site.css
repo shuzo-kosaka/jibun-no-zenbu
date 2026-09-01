@@ -42,7 +42,7 @@
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   html{overflow-x:clip}
-  body{margin:0; color:var(--fg); font-family:var(--sans); font-size:15px; line-height:1.9; overflow-x:clip; transition:color 1s var(--ease)}
+  body{margin:0; color:var(--fg); font-family:var(--sans); font-size:15px; line-height:1.9; overflow-x:clip}
   body::after{content:""; position:fixed; inset:0; z-index:-1; background:var(--bg); transition:background 1s var(--ease)}
   html{background:#F2F1EC}
   a{color:inherit}
@@ -1696,3 +1696,5 @@
   html.is-webkit [filter="url(#brfpink)"],html.is-webkit .brfp{filter:none !important}
   html.is-webkit .solopin .seals i,html.is-webkit .pass .pass-svg{
     -webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
+  #message .stick.mtail .mh3,#message .stick.mtail .mdown{opacity:var(--mtail,1) !important; filter:none; transform:translateY(-50%) !important; transition:none}
+  #message .stick.mtail .mdown{transform:none !important}

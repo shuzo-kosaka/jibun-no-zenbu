@@ -10,7 +10,10 @@
   var I18N = {}; (function(raw){ Object.keys(raw).forEach(function(k){ I18N[k.replace(/\s+/g, ' ').trim()] = raw[k]; }); })(window.I18N || {});
   /* v121: Safari pays far more for SVG filters than the others — a turbulence texture spread over the whole
      walk cost it 120ms frames while Chromium shrugged. The engine is marked here so the sheet can spare it. */
-  if(/^((?!chrome|android|crios|edg).)*safari/i.test(navigator.userAgent)) document.documentElement.classList.add('is-webkit');   /* NOT 'wk' — that class already belongs to the works band, and on <html> it dressed every link on the page as a works frame */
+  /* WebKit かどうか（Safari だけではない）。iOS の Chrome・Edge・Firefox は中身が WebKit なので、
+     同じ描き分けが要る。navigator.vendor が Apple になるのは WebKit だけ（Mac の Chrome は Google Inc.、
+     Firefox は空）。UA の判定はそれが取れない場合の控え。 */
+  if(/apple/i.test(navigator.vendor || '') || /^((?!chrome|android|crios|edg).)*safari/i.test(navigator.userAgent)) document.documentElement.classList.add('is-webkit');   /* NOT 'wk' — that class already belongs to the works band, and on <html> it dressed every link on the page as a works frame */
   var I18N_SEL = 'p, h3, figcaption, li, dd, .toc a, .sr .t, .sr .p2, .sr .a, #mseals .t, em.tag, .lab, .mlab, .tip, .msg, .lg-k, .lg-t, .legend strong, .legend span, .mp-cap b, .mp-cap span, .mp-key span, .gridbtn span, .mmsg .mx, #mlinks .txt, .menu .ml span, .wrap, .cap, .note, .br-cap, .again, .pdf, .cta, .x, footer span, footer a, footer a span, .cta span, .ft-name, .cp-ttl .w, .wk-vt .w, .cp-form label span, .cp-send b, .wk-side span, text, tspan, textPath, .ttl .split, .ttl small, #top .vt .split, #top .rb, #top .rot span, #top .tag span, .sub .w, .vid .t, .vid .s, .vid .badge, .wk em, .lines s, .page s, #ch5pin .wm span, #top .mean';
   var i18nEls = Array.prototype.slice.call(document.querySelectorAll(I18N_SEL)); i18nEls.forEach(function(el){ el.__ja = el.innerHTML; });
   /* split text into characters */
@@ -565,7 +568,13 @@
            the handwriting was still bright when the address arrived (they printed over each other) and the first
            paragraph came while the address was still standing in the middle. Both are back where they were. */
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
-        ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
+        /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
+           最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
+           時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
+        var mt = Math.max(0, Math.min(1, (1 - p) / .07));
+        ms.classList.toggle('mtail', p >= .93);
+        if(p >= .93) ms.style.setProperty('--mtail', mt.toFixed(3));   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
