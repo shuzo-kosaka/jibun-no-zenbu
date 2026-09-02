@@ -41,7 +41,7 @@
     if(reduce) return;
     document.querySelectorAll('#top .oval').forEach(function(o, k){
       var imgs = o.querySelectorAll('.phs image, .phs img'), n = imgs.length, cur = 0; if(n < 2) return;   /* v229: 写真は HTML の img に */
-      setTimeout(function(){ setInterval(function(){ if(body.classList.contains('opening') || document.hidden) return; imgs[cur].classList.remove('on'); cur = (cur + 1) % n; imgs[cur].classList.add('on'); }, 3400); }, k * 1700);
+      setTimeout(function(){ setInterval(function(){ if(body.classList.contains('opening') || document.hidden || !top.classList.contains('inview')) return; imgs[cur].classList.remove('on');   /* v230: 画面の外では切り替えない */ cur = (cur + 1) % n; imgs[cur].classList.add('on'); }, 3400); }, k * 1700);
     });
   })();
   (function(){
@@ -714,7 +714,8 @@
           var mOut = Math.round(Math.max(0, Math.min(1, (p - .93) / .07)) * mfs.length);
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
-        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */
+        hwStill(p >= .14);   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -1779,6 +1780,17 @@
     skipHud(c1 - c0, c0, c1);
     return flyToEl(id);
   }
+  /* v230: 手書きのアニメーション WebP は、薄くなっている間と画面外では静止画（ポスター）に差し替える */
+  var hwStillOn = null;
+  function hwStill(still){
+    var im = document.getElementById('hwv'); if(!im) return;
+    var anim = im.getAttribute('data-src'), poster = im.getAttribute('data-poster');
+    if(!anim || !poster || !im.getAttribute('src')) return;   /* まだ読み込まれていない（src が入る前）なら触らない */
+    if(hwStillOn === still) return; hwStillOn = still;
+    im.setAttribute('src', still ? poster : anim);
+  }
+  (function(){ var sec = document.getElementById('message'); if(!sec || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) hwStill(true); }); }, {threshold:0}).observe(sec); })();
   var jcur = null;
   function curtainJump(y, done, rew){
     if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }

@@ -2027,3 +2027,4 @@
   html:not(.rewind) .rew::after,html:not(.rewind) .rew::before{animation-play-state:paused !important}
   body:not(.opening) .ld,body:not(.opening) .ld *,body:not(.opening) .ld *::before,body:not(.opening) .ld *::after{animation-play-state:paused !important}
   #message .stick:not(.mwalkon) .mfp{animation-play-state:paused !important}
+  html.is-webkit #message .stick.dim .hw{filter:none}   /* v230: ぼかしは WebKit で再描画のたびに掛け直される */
