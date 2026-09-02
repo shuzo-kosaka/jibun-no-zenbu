@@ -162,6 +162,7 @@
           var nb = document.createElement('span'); nb.className = 'nb';
           Array.from(ph).forEach(function(ch){ var c = document.createElement('span'); c.className = 'mc'; c.textContent = ch; nb.appendChild(c); });
           frag.appendChild(nb);
+          if(ph === 'デザインに注ぐ。' && document.documentElement.classList.contains('phone')) frag.appendChild(document.createElement('br'));   /* v237: スマホはここで必ず行を替える */
         });
       }
       else frag.appendChild(nd.cloneNode(true));
@@ -1544,7 +1545,7 @@
     shift(svg.querySelector('.dg-title'), -872, -720);   /* 題 → 左上（左端 x=-372、y 130〜232）。text-anchor は CSS で start に */
     svg.querySelectorAll('.dg-cap tspan[dy]').forEach(function(t){ var d = parseFloat(t.getAttribute('dy')); if(d === 24) t.setAttribute('dy', '38'); else if(d === 26) t.setAttribute('dy', '40'); });   /* 行間を広く（28px の文字） */
     var caps = svg.querySelectorAll('.dg-cap');
-    shift(caps[1], -440, -340);   /* 左下の説明 → 左の列 */
+    shift(caps[1], -440, -370);   /* 左下の説明 → 左の列（右の説明と同じ高さ y 392〜） */
     shift(caps[2], 362, -370);    /* 右下の説明 → 右の列（y 392〜470）。題は左上に移ったので上へ。右の判（上端 y≈490）にも右下のボタンにも掛からない */
   })();
   function dgBuild(){
@@ -1942,7 +1943,7 @@
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
   document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
-    if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
+    if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(a.closest('#top .toc')){ if(!skipTo(h)) flyTo(0, rew); }   /* v237: TOP の目次も年数の札つき */ else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
 
   /* v126: the photographs are not offered for saving — the context menu and dragging are turned off over
      images, figures and video. This is a deterrent, not protection: anything the browser can display can still
