@@ -1684,11 +1684,11 @@
     return flyToEl(id);
   }
   var jcur = null;
-  function curtainJump(y, done){
+  function curtainJump(y, done, rew){
     if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
     clearTimeout(curtainJump.t1); clearTimeout(curtainJump.t2);
     void jcur.offsetWidth; jcur.classList.add('on');
-    var hold = jumpHud(window.scrollY, y) + 140;   /* v220: 年の数字が巻き戻り終わるまで幕を持つ */
+    var hold = rew ? jumpHud(window.scrollY, y) + 140 : 640;   /* v220: 先頭へ／末尾へは年の数字が送り終わるまで幕を持つ。章へのジャンプは skipTo の札（n 秒スキップ）をそのまま見せる */
     curtainJump.t1 = setTimeout(function(){
       window.scrollTo({top: y, behavior: 'instant'});
       done();
@@ -1709,7 +1709,7 @@
     function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); if(!(jcur && jcur.classList.contains('on')) && window.__skipHudOff) window.__skipHudOff(); }
     /* v218: 指の端末では、巻き戻しボタンと長い飛行（画面 3 つ分より遠く）は幕を下ろして一足で着く。
        全章を通り抜ける飛行は iOS の描画プロセスを落とし、Safari がページを黙って読み直していた */
-    if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land); return; }
+    if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land, rew); return; }
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
