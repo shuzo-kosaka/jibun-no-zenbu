@@ -650,6 +650,14 @@
 
   /* fixed cta after hero */
   var ctEl = document.getElementById('contact');
+  /* v217: スマホでは右下のボタンの周りの文字を、役目そのもの（下部へ／上部へ）にする */
+  (function(){
+    if(!document.documentElement.classList.contains('phone')) return;
+    var t1 = document.querySelector('.cta-fx .t1 textPath'), t2 = document.querySelector('.cta-fx .t2 textPath');
+    function put(el, ja, en){ if(!el) return; el.textContent = ja; el.__ja = el.innerHTML; el.setAttribute('data-ja', ja); el.setAttribute('data-en', en); }   /* __ja: 言語切替の台帳も差し替える */
+    put(t1, 'ページ下部へ移動 \u00b7 TO THE BOTTOM \u00b7 ', 'TO THE BOTTOM \u00b7 SKIP AHEAD \u00b7 ');
+    put(t2, 'ページ上部へ移動 \u00b7 TO THE TOP \u00b7 ', 'TO THE TOP \u00b7 BACK TO THE START \u00b7 ');
+  })();
   function ctaUpdate(){ body.classList.toggle('past', window.scrollY > vh()*.7); body.classList.toggle('atend', !!ctEl && ctEl.getBoundingClientRect().top < vh() * .55); }   /* at the contact block the round button turns into BACK TO TOP */
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
@@ -698,7 +706,8 @@
           var mOut = Math.round(Math.max(0, Math.min(1, (p - .93) / .07)) * mfs.length);
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
-        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */
+        ms.classList.toggle('hwback', p >= .93);   /* v217: 一文のあと、手書きがもう一度浮かび上がる */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -1548,6 +1557,17 @@
 
   /* in-page flights (the logo back to the top, contents, menu, the 小 button): one smooth run on requestAnimationFrame with a fixed short duration, whatever the distance. The heavy scroll-driven work of the pinned screens waits until landing, so the page glides instead of stuttering through them. A wheel, touch or key cancels the flight. */
   var flying = false, flyRaf = 0, snapping = false;   /* v196: 丸から丸へ送っている最中は、続くホイールで飛行を止めない */
+  var jcur = null;
+  function curtainJump(y, done){
+    if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
+    clearTimeout(curtainJump.t1); clearTimeout(curtainJump.t2);
+    void jcur.offsetWidth; jcur.classList.add('on');
+    curtainJump.t1 = setTimeout(function(){
+      window.scrollTo({top: y, behavior: 'instant'});
+      done();
+      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); }, 260);
+    }, 320);
+  }
   function flyTo(y, rew){
     y = Math.max(0, Math.round(y)); var start = window.scrollY, dist = y - start;
     if(Math.abs(dist) < 2) return;
@@ -1560,6 +1580,9 @@
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
     function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); }
+    /* v218: 指の端末では、巻き戻しボタンと長い飛行（画面 3 つ分より遠く）は幕を下ろして一足で着く。
+       全章を通り抜ける飛行は iOS の描画プロセスを落とし、Safari がページを黙って読み直していた */
+    if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land); return; }
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);

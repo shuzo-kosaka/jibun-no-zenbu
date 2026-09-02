@@ -1910,3 +1910,21 @@
   @media (hover:none){ #contact .oval:hover .phs{opacity:1} #contact .oval:hover .ovh{opacity:0} }
   /* いちばん上で下へ引いたときの「引っ張って更新」を起こさない（ボタンで上へ飛んだ直後に起きやすい） */
   html,body{overscroll-behavior-y:none}
+  /* スマホ：MESSAGE のグリッドの線が 1px（表示は 0.66px）で震えて見えていた。2px（表示 1.3px）に */
+  html.pcview.phone #message .lines i,html.pcview.phone #message.gridon .lines i{width:2px}
+  html.pcview.phone #message .lines i.h{width:auto; height:2px}
+  /* 指の端末：作品の枠を触ったときのちらつき（電球が点く演出）は、なめらかに灯るだけにする */
+  @media (hover:none){
+    .wkf:hover .ph,.wkf:focus-visible .ph{animation:none}
+    .wkf:hover .fl,.wkf:focus-visible .fl{animation:none; opacity:.34; transition:opacity .55s var(--ease)}
+    .wkf:hover,.wkf:focus-visible{transition:filter .55s var(--ease)}
+  }
+  /* 引き継ぎの一文のあと、下へ送ると「デザインで人を楽しませたい」の手書きがもう一度浮かび上がる */
+  #message .stick.dim.hwback .hw{opacity:.62; transform:translateY(-2vh) scale(.96); filter:none; transition:opacity 1.4s var(--ease), transform 1.6s var(--ease)}
+  /* v218: 指の端末の「先頭へ／末尾へ」は、幕を下ろして一足で着く（全章を通り抜ける長い飛行と、混合モードの縞の重なりが
+     iOS の描画プロセスを落とし、Safari がページを黙って読み直していた疑い。飛行そのものを無くす） */
+  .jcur{position:fixed; inset:0; z-index:96; background:var(--bg); opacity:0; pointer-events:none; visibility:hidden; transition:opacity .3s var(--ease), background-color .4s, visibility 0s .3s}
+  .jcur.on{opacity:1; visibility:visible; transition:opacity .26s var(--ease), background-color .4s, visibility 0s}
+  html.rewind .jcur{transition:opacity .26s var(--ease), background-color .4s, visibility 0s !important}
+  html.handheld .rew .bands{mix-blend-mode:normal; opacity:.42}
+  html.handheld .rew::after{mix-blend-mode:normal; opacity:.55}
