@@ -1581,8 +1581,9 @@
       /* PC・タブレット：左下の説明は輪の左（右揃え）、右下の説明は輪の右（左揃え）。上の説明はそのまま 2 行 */
       var x = null;
       if(!phone){
-        if(ci === 1){ x = '180'; t.setAttribute('text-anchor', 'end'); t.setAttribute('y', '372'); }
-        if(ci === 2){ x = '820'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '372'); }
+        /* v248: 左の説明は題の左端（x -180）に左揃えで GATHER の判の横、右の説明は右端（x 1200）に右揃えで CROSSOVER の判の横 */
+        if(ci === 1){ x = '-180'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '572'); }
+        if(ci === 2){ x = '1200'; t.setAttribute('text-anchor', 'end'); t.setAttribute('y', '572'); }
       }
       while(t.firstChild) t.removeChild(t.firstChild);
       lines.forEach(function(l, i){
