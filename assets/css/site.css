@@ -2120,3 +2120,4 @@
   html:not(.phone) #ch1pin .dg{align-items:end; padding-bottom:28px}
   html:not(.phone) #ch1pin .dg-svg{width:auto; height:calc(100vh - 110px); max-width:92vw}
   #ch1pin .dg-title text{text-anchor:start}
+  #message .body .p{transition-duration:.55s; transition-delay:calc(var(--i,0)*.06s)}   /* v251: 1.1s → .55s */
