@@ -156,7 +156,14 @@
     var m = document.querySelector('#top .mean'); if(!m || m.querySelector('.mc')) return;
     var frag = document.createDocumentFragment();
     Array.prototype.slice.call(m.childNodes).forEach(function(nd){
-      if(nd.nodeType === 3){ Array.from(nd.nodeValue).forEach(function(ch){ var c = document.createElement('span'); c.className = 'mc'; c.textContent = ch; frag.appendChild(c); }); }
+      if(nd.nodeType === 3){
+        /* v233: 句読点までをひと固まり（.nb、折り返し不可）にして、区切りでだけ行を替える */
+        nd.nodeValue.match(/[^、。]*[、。]?/g).filter(Boolean).forEach(function(ph){
+          var nb = document.createElement('span'); nb.className = 'nb';
+          Array.from(ph).forEach(function(ch){ var c = document.createElement('span'); c.className = 'mc'; c.textContent = ch; nb.appendChild(c); });
+          frag.appendChild(nb);
+        });
+      }
       else frag.appendChild(nd.cloneNode(true));
     });
     m.textContent = ''; m.appendChild(frag);
@@ -672,6 +679,7 @@
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
   var pins = document.querySelectorAll('.pin'), hw = document.getElementById('hw'), hwv = document.getElementById('hwv'), hwPlayed = false;
+  if(!document.documentElement.classList.contains('handheld')){ var fca = document.querySelector('#message .for-ca'); if(fca) fca.setAttribute('data-at', '.11'); }   /* v233: PC は最初の文をさらに早く（.16 → .11） */
   /* v130: the bar screen changes photograph as you go down it — a row of dots says how many there are and
      which one you are on, the way a counter does */
   pins.forEach(function(pin){
@@ -704,6 +712,7 @@
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .10);   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
         ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
         ms.classList.toggle('mdone', r.bottom < vh());   /* v231: ピンを通り過ぎた（手前ではない） */
+        ms.style.setProperty('--mdy', Math.min(0, r.bottom - vh()).toFixed(0) + 'px');   /* v233: 通り過ぎた分だけ一文を上へ（画面基準のまま） */
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
@@ -1163,8 +1172,8 @@
     var tex = inkSealTex.img, N = tex.naturalWidth || 96, dpr = Math.min(2, window.devicePixelRatio || 1);
     var vb = host.viewBox && host.viewBox.baseVal, hr = host.getBoundingClientRect();
     var sc = (vb && vb.width && hr.width) ? hr.width / vb.width : 1; if(!hr.width) return;
-    var cs = getComputedStyle(document.documentElement), sec = document.getElementById('ch5map');
-    var acc = ((sec && getComputedStyle(sec).getPropertyValue('--acc')) || cs.getPropertyValue('--acc') || '#E84518').trim();
+    var cs = getComputedStyle(document.documentElement);
+    var acc = (getComputedStyle(host).getPropertyValue('--acc') || cs.getPropertyValue('--acc') || '#FF6A3D').trim();   /* v233: 場面に依らず、地図の朱 */
     var mono = (cs.getPropertyValue('--mono') || 'monospace').trim(), sans = (cs.getPropertyValue('--sans') || 'sans-serif').trim();
     host.querySelectorAll('g.seal').forEach(function(g){
       var sp = g.__spec; if(!sp) return;
@@ -1860,12 +1869,12 @@
     }
     seamScan(); window.addEventListener('resize', seamScan, {passive:true});
     function damp(y){
-      var D = 560, k = 1;
+      var D = 380, k = 1;   /* v233: 560 → 380。継ぎ目の手前で重く感じる区間を短く */
       for(var i = 0; i < seams.length; i++){
         var d = Math.abs(seams[i] - y);
         /* v148: barely touched while the seam is still far off, then a real drag in the last stretch —
            at 100px out the page moves at a third of its speed, and at the seam itself at an eighth */
-        if(d < D){ var q = d / D, s = 1 - .88 * Math.pow(1 - q, 3); if(s < k) k = s; }
+        if(d < D){ var q = d / D, s = 1 - .74 * Math.pow(1 - q, 3); if(s < k) k = s; }   /* v233: 継ぎ目で 1/8 → 約 1/4 の速さ */
       }
       return k;
     }

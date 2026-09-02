@@ -2027,9 +2027,6 @@
   html.is-webkit #message .stick.dim .hw{filter:none}   /* v230: ぼかしは WebKit で再描画のたびに掛け直される */
   /* v231: 「ここから先は…」— ピンを通り過ぎた後（.mdone）だけ、段の中に置いて流す。手前（ピンに入る前）は従来どおり隠す。
      置き場所は .body（中央の列）ではなく .stick（画面いっぱい）に。.body を基準にすると左の列に寄って見えた */
-  #message .stick.mdone .body{position:static}
-  #message .stick.mdone .mh3{opacity:1 !important; visibility:visible !important; position:absolute; left:0; right:0; top:50%; z-index:3;
-    transform:translateY(-50%) !important; filter:none !important; transition:none !important}
   /* v231: 媒体ごとのスクロール量（PC を基準に、指の端末は短く） */
   #message{min-height:640vh}
   html.tablet #message{min-height:600vh}
@@ -2038,11 +2035,19 @@
   html.pcview.phone #ch5pin{min-height:330vh !important}
   html.pcview.phone #ch7c .solopin{min-height:270vh}
   /* v231: スマホの三つのこと — 下端のタブバー分（約 9vh）を残して大きく。文字も一回り */
-  html.pcview.phone #ch1pin .dg-svg{width:min(84vh, 92vw, 1040px); transform:translateY(-1.5vh)}
-  html.pcview.phone #ch1pin .dg-cap text{font-size:25px}
-  html.pcview.phone #ch1pin .dg-cap .ref{font-size:17px}
-  html.pcview.phone #ch1pin .dg-title .sub{font-size:26px}
-  html.pcview.phone #ch1pin text.en{font-size:38px} html.pcview.phone #ch1pin text.jp{font-size:26px} html.pcview.phone #ch1pin text.mini{font-size:15px}
   /* v231: スマホの目次をもう少し下へ（題字の下に来るまで）。行間だけ少し詰めて見出しの行の上に収める */
-  html.pcview.phone #top .toc{top:calc(52% + 64px)}
-  html.pcview.phone #top .toc li,html.pcview.phone #top .toc li a{line-height:1.5}
+  /* v233: 「ここから先は…」— 通り過ぎた後も画面基準（fixed）のまま、スクロール量ぶん（--mdy）だけ上へ送る。
+     段の中に置くと、基準の箱の幅によって左右がずれた。ピンの外（手前・先頭へ戻った後）は遷移なしで即座に隠す */
+  #message .stick.mdone .mh3{opacity:1 !important; visibility:visible !important; position:fixed; left:0; right:0; top:50%;
+    transform:translateY(-50%) translateY(var(--mdy, 0px)) !important; filter:none !important; transition:none !important}
+  #message .stick:not(.hold):not(.mdone) .mh3{opacity:0 !important; visibility:hidden !important; transition:none !important}
+  /* v233: スマホの題字「ジブンのゼンブを。」を 12px 下へ */
+  html.pcview.phone #top .name b.vt{top:calc(var(--y1) - 22px)}
+  /* v233: 「生まれた街も…」は句読点の区切りでだけ折り返す。タブレットは行を少し長く（3 行目が短くならないように） */
+  #top .mean .nb{white-space:nowrap}
+  html.tablet #top .mean{inline-size:56vh}
+  /* v233: 判の朱は場面に依存させない（絵に描くとき、朱の章（白い朱）で描かれて白い判になることがあった） */
+  #ch1pin .dg-svg{--acc:#E84518}
+  #ch5map .mp-svg{--acc:#FF6A3D}
+  /* v233: スマホの目次 — 行間は元のまま、位置だけ 44px 下へ */
+  html.pcview.phone #top .toc{top:calc(52% + 36px)}
