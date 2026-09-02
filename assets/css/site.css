@@ -2092,3 +2092,6 @@
   #tint{position:fixed; inset:0; z-index:-2; background-color:var(--bg); opacity:0; pointer-events:none}
   .menu:not(.open):not(.shown){display:none}
   html.handheld .rotv.gone.off{display:none}
+  /* v243: cover のとき、先頭へ／末尾への札（.jump）は中央のまま（.back の left が効いて縦に伸びていた） */
+  html.cover #skiphud.jump,html.cover #skiphud.jump.back{left:50%; right:auto; transform:translate(-50%,-50%) scale(.84)}
+  html.cover #skiphud.jump.on,html.cover #skiphud.jump.back.on{transform:translate(-50%,-50%) scale(1)}
