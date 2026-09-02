@@ -2109,3 +2109,10 @@
   #ch5pin .bgdot{pointer-events:auto} #ch5pin .bgdot i{cursor:pointer}
   /* v244: スマホの目次 — 画面の低い機種で題字に重ならないよう、下限を題字の下に固定（文字や行間は変えない） */
   html.pcview.phone #top .toc{top:max(calc(52% + 36px), calc(var(--hdh, 116px) + 172px))}
+  /* v245: 三つのことの説明 — 見せたい語（些細な差・細部／人・場／専門の外・デザイン）を今の大きさ（32）のまま、他は 24 に。句読点は朱。
+     PC・タブレットは「人を…」を輪の左、「専門の…」を輪の右へ。スマホは 28 を基準に見せたい語を 34 */
+  #ch1pin .dg-cap text{font-size:24px; letter-spacing:.03em}
+  #ch1pin .dg-cap .big{font-size:32px}
+  #ch1pin .dg-cap .pt{fill:var(--acc)}
+  html.pcview.phone #ch1pin .dg-cap text{font-size:28px}
+  html.pcview.phone #ch1pin .dg-cap .big{font-size:34px}

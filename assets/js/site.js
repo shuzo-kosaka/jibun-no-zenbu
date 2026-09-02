@@ -1549,10 +1549,7 @@
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
     var caps = svg.querySelectorAll('.dg-cap');
-    shift(caps[0], 0, -20);
-    shift(caps[1], -20, -32);   /* 判の下端（y 704）に掛からない高さ */
-    shift(caps[2], 20, -32);
-    shift(svg.querySelector('.dg-title'), 0, 40);   /* 題は少し下へ（説明の参照行と離す） */
+    shift(caps[0], 0, -20);   /* 上の説明は少し上へ。左右の説明の位置は dgCaps が座標で決める（v245） */
   })();
   (function(){
     if(!document.documentElement.classList.contains('pcview') || !document.documentElement.classList.contains('phone')) return;
@@ -1571,24 +1568,28 @@
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     var phone = document.documentElement.classList.contains('pcview') && document.documentElement.classList.contains('phone');
     var ja = !(typeof curLang !== 'undefined' && curLang === 'en');
-    var dy1 = phone ? 38 : (ja ? 44 : 34), dy2 = phone ? 40 : (ja ? 46 : 36);
-    svg.querySelectorAll('.dg-cap text').forEach(function(t){
+    var dy1 = phone ? 42 : (ja ? 40 : 34), dy2 = phone ? 44 : (ja ? 42 : 36);
+    var BIG = ['些細な差', '細部', '人', '場', '専門の外', 'デザイン'];   /* 見せたい語（v245） */
+    var ns = 'http://www.w3.org/2000/svg';
+    svg.querySelectorAll('.dg-cap text').forEach(function(t, ci){
       if(t.__mixed && t.__mixedLang === curLang) return;
       var lines = Array.prototype.slice.call(t.querySelectorAll(':scope > tspan')).map(function(ts){ return {x: ts.getAttribute('x'), ref: ts.classList.contains('ref'), text: ts.textContent}; });
       if(!lines.length) return;
-      if(ja && !phone){
-        var out = [];
-        lines.forEach(function(l){ if(!l.ref && l.text === 'つい細部まで手を入れたくなる。'){ out.push({x:l.x, ref:false, text:'つい細部まで'}); out.push({x:l.x, ref:false, text:'手を入れたくなる。'}); } else out.push(l); });
-        lines = out;
+      /* PC・タブレット：左下の説明は輪の左（右揃え）、右下の説明は輪の右（左揃え）。上の説明はそのまま 2 行 */
+      var x = null;
+      if(!phone){
+        if(ci === 1){ x = '180'; t.setAttribute('text-anchor', 'end'); t.setAttribute('y', '372'); }
+        if(ci === 2){ x = '820'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '372'); }
       }
-      var ns = 'http://www.w3.org/2000/svg';
       while(t.firstChild) t.removeChild(t.firstChild);
       lines.forEach(function(l, i){
-        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref ? dy2 : dy1)); if(l.ref) ts.setAttribute('class', 'ref');
+        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', x || l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref ? dy2 : dy1)); if(l.ref) ts.setAttribute('class', 'ref');
         if(ja && !l.ref){
-          Array.from(l.text).forEach(function(ch){ var c = document.createElementNS(ns, 'tspan');
-            if(/[。、！？]/.test(ch)) c.setAttribute('class', 'pt'); else if(/[\u4E00-\u9FFF\u3400-\u4DBF々〆]/.test(ch)) c.setAttribute('class', 'kj'); else if(/[\u3040-\u309F\u30A0-\u30FF\u30FC]/.test(ch)) c.setAttribute('class', 'kn');
-            c.textContent = ch; ts.appendChild(c); });
+          var big = []; BIG.forEach(function(w){ var k = l.text.indexOf(w); while(k >= 0){ for(var q = k; q < k + w.length; q++) big[q] = true; k = l.text.indexOf(w, k + 1); } });
+          Array.from(l.text).forEach(function(ch, k){ var c = document.createElementNS(ns, 'tspan'), cls = [];
+            if(/[。、！？]/.test(ch)) cls.push('pt'); else if(/[一-鿿㐀-䶿々〆]/.test(ch)) cls.push('kj'); else if(/[぀-ゟ゠-ヿー]/.test(ch)) cls.push('kn');
+            if(big[k]) cls.push('big');
+            if(cls.length) c.setAttribute('class', cls.join(' ')); c.textContent = ch; ts.appendChild(c); });
         } else ts.textContent = l.text;
         t.appendChild(ts);
       });
