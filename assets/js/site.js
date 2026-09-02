@@ -712,7 +712,6 @@
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .10);   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
         ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
         ms.classList.toggle('mdone', r.bottom < vh());   /* v231: ピンを通り過ぎた（手前ではない） */
-        ms.style.setProperty('--mdy', Math.min(0, r.bottom - vh()).toFixed(0) + 'px');   /* v233: 通り過ぎた分だけ一文を上へ（画面基準のまま） */
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
@@ -1532,11 +1531,24 @@
     }
     requestAnimationFrame(orbit);
   })(performance.now());
+  /* v235: スマホでは図を横長に組み替える：輪と判は中央のまま、題は右の列、説明は左右の列へ。
+     位置は内側の <g transform> で動かす（外側の .dg-cap / .dg-title は CSS の遷移で transform を使うため） */
+  (function(){
+    if(!document.documentElement.classList.contains('pcview') || !document.documentElement.classList.contains('phone')) return;
+    var svg = document.getElementById('dgsvg'); if(!svg) return;
+    svg.setAttribute('viewBox', '-380 20 1760 700');
+    function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
+    shift(svg.querySelector('.dg-title'), 630, -540);   /* 題 → 右の列の上寄り（y 310〜412） */
+    var caps = svg.querySelectorAll('.dg-cap');
+    shift(caps[1], -440, -340);   /* 左下の説明 → 左の列 */
+    shift(caps[2], 362, -304);    /* 右下の説明 → 右の列、題の下（y 458〜518）。右下のボタン（x 1323〜）にも、右の判にも掛からない */
+  })();
   function dgBuild(){
     var svg = document.getElementById('dgsvg'), inp = document.getElementById('dgin'); if(!svg || !inp) return;
     var r = svg.getBoundingClientRect(), x = (window.__srNextX !== undefined) ? window.__srNextX : r.left + r.width * .12;
-    var ex = (x - r.left) / r.width * 1000; ex = Math.max(-600, Math.min(170, ex));
-    var k = 1000 / Math.max(1, r.width);   /* viewBox units per screen px: the soles keep the rally's screen size */
+    var vbb = svg.viewBox && svg.viewBox.baseVal, vbw = (vbb && vbb.width) || 1000, vbx = (vbb && vbb.x) || 0;   /* v235: スマホでは横長の viewBox */
+    var ex = vbx + (x - r.left) / r.width * vbw; ex = Math.max(-600, Math.min(170, ex));
+    var k = vbw / Math.max(1, r.width);   /* viewBox units per screen px: the soles keep the rally's screen size */
     var dg = svg.closest('.dg'), dr = dg ? dg.getBoundingClientRect() : r, seamY = (dr.top - r.top) * k;   /* the pinned screen's top edge, in viewBox units */
     var iL = 190 - seamY;
     inp.setAttribute('d', 'M' + ex.toFixed(1) + ',' + seamY.toFixed(1) + ' C' + (ex + 34).toFixed(1) + ',' + (seamY + iL * .35).toFixed(1) + ' ' + (ex - 30).toFixed(1) + ',' + (seamY + iL * .7).toFixed(1) + ' ' + ex.toFixed(1) + ',190 C' + ex.toFixed(1) + ',330 200,300 200,440');   /* it keeps wandering a little on this side of the seam too — never a straight run */
@@ -1803,6 +1815,13 @@
   }
   (function(){ var sec = document.getElementById('message'); if(!sec || !('IntersectionObserver' in window)) return;
     new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) hwStill(true); }); }, {threshold:0}).observe(sec); })();
+  /* v234: オープニングの再生中は、指・ホイール・キーのどれでもスクロールさせない */
+  (function(){
+    function opening(){ return body.classList.contains('opening') || !!document.getElementById('ld'); }
+    window.addEventListener('touchmove', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('wheel', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('keydown', function(e){ if(opening() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
+  })();
   var jcur = null;
   function curtainJump(y, done, rew){
     if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
@@ -1896,7 +1915,7 @@
         if((e.deltaY < 0 && !up) || (e.deltaY > 0 && !dn)) e.preventDefault();
         return;
       }
-      if(busy()){ if(!flying && !body.classList.contains('opening')) e.preventDefault(); return; }   /* a sheet is open over the page: it holds still underneath */
+      if(busy()){ if(!flying) e.preventDefault(); return; }   /* a sheet is open over the page: it holds still underneath. v234: オープニング中も止める */
       e.preventDefault();
       /* v196: MESSAGE の中では、ひと振りのスクロールで必ず「次の丸」の内容へ進む。
          振り幅が小さくても大きくても、飛ばしたり手前で止まったりしない。端に来たらふつうのスクロールに戻す。 */

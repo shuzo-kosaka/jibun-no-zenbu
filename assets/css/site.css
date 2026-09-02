@@ -2038,11 +2038,8 @@
   /* v231: スマホの目次をもう少し下へ（題字の下に来るまで）。行間だけ少し詰めて見出しの行の上に収める */
   /* v233: 「ここから先は…」— 通り過ぎた後も画面基準（fixed）のまま、スクロール量ぶん（--mdy）だけ上へ送る。
      段の中に置くと、基準の箱の幅によって左右がずれた。ピンの外（手前・先頭へ戻った後）は遷移なしで即座に隠す */
-  #message .stick.mdone .mh3{opacity:1 !important; visibility:visible !important; position:fixed; left:0; right:0; top:50%;
-    transform:translateY(-50%) translateY(var(--mdy, 0px)) !important; filter:none !important; transition:none !important}
   #message .stick:not(.hold):not(.mdone) .mh3{opacity:0 !important; visibility:hidden !important; transition:none !important}
   /* v233: スマホの題字「ジブンのゼンブを。」を 12px 下へ */
-  html.pcview.phone #top .name b.vt{top:calc(var(--y1) - 22px)}
   /* v233: 「生まれた街も…」は句読点の区切りでだけ折り返す。タブレットは行を少し長く（3 行目が短くならないように） */
   #top .mean .nb{white-space:nowrap}
   html.tablet #top .mean{inline-size:56vh}
@@ -2051,3 +2048,19 @@
   #ch5map .mp-svg{--acc:#FF6A3D}
   /* v233: スマホの目次 — 行間は元のまま、位置だけ 44px 下へ */
   html.pcview.phone #top .toc{top:calc(52% + 36px)}
+  /* v234: 「ここから先は…」通り過ぎた後は段の中（absolute）に置く。fixed を JS で動かす方式は指の端末でカクついた。
+     基準は .body（中央の列）ではなく .stick（画面いっぱい）— 1440 / 1935 / 1280 の幅で中央に来ることを確認済み */
+  #message .stick.mdone .body{position:static}
+  #message .stick.mdone .mh3{opacity:1 !important; visibility:visible !important; position:absolute; left:0; right:0; top:50%; z-index:3;
+    transform:translateY(-50%) !important; filter:none !important; transition:none !important}
+  /* v234: スマホの題字「ジブンのゼンブを。」をさらに下へ（-22px → +4px） */
+  html.pcview.phone #top .name b.vt{top:calc(var(--y1) + 4px)}
+  /* v235: スマホ用「三つのこと」— 横長の図に組み替える。輪と判は中央、題は右の列、説明は左右の列へ。
+     高さいっぱい（ヘッダーとタブバーの分を除く）に使う。JS が viewBox を横長（-380 20 1760 700）に差し替える */
+  html.pcview.phone #ch1pin .dg{align-items:end; padding-bottom:50px}
+  html.pcview.phone #ch1pin .dg-svg{width:auto; height:calc(100vh - var(--hdh, 116px) - 58px); max-width:96vw; transform:none}
+  html.pcview.phone #ch1pin .dg-cap text{font-size:28px}
+  html.pcview.phone #ch1pin .dg-cap .ref{font-size:20px}
+  html.pcview.phone #ch1pin .dg-title .big{font-size:58px}
+  html.pcview.phone #ch1pin .dg-title .sub{font-size:24px}
+  html.pcview.phone #ch1pin text.en{font-size:31px} html.pcview.phone #ch1pin text.jp{font-size:26px} html.pcview.phone #ch1pin text.mini{font-size:14px}
