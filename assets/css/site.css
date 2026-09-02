@@ -2116,3 +2116,7 @@
   #ch1pin .dg-cap .pt{fill:var(--acc)}
   html.pcview.phone #ch1pin .dg-cap text{font-size:28px}
   html.pcview.phone #ch1pin .dg-cap .big{font-size:34px}
+  /* v246: PC・タブレット — 題を左上へ移し、空いた下の分だけ図を大きく（高さ基準で置く）。viewBox は JS が横長（-200 20 1400 780）に */
+  html:not(.phone) #ch1pin .dg{align-items:end; padding-bottom:28px}
+  html:not(.phone) #ch1pin .dg-svg{width:auto; height:calc(100vh - 110px); max-width:92vw}
+  #ch1pin .dg-title text{text-anchor:start}

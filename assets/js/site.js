@@ -1550,6 +1550,9 @@
     function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
     var caps = svg.querySelectorAll('.dg-cap');
     shift(caps[0], 0, -20);   /* 上の説明は少し上へ。左右の説明の位置は dgCaps が座標で決める（v245） */
+    /* v246: 題を左上へ（x -180、y 118〜220）、viewBox を横長にして図を大きく */
+    svg.setAttribute('viewBox', '-200 20 1400 780');
+    shift(svg.querySelector('.dg-title'), -680, -732);
   })();
   (function(){
     if(!document.documentElement.classList.contains('pcview') || !document.documentElement.classList.contains('phone')) return;
@@ -1582,8 +1585,20 @@
         if(ci === 2){ x = '820'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '372'); }
       }
       while(t.firstChild) t.removeChild(t.firstChild);
+      /* v246: PC・タブレットでは長い参照行を 2 行に（右端の年の札や画面の端に掛かっていた） */
+      if(!phone){
+        var out2 = [];
+        lines.forEach(function(l){
+          if(l.ref && l.text.length > 18){
+            var k = l.text.indexOf('\u3000'); if(k < 0) k = l.text.lastIndexOf(' ', Math.floor(l.text.length / 2));
+            if(k > 0){ out2.push({x:l.x, ref:true, text:l.text.slice(0, k)}); out2.push({x:l.x, ref:true, ref2:true, text:l.text.slice(k + 1)}); return; }
+          }
+          out2.push(l);
+        });
+        lines = out2;
+      }
       lines.forEach(function(l, i){
-        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', x || l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref ? dy2 : dy1)); if(l.ref) ts.setAttribute('class', 'ref');
+        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', x || l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref2 ? 24 : (l.ref ? dy2 : dy1))); if(l.ref) ts.setAttribute('class', 'ref');
         if(ja && !l.ref){
           var big = []; BIG.forEach(function(w){ var k = l.text.indexOf(w); while(k >= 0){ for(var q = k; q < k + w.length; q++) big[q] = true; k = l.text.indexOf(w, k + 1); } });
           Array.from(l.text).forEach(function(ch, k){ var c = document.createElementNS(ns, 'tspan'), cls = [];
