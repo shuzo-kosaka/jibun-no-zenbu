@@ -2137,3 +2137,9 @@
   html.pcview.phone .wkf,html.pcview.phone .wkf:hover,html.pcview.phone .wkf:focus-visible{filter:none !important; transition:none}
   html.pcview.phone .wkf .ph{filter:none !important; opacity:.96}
   html.pcview.phone .wkf:hover .seal,html.pcview.phone .wkf:focus-visible .seal{filter:none !important}
+  /* v260: 題の旗はメニューの旗と同じ登場（根元から立ち上がり、右へ傾いて止まる）。傾きは少し強めに */
+  #dgsvg .dgflag-a{transform:scale(0) rotate(-14deg); transform-origin:0 0}
+  #dgsvg .dg-title.in .dgflag-a{animation:dgflagin .55s cubic-bezier(.2,.9,.3,1) .5s forwards}
+  @keyframes dgflagin{from{transform:scale(0) rotate(-14deg)} to{transform:scale(1) rotate(18deg)}}
+  /* 輪の足跡：足跡の下に地の色の縁取りを敷き、その箇所の輪の線を消す */
+  .dgrp{opacity:0; fill:var(--fg2)} .dgrp .dgrpi{fill:var(--fg2)} .dgrp .dgrph{fill:var(--bg); stroke:var(--bg); stroke-width:2.4; stroke-linejoin:round}

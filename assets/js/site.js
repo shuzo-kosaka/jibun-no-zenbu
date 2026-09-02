@@ -1412,8 +1412,8 @@
     defs.appendChild(f);
   }
   /* soles along a path: `scale` = viewBox units per screen px; startPx = distance (screen px) before the first sole; parity keeps left/right alternating across two paths. Returns the group and the leftover distance after the last sole (screen px). */
-  function footprints(svg, pathEl, cls, scale, startPx, parity, limitPx, paw){
-    var stepPx = paw ? FP_STEP * 1.05 : FP_STEP, shape = paw ? PAW : SOLE, sideW = paw ? 6.5 : 7.5;
+  function footprints(svg, pathEl, cls, scale, startPx, parity, limitPx, paw, stepOv){
+    var stepPx = stepOv || (paw ? FP_STEP * 1.05 : FP_STEP),   /* v260: stepOv — 閉じた輪では歩幅を割り切れる値に */ shape = paw ? PAW : SOLE, sideW = paw ? 6.5 : 7.5;
     var L = pathEl.getTotalLength(), step = stepPx * scale, start = (startPx || 12) * scale, lim = Math.min(L - 6 * scale, limitPx !== undefined ? limitPx * scale : Infinity), n = Math.max(0, Math.floor((lim - start) / step) + 1), g = svgEl('g', {class:cls + 's', filter:'url(#' + cls + 'ink)'});
     fpFilter(svg, cls + 'ink', cls === 'fp' ? 21 : 33);
     for(var i = 0; i < n; i++){
@@ -1539,17 +1539,18 @@
   }
   /* the diagram's incoming line arrives at the NEXT slot's x, then bends into the ring */
   var dgSat = document.getElementById('dgsat'), dgNodes = document.querySelectorAll('#ch1pin .dg-node'), dgStick = document.querySelector('#ch1pin .dg'), dgOn = false, dgLastA = 0;
-  var dgTrail = null, dgTrailF = [];   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1） */
+  var dgTrail = null, dgTrailF = [], dgWasOn = false, dgT0 = 0;   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1）。v260: 見えるたびに輪の起点から歩き直す */
   var DG_ANG = [-90, 148.4, 31.6];
   var orbitN = 0;
   (function orbit(now){
     /* v224: 指の端末では 2 フレームに 1 回（点が動くたびに図全体が描き直される。半分で十分なめらか） */
-    if(dgSat && dgOn && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
-      var a = ((now / 18000) * 360) % 360, rad = a * Math.PI / 180;
+    if(!dgOn){ if(dgWasOn){ dgWasOn = false; if(dgTrail) for(var tj = 0; tj < dgTrail.length; tj++) dgTrail[tj].style.opacity = '0'; } }
+    else if(dgSat && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
+      if(!dgWasOn){ dgWasOn = true; dgT0 = now; dgLastA = 180; }   /* v260: 輪が描き終わって歩き出すたび、起点（左端）から */
+      var w = (now - dgT0) / 18000, a = ((w * 360 + 180) % 360 + 360) % 360, rad = a * Math.PI / 180;
       /* v257: 点はやめ、足跡が輪を歩く。歩き手の位置 f（輪の経路の割合、左端 a=180° から反時計回り）に対して、
          通り過ぎたばかりの足跡ほど濃く、古いものから薄れて消える（後ろ 30% ぶんだけ残る） */
-      var f = ((((a - 180) / 360) % 1) + 1) % 1;
-      if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = ((f - dgTrailF[ti]) % 1 + 1) % 1, op = age < .02 ? age / .02 : age < .16 ? 1 : age < .30 ? 1 - (age - .16) / .14 : 0; dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
+      if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = w - dgTrailF[ti], op = 0; if(age >= 0){ age %= 1; op = age < .02 ? age / .02 : age < .16 ? 1 : age < .30 ? 1 - (age - .16) / .14 : 0; } dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
       DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
       dgLastA = a;
     }
@@ -1621,10 +1622,16 @@
     var old = svg.querySelector('.dgrps'); if(old) old.remove();
     var r = svg.getBoundingClientRect(); if(!r.width) return;
     var vbb = svg.viewBox && svg.viewBox.baseVal, vbw = (vbb && vbb.width) || 1000, k = vbw / r.width;
-    var g = footprints(svg, ring, 'dgrp', k, 12, 0);
+    /* v260: 一周を偶数歩で割り切る（奇数だと継ぎ目で同じ足が二度続く）。足跡ごとに地の色の縁取りを下に敷いて、輪の線を隠す */
+    var L = ring.getTotalLength(), nEven = Math.max(2, 2 * Math.round(L / (FP_STEP * k) / 2)), stepPx = L / nEven / k, step = stepPx * k, start = 12 * k;
+    var g = footprints(svg, ring, 'dgrp', k, 12, 0, undefined, false, stepPx);
     g.setAttribute('class', 'dgrps');
     ring.parentNode.insertBefore(g, ring.nextSibling);   /* 輪のすぐ上、判より下に */
-    var L = ring.getTotalLength(), step = FP_STEP * k, start = 12 * k;
+    Array.prototype.slice.call(g.querySelectorAll('.dgrp')).forEach(function(pth){
+      var w = svgEl('g', {class:'dgrp', transform:pth.getAttribute('transform')}), h = svgEl('path', {d:SOLE, class:'dgrph'});
+      pth.removeAttribute('transform'); pth.removeAttribute('style'); pth.setAttribute('class', 'dgrpi');
+      g.insertBefore(w, pth); w.appendChild(h); w.appendChild(pth);
+    });
     dgTrail = g.querySelectorAll('.dgrp'); dgTrailF = [];
     for(var i = 0; i < dgTrail.length; i++) dgTrailF.push(((start + i * step) / L) % 1);
   }
@@ -1632,11 +1639,12 @@
     var svg = document.getElementById('dgsvg'), t = svg && svg.querySelector('.dg-title'); if(!t || t.querySelector('.dgflag')) return;
     var big = t.querySelector('.big'); if(!big) return;
     var bb; try{ bb = big.getBBox(); }catch(e){ return; }
-    var fl = flagSvg(), g = svgEl('g', {class:'dgflag'}), sc = 2.1;
-    /* 旗の竿の根元（6.5,39）を「WHAT」の右肩に */
-    g.setAttribute('transform', 'translate(' + (bb.x + bb.width + 10 - 6.5 * sc).toFixed(1) + ',' + (bb.y + bb.height * .18 - 39 * sc).toFixed(1) + ') scale(' + sc + ')');
-    while(fl.firstChild) g.appendChild(fl.firstChild);
-    (big.parentNode).appendChild(g);
+    var fl = flagSvg(), g = svgEl('g', {class:'dgflag'}), sc = 2.1, base = parseFloat(big.getAttribute('y')) || (bb.y + bb.height * .72);
+    /* v260: 竿の根元（6.5,39）を「WHAT」のベースライン上、右隣に。根元を原点にした内側の g（.dgflag-a）を CSS で立ち上げる */
+    g.setAttribute('transform', 'translate(' + (bb.x + bb.width + 10).toFixed(1) + ',' + base.toFixed(1) + ') scale(' + sc + ')');
+    var ga = svgEl('g', {class:'dgflag-a'}), gi = svgEl('g', {transform:'translate(-6.5,-39)'});
+    while(fl.firstChild) gi.appendChild(fl.firstChild);
+    ga.appendChild(gi); g.appendChild(ga); (big.parentNode).appendChild(g);
   }
   window.addEventListener('load', function(){ setTimeout(function(){ dgTrailBuild(); dgFlag(); }, 120); });
   window.addEventListener('resize', function(){ clearTimeout(dgTrailBuild.t); dgTrailBuild.t = setTimeout(dgTrailBuild, 300); }, {passive:true});
