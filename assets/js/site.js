@@ -350,8 +350,8 @@
     var H = document.documentElement;
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
-      ja: {small:'おっと、縦持ちになりました', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'紙面はそのまま、横長でお待ちしています。'},
-      en: {small:'Oops — portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'The page is waiting for you, sideways.'}
+      ja: {small:'おっと、縦持ちになりました', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'画面は、横長のままです。'},
+      en: {small:'Oops — portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'The page stays in landscape.'}
     };
     var recopied = false;
     function recopy(){
@@ -371,36 +371,42 @@
     /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
        回り終わってから始める。 */
     /* 途中で縦にして横へ戻したとき：案内が退場したあとに「よくできました」の判を押して、消える */
-    /* 花丸：ひと筆で花びらを一周し、最後に内へ小さく巻く。手の揺れを少し混ぜる */
-    function hanamaru(){
-      var pts = [], cx = 100, cy = 100, N = 420, petals = 11;
+    /* 花丸：定番の「たいへんよくできました」判の形。外に丸い花びらの輪（16 枚、弧で正確に描く）、
+       内に一重の輪、その上に蚊取り線香の小さな渦、まん中に文字。手描きの揺れは花びらの高さにだけ僅かに */
+    function hanamaruPetals(){
+      var N = 16, Rc = 78, cx = 100, cy = 100, d = '';
       for(var i = 0; i <= N; i++){
-        var t = i / N, th = -Math.PI / 2 + t * Math.PI * 2 * 1.16;
-        var base = 66 + 10 * Math.min(1, t * 1.6);                      /* 始めは少し内から、だんだん外へ */
-        var r = base - 3 + 11 * Math.pow(Math.abs(Math.sin(petals * th / 2)), .55) + 1.2 * Math.sin(i * .61) + .7 * Math.cos(i * 1.7);
-        pts.push([cx + r * Math.cos(th), cy + r * Math.sin(th)]);
+        var a = -Math.PI / 2 + Math.PI / N + i * 2 * Math.PI / N;   /* 谷（花びらの継ぎ目）の角度。天辺に山が来るよう半歩ずらす */
+        var x = cx + Rc * Math.cos(a), y = cy + Rc * Math.sin(a);
+        if(i === 0){ d += 'M' + x.toFixed(1) + ',' + y.toFixed(1); continue; }
+        var Rp = 90 + 1.6 * Math.sin(i * 2.3);                      /* 山の高さがほんの少しずつ違う */
+        var c = 2 * Rc * Math.sin(Math.PI / N), s = Rp - Rc * Math.cos(Math.PI / N), r = (c * c / 4 + s * s) / (2 * s);
+        d += ' A' + r.toFixed(1) + ',' + r.toFixed(1) + ' 0 0 1 ' + x.toFixed(1) + ',' + y.toFixed(1);
       }
-      var th0 = -Math.PI / 2 + Math.PI * 2 * 1.16;
-      for(var k = 1; k <= 60; k++){                                       /* 終わりの巻き */
-        var u = k / 60, th2 = th0 + u * Math.PI * .9, rr = 76 - 30 * u;
-        pts.push([cx + rr * Math.cos(th2), cy + rr * Math.sin(th2)]);
-      }
+      return d + ' Z';
+    }
+    function hanamaruSwirl(){
+      var pts = [], cx = 100, cy = 66;
+      for(var i = 0; i <= 120; i++){ var t = i / 120, th = t * Math.PI * 4.6, r = 1.2 + 8.8 * t; pts.push([cx + r * Math.cos(th), cy + r * Math.sin(th)]); }
       return 'M' + pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' L');
     }
     function rotOk(){
       var el = document.getElementById('rotok');
       if(!el){
         el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
-        el.innerHTML = '<div class="ink"><svg viewBox="0 0 200 200"><path d="' + hanamaru() + '"/>' +
-          '<text class="c1" x="100" y="94" text-anchor="middle" font-size="22"></text>' +
-          '<text class="c2" x="100" y="120" text-anchor="middle" font-size="22"></text>' +
-          '<text class="en" x="100" y="140" text-anchor="middle" font-size="7"></text></svg></div>';
+        el.innerHTML = '<div class="ink"><svg viewBox="0 0 200 200">' +
+          '<path class="pt" d="' + hanamaruPetals() + '"/>' +
+          '<circle class="rg" cx="100" cy="100" r="64"/>' +
+          '<path class="sp" d="' + hanamaruSwirl() + '"/>' +
+          '<text class="c1" x="100" y="106" text-anchor="middle" font-size="21"></text>' +
+          '<text class="c2" x="100" y="131" text-anchor="middle" font-size="21"></text>' +
+          '<text class="en" x="100" y="151" text-anchor="middle" font-size="6.5"></text></svg></div>';
         document.body.appendChild(el);
       }
       var en = (typeof curLang !== 'undefined' && curLang === 'en');
       el.querySelector('.c1').textContent = en ? 'WELL' : 'よく';
       el.querySelector('.c2').textContent = en ? 'DONE' : 'できました';
-      el.querySelector('.en').textContent = en ? 'ARIGATO · 横持ち' : 'WELL DONE · 横持ち';
+      el.querySelector('.en').textContent = en ? 'ARIGATO · LANDSCAPE' : 'WELL DONE · 横持ち';
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
