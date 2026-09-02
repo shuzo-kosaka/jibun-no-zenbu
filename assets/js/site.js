@@ -43,7 +43,9 @@
       var imgs = o.querySelectorAll('.phs image, .phs img'), n = imgs.length, cur = 0; if(n < 2) return;   /* v229: 写真は HTML の img に */
       /* v258: 二つの楕円が同時に切り替わらないよう、間隔は毎回ばらつかせる（2.6〜5.4 秒）。最初のずれも楕円ごとに変える */
       (function tick(first){ setTimeout(function(){
-        if(!(body.classList.contains('opening') || document.hidden || !top.classList.contains('inview'))){ imgs[cur].classList.remove('on'); cur = (cur + 1) % n; imgs[cur].classList.add('on'); }
+        var nowMs = performance.now();
+        if(nowMs - (window.__ovLast || 0) < 900){ setTimeout(function(){ tick(false); }, 0); return; }   /* v258: もう片方が切り替わった直後なら見送り、次の間隔で */
+        if(!(body.classList.contains('opening') || document.hidden || !top.classList.contains('inview'))){ imgs[cur].classList.remove('on'); cur = (cur + 1) % n; imgs[cur].classList.add('on'); window.__ovLast = nowMs; }
         tick(false); }, first ? (2200 + k * 1500 + Math.random() * 900) : (2600 + Math.random() * 2800)); })(true);
     });
   })();
@@ -1873,7 +1875,7 @@
     clearTimeout(hudT); clearInterval(hudTick);
     h.classList.remove('jump'); h.classList.toggle('back', d < 0);
     h.querySelector('b').textContent = n + (en ? (n === 1 ? ' YEAR' : ' YEARS') : '年');
-    h.querySelector('span').textContent = d > 0 ? (en ? 'SKIP AHEAD' : 'スキップ') : (en ? 'REWIND' : '巻き戻し');
+    h.querySelector('span').textContent = d > 0 ? (en ? 'FAST-FORWARD' : '早送り') : (en ? 'REWIND' : '巻き戻し');   /* v259: スキップ → 早送り */
     h.classList.remove('on'); void h.offsetWidth; h.classList.add('on');
   }
   /* 先頭へ／末尾へ：年が一つずつ巻き戻る（進む）数字。幕の間に読ませる */
