@@ -681,7 +681,7 @@
         pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
         pin.querySelectorAll('.bgdot i').forEach(function(d,i){ d.classList.toggle('on', i === idx); }); }
       if(r.top <= 0 && r.bottom >= vh()){ pin.querySelectorAll('.marg').forEach(function(m){ m.classList.add('in'); }); }
-      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 3.4 >= 1); st.classList.toggle('drawing', p * 3.4 > .012); dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0;
+      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012);   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0;
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
         fpFade = Math.max(0, Math.min(1, p / .16)); } if(pin.id === 'ch5map') mapUpdate(p); }
       if(pin.id === 'ch5pin'){ pin.classList.toggle('dotson', r.top <= 0 && r.bottom >= vh()); pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
@@ -1080,7 +1080,7 @@
     /* .oval の「seal」は判ではなく、楕円の枠と、その縁に沿った文字（デザイナーとして／こさか しゅうぞう）。
        群ごと紙目を掛けると小さな文字が潰れて読めなくなるので、枠の線だけに掛ける。 */
     var targets = [];
-    document.querySelectorAll('#dgsvg .seal, #mpsvg .seal').forEach(function(g){ targets.push(g); });
+    document.querySelectorAll('#mpsvg .seal').forEach(function(g){ targets.push(g); });
     document.querySelectorAll('.oval .seal').forEach(function(g){
       g.querySelectorAll('path').forEach(function(q){ targets.push(q); });
       g.querySelectorAll('text').forEach(function(q){ q.setAttribute('data-sealsoft', '1'); targets.push(q); });
@@ -1189,6 +1189,83 @@
       g.classList.add('rastered'); g.removeAttribute('filter');
     });
   }
+  /* v223: 汎用 — SVG の判（rect / circle / text / textPath）を canvas に描き、紙目を抜いて <image> で置く。
+     書体・色・太さは computed style から取る（ページのウェブフォントがそのまま使える） */
+  function rasterSealGroup(g, svg, sc, dpr, tex, N, gi){
+    var bb; try{ bb = g.getBBox(); }catch(e){ return null; }
+    if(!bb || !bb.width || !bb.height) return null;
+    var pad = Math.max(bb.width, bb.height) * .07, rx = bb.x - pad, ry = bb.y - pad, rw = bb.width + pad * 2, rh = bb.height + pad * 2;
+    var W = Math.min(2048, Math.ceil(rw * sc * dpr)), H = Math.min(2048, Math.ceil(rh * sc * dpr)); if(W < 2 || H < 2) return null;
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var x = c.getContext('2d'), k = W / rw; x.scale(k, k); x.translate(-rx, -ry); x.lineJoin = 'round';
+    function num(v, d){ v = parseFloat(v); return isNaN(v) ? d : v; }
+    function paint(cs){ var f = cs.fill, st = cs.stroke; return {fill:(f && f !== 'none') ? f : null, stroke:(st && st !== 'none') ? st : null, lw:num(cs.strokeWidth, 1)}; }
+    Array.prototype.forEach.call(g.querySelectorAll('rect, circle, text'), function(el){
+      var cs = getComputedStyle(el), pt = paint(cs), tag = el.tagName.toLowerCase();
+      if(cs.display === 'none' || num(cs.opacity, 1) === 0) return;
+      x.globalAlpha = num(cs.opacity, 1);
+      if(tag === 'rect'){
+        var ex = num(el.getAttribute('x'), 0), ey = num(el.getAttribute('y'), 0), ew = num(el.getAttribute('width'), 0), eh = num(el.getAttribute('height'), 0), er = num(el.getAttribute('rx'), 0);
+        x.beginPath(); if(x.roundRect) x.roundRect(ex, ey, ew, eh, er); else x.rect(ex, ey, ew, eh);
+        if(pt.fill){ x.fillStyle = pt.fill; x.fill(); } if(pt.stroke){ x.strokeStyle = pt.stroke; x.lineWidth = pt.lw; x.stroke(); }
+      } else if(tag === 'circle'){
+        x.beginPath(); x.arc(num(el.getAttribute('cx'), 0), num(el.getAttribute('cy'), 0), num(el.getAttribute('r'), 0), 0, Math.PI * 2);
+        if(pt.fill){ x.fillStyle = pt.fill; x.fill(); } if(pt.stroke){ x.strokeStyle = pt.stroke; x.lineWidth = pt.lw; x.stroke(); }
+      } else {
+        var fw = cs.fontWeight || '400', fs = num(cs.fontSize, 12), ff = cs.fontFamily || 'sans-serif', ls = cs.letterSpacing === 'normal' ? 0 : num(cs.letterSpacing, 0);
+        x.font = fw + ' ' + fs + 'px ' + ff; x.fillStyle = pt.fill || '#000'; x.textBaseline = 'alphabetic';
+        var tp = el.querySelector('textPath');
+        if(tp){
+          var href = tp.getAttribute('href') || tp.getAttributeNS('http://www.w3.org/1999/xlink', 'href'), path = href ? svg.querySelector(href) : null; if(!path || !path.getTotalLength) return;
+          var L = path.getTotalLength(), so = tp.getAttribute('startOffset') || '0', d = /%$/.test(so) ? L * parseFloat(so) / 100 : num(so, 0), str = tp.textContent || '';
+          x.textAlign = 'left';
+          for(var i = 0; i < str.length; i++){
+            var ch = str.charAt(i), w = x.measureText(ch).width; if(d + w > L) break;
+            var p0 = path.getPointAtLength(d + w / 2), p1 = path.getPointAtLength(Math.min(L, d + w / 2 + .5)), p2 = path.getPointAtLength(Math.max(0, d + w / 2 - .5));
+            var th = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+            x.save(); x.translate(p0.x, p0.y); x.rotate(th); x.fillText(ch, -w / 2, 0); x.restore();
+            d += w + ls;
+          }
+        } else {
+          var tx = num(el.getAttribute('x'), 0), ty = num(el.getAttribute('y'), 0), str2 = (el.textContent || '').replace(/\s+/g, ' ').trim(), an = cs.textAnchor || 'start';
+          var wsum = 0, i2; for(i2 = 0; i2 < str2.length; i2++) wsum += x.measureText(str2.charAt(i2)).width + (i2 < str2.length - 1 ? ls : 0);
+          var sx = an === 'middle' ? tx - wsum / 2 : an === 'end' ? tx - wsum : tx; x.textAlign = 'left';
+          for(i2 = 0; i2 < str2.length; i2++){ x.fillText(str2.charAt(i2), sx, ty); sx += x.measureText(str2.charAt(i2)).width + ls; }
+        }
+      }
+    });
+    x.globalAlpha = 1;
+    /* 紙目：画面 96px 周期で敷き詰め、判の絵をその形に抜く（判ごとに位相をずらす） */
+    x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-in';
+    var kk = 96 * dpr / N; x.scale(kk, kk); var pat = x.createPattern(tex, 'repeat');
+    if(pat){ var ox = ((gi || 0) * 37) % 96 / kk, oy = ((gi || 0) * 53) % 96 / kk; x.translate(-ox, -oy); x.fillStyle = pat; x.fillRect(0, 0, W / kk + ox + 1, H / kk + oy + 1); }
+    return {url:c.toDataURL('image/png'), x:rx, y:ry, w:rw, h:rh};
+  }
+  function dgSealRaster(){
+    if(!document.documentElement.classList.contains('is-webkit')) return;
+    var svg = document.getElementById('dgsvg'); if(!svg) return;
+    if(!inkSealTex.ready){ clearTimeout(dgSealRaster.t); dgSealRaster.t = setTimeout(dgSealRaster, 150); return; }
+    if(document.fonts && document.fonts.status !== 'loaded'){ document.fonts.ready.then(function(){ dgSealRaster(); }); return; }
+    var tex = inkSealTex.img, N = tex.naturalWidth || 96, dpr = Math.min(2, window.devicePixelRatio || 1);
+    var vb = svg.viewBox && svg.viewBox.baseVal, sr = svg.getBoundingClientRect(); if(!sr.width) return;
+    var sc = (vb && vb.width) ? sr.width / vb.width : 1, key = Math.round(sc * dpr * 100);
+    Array.prototype.forEach.call(svg.querySelectorAll('g.seal:not(.sealimg)'), function(g, gi){
+      var wrap = g.nextElementSibling && g.nextElementSibling.classList.contains('sealimg') ? g.nextElementSibling : null;
+      if(wrap && +wrap.getAttribute('data-key') === key) return;
+      var wasHidden = g.classList.contains('rastered'); if(wasHidden) g.classList.remove('rastered');   /* 測るために一度見せる */
+      var had = g.getAttribute('filter'); if(had) g.removeAttribute('filter');
+      var out = rasterSealGroup(g, svg, sc, dpr, tex, N, gi);
+      if(!out){ if(wasHidden) g.classList.add('rastered'); return; }
+      if(!wrap){ wrap = svgEl('g', {class:(g.getAttribute('class') || 'seal') + ' sealimg'}); var tr = g.getAttribute('transform'); if(tr) wrap.setAttribute('transform', tr); wrap.appendChild(svgEl('image', {preserveAspectRatio:'none'})); g.parentNode.insertBefore(wrap, g.nextSibling); }
+      var im = wrap.querySelector('image');
+      im.setAttributeNS('http://www.w3.org/1999/xlink', 'href', out.url); im.setAttribute('href', out.url);
+      im.setAttribute('x', out.x.toFixed(2)); im.setAttribute('y', out.y.toFixed(2)); im.setAttribute('width', out.w.toFixed(2)); im.setAttribute('height', out.h.toFixed(2));
+      wrap.setAttribute('data-key', key); g.classList.add('rastered');
+    });
+  }
+  window.__dgSealRaster = dgSealRaster;
+  window.addEventListener('load', function(){ setTimeout(dgSealRaster, 80); });
+  window.addEventListener('resize', function(){ clearTimeout(dgSealRaster.rt); dgSealRaster.rt = setTimeout(dgSealRaster, 280); }, {passive:true});
   window.__mapSealRaster = mapSealRaster;
   window.addEventListener('load', function(){ setTimeout(mapSealRaster, 60); });
   window.addEventListener('resize', function(){ clearTimeout(mapSealRaster.rt); mapSealRaster.rt = setTimeout(mapSealRaster, 260); }, {passive:true});
@@ -1418,8 +1495,10 @@
   /* the diagram's incoming line arrives at the NEXT slot's x, then bends into the ring */
   var dgSat = document.getElementById('dgsat'), dgNodes = document.querySelectorAll('#ch1pin .dg-node'), dgStick = document.querySelector('#ch1pin .dg'), dgOn = false, dgLastA = 0;
   var DG_ANG = [-90, 148.4, 31.6];
+  var orbitN = 0;
   (function orbit(now){
-    if(dgSat && dgOn){
+    /* v224: 指の端末では 2 フレームに 1 回（点が動くたびに図全体が描き直される。半分で十分なめらか） */
+    if(dgSat && dgOn && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
       var a = ((now / 18000) * 360) % 360, rad = a * Math.PI / 180;
       dgSat.setAttribute('cx', (500 + 300 * Math.cos(rad)).toFixed(1)); dgSat.setAttribute('cy', (440 - 300 * Math.sin(rad)).toFixed(1));   /* v119: the dot travels anticlockwise now — the y of the screen runs downward, so its sine is negated */
       DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
@@ -1651,12 +1730,15 @@
       hud.innerHTML = '<div class="tri"><i></i><i></i></div><div class="tx"><b></b><span></span></div>'; document.body.appendChild(hud); }
     return hud;
   }
-  function skipHud(d){
+  var CHAP_YEAR = [2001, 2001, 2008, 2011, 2020, 2022, 2024, 2026, 2026, 2026];   /* v223: 章の年（0=冒頭、8=作品、9=連絡先） */
+  function skipHud(d, y0, y1){
     if(!d) return;
-    var h = hudEl(), en = (typeof curLang !== 'undefined' && curLang === 'en'), n = Math.abs(d) * 5;
+    var n = Math.abs((CHAP_YEAR[y1] || 2026) - (CHAP_YEAR[y0] || 2001));   /* v223: 秒ではなく、飛び越す年数 */
+    if(!n) return;
+    var h = hudEl(), en = (typeof curLang !== 'undefined' && curLang === 'en');
     clearTimeout(hudT); clearInterval(hudTick);
     h.classList.remove('jump'); h.classList.toggle('back', d < 0);
-    h.querySelector('b').textContent = n + (en ? 's' : '秒');
+    h.querySelector('b').textContent = n + (en ? (n === 1 ? ' YEAR' : ' YEARS') : '年');
     h.querySelector('span').textContent = d > 0 ? (en ? 'SKIP AHEAD' : 'スキップ') : (en ? 'REWIND' : '巻き戻し');
     h.classList.remove('on'); void h.offsetWidth; h.classList.add('on');
   }
@@ -1680,7 +1762,8 @@
   function skipTo(id){
     var el = id && document.querySelector(id); if(!el) return false;
     var y = el.getBoundingClientRect().top + window.scrollY;
-    skipHud(chapAt(y) - chapAt(window.scrollY));
+    var c0 = chapAt(window.scrollY), c1 = chapAt(y);
+    skipHud(c1 - c0, c0, c1);
     return flyToEl(id);
   }
   var jcur = null;

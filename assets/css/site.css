@@ -1937,8 +1937,6 @@
   body.menuopen .anno{opacity:0 !important; transition:opacity .2s}
   /* v219: スマホ — 題字がヘッダーのぼかしに掛からないよう少し下げる。楕円の写真は左を軸に一回り大きく */
   html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 14px)}
-  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 172px); transform:scale(.78); transform-origin:0 0}   /* 題字を下げた分、目次もその下へ（重なっていた）。見出しの行までに収める */
-  html.pcview.phone #top .toc.on{transform:scale(.78)}
   html.pcview.phone #top .ovals{transform:translate(-50%,-50%) scale(1.12); transform-origin:0 50%}
   /* v219: スマホ — 研究の図と手順はヘッダーの下から始める。本文は一回り大きく */
   html.pcview.phone #seq .fig{align-self:start; margin-top:calc(var(--hdh, 116px) + 12px); height:calc(100vh - var(--hdh, 116px) - 36px)}
@@ -1984,3 +1982,23 @@
   /* v222: WebKit — 地図の印は一度だけ canvas に描いた絵（紙目つき）で置く。SVG フィルタは毎フレーム掛け直されて 36fps 止まりだった */
   html.is-webkit #mpseals .seal.rastered{display:none}
   html.is-webkit #mpseals image.sealimg{pointer-events:none}
+  /* v223: 「ここから先は…」の退場をゆっくりに（0.7s の急な出だし → 1.1s、ぼかしは軽く） */
+  #message .stick:not(.hold) .mh3{filter:blur(3px); transform:translateY(-50%) translateY(-16px) !important;
+    transition:opacity 1.1s cubic-bezier(.4,0,.2,1), transform 1.2s cubic-bezier(.4,0,.2,1), filter 1.1s cubic-bezier(.4,0,.2,1), visibility 0s 1.1s}
+  /* v223: WebKit — 三つのことの判も一度だけ canvas に描いた絵で置く（フィルタが毎フレーム掛け直され 20fps だった） */
+  html.is-webkit #dgsvg .seal.rastered{display:none}
+  /* v224: スマホの目次 — 題字（MASTER'S STUDENT）の下に 14px 空けて原寸で置く。文字は 11px → 13px、行間を詰めて見出しの行の上に収める */
+  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 176px); transform:none; font-size:13px}
+  html.pcview.phone #top .toc.on{transform:none}
+  html.pcview.phone #top .toc li,html.pcview.phone #top .toc li a{font-size:13px; line-height:1.4}
+  html.pcview.phone #top .toc .k{font-size:11px; margin-bottom:4px}
+  /* v224: タブレットの横持ちの案内を一回り大きく */
+  html.tablet .rotv svg{width:min(24vw, 24vh); height:min(24vw, 24vh)}
+  html.tablet .rotv b{font-size:min(5.5vw, 6.7vh)}
+  html.tablet .rotv small{font-size:min(2.6vw, 3.1vh)}
+  html.tablet .rotv .rnote{font-size:min(3.2vw, 3.9vh)}
+  /* v224: 背景色の切り替え — 地の板を自分の合成レイヤーに（色が変わる 1 秒間、ページ全体を描き直していた）。html の地（安全域の帯）も同じ速さで */
+  body::after{transform:translateZ(0); will-change:background-color}
+  html{transition:background-color 1s var(--ease)}
+  /* v224: 研究の図（タブレット）— 図の svg を自分のレイヤーに。段階が変わる間の描き直しをページから切り離す */
+  html.handheld #seq .fig svg{will-change:transform; transform:translateZ(0)}
