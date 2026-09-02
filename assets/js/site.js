@@ -361,16 +361,26 @@
       if(sm) sm.textContent = c.small;
       if(note) note.textContent = c.note;
       if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); b.classList.add('rv2'); if(typeof mixedSubs === 'function') mixedSubs(!en); }
+      rv.classList.add('rvscene');   /* 途中からは、その章の地色で */
     }
-    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup'); }
-    function show(){ if(!muted){ recopy(); rv.classList.remove('gone'); H.classList.add('rotvup'); } }
-    H.classList.add('rotvup');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
-    if(land.matches){ hide(); startOpening(); }                                  /* すでに横向きなら、お願いする必要がない */
-    else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);  /* 回さないまま置かれても止まらない */
+    /* 案内が出ているあいだは下の紙面を動かさない（指・ホイール・キー） */
+    function rvBlock(e){ if(!rv.classList.contains('gone')) e.preventDefault(); }
+    window.addEventListener('touchmove', rvBlock, {passive:false});
+    window.addEventListener('wheel', rvBlock, {passive:false});
+    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); }
+    function show(){
+      if(muted) return;
+      recopy();
+      var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
+      if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
+      rv.classList.remove('gone'); H.classList.add('rotvup');
+    }
+    H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
+    /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
+       すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
+    if(land.matches){ hide(); startOpening(); }
+    else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
-    /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
-       回り終わってから始める。 */
-    /* 途中で縦にして横へ戻したとき：案内が退場したあとに「よくできました」の判を押して、消える */
     /* 桜型の判（先生の「たいへんよくできました」判）：花びら 5 枚、先に切れ込み、二重の輪郭、中は縦書き */
     function sakuraPath(){
       var d = '';
@@ -530,7 +540,12 @@
     var sb = bt && (bt.getAttribute('data-scene') || 'paper'); if(sb && sb !== curBot){ curBot = sb; body.setAttribute('data-scene-bot', sb); }
     if(!hit || hit === curSec) return; curSec = hit;
     var sc = hit.getAttribute('data-scene') || 'paper';
-    if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc); document.documentElement.style.backgroundColor = getComputedStyle(body).getPropertyValue('--bg') || ''; }   /* v206: html の地も場面の色に（固定の地の下から紙色が覗かないように） */
+    if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc);
+      var cs0 = getComputedStyle(body), bg0 = cs0.getPropertyValue('--bg') || '';
+      document.documentElement.style.backgroundColor = bg0;
+      /* v212: 横持ちで読んでいる章の色を覚えておく。縦にしたときの案内はこの色で塗る */
+      if(!window.matchMedia || window.matchMedia('(orientation:landscape)').matches) window.__landCols = {bg: bg0.trim(), fg: (cs0.getPropertyValue('--fg') || '').trim()};
+    }   /* v206: html の地も場面の色に（固定の地の下から紙色が覗かないように） */
     setYear(hit.getAttribute('data-year')); setPlace(hit.getAttribute('data-place') || '');
   }
   /* the small name under the year: the letters scramble and lock in, top to bottom, and the tick is drawn again */

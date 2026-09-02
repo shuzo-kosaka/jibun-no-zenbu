@@ -1879,3 +1879,14 @@
   #rotok .ink .rg{fill:none; stroke:var(--acc); stroke-width:1.9}
   #rotok .ink .tx text{font-family:var(--sans); font-weight:700; fill:var(--acc)}
   .rotv .rtl.rv2 .w br ~ .ch{position:relative; left:.32em}   /* 「端末を横に。」の行だけ、少し右へ */
+  /* 最初の案内（幕の前）は朱。途中の案内は、いま読んでいる章の地色と文字色で */
+  html.rotvup0{background-color:var(--shu) !important}
+  html.handheld .rotv.rvscene{background:var(--bg); color:var(--fg)}
+  .rotv.rvscene .ok path{stroke:var(--bg)}
+  /* 案内が出ているあいだ、下の紙面を指で送れないように */
+  html.handheld .rotv{touch-action:none; overscroll-behavior:contain}
+  .rotv .rtl.rv2 .w br ~ .ch{left:.18em}
+  /* 途中の案内の色は「横持ちで読んでいた章」の色。縦にした瞬間に場面の判定が動いても引きずられない */
+  html.rotvup:not(.rotvup0){background-color:var(--rvbg, var(--shu)) !important}
+  html.handheld .rotv.rvscene{background:var(--rvbg, var(--bg)); color:var(--rvfg, var(--fg))}
+  .rotv.rvscene .ok path{stroke:var(--rvbg, var(--bg))}
