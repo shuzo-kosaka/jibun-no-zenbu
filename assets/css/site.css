@@ -2134,3 +2134,6 @@
   .dgrp{fill:var(--fg2); opacity:0}
   html.is-webkit .dgrp,html.is-webkit [filter="url(#dgrpink)"]{filter:none}
   #dgsvg .dgflag{pointer-events:none}
+  html.pcview.phone .wkf,html.pcview.phone .wkf:hover,html.pcview.phone .wkf:focus-visible{filter:none !important; transition:none}
+  html.pcview.phone .wkf .ph{filter:none !important; opacity:.96}
+  html.pcview.phone .wkf:hover .seal,html.pcview.phone .wkf:focus-visible .seal{filter:none !important}

@@ -41,7 +41,10 @@
     if(reduce) return;
     document.querySelectorAll('#top .oval').forEach(function(o, k){
       var imgs = o.querySelectorAll('.phs image, .phs img'), n = imgs.length, cur = 0; if(n < 2) return;   /* v229: 写真は HTML の img に */
-      setTimeout(function(){ setInterval(function(){ if(body.classList.contains('opening') || document.hidden || !top.classList.contains('inview')) return; imgs[cur].classList.remove('on');   /* v230: 画面の外では切り替えない */ cur = (cur + 1) % n; imgs[cur].classList.add('on'); }, 3400); }, k * 1700);
+      /* v258: 二つの楕円が同時に切り替わらないよう、間隔は毎回ばらつかせる（2.6〜5.4 秒）。最初のずれも楕円ごとに変える */
+      (function tick(first){ setTimeout(function(){
+        if(!(body.classList.contains('opening') || document.hidden || !top.classList.contains('inview'))){ imgs[cur].classList.remove('on'); cur = (cur + 1) % n; imgs[cur].classList.add('on'); }
+        tick(false); }, first ? (2200 + k * 1500 + Math.random() * 900) : (2600 + Math.random() * 2800)); })(true);
     });
   })();
   (function(){
@@ -456,6 +459,10 @@
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);
     else if(land.addListener) land.addListener(onOrient);
+    /* v258: 別のタブへ行っている間に向きが変わると change が届かないことがある。戻ってきたときに向きを見直す */
+    document.addEventListener('visibilitychange', function(){ if(document.hidden || !started) return;
+      if(!land.matches){ if(rv.classList.contains('gone')) show(); }
+      else if(!rv.classList.contains('gone')){ muted = false; hide(); } });
   })();
 
   /* ---------- mouse: crosshair + dot + coordinates, hero parallax (persists through the page) ---------- */
