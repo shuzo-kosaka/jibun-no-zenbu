@@ -12,7 +12,7 @@ var tablet=/iPad|Tablet|PlayBook|Silk|Kindle/i.test(u)||(/Android/i.test(u)&&!/M
 if(!(phone||tablet))return;
 var h=document.documentElement;
 if(/[?&]resp=1/.test(location.search)){h.className+=" resp handheld"+(phone?" phone":" tablet");return;}
-var m=document.querySelector("meta[name=viewport]");if(m)m.setAttribute("content","width=1280");
+var cover=/[?&]cover=1/.test(location.search);var m=document.querySelector("meta[name=viewport]");if(m)m.setAttribute("content","width=1280"+(cover?",viewport-fit=cover":""));if(cover)h.className+=" cover";
 h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
 <title>小坂脩蔵 — ジブンのゼンブを。</title>
 <meta name="description" content="小坂脩蔵（デザイナー／名古屋学芸大学大学院）の自己紹介サイト。岡崎、ミシガン、バーのカウンター、バンコク、研究室——七つのチェックポイントと、制作への向き合い方。">
@@ -27,7 +27,7 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" id="themec" content="#E84518">
 <style>body{margin:0;font-size:14px;font-family:system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
-<link rel="stylesheet" href="assets/css/site.css?v=a4b416fb">
+<link rel="stylesheet" href="assets/css/site.css?v=e25e8198">
 <script src="assets/js/i18n.js?v=09904238" defer></script>
 <script src="assets/js/matter.min.js?v=d79ceded" defer></script>
 <script src="assets/js/site.js?v=96b4a709" defer></script>

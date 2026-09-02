@@ -2072,3 +2072,12 @@
   html.pcview.phone #ch1pin .dg-cap text{font-weight:600}
   html.pcview.phone #ch1pin .dg-cap .ref{font-weight:500}
   html.pcview.phone #ch1pin .dg-title text{text-anchor:start}
+  /* v240: 試験用 ?cover=1 — viewport-fit=cover にして、安全域の帯までページ自身（1 秒で変わる板）で塗る。
+     内容は env(safe-area-inset-*) の分だけ内側へ。固定の部品も同じだけ寄せる */
+  html.cover body{padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
+  html.cover .hd{left:env(safe-area-inset-left, 0px); right:env(safe-area-inset-right, 0px)}
+  html.cover .cta-fx{right:calc(var(--x1) - 30px + env(safe-area-inset-right, 0px))}
+  html.cover .remain,html.cover #ch5pin .bgdot{left:calc(var(--x1) / 2 - 13px + env(safe-area-inset-left, 0px))}
+  html.cover .yr{left:calc(97% - env(safe-area-inset-right, 0px))}
+  html.cover #skiphud{right:calc(16% + env(safe-area-inset-right, 0px))} html.cover #skiphud.back{left:calc(16% + env(safe-area-inset-left, 0px))}
+  html.cover .menu-in{padding-left:calc(3.4% + env(safe-area-inset-left, 0px)); padding-right:calc(3.4% + env(safe-area-inset-right, 0px))}
