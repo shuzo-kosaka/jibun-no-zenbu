@@ -692,6 +692,10 @@
     var row = document.createElement('div'); row.className = 'bgdot'; row.setAttribute('aria-hidden', 'true');
     for(var i = 0; i < n; i++) row.appendChild(document.createElement('i'));
     st.appendChild(row);
+    /* v244: 丸を押すとその写真の位置へ（写真 i は p ∈ [i/n, (i+1)/n)。その真ん中へ飛ぶ） */
+    row.querySelectorAll('i').forEach(function(d, i){ d.style.pointerEvents = 'auto'; d.addEventListener('click', function(){
+      var r = pin.getBoundingClientRect(), total = pin.offsetHeight - vh(), y = r.top + window.scrollY + total * ((i + .5) / n);
+      if(typeof flyTo === 'function') flyTo(y); else window.scrollTo({top:y, behavior:'smooth'}); }); });
   });
   function pinUpdate(){
     pins.forEach(function(pin){
@@ -1540,6 +1544,16 @@
   })(performance.now());
   /* v235: スマホでは図を横長に組み替える：輪と判は中央のまま、題は右の列、説明は左右の列へ。
      位置は内側の <g transform> で動かす（外側の .dg-cap / .dg-title は CSS の遷移で transform を使うため） */
+  (function(){   /* v244: PC・タブレット — 大きくなった説明の置き場所 */
+    var H = document.documentElement; if(H.classList.contains('pcview') && H.classList.contains('phone')) return;
+    var svg = document.getElementById('dgsvg'); if(!svg) return;
+    function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
+    var caps = svg.querySelectorAll('.dg-cap');
+    shift(caps[0], 0, -20);
+    shift(caps[1], -20, -32);   /* 判の下端（y 704）に掛からない高さ */
+    shift(caps[2], 20, -32);
+    shift(svg.querySelector('.dg-title'), 0, 40);   /* 題は少し下へ（説明の参照行と離す） */
+  })();
   (function(){
     if(!document.documentElement.classList.contains('pcview') || !document.documentElement.classList.contains('phone')) return;
     var svg = document.getElementById('dgsvg'); if(!svg) return;
@@ -1548,9 +1562,41 @@
     shift(svg.querySelector('.dg-title'), -872, -720);   /* 題 → 左上（左端 x=-372、y 130〜232）。text-anchor は CSS で start に */
     svg.querySelectorAll('.dg-cap tspan[dy]').forEach(function(t){ var d = parseFloat(t.getAttribute('dy')); if(d === 24) t.setAttribute('dy', '38'); else if(d === 26) t.setAttribute('dy', '40'); });   /* 行間を広く（28px の文字） */
     var caps = svg.querySelectorAll('.dg-cap');
+    shift(caps[0], 40, 0);        /* 上の説明 → 少し右へ（v244） */
     shift(caps[1], -440, -370);   /* 左下の説明 → 左の列（右の説明と同じ高さ y 392〜） */
     shift(caps[2], 362, -370);    /* 右下の説明 → 右の列（y 392〜470）。題は左上に移ったので上へ。右の判（上端 y≈490）にも右下のボタンにも掛からない */
   })();
+  /* v244: 三つのことの説明文 — 見出しと同じ混植（漢字＝ゴシック、かな＝明朝）を tspan で。行間は文字の大きさに合わせ、PC は長い行を分ける */
+  function dgCaps(){
+    var svg = document.getElementById('dgsvg'); if(!svg) return;
+    var phone = document.documentElement.classList.contains('pcview') && document.documentElement.classList.contains('phone');
+    var ja = !(typeof curLang !== 'undefined' && curLang === 'en');
+    var dy1 = phone ? 38 : (ja ? 44 : 34), dy2 = phone ? 40 : (ja ? 46 : 36);
+    svg.querySelectorAll('.dg-cap text').forEach(function(t){
+      if(t.__mixed && t.__mixedLang === curLang) return;
+      var lines = Array.prototype.slice.call(t.querySelectorAll(':scope > tspan')).map(function(ts){ return {x: ts.getAttribute('x'), ref: ts.classList.contains('ref'), text: ts.textContent}; });
+      if(!lines.length) return;
+      if(ja && !phone){
+        var out = [];
+        lines.forEach(function(l){ if(!l.ref && l.text === 'つい細部まで手を入れたくなる。'){ out.push({x:l.x, ref:false, text:'つい細部まで'}); out.push({x:l.x, ref:false, text:'手を入れたくなる。'}); } else out.push(l); });
+        lines = out;
+      }
+      var ns = 'http://www.w3.org/2000/svg';
+      while(t.firstChild) t.removeChild(t.firstChild);
+      lines.forEach(function(l, i){
+        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref ? dy2 : dy1)); if(l.ref) ts.setAttribute('class', 'ref');
+        if(ja && !l.ref){
+          Array.from(l.text).forEach(function(ch){ var c = document.createElementNS(ns, 'tspan');
+            if(/[。、！？]/.test(ch)) c.setAttribute('class', 'pt'); else if(/[\u4E00-\u9FFF\u3400-\u4DBF々〆]/.test(ch)) c.setAttribute('class', 'kj'); else if(/[\u3040-\u309F\u30A0-\u30FF\u30FC]/.test(ch)) c.setAttribute('class', 'kn');
+            c.textContent = ch; ts.appendChild(c); });
+        } else ts.textContent = l.text;
+        t.appendChild(ts);
+      });
+      t.__mixed = true; t.__mixedLang = curLang;
+    });
+  }
+  window.__dgCaps = dgCaps;
+  setTimeout(dgCaps, 0);
   function dgBuild(){
     var svg = document.getElementById('dgsvg'), inp = document.getElementById('dgin'); if(!svg || !inp) return;
     var r = svg.getBoundingClientRect(), x = (window.__srNextX !== undefined) ? window.__srNextX : r.left + r.width * .12;
@@ -2690,6 +2736,7 @@
     document.querySelectorAll('.sr li .st, #mseals li .st').forEach(function(st){ while(st.firstChild) st.removeChild(st.firstChild); });
     document.querySelectorAll('#mseals > li').forEach(function(li, i){ var st = li.querySelector('.st'); if(st) st.appendChild(stampSvg(li, i)); });
     if(window.__mapStamp) window.__mapStamp();
+    if(window.__dgCaps){ document.querySelectorAll('#dgsvg .dg-cap text').forEach(function(t){ t.__mixed = false; }); setTimeout(window.__dgCaps, 0); }   /* v244 */
     setTimeout(function(){ rallyBuild(); }, 60);
     setTimeout(togFit, 720);   /* the toggles' labels are typed in first */
     setTimeout(function(){ if(window.__wkTryFit) window.__wkTryFit(); }, 120);   /* the sketch round the works' heading follows its new shape */

@@ -2095,3 +2095,17 @@
   /* v243: cover のとき、先頭へ／末尾への札（.jump）は中央のまま（.back の left が効いて縦に伸びていた） */
   html.cover #skiphud.jump,html.cover #skiphud.jump.back{left:50%; right:auto; transform:translate(-50%,-50%) scale(.84)}
   html.cover #skiphud.jump.on,html.cover #skiphud.jump.back.on{transform:translate(-50%,-50%) scale(1)}
+  /* v244: 三つのことの説明 — 見出しと同じ混植（漢字はゴシック、かなは明朝）。PC・タブレットは大きく（34）、スマホは従来の大きさ */
+  #ch1pin .dg-cap .kj{font-family:var(--sans); font-weight:700; font-size:.94em; letter-spacing:.005em}
+  #ch1pin .dg-cap .kn{font-family:var(--mincho); font-weight:900; font-size:1.02em}
+  #ch1pin .dg-cap .pt{font-family:var(--mincho); font-weight:900}
+  #ch1pin .dg-cap text{font-size:32px; letter-spacing:.03em}
+  #ch1pin .dg-cap .ref{font-size:18px; font-weight:500}
+  html[lang="en"] #ch1pin .dg-cap text{font-size:24px; letter-spacing:0}
+  html.pcview.phone #ch1pin .dg-cap text{font-size:28px}
+  html.pcview.phone #ch1pin .dg-cap .ref{font-size:20px}
+  /* v244: バーの章の丸 — MESSAGE の丸（同じ位置に隠れている）が押されないように */
+  .remain:not(.on) .i{pointer-events:none}
+  #ch5pin .bgdot{pointer-events:auto} #ch5pin .bgdot i{cursor:pointer}
+  /* v244: スマホの目次 — 画面の低い機種で題字に重ならないよう、下限を題字の下に固定（文字や行間は変えない） */
+  html.pcview.phone #top .toc{top:max(calc(52% + 36px), calc(var(--hdh, 116px) + 172px))}
