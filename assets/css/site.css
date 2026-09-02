@@ -2143,3 +2143,5 @@
   @keyframes dgflagin{from{transform:scale(0) rotate(-14deg)} to{transform:scale(1) rotate(18deg)}}
   /* 輪の足跡：足跡の下に地の色の縁取りを敷き、その箇所の輪の線を消す */
   .dgrp{opacity:0; fill:var(--fg2)} .dgrp .dgrpi{fill:var(--fg2)} .dgrp .dgrph{fill:var(--bg); stroke:var(--bg); stroke-width:2.4; stroke-linejoin:round}
+  /* v261: 足跡が歩き出したら輪の線そのものを消す（描き終わりを見せてから薄れる）。戻って描き直すときは再び出る */
+  #ch1pin .dg.walk .dg-ring{opacity:0; transition:opacity .9s ease .15s}
