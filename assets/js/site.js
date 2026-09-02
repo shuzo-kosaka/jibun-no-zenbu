@@ -375,13 +375,13 @@
     function rvBlock(e){ if(!rv.classList.contains('gone')) e.preventDefault(); }
     window.addEventListener('touchmove', rvBlock, {passive:false});
     window.addEventListener('wheel', rvBlock, {passive:false});
-    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); }
+    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
     function show(){
       if(muted) return;
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
-      rv.classList.remove('gone'); H.classList.add('rotvup');
+      rv.classList.remove('gone'); H.classList.add('rotvup'); if(window.__setTheme) window.__setTheme((c && c.bg) || '#E84518');
     }
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
@@ -578,6 +578,7 @@
     if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc);
       var cs0 = getComputedStyle(body), bg0 = cs0.getPropertyValue('--bg') || '';
       document.documentElement.style.backgroundColor = bg0;
+      if(window.__setTheme) window.__setTheme(bg0.trim());   /* v239: theme-color も同じ色に */
       if(window.__rvHide) window.__rvHide();   /* v232: 横向きで章が変わるときは、案内用の帯の色（!important）が残っていれば外す（ハッシュ付きで開くと残ることがあった） */
       /* v212: 横持ちで読んでいる章の色を覚えておく。縦にしたときの案内はこの色で塗る */
       if(!window.matchMedia || window.matchMedia('(orientation:landscape)').matches) window.__landCols = {bg: bg0.trim(), fg: (cs0.getPropertyValue('--fg') || '').trim()};
@@ -1827,6 +1828,8 @@
     window.addEventListener('wheel', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
     window.addEventListener('keydown', function(e){ if(opening() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
   })();
+  /* v239: theme-color（Safari が枠・帯・タブの色に使う）を場面の色に合わせる。案内の間は朱 */
+  window.__setTheme = function(c){ var m = document.getElementById('themec'); if(!m){ m = document.createElement('meta'); m.name = 'theme-color'; m.id = 'themec'; document.head.appendChild(m); } if(c && m.getAttribute('content') !== c) m.setAttribute('content', c); };
   var jcur = null;
   function curtainJump(y, done, rew){
     if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
