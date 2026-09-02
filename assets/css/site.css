@@ -1823,3 +1823,45 @@
   html.pcview.phone .menu .mseals .t{line-height:1.32}
   html.pcview.phone .menu .mseals .y{margin-top:1px}
   html.pcview.phone .menu .mlinks{margin-top:2px}
+  /* 案内の絵：縦の端末では見出しの帯が画面から溢れ（少し揺すっても収まらない）、
+     回すと帯が画面に収まって ✓ が付く。見せたいのは「横にすれば、ちゃんと読める」という得 */
+  .rotv svg{overflow:visible}
+  .rotv .ph,.rotv .ar{animation:none}
+  .rotv .pP,.rotv .pL{transform-origin:110px 100px}
+  .rotv .pP{animation:rvP 4.4s cubic-bezier(.45,0,.15,1) infinite}
+  .rotv .pL{animation:rvL 4.4s cubic-bezier(.45,0,.15,1) infinite}
+  .rotv .pc{animation:rvC 4.4s ease-in-out infinite}
+  .rotv .ok{transform-origin:162px 76px; animation:rvOK 4.4s cubic-bezier(.2,.9,.3,1) infinite}
+  @keyframes rvP{0%,20%{transform:rotate(0deg); opacity:1} 29%{opacity:1} 33%{opacity:0} 38%{transform:rotate(-90deg); opacity:0} 94%{transform:rotate(0deg); opacity:0} 100%{transform:rotate(0deg); opacity:1}}
+  @keyframes rvL{0%,20%{transform:rotate(90deg); opacity:0} 29%{opacity:0} 33%{opacity:1} 38%{transform:rotate(0deg); opacity:1} 90%{transform:rotate(0deg); opacity:1} 96%,100%{transform:rotate(0deg); opacity:0}}
+  @keyframes rvC{0%,5%{transform:translateX(0)} 9%{transform:translateX(-7px)} 13%{transform:translateX(0)} 100%{transform:translateX(0)}}
+  @keyframes rvOK{0%,44%{transform:scale(.3); opacity:0} 50%{transform:scale(1.18); opacity:1} 54%{transform:scale(1); opacity:1} 88%{transform:scale(1); opacity:1} 94%,100%{transform:scale(1); opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .rotv .pP,.rotv .pc{animation:none; display:none} .rotv .pL,.rotv .ok{animation:none; opacity:1; transform:none} }
+
+  /* スマホのメニュー：判の絵（少し傾いて枠より大きい）が案内行の線に掛かっていた。線から離し、その分を下で詰める */
+  html.pcview.phone .menu-in{padding-top:calc(var(--hdh, 116px) + 25px); padding-bottom:0}
+  html.pcview.phone .menu .mseals{padding-top:20px}
+  html.pcview.phone .menu .ml{margin-bottom:0}
+  html.pcview.phone .menu .mmsg{margin-bottom:0}
+  html.pcview.phone .menu .mmsg .txt b{margin-bottom:0}
+  html.pcview.phone .menu .mseals .slot{margin-bottom:2px}
+  html.pcview.phone .menu .mseals .t{line-height:1.2}
+  html.pcview.phone .menu .mseals .y{margin-top:0}
+  html.pcview.phone .menu .mlinks{margin-top:0}
+
+  /* 縦持ちにしたときの白い切れ目：画面の高さが伸びる瞬間、固定した地（body::after）の下に
+     html の紙色が覗く。地を場面の色にし、固定の地と案内は画面の下へ余分に伸ばしておく */
+  body{background-color:var(--bg)}
+  body::after{bottom:-32vh}
+  html.handheld .rotv{bottom:-24vh; padding-bottom:30vh}
+
+  /* 途中で縦→横に戻したときの「よくできました」の判。押されて、少し留まって、消える */
+  #rotok{position:fixed; left:50%; top:50%; width:min(46vw, 300px); aspect-ratio:1; z-index:290; pointer-events:none; opacity:0;
+    transform:translate(-50%,-50%) scale(1.55) rotate(-12deg)}
+  #rotok.on{animation:rotok 2.6s cubic-bezier(.2,.9,.3,1) forwards}
+  @keyframes rotok{0%{opacity:0; transform:translate(-50%,-50%) scale(1.55) rotate(-12deg)} 14%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-6deg)}
+    74%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-6deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.03) rotate(-6deg)}}
+  #rotok svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+  #rotok .ink{position:absolute; inset:0; -webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
+  #rotok .ink text{fill:#E84518; font-family:var(--mono); font-weight:500}
+  #rotok .ink .c{font-family:var(--sans); font-weight:700}

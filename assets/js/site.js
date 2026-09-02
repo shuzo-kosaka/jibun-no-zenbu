@@ -354,11 +354,28 @@
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
     /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
        回り終わってから始める。 */
+    /* 途中で縦にして横へ戻したとき：案内が退場したあとに「よくできました」の判を押して、消える */
+    function rotOk(){
+      var el = document.getElementById('rotok');
+      if(!el){
+        el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
+        el.innerHTML = '<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="rgba(245,242,236,.94)"/></svg>' +
+          '<div class="ink"><svg viewBox="0 0 200 200"><defs><path id="rokr" d="M 100 100 m -74 0 a 74 74 0 1 1 148 0 a 74 74 0 1 1 -148 0"/></defs>' +
+          '<g fill="none" stroke="#E84518"><circle cx="100" cy="100" r="88" stroke-width="4.2"/><circle cx="100" cy="100" r="62" stroke-width="1.6"/></g>' +
+          '<text font-size="10" letter-spacing="2.2"><textPath href="#rokr" startOffset="1%">WELL DONE \u00b7 横持ち \u00b7 ARIGATO \u00b7 WELL DONE \u00b7 </textPath></text>' +
+          '<text class="c" x="100" y="106" text-anchor="middle" font-size="17"></text>' +
+          '<text x="100" y="128" text-anchor="middle" font-size="8" letter-spacing="2.4">GOOD JOB</text></svg></div>';
+        document.body.appendChild(el);
+      }
+      el.querySelector('.c').textContent = (typeof curLang !== 'undefined' && curLang === 'en') ? 'WELL DONE' : 'よくできました';
+      el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+      clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
+    }
     function onOrient(e){
       var m = e.matches;
       clearTimeout(onOrient.t);
       onOrient.t = setTimeout(function(){
-        if(m){ muted = false; hide(); startOpening(); }
+        if(m){ var wasUp = started && !rv.classList.contains('gone'); muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520); }
         else if(started) show();
       }, 430);
     }
@@ -476,7 +493,7 @@
     var sb = bt && (bt.getAttribute('data-scene') || 'paper'); if(sb && sb !== curBot){ curBot = sb; body.setAttribute('data-scene-bot', sb); }
     if(!hit || hit === curSec) return; curSec = hit;
     var sc = hit.getAttribute('data-scene') || 'paper';
-    if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc); }
+    if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc); document.documentElement.style.backgroundColor = getComputedStyle(body).getPropertyValue('--bg') || ''; }   /* v206: html の地も場面の色に（固定の地の下から紙色が覗かないように） */
     setYear(hit.getAttribute('data-year')); setPlace(hit.getAttribute('data-place') || '');
   }
   /* the small name under the year: the letters scramble and lock in, top to bottom, and the tick is drawn again */
