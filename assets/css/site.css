@@ -2081,3 +2081,7 @@
   html.cover .yr{left:calc(97% - env(safe-area-inset-right, 0px))}
   html.cover #skiphud{right:calc(16% + env(safe-area-inset-right, 0px))} html.cover #skiphud.back{left:calc(16% + env(safe-area-inset-left, 0px))}
   html.cover .menu-in{padding-left:calc(3.4% + env(safe-area-inset-left, 0px)); padding-right:calc(3.4% + env(safe-area-inset-right, 0px))}
+  /* v241: ?cover=1 — スマホ・タブレット専用の位置指定（右下のボタンなど）にも安全域ぶんを足す */
+  html.cover.pcview.phone .cta-fx,html.cover.pcview.tablet .cta-fx{right:calc(28px + env(safe-area-inset-right, 0px))}
+  html.cover.pcview .remain,html.cover.pcview #ch5pin .bgdot{left:calc(var(--x1) / 2 - 13px + env(safe-area-inset-left, 0px))}
+  html.cover.pcview .yr{left:calc(97% - env(safe-area-inset-right, 0px))}
