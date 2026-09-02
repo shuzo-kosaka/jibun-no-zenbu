@@ -413,15 +413,15 @@
       var el = document.getElementById('rotok');
       if(!el){
         el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
-        el.innerHTML = '<div class="pad"></div><div class="ink"><svg viewBox="0 0 200 200"></svg></div>';
+        el.innerHTML = '<svg class="bkg" viewBox="0 0 200 200"></svg><div class="ink"><svg viewBox="0 0 200 200"></svg></div>';
         document.body.appendChild(el);
       }
       rotOkN++;
-      var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('svg'), sp = sakuraPath(), h = '';
+      var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('.ink svg'), bkg = el.querySelector('svg.bkg'), sp = sakuraPath(), h = '';
       if(rotOkN === 1){
         h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
         h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>'
-                : vcols(['たいへん'], [119], 12.5, 90, 14) + vcols(['よくでき', 'ました'], [101, 82], 16, 88, 16.5);
+                : vcols(['たいへん', 'よくでき', 'ました'], [120, 100, 80], 15.5, 84, 16.5);
       } else if(rotOkN === 2){
         h = '<path class="pt" d="' + sp + '"/>';
         h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">KEEP IT</text><text x="100" y="118" text-anchor="middle" font-size="19">UP</text>'
@@ -432,6 +432,7 @@
                 : vcols(['もういちど', '復習しよう'], [111, 89], 15.5, 78, 16.5);
       }
       svg.innerHTML = h;
+      bkg.innerHTML = rotOkN <= 2 ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }

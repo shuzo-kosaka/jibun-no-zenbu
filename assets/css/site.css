@@ -1901,3 +1901,12 @@
   #message .stick:not(.hold) .mdown{opacity:0; visibility:hidden; transform:translateY(-18px) !important; filter:blur(6px);
     transition:opacity .5s var(--ease), transform .6s var(--ease), filter .5s var(--ease), visibility 0s .6s}
   #message .stick.hold .mh3,#message .stick.hold .mdown{transition:opacity .6s var(--ease), transform .7s var(--ease), filter .6s var(--ease)}
+  /* 判の下地は輪郭の内側だけ：ぼかした円ではなく、判の形そのものを地色で塗る */
+  #rotok .pad{display:none}
+  #rotok .bk{fill:var(--bg); opacity:.86; stroke:none}
+  /* スマホで、右下のボタンの周りの文字を読める大きさに */
+  html.pcview.phone .cta-fx svg text{font-size:10.5px}
+  /* 指で触る端末では :hover が貼り付くので、プロフィールの写真は入れ替えない（消えていた） */
+  @media (hover:none){ #contact .oval:hover .phs{opacity:1} #contact .oval:hover .ovh{opacity:0} }
+  /* いちばん上で下へ引いたときの「引っ張って更新」を起こさない（ボタンで上へ飛んだ直後に起きやすい） */
+  html,body{overscroll-behavior-y:none}
