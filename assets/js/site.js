@@ -40,7 +40,7 @@
   (function(){
     if(reduce) return;
     document.querySelectorAll('#top .oval').forEach(function(o, k){
-      var imgs = o.querySelectorAll('.phs image'), n = imgs.length, cur = 0; if(n < 2) return;
+      var imgs = o.querySelectorAll('.phs image, .phs img'), n = imgs.length, cur = 0; if(n < 2) return;   /* v229: 写真は HTML の img に */
       setTimeout(function(){ setInterval(function(){ if(body.classList.contains('opening') || document.hidden) return; imgs[cur].classList.remove('on'); cur = (cur + 1) % n; imgs[cur].classList.add('on'); }, 3400); }, k * 1700);
     });
   })();
@@ -483,17 +483,25 @@
          first Japanese glyph — non-breaking spaces hold it in the middle, as the other dot is */
       if(tp) tp.textContent = up ? 'ページの先頭へ戻ります \u00b7 BACK TO THE TOP\u00a0\u00b7\u00a0' : '画面下部へ移動します \u00b7 TO THE FOOT OF THE PAGE\u00a0\u00b7\u00a0';
     }
+    var parallaxEls = null;
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
       var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null;
       cur.classList.toggle('hov', !!hov);
       cur.classList.toggle('onmedia', !!(t && t.closest && t.closest('.vid, .wkf, .marg figure, .hw, #ch5pin .bgph, .wk-mid')));   /* v100: ink-on-ink is invisible over a photo or a video thumbnail */
       suckHold(t);
-      if(!body.classList.contains('opening')){ top.style.setProperty('--mx', (mx / window.innerWidth - .5).toFixed(3)); top.style.setProperty('--my', (my / vh() - .5).toFixed(3)); }
-      if(my < vh() * 1.2){ var tr = top.getBoundingClientRect(); top.style.setProperty('--px', (mx - tr.left).toFixed(0) + 'px'); top.style.setProperty('--py', (my - tr.top).toFixed(0) + 'px'); }
+      if(!body.classList.contains('opening')){
+        /* v229: --mx/--my を #top に置くと、継承で配下すべて（楕円の SVG の文字や写真まで）が再計算・再配置される（WebKit で特に重い）。
+           題字にはその要素だけに置き、楕円は transform を直接書く */
+        var mxv = (mx / window.innerWidth - .5), myv = (my / vh() - .5);
+        if(!parallaxEls) parallaxEls = {b:top.querySelectorAll('.name b'), ov:top.querySelector('.ovals')};
+        parallaxEls.b.forEach(function(el){ el.style.setProperty('--mx', mxv.toFixed(3)); el.style.setProperty('--my', myv.toFixed(3)); });
+        if(parallaxEls.ov && window.innerWidth > 1024) parallaxEls.ov.style.transform = 'translate(-50%,-50%) translate(' + (mxv * -14).toFixed(1) + 'px,' + (myv * -10).toFixed(1) + 'px)';
+      }
+      if(my < vh() * 1.2){ var tr = top.getBoundingClientRect(), pkEl = window.__peek || top; pkEl.style.setProperty('--px', (mx - tr.left).toFixed(0) + 'px'); pkEl.style.setProperty('--py', (my - tr.top).toFixed(0) + 'px'); }
     }, {passive:true});
     /* a second copy of the hero's grid, masked to a soft circle around the cursor: the hidden grid shows faintly where the mouse is */
-    (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
+    (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); window.__peek = pk; pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
     var c5 = document.getElementById('ch5pin');
     window.addEventListener('mousemove', function(e){ if(c5){ c5.style.setProperty('--sx', (e.clientX / window.innerWidth * 100).toFixed(1) + '%'); c5.style.setProperty('--sy', (e.clientY / vh() * 100).toFixed(1) + '%'); } }, {passive:true});
     window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); suckHold(t); }, {passive:true});
@@ -706,8 +714,7 @@
           var mOut = Math.round(Math.max(0, Math.min(1, (p - .93) / .07)) * mfs.length);
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
-        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */
-        ms.classList.toggle('hwback', p >= .93);   /* v217: 一文のあと、手書きがもう一度浮かび上がる */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -1266,6 +1273,12 @@
   window.__dgSealRaster = dgSealRaster;
   window.addEventListener('load', function(){ setTimeout(dgSealRaster, 80); });
   window.addEventListener('resize', function(){ clearTimeout(dgSealRaster.rt); dgSealRaster.rt = setTimeout(dgSealRaster, 280); }, {passive:true});
+  /* v229: 画面の外の章は .inview を外し、CSS でアニメーションを止める */
+  (function(){
+    if(!('IntersectionObserver' in window)) { document.querySelectorAll('section[id]').forEach(function(sec){ sec.classList.add('inview'); }); return; }
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ e.target.classList.toggle('inview', e.isIntersecting); }); }, {rootMargin:'15% 0px 15% 0px', threshold:0});
+    document.querySelectorAll('section[id]').forEach(function(sec){ io.observe(sec); });
+  })();
   window.__mapSealRaster = mapSealRaster;
   window.addEventListener('load', function(){ setTimeout(mapSealRaster, 60); });
   window.addEventListener('resize', function(){ clearTimeout(mapSealRaster.rt); mapSealRaster.rt = setTimeout(mapSealRaster, 260); }, {passive:true});

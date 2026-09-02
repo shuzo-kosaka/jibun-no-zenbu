@@ -1988,17 +1988,42 @@
   /* v223: WebKit — 三つのことの判も一度だけ canvas に描いた絵で置く（フィルタが毎フレーム掛け直され 20fps だった） */
   html.is-webkit #dgsvg .seal.rastered{display:none}
   /* v224: スマホの目次 — 題字（MASTER'S STUDENT）の下に 14px 空けて原寸で置く。文字は 11px → 13px、行間を詰めて見出しの行の上に収める */
-  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 176px); transform:none; font-size:13px}
-  html.pcview.phone #top .toc.on{transform:none}
-  html.pcview.phone #top .toc li,html.pcview.phone #top .toc li a{font-size:13px; line-height:1.4}
-  html.pcview.phone #top .toc .k{font-size:11px; margin-bottom:4px}
   /* v224: タブレットの横持ちの案内を一回り大きく */
   html.tablet .rotv svg{width:min(24vw, 24vh); height:min(24vw, 24vh)}
   html.tablet .rotv b{font-size:min(5.5vw, 6.7vh)}
   html.tablet .rotv small{font-size:min(2.6vw, 3.1vh)}
   html.tablet .rotv .rnote{font-size:min(3.2vw, 3.9vh)}
-  /* v224: 背景色の切り替え — 地の板を自分の合成レイヤーに（色が変わる 1 秒間、ページ全体を描き直していた）。html の地（安全域の帯）も同じ速さで */
-  body::after{transform:translateZ(0); will-change:background-color}
-  html{transition:background-color 1s var(--ease)}
+  /* v224→v228: 地の板の合成レイヤー昇格と html の地の 1 秒遷移は、iPhone で計測すると逆に重かった（p90 108ms）。
+     html の地（安全域の帯）は一発で切り替え、板だけが 1 秒で変わる（p90 31ms）。板の昇格もしない */
   /* v224: 研究の図（タブレット）— 図の svg を自分のレイヤーに。段階が変わる間の描き直しをページから切り離す */
   html.handheld #seq .fig svg{will-change:transform; transform:translateZ(0)}
+  /* v226: 「ここから先は…」は退場させない。ピンが外れたら画面固定をやめ、段の中に置いてそのまま流れていく */
+  #message .stick:not(.hold) .mh3{opacity:1 !important; visibility:visible !important; position:absolute; top:50%; left:0; right:0;
+    transform:translateY(-50%) !important; filter:none !important; transition:none !important}
+  /* v226: 手書きの再浮上はなし（.hwback の規則を無効に） */
+  #message .stick.dim.hwback .hw,#message .stick.dim.hwback:not(.hold) .hw{opacity:.16; transform:translateY(-6vh) scale(.92); filter:blur(1.5px); transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease)}
+  /* v226: スマホ・タブレットは MESSAGE を短く（指のスクロールで 6 画面分あった。止まりの間隔 100vh → 約 70vh） */
+  html.handheld #message{min-height:540vh}
+  /* v226: 締めの判までの助走と、判の後の余韻を少し短く（330vh → 290vh） */
+  #ch7c .solopin{min-height:290vh}
+  /* v226: スマホ — 三つのことの図を一回り小さくして、下端のタブバーに掛からないようにする */
+  html.pcview.phone #ch1pin .dg-svg{width:min(76vh, 92vw, 1040px)}
+  /* v227: 背景色のクロスフェードを取り戻す。v216 で body に地色を塗ったため、その下にある固定の板（body::after、1 秒で色が変わる）が
+     隠れて、どの媒体でも一発切替になっていた。body は透明に戻し、板と html の地（安全域の帯）が同じ 1 秒で変わる */
+  body{background-color:transparent}
+  /* v229: 楕円の写真を SVG の外へ（HTML の img ＋ objectBoundingBox のクリップ）。
+     WebKit の旧 SVG エンジンは <image> の不透明度が変わるたびに SVG 全体を組み直し、データ URI の href を毎回解析していた（TOP で常時 30% の CPU） */
+  .oval{position:relative}
+  .oval .phs{position:absolute; left:0; top:0; width:100%; aspect-ratio:400/520; overflow:hidden; pointer-events:none}
+  .oval .phs img{position:absolute; display:block; max-width:none}
+  .oval > svg{position:relative; z-index:1}
+  #top .oval .phs img{opacity:0; transition:opacity 1.1s var(--ease)}
+  #top .oval .phs img.on{opacity:1}
+  /* v229: 画面の外の章のアニメーションは止める（旧 SVG エンジンでは、見えていない足跡や図の揺れが毎フレーム組み直しを起こしていた） */
+  section[id]:not(.inview) *{animation-play-state:paused !important}
+  body:not(.opening) #ld *{animation-play-state:paused !important}
+  html:not(.rewind) .rew,html:not(.rewind) .rew *{animation-play-state:paused !important}
+  /* v229b: 止め漏れ — テープの走査帯（::after）、開幕の点滅、MESSAGE の足跡（ピンが動いている間だけ歩く） */
+  html:not(.rewind) .rew::after,html:not(.rewind) .rew::before{animation-play-state:paused !important}
+  body:not(.opening) .ld,body:not(.opening) .ld *,body:not(.opening) .ld *::before,body:not(.opening) .ld *::after{animation-play-state:paused !important}
+  #message .stick:not(.mwalkon) .mfp{animation-play-state:paused !important}
