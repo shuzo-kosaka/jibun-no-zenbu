@@ -1814,3 +1814,12 @@
   body.menuopen .hd::before{opacity:0}   /* 紙のシートの上に、章の地色のグラデーションが一帯だけ乗っていた。旗の頭もこれに隠れていた */
   .menu .menu-in{padding-top:max(11vh, calc(var(--hdh, 68px) + 40px))}   /* 旗はいちばん上の判から 33px 伸び上がる。ヘッダーに重ならない高さから始める */
   .menu.open{transition:none; animation-fill-mode:forwards}
+  html.pcview.phone .menu-in{padding-top:calc(var(--hdh, 116px) + 32px); padding-bottom:2px}   /* 旗は判から 24px 伸び上がる。その頭がヘッダーの下に出る高さから始める */
+  html.pcview.phone .menu .mmsg .kslot .flag{top:-24px}
+  html.pcview.phone .menu .mmsg{margin-bottom:3px}
+  html.pcview.phone .menu .mmsg .txt b{margin-bottom:2px}
+  html.pcview.phone .menu .ml{padding-top:0; margin-bottom:2px}
+  html.pcview.phone .menu .mseals .slot{margin-bottom:4px}
+  html.pcview.phone .menu .mseals .t{line-height:1.32}
+  html.pcview.phone .menu .mseals .y{margin-top:1px}
+  html.pcview.phone .menu .mlinks{margin-top:2px}
