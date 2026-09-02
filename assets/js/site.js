@@ -4,8 +4,6 @@
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var vh = function(){ return window.innerHeight; };
   var body = document.body, top = document.getElementById('top');
-  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  if(!location.hash){ window.scrollTo(0, 0); window.addEventListener('pageshow', function(e){ if(e.persisted) window.scrollTo(0, 0); }); }   /* v252 */
 
   /* EN toggle: every translatable container keeps its Japanese innerHTML from before any splitting or re-setting; the English lives in I18N (keyed by that Japanese) */
   var curLang = 'ja', PLACE_EN = {'岡崎':'Okazaki', 'ミシガン':'Michigan', '帰国':'Back to|Japan', '名古屋':'Nagoya', 'バー／|海外':'Bar /|abroad', 'バーと|海外':'Bar &|abroad', '大学院':'Grad|school', 'いま':'Now', 'バンコク':'Bangkok', 'バー':'Bar', '海外':'Abroad', 'バンコク|インターン':'Bangkok|internship', '作品':'Works', '制作':'Making', '連絡':'Contact', 'ジブンの|ゼンブを':'All of|myself'};
