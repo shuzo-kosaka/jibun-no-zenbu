@@ -378,8 +378,9 @@
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
+    window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
-    else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);
+    else setTimeout(function(){ if(!started){ hide(); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
     /* 先生の判（参考画像に合わせて）：桜型は花びら 5 枚・先に小さな切れ込み・丸い山。中は縦書き。
        押される回数で中身と形が変わる：1 回目「たいへんよくできました」（二重線の花）、
@@ -569,6 +570,7 @@
     if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc);
       var cs0 = getComputedStyle(body), bg0 = cs0.getPropertyValue('--bg') || '';
       document.documentElement.style.backgroundColor = bg0;
+      if(window.__rvHide) window.__rvHide();   /* v232: 横向きで章が変わるときは、案内用の帯の色（!important）が残っていれば外す（ハッシュ付きで開くと残ることがあった） */
       /* v212: 横持ちで読んでいる章の色を覚えておく。縦にしたときの案内はこの色で塗る */
       if(!window.matchMedia || window.matchMedia('(orientation:landscape)').matches) window.__landCols = {bg: bg0.trim(), fg: (cs0.getPropertyValue('--fg') || '').trim()};
     }   /* v206: html の地も場面の色に（固定の地の下から紙色が覗かないように） */
