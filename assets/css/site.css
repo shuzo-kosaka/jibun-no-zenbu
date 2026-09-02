@@ -2129,3 +2129,8 @@
   html.tablet #message{min-height:600vh}
   html.pcview.phone #message{min-height:480vh}
   html:not(.handheld) #contents .stamp-pic{right:calc(100% - var(--x4) + 1vw)}   /* v256: -1vw → +1vw（約 29px 左へ。パスポートには掛からない限界） */
+  /* v257: 三つのこと — 輪を回る点はやめ、足跡が輪を歩く（古い足跡から薄れて消える）。題には旗 */
+  #ch1pin .dg-sat{display:none}
+  .dgrp{fill:var(--fg2); opacity:0}
+  html.is-webkit .dgrp,html.is-webkit [filter="url(#dgrpink)"]{filter:none}
+  #dgsvg .dgflag{pointer-events:none}

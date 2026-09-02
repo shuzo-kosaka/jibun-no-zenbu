@@ -1530,13 +1530,17 @@
   }
   /* the diagram's incoming line arrives at the NEXT slot's x, then bends into the ring */
   var dgSat = document.getElementById('dgsat'), dgNodes = document.querySelectorAll('#ch1pin .dg-node'), dgStick = document.querySelector('#ch1pin .dg'), dgOn = false, dgLastA = 0;
+  var dgTrail = null, dgTrailF = [];   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1） */
   var DG_ANG = [-90, 148.4, 31.6];
   var orbitN = 0;
   (function orbit(now){
     /* v224: 指の端末では 2 フレームに 1 回（点が動くたびに図全体が描き直される。半分で十分なめらか） */
     if(dgSat && dgOn && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
       var a = ((now / 18000) * 360) % 360, rad = a * Math.PI / 180;
-      dgSat.setAttribute('cx', (500 + 300 * Math.cos(rad)).toFixed(1)); dgSat.setAttribute('cy', (440 - 300 * Math.sin(rad)).toFixed(1));   /* v119: the dot travels anticlockwise now — the y of the screen runs downward, so its sine is negated */
+      /* v257: 点はやめ、足跡が輪を歩く。歩き手の位置 f（輪の経路の割合、左端 a=180° から反時計回り）に対して、
+         通り過ぎたばかりの足跡ほど濃く、古いものから薄れて消える（後ろ 30% ぶんだけ残る） */
+      var f = ((((a - 180) / 360) % 1) + 1) % 1;
+      if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = ((f - dgTrailF[ti]) % 1 + 1) % 1, op = age < .02 ? age / .02 : age < .16 ? 1 : age < .30 ? 1 - (age - .16) / .14 : 0; dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
       DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
       dgLastA = a;
     }
@@ -1602,6 +1606,31 @@
   }
   window.__dgCaps = dgCaps;
   setTimeout(dgCaps, 0);
+  /* v257: 輪の足跡（一周ぶんを置いておき、orbit が濃さで「歩き」を表す）と、題の旗 */
+  function dgTrailBuild(){
+    var svg = document.getElementById('dgsvg'), ring = svg && svg.querySelector('.dg-ring'); if(!svg || !ring) return;
+    var old = svg.querySelector('.dgrps'); if(old) old.remove();
+    var r = svg.getBoundingClientRect(); if(!r.width) return;
+    var vbb = svg.viewBox && svg.viewBox.baseVal, vbw = (vbb && vbb.width) || 1000, k = vbw / r.width;
+    var g = footprints(svg, ring, 'dgrp', k, 12, 0);
+    g.setAttribute('class', 'dgrps');
+    ring.parentNode.insertBefore(g, ring.nextSibling);   /* 輪のすぐ上、判より下に */
+    var L = ring.getTotalLength(), step = FP_STEP * k, start = 12 * k;
+    dgTrail = g.querySelectorAll('.dgrp'); dgTrailF = [];
+    for(var i = 0; i < dgTrail.length; i++) dgTrailF.push(((start + i * step) / L) % 1);
+  }
+  function dgFlag(){
+    var svg = document.getElementById('dgsvg'), t = svg && svg.querySelector('.dg-title'); if(!t || t.querySelector('.dgflag')) return;
+    var big = t.querySelector('.big'); if(!big) return;
+    var bb; try{ bb = big.getBBox(); }catch(e){ return; }
+    var fl = flagSvg(), g = svgEl('g', {class:'dgflag'}), sc = 2.1;
+    /* 旗の竿の根元（6.5,39）を「WHAT」の右肩に */
+    g.setAttribute('transform', 'translate(' + (bb.x + bb.width + 10 - 6.5 * sc).toFixed(1) + ',' + (bb.y + bb.height * .18 - 39 * sc).toFixed(1) + ') scale(' + sc + ')');
+    while(fl.firstChild) g.appendChild(fl.firstChild);
+    (big.parentNode).appendChild(g);
+  }
+  window.addEventListener('load', function(){ setTimeout(function(){ dgTrailBuild(); dgFlag(); }, 120); });
+  window.addEventListener('resize', function(){ clearTimeout(dgTrailBuild.t); dgTrailBuild.t = setTimeout(dgTrailBuild, 300); }, {passive:true});
   function dgBuild(){
     var svg = document.getElementById('dgsvg'), inp = document.getElementById('dgin'); if(!svg || !inp) return;
     var r = svg.getBoundingClientRect(), x = (window.__srNextX !== undefined) ? window.__srNextX : r.left + r.width * .12;
