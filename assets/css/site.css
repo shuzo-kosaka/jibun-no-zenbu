@@ -1859,8 +1859,8 @@
   #rotok{position:fixed; left:50%; top:50%; width:min(46vw, 300px); aspect-ratio:1; z-index:290; pointer-events:none; opacity:0;
     transform:translate(-50%,-50%) scale(1.55) rotate(-12deg)}
   #rotok.on{animation:rotok 2.6s cubic-bezier(.2,.9,.3,1) forwards}
-  @keyframes rotok{0%{opacity:0; transform:translate(-50%,-50%) scale(1.55) rotate(-12deg)} 14%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-6deg)}
-    74%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-6deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.03) rotate(-6deg)}}
+  @keyframes rotok{0%{opacity:0; transform:translate(-50%,-50%) scale(1.55) rotate(-9deg)} 14%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-3deg)}
+    74%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-3deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.03) rotate(-3deg)}}
   #rotok svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
   #rotok .ink{position:absolute; inset:0; -webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
   #rotok .ink text{fill:#E84518; font-family:var(--mono); font-weight:500}
@@ -1875,3 +1875,7 @@
   #rotok .ink .pt{stroke-width:5.2}
   #rotok .ink .rg{fill:none; stroke:var(--acc); stroke-width:2.4}
   #rotok .ink .sp{stroke-width:2.4}
+  #rotok .ink .pt{stroke-width:4.6}
+  #rotok .ink .rg{fill:none; stroke:var(--acc); stroke-width:1.9}
+  #rotok .ink .tx text{font-family:var(--sans); font-weight:700; fill:var(--acc)}
+  .rotv .rtl.rv2 .w br ~ .ch{position:relative; left:.32em}   /* 「端末を横に。」の行だけ、少し右へ */

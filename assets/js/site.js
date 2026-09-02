@@ -350,8 +350,8 @@
     var H = document.documentElement;
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
-      ja: {small:'おっと、縦持ちになりました', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'画面は、横長のままです。'},
-      en: {small:'Oops — portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'The page stays in landscape.'}
+      ja: {small:'おっと、縦持ちになったようです。', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'できれば、横持ちでお楽しみください。'},
+      en: {small:'Oops — it seems we are in portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'If you can, enjoy it in landscape.'}
     };
     var recopied = false;
     function recopy(){
@@ -360,7 +360,7 @@
       var sm = rv.querySelector('small'), b = rv.querySelector('b.rtl'), w = b && b.querySelector('.w'), note = rv.querySelector('.rnote');
       if(sm) sm.textContent = c.small;
       if(note) note.textContent = c.note;
-      if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); if(typeof mixedSubs === 'function') mixedSubs(!en); }
+      if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); b.classList.add('rv2'); if(typeof mixedSubs === 'function') mixedSubs(!en); }
     }
     function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup'); }
     function show(){ if(!muted){ recopy(); rv.classList.remove('gone'); H.classList.add('rotvup'); } }
@@ -371,42 +371,40 @@
     /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
        回り終わってから始める。 */
     /* 途中で縦にして横へ戻したとき：案内が退場したあとに「よくできました」の判を押して、消える */
-    /* 花丸：定番の「たいへんよくできました」判の形。外に丸い花びらの輪（16 枚、弧で正確に描く）、
-       内に一重の輪、その上に蚊取り線香の小さな渦、まん中に文字。手描きの揺れは花びらの高さにだけ僅かに */
-    function hanamaruPetals(){
-      var N = 16, Rc = 78, cx = 100, cy = 100, d = '';
-      for(var i = 0; i <= N; i++){
-        var a = -Math.PI / 2 + Math.PI / N + i * 2 * Math.PI / N;   /* 谷（花びらの継ぎ目）の角度。天辺に山が来るよう半歩ずらす */
-        var x = cx + Rc * Math.cos(a), y = cy + Rc * Math.sin(a);
-        if(i === 0){ d += 'M' + x.toFixed(1) + ',' + y.toFixed(1); continue; }
-        var Rp = 90 + 1.6 * Math.sin(i * 2.3);                      /* 山の高さがほんの少しずつ違う */
-        var c = 2 * Rc * Math.sin(Math.PI / N), s = Rp - Rc * Math.cos(Math.PI / N), r = (c * c / 4 + s * s) / (2 * s);
-        d += ' A' + r.toFixed(1) + ',' + r.toFixed(1) + ' 0 0 1 ' + x.toFixed(1) + ',' + y.toFixed(1);
+    /* 桜型の判（先生の「たいへんよくできました」判）：花びら 5 枚、先に切れ込み、二重の輪郭、中は縦書き */
+    function sakuraPath(){
+      var d = '';
+      function P(a, r){ var t = a * Math.PI / 180; return (100 + r * Math.sin(t)).toFixed(1) + ',' + (100 - r * Math.cos(t)).toFixed(1); }
+      for(var k = 0; k < 5; k++){
+        var o = k * 72;
+        if(k === 0) d += 'M' + P(o - 36, 44);
+        d += ' C' + P(o - 42, 66) + ' ' + P(o - 31, 93) + ' ' + P(o - 8, 90)     /* 左の山 */
+           + ' Q' + P(o, 75) + ' ' + P(o + 8, 90)                                /* 先の切れ込み */
+           + ' C' + P(o + 31, 93) + ' ' + P(o + 42, 66) + ' ' + P(o + 36, 44);   /* 右の山 → 隣の花びらの付け根 */
       }
       return d + ' Z';
-    }
-    function hanamaruSwirl(){
-      var pts = [], cx = 100, cy = 66;
-      for(var i = 0; i <= 120; i++){ var t = i / 120, th = t * Math.PI * 4.6, r = 1.2 + 8.8 * t; pts.push([cx + r * Math.cos(th), cy + r * Math.sin(th)]); }
-      return 'M' + pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' L');
     }
     function rotOk(){
       var el = document.getElementById('rotok');
       if(!el){
         el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
+        var sp = sakuraPath();
         el.innerHTML = '<div class="ink"><svg viewBox="0 0 200 200">' +
-          '<path class="pt" d="' + hanamaruPetals() + '"/>' +
-          '<circle class="rg" cx="100" cy="100" r="64"/>' +
-          '<path class="sp" d="' + hanamaruSwirl() + '"/>' +
-          '<text class="c1" x="100" y="106" text-anchor="middle" font-size="21"></text>' +
-          '<text class="c2" x="100" y="131" text-anchor="middle" font-size="21"></text>' +
-          '<text class="en" x="100" y="151" text-anchor="middle" font-size="6.5"></text></svg></div>';
+          '<path class="pt" d="' + sp + '"/>' +
+          '<path class="rg" d="' + sp + '" transform="translate(100 100) scale(.855) translate(-100 -100)"/>' +
+          '<g class="tx"></g></svg></div>';
         document.body.appendChild(el);
       }
-      var en = (typeof curLang !== 'undefined' && curLang === 'en');
-      el.querySelector('.c1').textContent = en ? 'WELL' : 'よく';
-      el.querySelector('.c2').textContent = en ? 'DONE' : 'できました';
-      el.querySelector('.en').textContent = en ? 'ARIGATO · LANDSCAPE' : 'WELL DONE · 横持ち';
+      var en = (typeof curLang !== 'undefined' && curLang === 'en'), g = el.querySelector('.tx'), h = '';
+      if(en){
+        h = '<text x="100" y="97" text-anchor="middle" font-size="13.5">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>';
+      } else {
+        /* 縦書き三列、右から。上をそろえる */
+        var cols = ['たいへん', 'よくでき', 'ました'], xs = [121, 100, 79];
+        cols.forEach(function(c, i){ Array.from(c).forEach(function(ch, j){
+          h += '<text x="' + xs[i] + '" y="' + (87 + j * 16) + '" text-anchor="middle" font-size="14.5">' + ch + '</text>'; }); });
+      }
+      g.innerHTML = h;
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
