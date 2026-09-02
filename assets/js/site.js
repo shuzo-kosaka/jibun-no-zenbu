@@ -699,8 +699,9 @@
         /* v157: these two were fractions of the old 620vh screen. The screen is 840vh now, so in real distance
            the handwriting was still bright when the address arrived (they printed over each other) and the first
            paragraph came while the address was still standing in the middle. Both are back where they were. */
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .14);
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .10);   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
         ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
+        ms.classList.toggle('mdone', r.bottom < vh());   /* v231: ピンを通り過ぎた（手前ではない） */
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
@@ -715,7 +716,7 @@
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
         ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */
-        hwStill(p >= .14);   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        hwStill(p >= .10);   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
         var s2 = p >= .548 && p < .698;
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */

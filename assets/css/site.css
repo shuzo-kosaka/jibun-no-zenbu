@@ -1998,12 +1998,9 @@
   /* v224: 研究の図（タブレット）— 図の svg を自分のレイヤーに。段階が変わる間の描き直しをページから切り離す */
   html.handheld #seq .fig svg{will-change:transform; transform:translateZ(0)}
   /* v226: 「ここから先は…」は退場させない。ピンが外れたら画面固定をやめ、段の中に置いてそのまま流れていく */
-  #message .stick:not(.hold) .mh3{opacity:1 !important; visibility:visible !important; position:absolute; top:50%; left:0; right:0;
-    transform:translateY(-50%) !important; filter:none !important; transition:none !important}
   /* v226: 手書きの再浮上はなし（.hwback の規則を無効に） */
   #message .stick.dim.hwback .hw,#message .stick.dim.hwback:not(.hold) .hw{opacity:.16; transform:translateY(-6vh) scale(.92); filter:blur(1.5px); transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease)}
   /* v226: スマホ・タブレットは MESSAGE を短く（指のスクロールで 6 画面分あった。止まりの間隔 100vh → 約 70vh） */
-  html.handheld #message{min-height:540vh}
   /* v226: 締めの判までの助走と、判の後の余韻を少し短く（330vh → 290vh） */
   #ch7c .solopin{min-height:290vh}
   /* v226: スマホ — 三つのことの図を一回り小さくして、下端のタブバーに掛からないようにする */
@@ -2028,3 +2025,24 @@
   body:not(.opening) .ld,body:not(.opening) .ld *,body:not(.opening) .ld *::before,body:not(.opening) .ld *::after{animation-play-state:paused !important}
   #message .stick:not(.mwalkon) .mfp{animation-play-state:paused !important}
   html.is-webkit #message .stick.dim .hw{filter:none}   /* v230: ぼかしは WebKit で再描画のたびに掛け直される */
+  /* v231: 「ここから先は…」— ピンを通り過ぎた後（.mdone）だけ、段の中に置いて流す。手前（ピンに入る前）は従来どおり隠す。
+     置き場所は .body（中央の列）ではなく .stick（画面いっぱい）に。.body を基準にすると左の列に寄って見えた */
+  #message .stick.mdone .body{position:static}
+  #message .stick.mdone .mh3{opacity:1 !important; visibility:visible !important; position:absolute; left:0; right:0; top:50%; z-index:3;
+    transform:translateY(-50%) !important; filter:none !important; transition:none !important}
+  /* v231: 媒体ごとのスクロール量（PC を基準に、指の端末は短く） */
+  #message{min-height:640vh}
+  html.tablet #message{min-height:600vh}
+  html.pcview.phone #message{min-height:480vh}
+  html.pcview.phone #seq{height:calc(8 * 85vh)}
+  html.pcview.phone #ch5pin{min-height:330vh !important}
+  html.pcview.phone #ch7c .solopin{min-height:270vh}
+  /* v231: スマホの三つのこと — 下端のタブバー分（約 9vh）を残して大きく。文字も一回り */
+  html.pcview.phone #ch1pin .dg-svg{width:min(84vh, 92vw, 1040px); transform:translateY(-1.5vh)}
+  html.pcview.phone #ch1pin .dg-cap text{font-size:25px}
+  html.pcview.phone #ch1pin .dg-cap .ref{font-size:17px}
+  html.pcview.phone #ch1pin .dg-title .sub{font-size:26px}
+  html.pcview.phone #ch1pin text.en{font-size:38px} html.pcview.phone #ch1pin text.jp{font-size:26px} html.pcview.phone #ch1pin text.mini{font-size:15px}
+  /* v231: スマホの目次をもう少し下へ（題字の下に来るまで）。行間だけ少し詰めて見出しの行の上に収める */
+  html.pcview.phone #top .toc{top:calc(52% + 64px)}
+  html.pcview.phone #top .toc li,html.pcview.phone #top .toc li a{line-height:1.5}
