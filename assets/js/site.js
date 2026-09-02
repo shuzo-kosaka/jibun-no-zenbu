@@ -685,7 +685,7 @@
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
   var pins = document.querySelectorAll('.pin'), hw = document.getElementById('hw'), hwv = document.getElementById('hwv'), hwPlayed = false;
-  if(!document.documentElement.classList.contains('handheld')){ var fca = document.querySelector('#message .for-ca'); if(fca) fca.setAttribute('data-at', '.11'); }   /* v233: PC は最初の文をさらに早く（.16 → .11） */
+
   /* v130: the bar screen changes photograph as you go down it — a row of dots says how many there are and
      which one you are on, the way a counter does */
   pins.forEach(function(pin){
@@ -1990,7 +1990,7 @@
       e.preventDefault();
       /* v196: MESSAGE の中では、ひと振りのスクロールで必ず「次の丸」の内容へ進む。
          振り幅が小さくても大きくても、飛ばしたり手前で止まったりしない。端に来たらふつうのスクロールに戻す。 */
-      if(window.__msgStops){
+      if(false && window.__msgStops){   /* v253: 案 B — ひと振りで止まりへ飛ぶ仕組みは外し、ふつうの慣性スクロールで読む */
         var nowT = performance.now();
         if(snapping && flying){ snapLock = nowT + 420; return; }   /* v219: 飛行中の続きは錠を延ばして捨てる */
         if(nowT < snapLock){ snapLock = nowT + 260; return; }   /* v219: 余韻の続き（260ms 以内に次が来る限り同じひと振り）も捨てる。間が空けば新しいひと振り */

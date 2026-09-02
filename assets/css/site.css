@@ -2120,3 +2120,7 @@
   html:not(.phone) #ch1pin .dg{align-items:end; padding-bottom:28px}
   html:not(.phone) #ch1pin .dg-svg{width:auto; height:calc(100vh - 110px); max-width:92vw}
   #ch1pin .dg-title text{text-anchor:start}
+  #message{min-height:360vh}   /* v253: 案 B。止まりの間隔 85vh → 約 50vh */
+  html.tablet #message{min-height:600vh}
+  html.pcview.phone #message{min-height:480vh}
+  #message .body .p{transition-duration:.6s; transition-delay:calc(var(--i,0)*.08s)}   /* v253: 1.1s → .6s */
