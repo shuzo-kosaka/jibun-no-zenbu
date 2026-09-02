@@ -711,7 +711,10 @@
            paragraph came while the address was still standing in the middle. Both are back where they were. */
         var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .10);   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
         ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
-        ms.classList.toggle('mdone', r.bottom < vh());   /* v231: ピンを通り過ぎた（手前ではない） */
+        var wasDone = ms.classList.contains('mdone'), nowDone = r.bottom < vh();
+        if(nowDone !== wasDone){ ms.classList.toggle('mdone', nowDone);
+          if(nowDone){ var mh = ms.querySelector('.mh3'), op = (mh && mh.offsetParent) || ms, orr = op.getBoundingClientRect();
+            ms.style.setProperty('--mcx', (window.innerWidth / 2 - orr.left).toFixed(1) + 'px'); } }   /* v236: 外れた瞬間に、画面中央の位置を「実際の基準の箱」（offsetParent）からの距離で一度だけ測る */
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
@@ -1538,10 +1541,11 @@
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     svg.setAttribute('viewBox', '-380 20 1760 700');
     function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
-    shift(svg.querySelector('.dg-title'), 630, -540);   /* 題 → 右の列の上寄り（y 310〜412） */
+    shift(svg.querySelector('.dg-title'), -872, -720);   /* 題 → 左上（左端 x=-372、y 130〜232）。text-anchor は CSS で start に */
+    svg.querySelectorAll('.dg-cap tspan[dy]').forEach(function(t){ var d = parseFloat(t.getAttribute('dy')); if(d === 24) t.setAttribute('dy', '38'); else if(d === 26) t.setAttribute('dy', '40'); });   /* 行間を広く（28px の文字） */
     var caps = svg.querySelectorAll('.dg-cap');
     shift(caps[1], -440, -340);   /* 左下の説明 → 左の列 */
-    shift(caps[2], 362, -304);    /* 右下の説明 → 右の列、題の下（y 458〜518）。右下のボタン（x 1323〜）にも、右の判にも掛からない */
+    shift(caps[2], 362, -370);    /* 右下の説明 → 右の列（y 392〜470）。題は左上に移ったので上へ。右の判（上端 y≈490）にも右下のボタンにも掛からない */
   })();
   function dgBuild(){
     var svg = document.getElementById('dgsvg'), inp = document.getElementById('dgin'); if(!svg || !inp) return;

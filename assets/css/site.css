@@ -2063,4 +2063,12 @@
   html.pcview.phone #ch1pin .dg-cap .ref{font-size:20px}
   html.pcview.phone #ch1pin .dg-title .big{font-size:58px}
   html.pcview.phone #ch1pin .dg-title .sub{font-size:24px}
-  html.pcview.phone #ch1pin text.en{font-size:31px} html.pcview.phone #ch1pin text.jp{font-size:26px} html.pcview.phone #ch1pin text.mini{font-size:14px}
+  /* v236: 「ここから先は…」の中央合わせを、箱の幅や余白に依存しない形に。
+     ピンの中：画面の左 50% に置いて自分の幅の半分だけ戻す。通り過ぎた後：外れた瞬間に画面中央の位置（--mcx）を一度だけ測って置く */
+  #message .stick.hold .mh3{left:50%; right:auto; width:max-content; max-width:94vw; margin:0; transform:translate(-50%,-50%) !important}
+  #message .stick.mdone .mh3{left:var(--mcx, 50%); right:auto; width:max-content; max-width:94vw; margin:0; transform:translate(-50%,-50%) !important}
+  /* v236: スマホの三つのこと — 判の中の文字は枠に収める。説明は太く、行間を広く。題は左上へ */
+  html.pcview.phone #ch1pin text.en{font-size:24px} html.pcview.phone #ch1pin text.jp{font-size:24px} html.pcview.phone #ch1pin text.mini{font-size:11px}
+  html.pcview.phone #ch1pin .dg-cap text{font-weight:600}
+  html.pcview.phone #ch1pin .dg-cap .ref{font-weight:500}
+  html.pcview.phone #ch1pin .dg-title text{text-anchor:start}
