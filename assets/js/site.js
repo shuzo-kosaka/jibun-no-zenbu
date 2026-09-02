@@ -951,12 +951,14 @@
     h.classList.add('grid'); if(typeof togFit === 'function') togFit();
     gridTemp = setTimeout(function(){ gridTemp = 0; h.classList.remove('grid'); if(typeof togFit === 'function') togFit(); }, 5200);
   }
+  window.__annoSync = function(){ if(annoLive.length && !annoFollow.pending){ annoFollow.pending = true; cancelAnimationFrame(annoRaf); annoFollow(); } };
   function annoFollow(){
+    annoFollow.pending = false;
     if(!annoHere()){ annoClear(); return; }
     var H = vh(), W = window.innerWidth;
     annoLive.forEach(function(o){
       var r = o.t.getBoundingClientRect(), p = annoAt(o.t, o.m);
-      o.el.style.left = p.x.toFixed(1) + 'px'; o.el.style.top = p.y.toFixed(1) + 'px';
+      o.el.style.left = Math.round(p.x) + 'px'; o.el.style.top = Math.round(p.y) + 'px';   /* v219: 小数位置は縁が揺れて見える */
       if(o.m === 'centre' || o.m === 'far') o.el.classList.toggle('lft', p.x > W * .55);   /* a mark: the card is laid out to whichever side has room */
       o.el.classList.toggle('gone', r.bottom < 8 || r.top > H - 8 || p.y < 26 || p.y > H - 14);   /* what it points at has left the screen */
     });
@@ -1069,35 +1071,43 @@
     var cs = getComputedStyle(probe), mi = cs.maskImage || cs.webkitMaskImage || '';
     var mm = mi.match(/url\(["']?([^"')]+)["']?\)/); if(!mm) return;   /* 1 枚版はデータ URI、公開版は assets/img/…。解決済みの絶対 URL がここで手に入る */
     var url = mm[1];
+    /* v220: 紙目の絵を一度だけ読み込む。届く前に呼ばれたら、届いてからやり直す */
+    if(!inkSealTex.img || inkSealTex.img.src !== url){
+      var im0 = new Image(); im0.onload = function(){ inkSealTex.ready = true; inkSealTex(); }; im0.src = url; inkSealTex.img = im0; inkSealTex.ready = im0.complete && im0.naturalWidth > 0;
+    }
+    if(!inkSealTex.ready) return;
+    var tex = inkSealTex.img, N = tex.naturalWidth || 96, dpr = Math.min(2, window.devicePixelRatio || 1);
     /* .oval の「seal」は判ではなく、楕円の枠と、その縁に沿った文字（デザイナーとして／こさか しゅうぞう）。
        群ごと紙目を掛けると小さな文字が潰れて読めなくなるので、枠の線だけに掛ける。 */
     var targets = [];
     document.querySelectorAll('#dgsvg .seal, #mpsvg .seal').forEach(function(g){ targets.push(g); });
     document.querySelectorAll('.oval .seal').forEach(function(g){
       g.querySelectorAll('path').forEach(function(q){ targets.push(q); });
-      /* 文字にも同じ紙目を掛けるが、抜けきらないように下限を持たせる（そのまま掛けると小さな曲線文字が読めない）。
-         a' = .58 + .42a なので、いちばん薄いところでも 58% は残る。 */
       g.querySelectorAll('text').forEach(function(q){ q.setAttribute('data-sealsoft', '1'); targets.push(q); });
       if(g.getAttribute('data-sealtex')){ g.removeAttribute('data-sealtex'); g.removeAttribute('filter'); }
     });
-    targets.forEach(function(g){
+    targets.forEach(function(g, gi){
       var svg = g.ownerSVGElement; if(!svg) return;
       var bb; try{ bb = g.getBBox(); }catch(e){ return; }
       if(!bb || !bb.width || !bb.height) return;
-      /* 判ひとつにつきフィルタひとつ。紙目は「その判の枠いっぱいに伸ばした一枚」で、feTile は使わない。
-         ・feTile だと、貼る位置を原点に置いた版では判が原点から遠いと切り取られて丸ごと消え（デザイン・ヒト）、
-           位置を合わせても継ぎ目が白い十字になって出た。一枚に伸ばせば継ぎ目そのものが無い。
-         ・SVG の <mask> でも同じ絵になるが、地図のように毎フレーム描き直される SVG では判ごとに裏画面を作る
-           ことになり、17ms が 26ms（半分の滑らかさ）まで落ちた。フィルタは入力が変わらないので使い回される。 */
-      var px = bb.width * .12, py = bb.height * .12;
+      /* 判ひとつにつきフィルタひとつ。feTile は使わない（原点から遠い判が丸ごと消え、継ぎ目が白い十字に出た）。
+         v220: 以前は 96px の紙目を判の枠いっぱいに一枚引き伸ばしていたので、大きな判ほど紙目が粗く（まだらに）なり、
+         HTML の判（CSS マスク、96px で敷き詰め）と質感が揃わなかった。
+         いまは画面上の 96px 周期で敷き詰めた絵を canvas で作り、その一枚を枠いっぱいに貼る。縮尺は CSS マスクと同じになる。 */
+      var vb = svg.viewBox && svg.viewBox.baseVal, sr = svg.getBoundingClientRect();
+      var sc = (vb && vb.width && sr.width) ? sr.width / vb.width : 1;          /* 1 ユーザー単位が画面で何 px か */
+      var px = bb.width * .08, py = bb.height * .08;                             /* 線の太さの分だけ枠より外へ */
+      var rx = bb.x - px, ry = bb.y - py, rw = bb.width + px * 2, rh = bb.height + py * 2;
+      var W = Math.min(2048, Math.ceil(rw * sc * dpr)), H = Math.min(2048, Math.ceil(rh * sc * dpr));
+      if(W < 2 || H < 2) return;
+      var key = W + 'x' + H + ':' + N;
       var id = g.getAttribute('data-sealtex');
+      var defs = svg.querySelector('defs');
+      if(!defs){ defs = svgEl('defs', {}); svg.insertBefore(defs, svg.firstChild); }
       if(!id){
         id = 'sealtex' + (++inkmN); g.setAttribute('data-sealtex', id);
-        var defs = svg.querySelector('defs');
-        if(!defs){ defs = svgEl('defs', {}); svg.insertBefore(defs, svg.firstChild); }
         var f = svgEl('filter', {id:id, x:'-12%', y:'-12%', width:'124%', height:'124%'});
         var im = svgEl('feImage', {preserveAspectRatio:'none', result:'i'});
-        im.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url); im.setAttribute('href', url);
         f.appendChild(im);
         if(g.getAttribute('data-sealsoft')){
           var ct = svgEl('feComponentTransfer', {'in':'i', result:'s'});
@@ -1110,14 +1120,78 @@
         defs.appendChild(f);
       }
       var im2 = svg.querySelector('filter[id="' + id + '"] feImage');
-      if(im2){ im2.setAttribute('x', (bb.x - px).toFixed(1)); im2.setAttribute('y', (bb.y - py).toFixed(1));
-               im2.setAttribute('width', (bb.width + px * 2).toFixed(1)); im2.setAttribute('height', (bb.height + py * 2).toFixed(1)); }
+      if(im2){
+        if(im2.getAttribute('data-key') !== key){
+          var c = document.createElement('canvas'); c.width = W; c.height = H;
+          var ctx = c.getContext('2d'), k = 96 * dpr / N;                       /* 紙目 1 枚 = 画面 96px（CSS マスクと同じ） */
+          ctx.scale(k, k);
+          var pat = ctx.createPattern(tex, 'repeat');
+          if(pat){
+            var ox = (gi * 37) % 96 / k, oy = (gi * 53) % 96 / k;               /* 判ごとに位相をずらす */
+            ctx.translate(-ox, -oy); ctx.fillStyle = pat; ctx.fillRect(0, 0, W / k + ox + 1, H / k + oy + 1);
+          }
+          var du = c.toDataURL('image/png');
+          im2.setAttributeNS('http://www.w3.org/1999/xlink', 'href', du); im2.setAttribute('href', du); im2.setAttribute('data-key', key);
+        }
+        im2.setAttribute('x', rx.toFixed(1)); im2.setAttribute('y', ry.toFixed(1)); im2.setAttribute('width', rw.toFixed(1)); im2.setAttribute('height', rh.toFixed(1));
+      }
       if(g.getAttribute('mask')) g.removeAttribute('mask');
       /* 元の filter は html.is-webkit の規則で none にされている（生の feTurbulence が重いため）。
          id を差し替えればその規則に当たらなくなり、こちらが効く。id を ink… で始めないこと。 */
       if(g.getAttribute('filter') !== 'url(#' + id + ')') g.setAttribute('filter', 'url(#' + id + ')');
     });
   }
+  /* v222: WebKit では地図の印（到着印 6 つと、バンコクの判）を一度だけ canvas に描き、<image> で置く。
+     SVG フィルタ（紙目）は、別レイヤーに分けても飛行機が動くたびに掛け直されて 36fps 止まりだった。絵にすれば 60fps。
+     文字は stampG と同じ書体・寸法で描く（canvas は読み込み済みのウェブフォントを使える）。紙目は inkSealTex と同じ 96px 周期 */
+  function mapSealRaster(){
+    if(!document.documentElement.classList.contains('is-webkit')) return;
+    var host = document.getElementById('mpseals'); if(!host) return;
+    if(!inkSealTex.ready){ clearTimeout(mapSealRaster.t); mapSealRaster.t = setTimeout(mapSealRaster, 150); return; }
+    if(document.fonts && document.fonts.status !== 'loaded'){ document.fonts.ready.then(function(){ mapSealRaster(); }); return; }
+    var tex = inkSealTex.img, N = tex.naturalWidth || 96, dpr = Math.min(2, window.devicePixelRatio || 1);
+    var vb = host.viewBox && host.viewBox.baseVal, hr = host.getBoundingClientRect();
+    var sc = (vb && vb.width && hr.width) ? hr.width / vb.width : 1; if(!hr.width) return;
+    var cs = getComputedStyle(document.documentElement), sec = document.getElementById('ch5map');
+    var acc = ((sec && getComputedStyle(sec).getPropertyValue('--acc')) || cs.getPropertyValue('--acc') || '#E84518').trim();
+    var mono = (cs.getPropertyValue('--mono') || 'monospace').trim(), sans = (cs.getPropertyValue('--sans') || 'sans-serif').trim();
+    host.querySelectorAll('g.seal').forEach(function(g){
+      var sp = g.__spec; if(!sp) return;
+      var r = sp.r, R = r * 1.14, S = Math.min(1024, Math.ceil(2 * R * sc * dpr)), key = S + ':' + acc + ':' + sp.center;
+      var img = g.parentNode.querySelector('image.sealimg');
+      if(img && img.getAttribute('data-key') === key) return;
+      var c = document.createElement('canvas'); c.width = c.height = S;
+      var x = c.getContext('2d'), k = S / (2 * R);
+      x.scale(k, k); x.translate(R, R);
+      x.strokeStyle = acc; x.fillStyle = acc; x.lineJoin = 'round';
+      x.lineWidth = r * .045; x.beginPath(); x.arc(0, 0, r, 0, Math.PI * 2); x.stroke();
+      x.lineWidth = r * .02; x.beginPath(); x.arc(0, 0, r * .64, 0, Math.PI * 2); x.stroke();
+      /* 環の文字：左端から時計回り（SVG の textPath と同じ向き・始点） */
+      var fs = r * .13, ls = r * .028, rr = r * .8; x.font = '500 ' + fs + 'px ' + mono; x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+      var sdist = 2 * Math.PI * rr * .01, str = sp.ring || '';
+      for(var i = 0; i < str.length; i++){
+        var ch = str.charAt(i), w = x.measureText(ch).width, th = Math.PI + (sdist + w / 2) / rr;
+        if(sdist + w > 2 * Math.PI * rr) break;
+        x.save(); x.translate(rr * Math.cos(th), rr * Math.sin(th)); x.rotate(th + Math.PI / 2); x.fillText(ch, -w / 2, 0); x.restore();
+        sdist += w + ls;
+      }
+      x.textAlign = 'center';
+      x.font = '700 ' + (r * .3) + 'px ' + sans; x.fillText(sp.center || '', 0, sp.sub ? r * .04 : r * .12);
+      if(sp.sub){ x.font = '400 ' + (r * .12) + 'px ' + mono; var sub = sp.sub, sw = 0, ls2 = r * .02, i2; for(i2 = 0; i2 < sub.length; i2++) sw += x.measureText(sub.charAt(i2)).width + ls2; sw -= ls2; var sx = -sw / 2; x.textAlign = 'left'; for(i2 = 0; i2 < sub.length; i2++){ x.fillText(sub.charAt(i2), sx, r * .34); sx += x.measureText(sub.charAt(i2)).width + ls2; } }
+      /* 紙目：画面 96px 周期で敷き詰め、判の絵をその形に抜く */
+      x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-in';
+      var kk = 96 * dpr / N; x.scale(kk, kk); var pat = x.createPattern(tex, 'repeat');
+      if(pat){ x.fillStyle = pat; x.fillRect(0, 0, S / kk + 1, S / kk + 1); }
+      var du = c.toDataURL('image/png');
+      if(!img){ img = svgEl('image', {class:'sealimg', preserveAspectRatio:'none'}); g.parentNode.insertBefore(img, g.nextSibling); }
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', du); img.setAttribute('href', du);
+      img.setAttribute('x', (-R).toFixed(2)); img.setAttribute('y', (-R).toFixed(2)); img.setAttribute('width', (2 * R).toFixed(2)); img.setAttribute('height', (2 * R).toFixed(2)); img.setAttribute('data-key', key);
+      g.classList.add('rastered'); g.removeAttribute('filter');
+    });
+  }
+  window.__mapSealRaster = mapSealRaster;
+  window.addEventListener('load', function(){ setTimeout(mapSealRaster, 60); });
+  window.addEventListener('resize', function(){ clearTimeout(mapSealRaster.rt); mapSealRaster.rt = setTimeout(mapSealRaster, 260); }, {passive:true});
   window.__inkSealTex = inkSealTex;
   window.addEventListener('load', inkSealTex);
   var inkmT; window.addEventListener('resize', function(){ clearTimeout(inkmT); inkmT = setTimeout(inkSealTex, 200); }, {passive:true});
@@ -1146,6 +1220,7 @@
   /* a round 朱 seal as an SVG group, centred on 0,0 (radius r) */
   function stampG(r, ring, center, sub, seed){
     var g = svgEl('g', {class:'seal'}), id = 'sealf' + seed;
+    g.__spec = {r:r, ring:ring, center:center, sub:sub};   /* v222: WebKit で canvas に描き直すための元データ */
     g.innerHTML = '<defs><filter id="' + id + '" x="-12%" y="-12%" width="124%" height="124%"><feTurbulence type="fractalNoise" baseFrequency=".95" numOctaves="2" seed="' + seed + '" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="' + (seed + 7) + '" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.8 -.5" result="ga"/><feComposite in="d" in2="ga" operator="in"/></filter>' +
       '<path id="ringp' + seed + '" d="M 0 0 m ' + (-r * .8) + ' 0 a ' + (r * .8) + ' ' + (r * .8) + ' 0 1 1 ' + (r * 1.6) + ' 0 a ' + (r * .8) + ' ' + (r * .8) + ' 0 1 1 ' + (-r * 1.6) + ' 0"/></defs>' +
       '<g filter="url(#' + id + ')" fill="none" stroke="var(--acc)"><circle r="' + r + '" stroke-width="' + (r * .045) + '"/><circle r="' + (r * .64) + '" stroke-width="' + (r * .02) + '"/>' +
@@ -1155,12 +1230,12 @@
     return g;
   }
   /* ---------- CHECKPOINT 05 · the map: the route is flown as you scroll, the plane lands in Bangkok and the seal is pressed ---------- */
-  var mp = document.querySelector('#ch5map .mp'), mpProg = document.getElementById('mpprog'), mpPlane = document.getElementById('mpplane'), mpStops = document.querySelectorAll('#ch5map .stop'), mpL = 0, mpStopAt = [];
+  var mp = document.querySelector('#ch5map .mp'), mpProg = document.getElementById('mpprog'), mpPlane = document.getElementById('mpplane'), mpStops = document.querySelectorAll('#mpsvg .stop'), mpL = 0, mpStopAt = [], mpSeals = [];
   if(mp && mpProg){
     mpL = mpProg.getTotalLength();
     /* distance along the route at which each stop is reached: nearest point search */
     mpStopAt = Array.prototype.map.call(mpStops, function(st){ var c = st.querySelector('circle'), cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy'), best = 0, bd = 1e9; for(var l = 0; l <= mpL; l += 4){ var q = mpProg.getPointAtLength(l), d = (q.x - cx) * (q.x - cx) + (q.y - cy) * (q.y - cy); if(d < bd){ bd = d; best = l; } } return best; });
-    window.__mapStamp = function(){ var stampHost = document.getElementById('mpstamp'); if(!stampHost) return; while(stampHost.firstChild) stampHost.removeChild(stampHost.firstChild); stampHost.appendChild(svgEl('circle', {r:80, class:'mp-back'})); stampHost.appendChild(stampG(72, 'BANGKOK \u00b7 INTERNSHIP \u00b7 3 MONTHS \u00b7 2025 \u00b7 ', curLang === 'en' ? 'Bangkok' : 'バンコク', 'INTERN', 21));  if(window.__inkSealTex) window.__inkSealTex();};   /* a faint paper disc quiets the seals piling up under it */
+    window.__mapStamp = function(){ var stampHost = document.getElementById('mpstamp'); if(!stampHost) return; while(stampHost.firstChild) stampHost.removeChild(stampHost.firstChild); stampHost.appendChild(svgEl('circle', {r:80, class:'mp-back'})); stampHost.appendChild(stampG(72, 'BANGKOK \u00b7 INTERNSHIP \u00b7 3 MONTHS \u00b7 2025 \u00b7 ', curLang === 'en' ? 'Bangkok' : 'バンコク', 'INTERN', 21));  if(window.__inkSealTex) window.__inkSealTex(); if(window.__mapSealRaster) setTimeout(window.__mapSealRaster, 0);};   /* a faint paper disc quiets the seals piling up under it */
     window.__mapStamp();
     /* arrival seals: one per country (the start has none) */
     var CTRY = [null, ['KOREA', 'KR'], ['THAILAND', 'TH'], ['VIETNAM', 'VN'], ['CAMBODIA', 'KH'], ['SINGAPORE', 'SG'], ['MALDIVES', 'MV']];
@@ -1169,7 +1244,10 @@
       var c = st.querySelector('circle'), cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy');
       var wrap = svgEl('g', {transform:'translate(' + cx + ',' + cy + ')'}), inner = svgEl('g', {class:'mini', style:'--rot:' + ((i * 37) % 17 - 8) + 'deg'});
       inner.appendChild(stampG(22, CTRY[i][0] + ' \u00b7 ARRIVAL \u00b7 ' + CTRY[i][0] + ' \u00b7 ', CTRY[i][1], null, 40 + i));
-      wrap.appendChild(inner); st.appendChild(wrap); st.classList.add('sealed');
+      wrap.appendChild(inner); st.classList.add('sealed');
+      /* v221: 印は別の svg（#mpseals）に置く。飛行機の描き直しに巻き込まれない */
+      var host = document.querySelector('#mpseals .stops');
+      if(host){ var sx = svgEl('g', {class:'stop sealed', 'data-i':i}); sx.appendChild(wrap); host.appendChild(sx); mpSeals[i] = sx; } else st.appendChild(wrap);
     });
   }
   function mapUpdate(p){
@@ -1180,10 +1258,10 @@
     var head = f * mpL, q = mpProg.getPointAtLength(head), q2 = mpProg.getPointAtLength(Math.min(mpL, head + 1)), ang = Math.atan2(q2.y - q.y, q2.x - q.x) * 180 / Math.PI;
     mpPlane.setAttribute('transform', 'translate(' + q.x.toFixed(1) + ',' + q.y.toFixed(1) + ') rotate(' + (ang + 90).toFixed(1) + ') scale(1.1) translate(-12,-12)');
     mp.classList.toggle('fly', f > 0 && f < 1);
-    mpStops.forEach(function(st, i){ st.classList.toggle('on', head >= mpStopAt[i] - 2); });
+    mpStops.forEach(function(st, i){ var on = head >= mpStopAt[i] - 2; st.classList.toggle('on', on); if(mpSeals[i]) mpSeals[i].classList.toggle('on', on); });
     mp.classList.toggle('landed', f >= 1);
     /* v95: on a phone the map is larger than the screen and the camera follows the plane (a nod to the horizontally travelling magazine spreads) */
-    var svg = document.getElementById('mpsvg');
+    var svg = document.getElementById('mpsvg'), lsvg = document.querySelector('#ch5map .mp-land'), ssvg = document.getElementById('mpseals');
     if(svg){
       if(window.innerWidth <= 1024){
         var vb = svg.viewBox.baseVal, sw = svg.clientWidth, sh = svg.clientHeight;
@@ -1193,9 +1271,11 @@
           var tx = Math.max(0, Math.min(sw - vw, px - vw * .5));
           var ty = Math.max(0, Math.min(Math.max(0, sh - vhp * .64), py - vhp * .42));
           /* a transform (not left/top) so the CSS transition glides the map between scroll steps, and the compositor does the work */
-          svg.style.transform = 'translate3d(' + (-tx).toFixed(1) + 'px,' + (Math.round(vhp * .16) - ty).toFixed(1) + 'px,0)';   /* the head's band stays clear above */
+          svg.style.transform = 'translate3d(' + (-tx).toFixed(1) + 'px,' + (Math.round(vhp * .16) - ty).toFixed(1) + 'px,0)';
+          if(lsvg) lsvg.style.transform = svg.style.transform;
+          if(ssvg) ssvg.style.transform = svg.style.transform;   /* the head's band stays clear above */
         }
-      } else { svg.style.transform = ''; svg.style.left = ''; svg.style.top = ''; }
+      } else { svg.style.transform = ''; svg.style.left = ''; svg.style.top = ''; if(lsvg) lsvg.style.transform = ''; if(ssvg) ssvg.style.transform = ''; }
     }
   }
   /* footprints walking along a path: alternating left/right soles, rotated to the direction of travel, appearing one after another */
@@ -1557,15 +1637,62 @@
 
   /* in-page flights (the logo back to the top, contents, menu, the 小 button): one smooth run on requestAnimationFrame with a fixed short duration, whatever the distance. The heavy scroll-driven work of the pinned screens waits until landing, so the page glides instead of stuttering through them. A wheel, touch or key cancels the flight. */
   var flying = false, flyRaf = 0, snapping = false;   /* v196: 丸から丸へ送っている最中は、続くホイールで飛行を止めない */
+  /* v220: 章へ飛ぶときの「5 秒スキップ／巻き戻し」。章の距離 1 つにつき 5 秒 */
+  var CHAPS = ['ch1', 'ch2', 'ch3', 'ch4', 'ch5pin', 'ch6', 'ch7'];
+  var CHAP_OF = {top:0, message:0, contents:0, ch1pin:1, bridge:1, ch1:1, ch2:2, ch3:3, ch4:4, ch5pin:5, ch5:5, ch5map:5, ch5trip:5, ch5intern:5, ch6:6, ch7:7, works:8, ch7b:8, ch7c:8, contact:9};
+  function chapAt(y){   /* 文書位置 y に画面を置いたとき、画面の中央にある章 */
+    var secs = document.querySelectorAll('section[id]'), mid = y + window.innerHeight / 2, best = 0;
+    for(var i = 0; i < secs.length; i++){ var top = secs[i].getBoundingClientRect().top + window.scrollY; if(top <= mid && CHAP_OF[secs[i].id] !== undefined) best = CHAP_OF[secs[i].id]; }
+    return best;
+  }
+  var hud = null, hudT = 0, hudTick = 0;
+  function hudEl(){
+    if(!hud){ hud = document.createElement('div'); hud.id = 'skiphud'; hud.setAttribute('aria-hidden', 'true');
+      hud.innerHTML = '<div class="tri"><i></i><i></i></div><div class="tx"><b></b><span></span></div>'; document.body.appendChild(hud); }
+    return hud;
+  }
+  function skipHud(d){
+    if(!d) return;
+    var h = hudEl(), en = (typeof curLang !== 'undefined' && curLang === 'en'), n = Math.abs(d) * 5;
+    clearTimeout(hudT); clearInterval(hudTick);
+    h.classList.remove('jump'); h.classList.toggle('back', d < 0);
+    h.querySelector('b').textContent = n + (en ? 's' : '秒');
+    h.querySelector('span').textContent = d > 0 ? (en ? 'SKIP AHEAD' : 'スキップ') : (en ? 'REWIND' : '巻き戻し');
+    h.classList.remove('on'); void h.offsetWidth; h.classList.add('on');
+  }
+  /* 先頭へ／末尾へ：年が一つずつ巻き戻る（進む）数字。幕の間に読ませる */
+  function jumpHud(fromY, toY, onDone){
+    var h = hudEl(), en = (typeof curLang !== 'undefined' && curLang === 'en'), back = toY < fromY;
+    var fi = Math.max(0, Math.min(6, chapAt(fromY) - 1)), ti = Math.max(0, Math.min(6, chapAt(toY) - 1));
+    var years = [], i = fi;
+    while(true){ var sec = document.getElementById(CHAPS[i]); years.push(sec ? (sec.getAttribute('data-year') || '') : ''); if(i === ti) break; i += back ? -1 : 1; }
+    clearTimeout(hudT); clearInterval(hudTick);
+    h.classList.add('jump'); h.classList.toggle('back', back);
+    var b = h.querySelector('b'); b.textContent = years[0];
+    h.querySelector('span').textContent = back ? (en ? 'REWIND TO THE TOP' : '先頭へ巻き戻し') : (en ? 'FORWARD TO THE END' : '末尾へ早送り');
+    h.classList.remove('on'); void h.offsetWidth; h.classList.add('on');
+    var k = 0, step = 110;
+    hudTick = setInterval(function(){ k++; if(k < years.length){ b.textContent = years[k]; } else { clearInterval(hudTick); if(onDone) onDone(); } }, step);
+    return years.length * step;
+  }
+  document.querySelectorAll('#sr a[href^="#"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); skipTo(a.getAttribute('href')); }); });   /* v220 */
+  window.__skipHudOff = function(){ if(hud){ clearTimeout(hudT); hudT = setTimeout(function(){ hud.classList.remove('on'); }, 240); } };
+  function skipTo(id){
+    var el = id && document.querySelector(id); if(!el) return false;
+    var y = el.getBoundingClientRect().top + window.scrollY;
+    skipHud(chapAt(y) - chapAt(window.scrollY));
+    return flyToEl(id);
+  }
   var jcur = null;
   function curtainJump(y, done){
     if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
     clearTimeout(curtainJump.t1); clearTimeout(curtainJump.t2);
     void jcur.offsetWidth; jcur.classList.add('on');
+    var hold = jumpHud(window.scrollY, y) + 140;   /* v220: 年の数字が巻き戻り終わるまで幕を持つ */
     curtainJump.t1 = setTimeout(function(){
       window.scrollTo({top: y, behavior: 'instant'});
       done();
-      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); }, 260);
+      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); }, Math.max(260, hold - 320));
     }, 320);
   }
   function flyTo(y, rew){
@@ -1579,7 +1706,7 @@
     if(rew){ document.documentElement.classList.add('rewind'); document.documentElement.classList.toggle('fwd', dist > 0); }   /* v107: the same tape, wound the other way when the button sends you down */
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
-    function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); }
+    function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); if(!(jcur && jcur.classList.contains('on')) && window.__skipHudOff) window.__skipHudOff(); }
     /* v218: 指の端末では、巻き戻しボタンと長い飛行（画面 3 つ分より遠く）は幕を下ろして一足で着く。
        全章を通り抜ける飛行は iOS の描画プロセスを落とし、Safari がページを黙って読み直していた */
     if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land); return; }
@@ -1637,8 +1764,8 @@
     }
     function loop(){
       cur += (target - cur) * .13 * damp(cur);   /* v128: heavier — .32 followed the wheel almost exactly. v138: and gentler still as a seam comes up */
-      if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo({top:Math.round(cur), behavior:'instant'}); return; }
-      window.scrollTo({top:Math.round(cur), behavior:'instant'});   /* v113: html{scroll-behavior:smooth} would otherwise animate every one of these, and the two eases stacked into a long lag */
+      if(Math.abs(target - cur) < 1.2){ cur = target; active = false; raf = 0; window.scrollTo({top:Math.round(cur), behavior:'instant'}); if(window.__annoSync) window.__annoSync(); return; }
+      window.scrollTo({top:Math.round(cur), behavior:'instant'}); if(window.__annoSync) window.__annoSync();   /* v219: 札は書き込んだ位置に即座に合わせる */   /* v113: html{scroll-behavior:smooth} would otherwise animate every one of these, and the two eases stacked into a long lag */
       raf = requestAnimationFrame(loop);
     }
     window.addEventListener('wheel', function(e){
@@ -1655,7 +1782,8 @@
          振り幅が小さくても大きくても、飛ばしたり手前で止まったりしない。端に来たらふつうのスクロールに戻す。 */
       if(window.__msgStops){
         var nowT = performance.now();
-        if(nowT < snapLock) return;                       /* 同じひと振りの続きは捨てる */
+        if(snapping && flying){ snapLock = nowT + 420; return; }   /* v219: 飛行中の続きは錠を延ばして捨てる */
+        if(nowT < snapLock){ snapLock = nowT + 260; return; }   /* v219: 余韻の続き（260ms 以内に次が来る限り同じひと振り）も捨てる。間が空けば新しいひと振り */
         var ty = window.__msgStops(e.deltaY > 0 ? 1 : -1);
         if(ty !== null){ snapLock = nowT + 780; snapping = true; flyTo(ty); return; }
       }
@@ -1794,7 +1922,7 @@
     try{ if(localStorage.getItem('kosaka-deskview') === '1') apply(true); }catch(e){}
     btn.addEventListener('click', function(){ apply(!document.documentElement.classList.contains('deskview')); });
   })();
-  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } setTimeout(function(){ flyToEl(id); }, 350); }); });   /* v85: the CONTACT card opens the contact page */
+  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } setTimeout(function(){ skipTo(id); }, 350); }); });   /* v220: 5 秒スキップの札つき */   /* v85: the CONTACT card opens the contact page */
   window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && menu.classList.contains('open')) setMenu(false); });
 
   /* grid toggle */

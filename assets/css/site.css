@@ -1928,3 +1928,59 @@
   html.rewind .jcur{transition:opacity .26s var(--ease), background-color .4s, visibility 0s !important}
   html.handheld .rew .bands{mix-blend-mode:normal; opacity:.42}
   html.handheld .rew::after{mix-blend-mode:normal; opacity:.55}
+  /* v219: 足跡は上からゆっくり消える */
+  #message .mfp.off{transition:opacity 1.3s var(--ease)}
+  /* v219: 手書きは、引き継ぎの一文が退場してから浮かび上がる（ピンが外れた後） */
+  #message .stick.dim.hwback .hw{opacity:.16; transform:translateY(-6vh) scale(.92); filter:blur(1.5px); transition:opacity 1.2s var(--ease), transform 1.4s var(--ease), filter 1.2s var(--ease)}
+  #message .stick.dim.hwback:not(.hold) .hw{opacity:.62; transform:translateY(-2vh) scale(.96); filter:none; transition:opacity 1.4s var(--ease) .75s, transform 1.6s var(--ease) .75s, filter 1s var(--ease) .75s}
+  /* v219: 世の中全部の札 — メニューの幕の下では消す */
+  body.menuopen .anno{opacity:0 !important; transition:opacity .2s}
+  /* v219: スマホ — 題字がヘッダーのぼかしに掛からないよう少し下げる。楕円の写真は左を軸に一回り大きく */
+  html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 14px)}
+  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 172px); transform:scale(.78); transform-origin:0 0}   /* 題字を下げた分、目次もその下へ（重なっていた）。見出しの行までに収める */
+  html.pcview.phone #top .toc.on{transform:scale(.78)}
+  html.pcview.phone #top .ovals{transform:translate(-50%,-50%) scale(1.12); transform-origin:0 50%}
+  /* v219: スマホ — 研究の図と手順はヘッダーの下から始める。本文は一回り大きく */
+  html.pcview.phone #seq .fig{align-self:start; margin-top:calc(var(--hdh, 116px) + 12px); height:calc(100vh - var(--hdh, 116px) - 36px)}
+  html.pcview.phone #seq .steps{align-self:start; margin-top:calc(var(--hdh, 116px) + 6px)}
+  html.pcview.phone #seq .steps li{padding:2px 0}
+  html.pcview.phone #seq .steps li:not(.act) b,html.pcview.phone #seq .steps li:not(.act) strong{display:inline; line-height:1.3}
+  html.pcview.phone #seq .steps li:not(.act) b{margin-right:8px}
+  html.pcview.phone #seq .steps li:not(.act) strong{font-size:14px}
+  html.pcview.phone #seq .steps li.act strong{font-size:20px}
+  html.pcview.phone #seq .steps li span{font-size:17.5px; line-height:1.72}
+  html.pcview.phone #seq .steps li.act span{height:auto; max-height:12em}
+  /* v219: 判子の絵をパスポートの右へ逃がす（重なっていた） */
+  #contents .stamp-pic{right:calc(100% - var(--x4) - 1vw)}
+  /* v219: 地図の点描は別の <svg> に分け、飛行機や航路が動いても描き直さない */
+  #ch5map .mp-land{pointer-events:none}
+  /* v219: Safari — 模写の走り書きは SVG のタイルをやめ、描画済みの PNG（3 倍）を敷く */
+  html.is-webkit .wipe.scr .en .sc{background-image:url(../img/SCRAWL.png)}
+  /* v220: 章へ飛ぶときの「5 秒スキップ／5 秒巻き戻し」（動画の早送りの作法）。メニューの見出しと、チェックポイントの判から */
+  #skiphud{position:fixed; z-index:98; top:50%; right:16%; transform:translateY(-50%) scale(.84); width:138px; height:138px; border-radius:50%;
+    background:rgba(21,21,26,.82); color:#FBF7F2; display:grid; place-content:center; justify-items:center; gap:7px; opacity:0; pointer-events:none;
+    transition:opacity .2s var(--ease), transform .3s cubic-bezier(.2,1.3,.4,1); font-family:var(--mono); letter-spacing:.08em; text-align:center; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+  #skiphud.on{opacity:1; transform:translateY(-50%) scale(1)}
+  #skiphud.back{right:auto; left:16%}
+  #skiphud .tri{display:flex; gap:3px; height:16px}
+  #skiphud .tri i{display:block; width:0; height:0; border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:13px solid #FBF7F2; animation:skipTri .64s linear infinite}
+  #skiphud .tri i+i{animation-delay:.16s}
+  #skiphud.back .tri{transform:scaleX(-1)}
+  #skiphud .tx b{display:block; font-size:26px; font-weight:500; line-height:1; font-variant-numeric:tabular-nums}
+  #skiphud .tx span{display:block; font-size:10.5px; margin-top:5px; opacity:.85; white-space:nowrap}
+  @keyframes skipTri{0%,100%{opacity:.28} 40%{opacity:1}}
+  html.rewind #skiphud{transition:opacity .2s var(--ease), transform .3s cubic-bezier(.2,1.3,.4,1) !important}
+  /* 先頭へ／末尾へ（スマホの幕）：年が巻き戻る／進む数字を大きく */
+  #skiphud.jump{right:auto; left:50%; width:auto; height:auto; min-width:220px; padding:24px 34px 22px; border-radius:20px; transform:translate(-50%,-50%) scale(.84)}
+  #skiphud.jump.on{transform:translate(-50%,-50%) scale(1)}
+  #skiphud.jump .tx b{font-size:44px; letter-spacing:.04em}
+  #skiphud.jump .tx span{font-size:11.5px; margin-top:8px}
+  html.pcview.phone #skiphud{width:160px; height:160px} html.pcview.phone #skiphud .tx b{font-size:30px} html.pcview.phone #skiphud .tx span{font-size:12px}
+  html.pcview.phone #skiphud.jump{width:auto; height:auto}
+  /* v221: 地図の到着印は別の <svg>（自分の合成レイヤー）へ。飛行機と航路が動くたびに印のフィルタが掛け直されていた
+     （シミュレータの Safari：印のフィルタ有り 36fps → 無し 60fps）。点描の層も同じく昇格 */
+  #ch5map .mp-land,#ch5map .mp-seals,#ch5map #mpsvg{will-change:transform; transform:translateY(-46%) translateZ(0)}
+  #ch5map .mp-seals{pointer-events:none}
+  /* v222: WebKit — 地図の印は一度だけ canvas に描いた絵（紙目つき）で置く。SVG フィルタは毎フレーム掛け直されて 36fps 止まりだった */
+  html.is-webkit #mpseals .seal.rastered{display:none}
+  html.is-webkit #mpseals image.sealimg{pointer-events:none}
