@@ -1549,22 +1549,22 @@
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
     var caps = svg.querySelectorAll('.dg-cap');
-    shift(caps[0], 40, -20);   /* 上の説明は少し上へ（v249: 図解の分 +40）。左右の説明の位置は dgCaps が座標で決める（v245） */
+    shift(caps[0], 13, -20);   /* 上の説明は少し上へ（v250）。左右の説明の位置は dgCaps が座標で決める（v245） */
     /* v246: 題を左上へ（x -180、y 118〜220）、viewBox を横長にして図を大きく */
-    svg.setAttribute('viewBox', '-160 20 1400 780');   /* v249: 図解だけ 40 左へ（描画域を右へずらし、文字は +40 で据え置き） */
-    shift(svg.querySelector('.dg-title'), -640, -732);
+    svg.setAttribute('viewBox', '-187 20 1400 780');   /* v250: 左右の説明と判の間隔が等しくなる位置（両側 17）。文字は据え置き */
+    shift(svg.querySelector('.dg-title'), -667, -732);
   })();
   (function(){
     if(!document.documentElement.classList.contains('pcview') || !document.documentElement.classList.contains('phone')) return;
     var svg = document.getElementById('dgsvg'); if(!svg) return;
-    svg.setAttribute('viewBox', '-340 20 1760 700');   /* v249: 図解だけ 40 左へ */
+    svg.setAttribute('viewBox', '-328.5 20 1760 700');   /* v250: 左右の説明と判の間隔が等しくなる位置（両側 15.5） */
     function shift(el, tx, ty){ if(!el) return; var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('transform', 'translate(' + tx + ',' + ty + ')'); while(el.firstChild) g.appendChild(el.firstChild); el.appendChild(g); }
-    shift(svg.querySelector('.dg-title'), -832, -720);   /* 題 → 左上（左端 x=-372、y 130〜232）。text-anchor は CSS で start に */
+    shift(svg.querySelector('.dg-title'), -820.5, -720);   /* 題 → 左上（左端 x=-372、y 130〜232）。text-anchor は CSS で start に */
     svg.querySelectorAll('.dg-cap tspan[dy]').forEach(function(t){ var d = parseFloat(t.getAttribute('dy')); if(d === 24) t.setAttribute('dy', '38'); else if(d === 26) t.setAttribute('dy', '40'); });   /* 行間を広く（28px の文字） */
     var caps = svg.querySelectorAll('.dg-cap');
-    shift(caps[0], 80, 0);        /* 上の説明 → 少し右へ（v244）＋図解の分（v249） */
-    shift(caps[1], -400, -370);   /* 左下の説明 → 左の列（v249: +40） */
-    shift(caps[2], 402, -370);    /* 右下の説明 → 右の列（v249: +40） */
+    shift(caps[0], 91.5, 0);      /* 上の説明（v250） */
+    shift(caps[1], -388.5, -370);   /* 左下の説明 → 左の列（v250） */
+    shift(caps[2], 413.5, -370);    /* 右下の説明 → 右の列（v250） */
   })();
   /* v244: 三つのことの説明文 — 見出しと同じ混植（漢字＝ゴシック、かな＝明朝）を tspan で。行間は文字の大きさに合わせ、PC は長い行を分ける */
   function dgCaps(){
@@ -1582,8 +1582,8 @@
       var x = null;
       if(!phone){
         /* v248: 左の説明は題の左端（x -180）に左揃えで GATHER の判の横、右の説明は右端（x 1200）に右揃えで CROSSOVER の判の横 */
-        if(ci === 1){ x = '-140'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '572'); }   /* v249: +40 */
-        if(ci === 2){ x = '1240'; t.setAttribute('text-anchor', 'end'); t.setAttribute('y', '572'); }
+        if(ci === 1){ x = '-167'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '572'); }   /* v250 */
+        if(ci === 2){ x = '1213'; t.setAttribute('text-anchor', 'end'); t.setAttribute('y', '572'); }
       }
       while(t.firstChild) t.removeChild(t.firstChild);
       lines.forEach(function(l, i){
