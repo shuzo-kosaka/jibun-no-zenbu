@@ -347,27 +347,60 @@
     var land = window.matchMedia('(orientation:landscape)');
     var started = false, muted = false;
     function startOpening(){ if(started) return; started = true; setTimeout(loader, 280); }   /* 案内が薄くなりはじめてから幕を動かす */
-    function hide(){ rv.classList.add('gone'); }
-    function show(){ if(!muted) rv.classList.remove('gone'); }
+    var H = document.documentElement;
+    /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
+    var RECOPY = {
+      ja: {small:'おっと、縦持ちになりました', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'紙面はそのまま、横長でお待ちしています。'},
+      en: {small:'Oops — portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'The page is waiting for you, sideways.'}
+    };
+    var recopied = false;
+    function recopy(){
+      if(recopied) return; recopied = true;
+      var en = (typeof curLang !== 'undefined' && curLang === 'en'), c = en ? RECOPY.en : RECOPY.ja;
+      var sm = rv.querySelector('small'), b = rv.querySelector('b.rtl'), w = b && b.querySelector('.w'), note = rv.querySelector('.rnote');
+      if(sm) sm.textContent = c.small;
+      if(note) note.textContent = c.note;
+      if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); if(typeof mixedSubs === 'function') mixedSubs(!en); }
+    }
+    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup'); }
+    function show(){ if(!muted){ recopy(); rv.classList.remove('gone'); H.classList.add('rotvup'); } }
+    H.classList.add('rotvup');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
     if(land.matches){ hide(); startOpening(); }                                  /* すでに横向きなら、お願いする必要がない */
     else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);  /* 回さないまま置かれても止まらない */
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
     /* 端末の回転そのものに画面全体のアニメーションが走るので、そこへ重ねると出入りが見えない。
        回り終わってから始める。 */
     /* 途中で縦にして横へ戻したとき：案内が退場したあとに「よくできました」の判を押して、消える */
+    /* 花丸：ひと筆で花びらを一周し、最後に内へ小さく巻く。手の揺れを少し混ぜる */
+    function hanamaru(){
+      var pts = [], cx = 100, cy = 100, N = 420, petals = 11;
+      for(var i = 0; i <= N; i++){
+        var t = i / N, th = -Math.PI / 2 + t * Math.PI * 2 * 1.16;
+        var base = 66 + 10 * Math.min(1, t * 1.6);                      /* 始めは少し内から、だんだん外へ */
+        var r = base - 3 + 11 * Math.pow(Math.abs(Math.sin(petals * th / 2)), .55) + 1.2 * Math.sin(i * .61) + .7 * Math.cos(i * 1.7);
+        pts.push([cx + r * Math.cos(th), cy + r * Math.sin(th)]);
+      }
+      var th0 = -Math.PI / 2 + Math.PI * 2 * 1.16;
+      for(var k = 1; k <= 60; k++){                                       /* 終わりの巻き */
+        var u = k / 60, th2 = th0 + u * Math.PI * .9, rr = 76 - 30 * u;
+        pts.push([cx + rr * Math.cos(th2), cy + rr * Math.sin(th2)]);
+      }
+      return 'M' + pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' L');
+    }
     function rotOk(){
       var el = document.getElementById('rotok');
       if(!el){
         el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
-        el.innerHTML = '<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="rgba(245,242,236,.94)"/></svg>' +
-          '<div class="ink"><svg viewBox="0 0 200 200"><defs><path id="rokr" d="M 100 100 m -74 0 a 74 74 0 1 1 148 0 a 74 74 0 1 1 -148 0"/></defs>' +
-          '<g fill="none" stroke="#E84518"><circle cx="100" cy="100" r="88" stroke-width="4.2"/><circle cx="100" cy="100" r="62" stroke-width="1.6"/></g>' +
-          '<text font-size="10" letter-spacing="2.2"><textPath href="#rokr" startOffset="1%">WELL DONE \u00b7 横持ち \u00b7 ARIGATO \u00b7 WELL DONE \u00b7 </textPath></text>' +
-          '<text class="c" x="100" y="106" text-anchor="middle" font-size="17"></text>' +
-          '<text x="100" y="128" text-anchor="middle" font-size="8" letter-spacing="2.4">GOOD JOB</text></svg></div>';
+        el.innerHTML = '<div class="ink"><svg viewBox="0 0 200 200"><path d="' + hanamaru() + '"/>' +
+          '<text class="c1" x="100" y="94" text-anchor="middle" font-size="22"></text>' +
+          '<text class="c2" x="100" y="120" text-anchor="middle" font-size="22"></text>' +
+          '<text class="en" x="100" y="140" text-anchor="middle" font-size="7"></text></svg></div>';
         document.body.appendChild(el);
       }
-      el.querySelector('.c').textContent = (typeof curLang !== 'undefined' && curLang === 'en') ? 'WELL DONE' : 'よくできました';
+      var en = (typeof curLang !== 'undefined' && curLang === 'en');
+      el.querySelector('.c1').textContent = en ? 'WELL' : 'よく';
+      el.querySelector('.c2').textContent = en ? 'DONE' : 'できました';
+      el.querySelector('.en').textContent = en ? 'ARIGATO · 横持ち' : 'WELL DONE · 横持ち';
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
