@@ -2128,3 +2128,4 @@
   #message{min-height:440vh}
   html.tablet #message{min-height:600vh}
   html.pcview.phone #message{min-height:480vh}
+  html:not(.handheld) #contents .stamp-pic{right:calc(100% - var(--x4) + 1vw)}   /* v256: -1vw → +1vw（約 29px 左へ。パスポートには掛からない限界） */
