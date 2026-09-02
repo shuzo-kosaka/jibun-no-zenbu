@@ -1890,3 +1890,14 @@
   html.rotvup:not(.rotvup0){background-color:var(--rvbg, var(--shu)) !important}
   html.handheld .rotv.rvscene{background:var(--rvbg, var(--bg)); color:var(--rvfg, var(--fg))}
   .rotv.rvscene .ok path{stroke:var(--rvbg, var(--bg))}
+  /* 判の下地：紙面の見出しや本文と重なっても両方読めるよう、その場面の地色を薄く敷く */
+  #rotok .pad{position:absolute; inset:-3%; border-radius:50%; background:var(--bg); opacity:.84; filter:blur(7px)}
+  #rotok circle.pt{fill:none; stroke:var(--acc); stroke-width:4.4}
+  #rotok circle.rg{fill:none; stroke:var(--acc); stroke-width:1.8}
+  #rotok svg text{font-family:var(--sans); font-weight:700; fill:var(--acc)}
+  /* 引き継ぎの一文：pin が外れるとき、入ってきたときの逆をたどって去る（少し上へ、ぼけながら） */
+  #message .stick:not(.hold) .mh3{opacity:0; visibility:hidden; transform:translateY(-50%) translateY(-24px) !important; filter:blur(8px);
+    transition:opacity .6s var(--ease), transform .7s var(--ease), filter .6s var(--ease), visibility 0s .7s}
+  #message .stick:not(.hold) .mdown{opacity:0; visibility:hidden; transform:translateY(-18px) !important; filter:blur(6px);
+    transition:opacity .5s var(--ease), transform .6s var(--ease), filter .5s var(--ease), visibility 0s .6s}
+  #message .stick.hold .mh3,#message .stick.hold .mdown{transition:opacity .6s var(--ease), transform .7s var(--ease), filter .6s var(--ease)}

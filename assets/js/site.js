@@ -381,40 +381,57 @@
     if(land.matches){ hide(); startOpening(); }
     else setTimeout(function(){ if(!started){ hide(); startOpening(); } }, 5000);
     rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
-    /* 桜型の判（先生の「たいへんよくできました」判）：花びら 5 枚、先に切れ込み、二重の輪郭、中は縦書き */
+    /* 先生の判（参考画像に合わせて）：桜型は花びら 5 枚・先に小さな切れ込み・丸い山。中は縦書き。
+       押される回数で中身と形が変わる：1 回目「たいへんよくできました」（二重線の花）、
+       2 回目「がんばりましょう」（一重線の花）、3 回目から「もういちど復習しよう」（二重丸） */
     function sakuraPath(){
-      var d = '';
-      function P(a, r){ var t = a * Math.PI / 180; return (100 + r * Math.sin(t)).toFixed(1) + ',' + (100 - r * Math.cos(t)).toFixed(1); }
+      /* 花びらは円弧で組む（ベジエだと付け根で交差してしまう）。
+         花びらの円：中心から 52、半径 40。隣どうしは中心から 67.8 の点（付け根）で交わり、先端は 92 まで届く。
+         先の切れ込みは、花びらの円の外側 ±12° の二点から中心へ向けて 82 まで小さく折る */
+      var d = '', cx = 100, cy = 100, dist = 52, R = 40, cusp = 67.8, nt = 12 * Math.PI / 180;
+      function pt(a, r){ return [cx + r * Math.sin(a), cy - r * Math.cos(a)]; }
+      function f(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
       for(var k = 0; k < 5; k++){
-        var o = k * 72;
-        if(k === 0) d += 'M' + P(o - 36, 44);
-        d += ' C' + P(o - 42, 66) + ' ' + P(o - 31, 93) + ' ' + P(o - 8, 90)     /* 左の山 */
-           + ' Q' + P(o, 75) + ' ' + P(o + 8, 90)                                /* 先の切れ込み */
-           + ' C' + P(o + 31, 93) + ' ' + P(o + 42, 66) + ' ' + P(o + 36, 44);   /* 右の山 → 隣の花びらの付け根 */
+        var th = k * 2 * Math.PI / 5;
+        var A = pt(th - Math.PI / 5, cusp), B = pt(th + Math.PI / 5, cusp), C = pt(th, dist);
+        var N1 = [C[0] + R * Math.sin(th - nt), C[1] - R * Math.cos(th - nt)];
+        var N2 = [C[0] + R * Math.sin(th + nt), C[1] - R * Math.cos(th + nt)];
+        var V = pt(th, 82);
+        if(k === 0) d += 'M' + f(A);
+        d += ' A' + R + ',' + R + ' 0 0 1 ' + f(N1) + ' L' + f(V) + ' L' + f(N2) + ' A' + R + ',' + R + ' 0 0 1 ' + f(B);
       }
       return d + ' Z';
     }
+    function vcols(cols, xs, size, y0, pitch){
+      var h = '';
+      cols.forEach(function(c, i){ Array.from(c).forEach(function(ch, j){
+        h += '<text x="' + xs[i] + '" y="' + (y0 + j * pitch) + '" text-anchor="middle" font-size="' + size + '">' + ch + '</text>'; }); });
+      return h;
+    }
+    var rotOkN = 0;
     function rotOk(){
       var el = document.getElementById('rotok');
       if(!el){
         el = document.createElement('div'); el.id = 'rotok'; el.setAttribute('aria-hidden', 'true');
-        var sp = sakuraPath();
-        el.innerHTML = '<div class="ink"><svg viewBox="0 0 200 200">' +
-          '<path class="pt" d="' + sp + '"/>' +
-          '<path class="rg" d="' + sp + '" transform="translate(100 100) scale(.855) translate(-100 -100)"/>' +
-          '<g class="tx"></g></svg></div>';
+        el.innerHTML = '<div class="pad"></div><div class="ink"><svg viewBox="0 0 200 200"></svg></div>';
         document.body.appendChild(el);
       }
-      var en = (typeof curLang !== 'undefined' && curLang === 'en'), g = el.querySelector('.tx'), h = '';
-      if(en){
-        h = '<text x="100" y="97" text-anchor="middle" font-size="13.5">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>';
+      rotOkN++;
+      var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('svg'), sp = sakuraPath(), h = '';
+      if(rotOkN === 1){
+        h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>'
+                : vcols(['たいへん'], [119], 12.5, 90, 14) + vcols(['よくでき', 'ました'], [101, 82], 16, 88, 16.5);
+      } else if(rotOkN === 2){
+        h = '<path class="pt" d="' + sp + '"/>';
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">KEEP IT</text><text x="100" y="118" text-anchor="middle" font-size="19">UP</text>'
+                : vcols(['がんばり', 'ましょう'], [110, 89], 16.5, 86, 17);
       } else {
-        /* 縦書き三列、右から。上をそろえる */
-        var cols = ['たいへん', 'よくでき', 'ました'], xs = [121, 100, 79];
-        cols.forEach(function(c, i){ Array.from(c).forEach(function(ch, j){
-          h += '<text x="' + xs[i] + '" y="' + (87 + j * 16) + '" text-anchor="middle" font-size="14.5">' + ch + '</text>'; }); });
+        h = '<circle class="pt" cx="100" cy="100" r="88"/><circle class="rg" cx="100" cy="100" r="79"/>';
+        h += en ? '<text x="100" y="94" text-anchor="middle" font-size="12">ONE MORE</text><text x="100" y="116" text-anchor="middle" font-size="17">TIME</text>'
+                : vcols(['もういちど', '復習しよう'], [111, 89], 15.5, 78, 16.5);
       }
-      g.innerHTML = h;
+      svg.innerHTML = h;
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
