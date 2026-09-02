@@ -1879,7 +1879,7 @@
     new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) hwStill(true); }); }, {threshold:0}).observe(sec); })();
   /* v234: オープニングの再生中は、指・ホイール・キーのどれでもスクロールさせない */
   (function(){
-    function opening(){ return body.classList.contains('opening'); }   /* v251: 幕が上がって 1.2 秒で解除（#ld の消滅を待つと 1.4 秒余計に止まっていた） */
+    function opening(){ return body.classList.contains('opening') || !!document.getElementById('ld'); }
     window.addEventListener('touchmove', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
     window.addEventListener('wheel', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
     window.addEventListener('keydown', function(e){ if(opening() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
@@ -1905,19 +1905,18 @@
       curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); setTimeout(nudge, 420); setTimeout(function(){ jcur.style.display = 'none'; if(window.__retint) window.__retint(); }, 340); }, Math.max(260, hold - 320));
     }, 320);
   }
-  function flyTo(y, rew, durOverride){
+  function flyTo(y, rew){
     y = Math.max(0, Math.round(y)); var start = window.scrollY, dist = y - start;
     if(Math.abs(dist) < 2) return;
     if(reduce){ window.scrollTo({top:y, behavior:'instant'}); return; }
     cancelAnimationFrame(flyRaf);
     /* v106: the button at the end winds the page back like tape — a long spool that runs fast and eases out, the page stepping backwards a frame at a time */
-    var dur = durOverride || (rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10))), t0 = performance.now();
+    var dur = rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
     flying = true; document.documentElement.classList.add('flying');
     if(rew){ document.documentElement.classList.add('rewind'); document.documentElement.classList.toggle('fwd', dist > 0); }   /* v107: the same tape, wound the other way when the button sends you down */
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
-    function land(){ if(snapping) window.__snapLanded = performance.now();   /* v251: 着地直後に遅れて届くホイールを同じひと振りとして捨てるための印 */
-      flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); if(!(jcur && jcur.classList.contains('on')) && window.__skipHudOff) window.__skipHudOff(); }
+    function land(){ flying = false; snapping = false; document.documentElement.classList.remove('flying'); document.documentElement.classList.remove('rewind'); document.documentElement.classList.remove('fwd'); ticking = false; onScroll(); if(!(jcur && jcur.classList.contains('on')) && window.__skipHudOff) window.__skipHudOff(); }
     /* v218: 指の端末では、巻き戻しボタンと長い飛行（画面 3 つ分より遠く）は幕を下ろして一足で着く。
        全章を通り抜ける飛行は iOS の描画プロセスを落とし、Safari がページを黙って読み直していた */
     if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land, rew); return; }
@@ -1987,7 +1986,7 @@
         if((e.deltaY < 0 && !up) || (e.deltaY > 0 && !dn)) e.preventDefault();
         return;
       }
-      if(busy()){ if(!flying || snapping){ e.preventDefault(); if(snapping) snapLock = performance.now() + 420; } return; }   /* v251: 止まりへ飛んでいる間のホイールは素のスクロールにさせない（着地がずれていた） */
+      if(busy()){ if(!flying) e.preventDefault(); return; }   /* a sheet is open over the page: it holds still underneath. v234: オープニング中も止める */
       e.preventDefault();
       /* v196: MESSAGE の中では、ひと振りのスクロールで必ず「次の丸」の内容へ進む。
          振り幅が小さくても大きくても、飛ばしたり手前で止まったりしない。端に来たらふつうのスクロールに戻す。 */
@@ -1995,12 +1994,8 @@
         var nowT = performance.now();
         if(snapping && flying){ snapLock = nowT + 420; return; }   /* v219: 飛行中の続きは錠を延ばして捨てる */
         if(nowT < snapLock){ snapLock = nowT + 260; return; }   /* v219: 余韻の続き（260ms 以内に次が来る限り同じひと振り）も捨てる。間が空けば新しいひと振り */
-        if(nowT - (window.__snapLanded || 0) < 700){ snapLock = nowT + 260; return; }   /* v251: 短い飛行の着地後 0.7 秒は、遅れて届くひと振りの余韻として捨てる */
         var ty = window.__msgStops(e.deltaY > 0 ? 1 : -1);
-        if(ty !== null){ snapLock = nowT + 780; snapping = true;
-          /* v251: 着地を待たずに次の文を出し始め（飛行中は pinUpdate が止まるので消されない）、飛行も短く（650〜 → 420ms） */
-          if(window.__msgNext) window.__msgNext.forEach(function(el){ el.classList.add('in'); });
-          flyTo(ty, false, 420); return; }
+        if(ty !== null){ snapLock = nowT + 780; snapping = true; flyTo(ty); return; }
       }
       var d = e.deltaY * (e.deltaMode === 1 ? 34 : e.deltaMode === 2 ? window.innerHeight : 1);
       target = Math.max(0, Math.min(limit(), (active ? target : window.scrollY) + d));
@@ -2047,7 +2042,6 @@
       var ats = items.map(function(el){ return parseFloat(el.getAttribute('data-at')) || 0; });
       if(dir > 0){ for(i = 0; i < ats.length; i++){ if(ats[i] > p + .006) break; } if(i >= ats.length) return null; }
       else { for(i = ats.length - 1; i >= 0; i--){ if(ats[i] < p - .006) break; } if(i < 0) return null; }
-      window.__msgNext = items.filter(function(el){ return (parseFloat(el.getAttribute('data-at')) || 0) === ats[i]; });   /* v251: 先に見せる相手 */
       return r.top + window.scrollY + run * ats[i] + 6;
     };
     var nav = document.createElement('nav'); nav.className = 'remain'; nav.setAttribute('aria-label', 'このページの目次');
