@@ -375,9 +375,10 @@
     function rvBlock(e){ if(!rv.classList.contains('gone')) e.preventDefault(); }
     window.addEventListener('touchmove', rvBlock, {passive:false});
     window.addEventListener('wheel', rvBlock, {passive:false});
-    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
+    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); clearTimeout(hide.t); hide.t = setTimeout(function(){ if(rv.classList.contains('gone')){ rv.classList.add('off'); if(window.__retint) window.__retint(); } }, 1000); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
     function show(){
       if(muted) return;
+      clearTimeout(hide.t); rv.classList.remove('off');
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
@@ -579,6 +580,7 @@
       var cs0 = getComputedStyle(body), bg0 = cs0.getPropertyValue('--bg') || '';
       document.documentElement.style.backgroundColor = bg0;
       if(window.__setTheme) window.__setTheme(bg0.trim());   /* v239: theme-color も同じ色に */
+      if(window.__retint) window.__retint();   /* v242: 帯の色を採り直させる */
       if(window.__rvHide) window.__rvHide();   /* v232: 横向きで章が変わるときは、案内用の帯の色（!important）が残っていれば外す（ハッシュ付きで開くと残ることがあった） */
       /* v212: 横持ちで読んでいる章の色を覚えておく。縦にしたときの案内はこの色で塗る */
       if(!window.matchMedia || window.matchMedia('(orientation:landscape)').matches) window.__landCols = {bg: bg0.trim(), fg: (cs0.getPropertyValue('--fg') || '').trim()};
@@ -1770,6 +1772,7 @@
   }
   var hud = null, hudT = 0, hudTick = 0;
   function hudEl(){
+    if(hud) hud.style.display = '';
     if(!hud){ hud = document.createElement('div'); hud.id = 'skiphud'; hud.setAttribute('aria-hidden', 'true');
       hud.innerHTML = '<div class="tri"><i></i><i></i></div><div class="tx"><b></b><span></span></div>'; document.body.appendChild(hud); }
     return hud;
@@ -1802,7 +1805,7 @@
     return years.length * step;
   }
   document.querySelectorAll('#sr a[href^="#"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); skipTo(a.getAttribute('href')); }); });   /* v220 */
-  window.__skipHudOff = function(){ if(hud){ clearTimeout(hudT); hudT = setTimeout(function(){ hud.classList.remove('on'); }, 240); } };
+  window.__skipHudOff = function(){ if(hud){ clearTimeout(hudT); hudT = setTimeout(function(){ hud.classList.remove('on'); setTimeout(function(){ if(!hud.classList.contains('on')) hud.style.display = 'none'; }, 320); }, 240); } };
   function skipTo(id){
     var el = id && document.querySelector(id); if(!el) return false;
     var y = el.getBoundingClientRect().top + window.scrollY;
@@ -1829,12 +1832,15 @@
     window.addEventListener('keydown', function(e){ if(opening() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
   })();
   /* v239: theme-color（Safari が枠・帯・タブの色に使う）を場面の色に合わせる。案内の間は朱 */
+  /* v242: Safari（iOS 26）に帯・ツールバーの色を採り直させる。#tint（fixed、場面の色、透明）の display を切り替える */
+  var tintEl = document.createElement('div'); tintEl.id = 'tint'; tintEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tintEl);
+  window.__retint = function(){ tintEl.style.display = 'none'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tintEl.style.display = ''; }); }); };
   window.__setTheme = function(c){ var m = document.getElementById('themec'); if(!m){ m = document.createElement('meta'); m.name = 'theme-color'; m.id = 'themec'; document.head.appendChild(m); } if(c && m.getAttribute('content') !== c) m.setAttribute('content', c); };
   var jcur = null;
   function curtainJump(y, done, rew){
-    if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); document.body.appendChild(jcur); }
+    if(!jcur){ jcur = document.createElement('div'); jcur.className = 'jcur'; jcur.setAttribute('aria-hidden', 'true'); jcur.style.display = 'none'; document.body.appendChild(jcur); }
     clearTimeout(curtainJump.t1); clearTimeout(curtainJump.t2);
-    void jcur.offsetWidth; jcur.classList.add('on');
+    jcur.style.display = 'block'; void jcur.offsetWidth; jcur.classList.add('on');   /* v242: 隠れている間は display:none（Safari が古い色を採らないように） */
     var hold = rew ? jumpHud(window.scrollY, y) + 140 : 640;   /* v220: 先頭へ／末尾へは年の数字が送り終わるまで幕を持つ。章へのジャンプは skipTo の札（n 秒スキップ）をそのまま見せる */
     curtainJump.t1 = setTimeout(function(){
       window.scrollTo({top: y, behavior: 'instant'});
@@ -1843,7 +1849,7 @@
          JS 側は 1 フレーム後に色を更新している（計測済み）ので、幕の下で 1px だけ揺らして描き直しを起こす。幕が上がった後にも一度 */
       function nudge(){ var sy = window.scrollY; window.scrollTo({top: sy + 1, behavior: 'instant'}); requestAnimationFrame(function(){ window.scrollTo({top: sy, behavior: 'instant'}); }); }
       setTimeout(nudge, 140);
-      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); setTimeout(nudge, 420); }, Math.max(260, hold - 320));
+      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); setTimeout(nudge, 420); setTimeout(function(){ jcur.style.display = 'none'; if(window.__retint) window.__retint(); }, 340); }, Math.max(260, hold - 320));
     }, 320);
   }
   function flyTo(y, rew){

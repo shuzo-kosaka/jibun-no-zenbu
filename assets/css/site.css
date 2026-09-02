@@ -2085,3 +2085,10 @@
   html.cover.pcview.phone .cta-fx,html.cover.pcview.tablet .cta-fx{right:calc(28px + env(safe-area-inset-right, 0px))}
   html.cover.pcview .remain,html.cover.pcview #ch5pin .bgdot{left:calc(var(--x1) / 2 - 13px + env(safe-area-inset-left, 0px))}
   html.cover.pcview .yr{left:calc(97% - env(safe-area-inset-right, 0px))}
+  /* v242: iOS 26 Safari の帯・ツールバーの色は、theme-color でも html の地でもなく「画面の端に触れている fixed/sticky 要素の background-color」
+     から、描画のたびではなく初回描画やスクロール・display の切替時に採られる（擬似要素は対象外、opacity:0 でも対象）。
+     → 色を渡す専用の fixed 要素 #tint を置き、場面が変わるたび display を切り替えて採り直させる。
+     隠れている全画面の fixed 要素（幕・メニュー・案内・札）は display:none にして、古い色を採られないようにする */
+  #tint{position:fixed; inset:0; z-index:-2; background-color:var(--bg); opacity:0; pointer-events:none}
+  .menu:not(.open):not(.shown){display:none}
+  html.handheld .rotv.gone.off{display:none}
