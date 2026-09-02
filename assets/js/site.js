@@ -1836,7 +1836,11 @@
     curtainJump.t1 = setTimeout(function(){
       window.scrollTo({top: y, behavior: 'instant'});
       done();
-      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); }, Math.max(260, hold - 320));
+      /* v238: iOS Safari は一足のジャンプの後、安全域の帯（html の地色）を次のスクロールまで描き直さないことがある。
+         JS 側は 1 フレーム後に色を更新している（計測済み）ので、幕の下で 1px だけ揺らして描き直しを起こす。幕が上がった後にも一度 */
+      function nudge(){ var sy = window.scrollY; window.scrollTo({top: sy + 1, behavior: 'instant'}); requestAnimationFrame(function(){ window.scrollTo({top: sy, behavior: 'instant'}); }); }
+      setTimeout(nudge, 140);
+      curtainJump.t2 = setTimeout(function(){ jcur.classList.remove('on'); if(window.__skipHudOff) window.__skipHudOff(); setTimeout(nudge, 420); }, Math.max(260, hold - 320));
     }, 320);
   }
   function flyTo(y, rew){
