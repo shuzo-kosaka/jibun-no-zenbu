@@ -2100,7 +2100,7 @@
   #ch1pin .dg-cap .kn{font-family:var(--mincho); font-weight:900; font-size:1.02em}
   #ch1pin .dg-cap .pt{font-family:var(--mincho); font-weight:900}
   #ch1pin .dg-cap text{font-size:32px; letter-spacing:.03em}
-  #ch1pin .dg-cap .ref{font-size:18px; font-weight:500}
+  #ch1pin .dg-cap .ref{font-size:12px; font-weight:500}   /* v247: 参照行は元の大きさ（12）に戻す。1 行のまま */
   html[lang="en"] #ch1pin .dg-cap text{font-size:24px; letter-spacing:0}
   html.pcview.phone #ch1pin .dg-cap text{font-size:28px}
   html.pcview.phone #ch1pin .dg-cap .ref{font-size:20px}

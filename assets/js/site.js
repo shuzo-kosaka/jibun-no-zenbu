@@ -1571,7 +1571,7 @@
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     var phone = document.documentElement.classList.contains('pcview') && document.documentElement.classList.contains('phone');
     var ja = !(typeof curLang !== 'undefined' && curLang === 'en');
-    var dy1 = phone ? 42 : (ja ? 40 : 34), dy2 = phone ? 44 : (ja ? 42 : 36);
+    var dy1 = phone ? 42 : (ja ? 40 : 34), dy2 = phone ? 44 : (ja ? 36 : 32);
     var BIG = ['些細な差', '細部', '人', '場', '専門の外', 'デザイン'];   /* 見せたい語（v245） */
     var ns = 'http://www.w3.org/2000/svg';
     svg.querySelectorAll('.dg-cap text').forEach(function(t, ci){
@@ -1585,20 +1585,8 @@
         if(ci === 2){ x = '820'; t.setAttribute('text-anchor', 'start'); t.setAttribute('y', '372'); }
       }
       while(t.firstChild) t.removeChild(t.firstChild);
-      /* v246: PC・タブレットでは長い参照行を 2 行に（右端の年の札や画面の端に掛かっていた） */
-      if(!phone){
-        var out2 = [];
-        lines.forEach(function(l){
-          if(l.ref && l.text.length > 18){
-            var k = l.text.indexOf('\u3000'); if(k < 0) k = l.text.lastIndexOf(' ', Math.floor(l.text.length / 2));
-            if(k > 0){ out2.push({x:l.x, ref:true, text:l.text.slice(0, k)}); out2.push({x:l.x, ref:true, ref2:true, text:l.text.slice(k + 1)}); return; }
-          }
-          out2.push(l);
-        });
-        lines = out2;
-      }
       lines.forEach(function(l, i){
-        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', x || l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref2 ? 24 : (l.ref ? dy2 : dy1))); if(l.ref) ts.setAttribute('class', 'ref');
+        var ts = document.createElementNS(ns, 'tspan'); ts.setAttribute('x', x || l.x); ts.setAttribute('dy', i === 0 ? '0' : (l.ref ? dy2 : dy1)); if(l.ref) ts.setAttribute('class', 'ref');
         if(ja && !l.ref){
           var big = []; BIG.forEach(function(w){ var k = l.text.indexOf(w); while(k >= 0){ for(var q = k; q < k + w.length; q++) big[q] = true; k = l.text.indexOf(w, k + 1); } });
           Array.from(l.text).forEach(function(ch, k){ var c = document.createElementNS(ns, 'tspan'), cls = [];
