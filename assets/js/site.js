@@ -724,7 +724,7 @@
         var wasDone = ms.classList.contains('mdone'), nowDone = r.bottom < vh();
         if(nowDone !== wasDone){ ms.classList.toggle('mdone', nowDone);
           if(nowDone){ var mh = ms.querySelector('.mh3'), op = (mh && mh.offsetParent) || ms, orr = op.getBoundingClientRect();
-            ms.style.setProperty('--mcx', (window.innerWidth / 2 - orr.left).toFixed(1) + 'px'); } }   /* v236: 外れた瞬間に、画面中央の位置を「実際の基準の箱」（offsetParent）からの距離で一度だけ測る */
+            ms.style.setProperty('--mcx', (window.innerWidth / 2 - orr.left).toFixed(1) + 'px'); ms.style.setProperty('--mcy', (window.innerHeight / 2 - orr.top).toFixed(1) + 'px'); } }   /* v254: 縦も画面中央からの距離で */   /* v236: 外れた瞬間に、画面中央の位置を「実際の基準の箱」（offsetParent）からの距離で一度だけ測る */
         /* v192: 引き継ぎの一文は、これまで pin が外れた瞬間に（hold が外れて）ぱっと消えていた。
            最後の一割はスクロールに連れて薄くしていき、pin が外れるときにはもう見えていない状態にする。
            時間の遷移ではなくスクロールに紐づけるので、速く送っても途中で切られない。 */
@@ -735,17 +735,17 @@
           /* v202: 足跡は SCROLL の縦棒の代わりなので、スクロールしなくても歩き続ける（CSS のループ）。
              ここでは「一文の画面に居るか」の出し入れと、終盤に上から一歩ずつ消していく分だけを持つ。 */
           ms.classList.toggle('mwalkon', p >= .858);
-          var mOut = Math.round(Math.max(0, Math.min(1, (p - .93) / .07)) * mfs.length);
+          var mOut = Math.round(Math.max(0, Math.min(1, (p - .90) / .10)) * mfs.length);   /* v254: 区間が短くなった分、消し始めを少し早く */
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
-        ms.classList.toggle('mtail', p >= .93);   /* v201: 一文は画面に固定したまま。流さない */
+        ms.classList.toggle('mtail', p >= .90);   /* v254 */
         hwStill(p >= .10);   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
-        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .268);
-        var s2 = p >= .548 && p < .698;
+        if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .27);   /* v254: 止まりを詰めた分（最初の段落は .30 から） */
+        var s2 = p >= .50 && p < .66;   /* v254: 二つ目の見出しは .50 で来て、.68 の段落の少し前に退く */
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
         ms.classList.toggle('solo2', s2);   /* v155: the second address holds the middle of the screen */
-        ms.classList.toggle('away2', p >= .698);              /* and then recedes, and the paragraphs come in behind it */
-        pin.classList.toggle('gridon', p >= .573);   /* v104: the grid is drawn as the page says it loves grids. v161: at the very moment the address arrives, not a step before it */
+        ms.classList.toggle('away2', p >= .66);              /* v254 */
+        pin.classList.toggle('gridon', p >= .50);   /* v254: 見出しが来る瞬間に */
         if(p >= .573){ if(!pin.__gt) pin.__gt = setTimeout(function(){ pin.classList.add('gridgone'); }, 5600); }   /* held as long as the opening screen holds it, then let go */
         else { if(pin.__gt){ clearTimeout(pin.__gt); pin.__gt = 0; } pin.classList.remove('gridgone'); }   /* the address alone, large, until the text is due (a good two thirds of a screen of scrolling) */
       }

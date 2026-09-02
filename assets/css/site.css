@@ -2124,3 +2124,7 @@
   html.tablet #message{min-height:600vh}
   html.pcview.phone #message{min-height:480vh}
   #message .body .p{transition-duration:.6s; transition-delay:calc(var(--i,0)*.08s)}   /* v253: 1.1s → .6s */
+  #message .stick.mdone .mh3{top:var(--mcy, 50%)}
+  #message{min-height:440vh}
+  html.tablet #message{min-height:600vh}
+  html.pcview.phone #message{min-height:480vh}
