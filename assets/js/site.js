@@ -373,8 +373,8 @@
     var H = document.documentElement;
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
-      ja: {small:'おっと、縦持ちになったようです。', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'できれば、横持ちでお楽しみください。'},
-      en: {small:'Oops — it seems we are in portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'If you can, enjoy it in landscape.'}
+      ja: {small:'メールも、文字の遊びも、ありがとうございました。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'いただいたご連絡は、私にまっすぐ届きます。'},
+      en: {small:'Thank you — for the message, and for playing with the letters.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Whatever you send comes straight to me.'}
     };
     var recopied = false;
     function recopy(){
@@ -450,16 +450,16 @@
       var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('.ink svg'), bkg = el.querySelector('svg.bkg'), sp = sakuraPath(), h = '';
       if(rotOkN === 1){
         h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
-        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>'
-                : vcols(['たいへん', 'よくでき', 'ました'], [120, 100, 80], 15.5, 84, 16.5);
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="14">THANK</text><text x="100" y="119" text-anchor="middle" font-size="19">YOU</text>'
+                : vcols(['ありがと', 'うござい', 'ました'], [120, 100, 80], 15.5, 84, 16.5);   /* v287: お礼の判に */
       } else if(rotOkN === 2){
         h = '<path class="pt" d="' + sp + '"/>';
-        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">KEEP IT</text><text x="100" y="118" text-anchor="middle" font-size="19">UP</text>'
-                : vcols(['がんばり', 'ましょう'], [110, 89], 16.5, 86, 17);
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="12">THANK YOU</text><text x="100" y="118" text-anchor="middle" font-size="19">TOO</text>'
+                : vcols(['こちらこそ', 'ありがとう'], [110, 89], 15.5, 84, 16);
       } else {
         h = '<circle class="pt" cx="100" cy="100" r="88"/><circle class="rg" cx="100" cy="100" r="79"/>';
-        h += en ? '<text x="100" y="94" text-anchor="middle" font-size="12">ONE MORE</text><text x="100" y="116" text-anchor="middle" font-size="17">TIME</text>'
-                : vcols(['もういちど', '復習しよう'], [111, 89], 15.5, 78, 16.5);
+        h += en ? '<text x="100" y="94" text-anchor="middle" font-size="13">THANKS</text><text x="100" y="116" text-anchor="middle" font-size="17">AGAIN</text>'
+                : vcols(['なんども', 'ありがとう'], [111, 89], 15.5, 80, 16.5);
       }
       svg.innerHTML = h;
       bkg.innerHTML = rotOkN <= 2 ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
@@ -2083,7 +2083,8 @@
   function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
-  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
+  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');
+    if(body.classList.contains('menuopen') && typeof setMenu === 'function') setMenu(false);   /* v287: メニューを開いたままロゴで TOP へ飛ぶと、メニューが開きっぱなしだった */   /* v108: the mark and the name wind the page back too */
     if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(a.closest('#top .toc')){ if(!skipTo(h)) flyTo(0, rew); }   /* v237: TOP の目次も年数の札つき */ else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
 
   /* v126: the photographs are not offered for saving — the context menu and dragging are turned off over
