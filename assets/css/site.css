@@ -2165,3 +2165,8 @@
   html.pcview.phone .wkf:hover .ph,html.pcview.phone .wkf:focus-visible .ph{filter:url(#wkink2) !important; opacity:.92}
   html.pcview.phone .wkf.lit .ph{opacity:0 !important}
   html.pcview.phone .wkf.lit .phc{opacity:1}
+  /* v279: スマホ（cover）— TOP の縦幅（px）だけを増やして収める。横持ちの cover では画面の高さが 590px 相当しかなく、
+     題字 → CONTENTS → 添え書き → 回転文 → SCROLL の段が重なっていた。TOP の高さを 685px（cover 前の高さ）以上にし、
+     画面の高さ（vh）で決めていた段の位置（--y1〜--y3）も TOP の高さに追随させる。ノッチの無い機種（100vh ≥ 685）は今までどおり。
+     大きさ・横の配置・cover はそのまま。はみ出した分は最初の一画面の下に入り、少しスクロールすると現れる */
+  html.pcview.phone #top{height:max(100vh, 685px); min-height:max(100vh, 685px); --y1:calc(.14 * max(100vh, 685px)); --y2:calc(.32 * max(100vh, 685px)); --y3:calc(.71 * max(100vh, 685px))}
