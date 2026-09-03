@@ -2688,7 +2688,7 @@
     (function next(){
       var name = tries.shift(); if(!name) return;
       var im = new Image();
-      im.onload = function(){ if(im.naturalWidth > 200){ th.style.opacity = '0'; setTimeout(function(){ th.src = im.src; th.style.opacity = '1'; }, 300); } else next(); };
+      im.onload = function(){ if(im.naturalWidth > 200){ th.style.opacity = '0'; setTimeout(function(){ th.removeAttribute('srcset'); th.removeAttribute('sizes'); th.src = im.src; th.style.opacity = '1'; }, 300); } else next(); };   /* v272: 公開版は仮の絵に srcset が付く。srcset は src より優先されるので、外してから差し替える */
       im.onerror = next;
       im.src = 'https://img.youtube.com/vi/' + id + '/' + name + '.jpg';
     })();
