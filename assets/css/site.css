@@ -2197,3 +2197,12 @@
   html.pcview.phone #top .sub,html.pcview.phone #top .rot{left:calc(var(--x1) - 40px); transform:translateY(-22px)}
   html.pcview.phone #top .mean{margin-top:-48px}
   html.pcview.phone #top .toc .k{padding-left:18.5px}
+  /* v285: スマホの TOP（指示の 4 点）
+     ・「生まれた街も…」を 30px 下げる（字の下端が画面に収まる範囲で）
+     ・流れる文字と SEVEN CHECKPOINTS の左端を、目次の行（やっぱり、デザインで…）に揃え、もう少しだけ上へ
+     ・SCROLL はスマホでは出さない
+     ・楕円の写真を画面の中央に（横は左右対称に拡大、縦は画面の中央） */
+  html.pcview.phone #top .mean{margin-top:-18px}
+  html.pcview.phone #top .sub,html.pcview.phone #top .rot{left:calc(var(--x1) - 60px); transform:translateY(-36px)}
+  html.pcview.phone #top .scroll{display:none}
+  html.pcview.phone #top .ovals{transform-origin:50% 50%; top:50vh}
