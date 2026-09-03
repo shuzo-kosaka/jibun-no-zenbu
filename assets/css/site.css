@@ -2244,3 +2244,7 @@
   html.pcview.phone #cprot .cprot-tx b{font-size:21px} html.pcview.phone #cprot .cprot-tx > span{font-size:18px}
   html.pcview.phone #cprot svg{width:86px; height:86px}
   html.pcview.tablet #cprot .cprot-tx b{font-size:16px} html.pcview.tablet #cprot .cprot-tx > span{font-size:14px}
+  /* v290: メニューの判の下（2001 · OKAZAKI などの年と地名）の下に、少し空間を置く */
+  .menu .mseals .y{padding-bottom:14px}
+  html.pcview.phone .menu .mseals .y{padding-bottom:18px}
+  html.pcview.tablet .menu .mseals .y{padding-bottom:16px}
