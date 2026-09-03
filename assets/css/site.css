@@ -2150,5 +2150,5 @@
   /* v265: 足跡が着いた判は「いま」の判。人生のチェックポイントの現在地と同じ波紋（細い朱の枠が中心から広がって消える）を、
      判の外枠と同じ角丸で繰り返す。次の判に着くと移る。光る演出（v264）は撤去 */
   #ch1pin .dgpulse{fill:none; stroke:var(--acc); stroke-width:1.5; opacity:0; transform-box:fill-box; transform-origin:center; pointer-events:none}
-  #ch1pin .dg-node.now .dgpulse{animation:dgpulse 2.4s ease-out infinite}
-  @keyframes dgpulse{0%{transform:scale(.85); opacity:1} 100%{transform:scale(1.22); opacity:0}}
+  #ch1pin .dg-node.now .dgpulse{animation:dgpulse 2.4s ease-out 2}   /* v266: 二回。一番外側の線から広がる */
+  @keyframes dgpulse{0%{transform:scale(1); opacity:1} 100%{transform:scale(1.36); opacity:0}}
