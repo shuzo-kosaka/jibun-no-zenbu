@@ -411,6 +411,11 @@
       if(window.__retint) window.__retint();   /* v296: 帯の色を採り直させる（iOS は画面の端の固定要素＝#tint から採る） */
     }
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
+    if(!land.matches){   /* v298: 最初から縦持ちのときは、幕（オープニング）と同じように帯の色を採り直させる。
+       案内が出ている間はスクロールを止めているので、放っておくと最初に描いたときの色（紙）のまま残る */
+      var rt = function(){ if(window.__retint) window.__retint(); if(window.__setTheme) window.__setTheme('#E84518'); };
+      requestAnimationFrame(function(){ requestAnimationFrame(rt); }); setTimeout(rt, 350); setTimeout(rt, 1000); setTimeout(rt, 2200);
+    }
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
     window.__rvSuppress = function(){ hide(); };   /* v286: メールを送るを開いたとき（閉じたら戻す。閉じたことにはしない） */

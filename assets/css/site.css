@@ -2280,3 +2280,13 @@
   html.pcview.phone #top .tag{margin-top:-38px}
   /* v297: スマホの TOP — 「生まれた街も…」も右の帯と同じだけ上げる（v285 の -18px に、帯と同じ 38px 分を足す） */
   html.pcview.phone #top .mean{margin-top:-56px}
+  /* v298
+     ・横持ちの案内が出ている間は、下の紙面そのものを伏せる（固定の箱が前の向きの大きさのまま残ると、
+       タブバーのあたりから本体が透けて見えることがあった。メールを送るのときと同じ手当て）
+     ・メニューを閉じている最中もヘッダーは明るい配色のまま（途中で配色が戻ると JA の下地が消え、枠の線だけが残っていた）
+     ・スマホのメニューは、判と番号だけにする（章名と年・地名は出さない） */
+  html.rotvup body > section,html.rotvup body > footer,html.rotvup body > .yr,html.rotvup body > .rew,html.rotvup body > .remain,html.rotvup body > .cta-fx{visibility:hidden}
+  html.rotvup body::after{background:var(--rvbg, var(--shu)) !important; transition:none}
+  html.rotvup0 body::after{background:var(--shu) !important}
+  body.menuclosing .hd{--fg:#1C1B19; --fg2:#5A5955; --acc:#E84518; --bg:#F2F2EE; color:var(--fg)}
+  html.pcview.phone .menu .mseals .t,html.pcview.phone .menu .mseals .y{display:none}
