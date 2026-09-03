@@ -4,6 +4,11 @@
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var vh = function(){ return window.innerHeight; };
   var body = document.body, top = document.getElementById('top');
+  /* 開発者ツールを開いてくださった方へ */
+  try{
+    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n   コードの中まで見ていただけるのは、つくった側として何よりうれしいことです。\n   このサイトも、ひとつずつ手を動かしてつくりました。どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far. Every part of this site was made by hand, one piece at a time. Enjoy the rest of it. — Shuzo Kosaka',
+      'display:inline-block; background:#E84518; color:#FBF7F2; font:700 14px/1 serif; padding:6px 7px; border-radius:50%; margin-right:6px', 'color:#1C1B19; font:13px/1.7 -apple-system, system-ui, sans-serif');
+  }catch(e){}
 
   /* EN toggle: every translatable container keeps its Japanese innerHTML from before any splitting or re-setting; the English lives in I18N (keyed by that Japanese) */
   var curLang = 'ja', PLACE_EN = {'岡崎':'Okazaki', 'ミシガン':'Michigan', '帰国':'Back to|Japan', '名古屋':'Nagoya', 'バー／|海外':'Bar /|abroad', 'バーと|海外':'Bar &|abroad', '大学院':'Grad|school', 'いま':'Now', 'バンコク':'Bangkok', 'バー':'Bar', '海外':'Abroad', 'バンコク|インターン':'Bangkok|internship', '作品':'Works', '制作':'Making', '連絡':'Contact', 'ジブンの|ゼンブを':'All of|myself'};
@@ -98,7 +103,7 @@
         words.forEach(function(wd){ var k = txt.indexOf(wd); while(k >= 0){ for(var q = 0; q < wd.length; q++) if(chs[k + q]) chs[k + q].classList.add('big'); k = txt.indexOf(wd, k + wd.length); } });
       }
       /* each line's first glyph pulled left by its side bearing, like the titles */
-      var cv = document.createElement('canvas'), cx = cv.getContext('2d'), rows = [], first = true;
+      var cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently:true}), rows = [], first = true;
       Array.prototype.slice.call(w.childNodes).forEach(function(nd){ if(nd.nodeName === 'BR'){ first = true; return; } if(first && nd.classList && nd.classList.contains('ch') && nd.__t.trim()){ first = false; if(cx){ var cs = getComputedStyle(nd); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily; rows.push({el:nd, lsb:-cx.measureText(nd.__t).actualBoundingBoxLeft}); } } });
       var vertical = getComputedStyle(sub).writingMode !== 'horizontal-tb';
       if(rows.length > 1 && !vertical && getComputedStyle(sub).textAlign !== 'center'){ var mn = Math.min.apply(null, rows.map(function(r){ return r.lsb; })); rows.forEach(function(r){ r.el.style.marginLeft = (-(r.lsb - mn) * .8).toFixed(2) + 'px'; }); }
@@ -114,7 +119,7 @@
   mixedSubs(true);
   /* optical alignment of heading lines: the first glyph of each line is measured on a canvas (its own face, weight and size) and the difference in left side-bearing between the lines is cancelled, so the ink edges — not the boxes — stand on one vertical. Kana carry far more bearing than kanji, which is what made「デザインで人を」look inset. */
   function opticalAlign(){
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently:true}); if(!cx) return;
     document.querySelectorAll('.ttl:not(.vert)').forEach(function(h){
       var rows = [];
       h.querySelectorAll('.split').forEach(function(sp){ var c = sp.querySelector('.ch'); if(!c || !c.textContent.trim()) return; var cs = getComputedStyle(c); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily; var m = cx.measureText(c.textContent); rows.push({el:c, lsb:-m.actualBoundingBoxLeft}); });
@@ -125,7 +130,7 @@
   }
   /* the lines on the top page are a ruler: the small left-aligned texts are pulled left by their first glyph's side bearing, so the ink itself sits on X1 */
   function hugLine(){
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently:true}); if(!cx) return;
     var probe = document.createElement('span'); probe.style.cssText = 'position:absolute; left:-9999px; top:0; white-space:pre; visibility:hidden'; document.body.appendChild(probe);
     /* the blank before a glyph's ink: drawn large on a canvas and scanned (canvas ignores palt, so its trim is estimated from the advance it takes away, half on each side) */
     function inkLeft(ch, cs){ var px = parseFloat(cs.fontSize), S = 4; cv.width = Math.ceil(px * S * 2.2); cv.height = Math.ceil(px * S * 1.8); cx.clearRect(0, 0, cv.width, cv.height); cx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + (px * S) + 'px ' + cs.fontFamily; cx.textBaseline = 'middle'; cx.fillStyle = '#000'; var x0 = Math.round(px * S * .6); cx.fillText(ch, x0, cv.height / 2); var d = cx.getImageData(0, 0, cv.width, cv.height).data; for(var x = 0; x < cv.width; x++){ for(var y = 0; y < cv.height; y++){ if(d[(y * cv.width + x) * 4 + 3] > 40) return (x - x0) / S; } } return 0; }
@@ -144,7 +149,7 @@
   /* the katakana tag at the right starts at the same height as JIBUN no ZENBU wo: the ink tops are measured and the tag (rules and all) moves by the difference */
   function tagAlign(){
     var tag = top.querySelector('.tag'), rj = top.querySelector('.lbl b.rj .ln'), sp = tag && tag.querySelector('span'); if(!tag || !rj || !sp) return;
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently:true}); if(!cx) return;
     var rc = getComputedStyle(rj), F = parseFloat(rc.fontSize), LH = parseFloat(rc.lineHeight) || F * 1.12;
     cx.font = rc.fontStyle + ' ' + rc.fontWeight + ' ' + F + 'px ' + rc.fontFamily; var m = cx.measureText(rj.textContent.trim().charAt(0) || 'J');
     var A = m.fontBoundingBoxAscent || F * .9, D = m.fontBoundingBoxDescent || F * .2, cap = m.actualBoundingBoxAscent || F * .7;
@@ -857,7 +862,7 @@
     var cv = sp.__code; if(!cv){ cv = document.createElement('canvas'); cv.className = 'codebg'; cv.setAttribute('aria-hidden', 'true'); var st = sp.querySelector('.stick'); if(!st) return; st.appendChild(cv); sp.__code = cv; sp.__lines = []; }
     var W = window.innerWidth, H = vh(), dpr = Math.min(2, window.devicePixelRatio || 1);
     if(cv.__w !== W || cv.__h !== H){ cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.__w = W; cv.__h = H; sp.__lines = []; }
-    var ctx = cv.getContext('2d'); if(!ctx) return;
+    var ctx = cv.getContext('2d', {willReadFrequently:true}); if(!ctx) return;
     var lh = 20, rows = Math.ceil(H / lh) + 1, cols = W > 980 ? 2 : 1, colW = W / cols, total = rows * cols, lines = sp.__lines;
     while(lines.length < total) lines.push(codeLine());
     for(var k = 0; k < Math.max(2, Math.round(total * .1)); k++) lines[Math.floor(Math.random() * total)] = codeLine();
@@ -2661,13 +2666,25 @@
   wkTry();
   /* v86: the works' frames do nothing when clicked (they used to carry href="#", which went to the top) */
   document.querySelectorAll('.wkf').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }); });
+  /* v270: スマホ — タップで色が付くとき、白黒のフィルタを外す代わりに、色の写真（.phc）を下に敷いて白黒（.ph）を透明にする。
+     フィルタを外すと WebKit が写真を描き直し、その間だけ紙の白が見えていた。色の写真は最初にタップしたときに一枚だけ足す */
+  if(document.documentElement.classList.contains('phone')){
+    function wkLit(a){
+      document.querySelectorAll('.wkf.lit').forEach(function(o){ if(o !== a) o.classList.remove('lit'); });
+      if(!a) return;
+      var ph = a.querySelector('.ph'); if(ph && !a.querySelector('.phc')){ var c = ph.cloneNode(false); c.setAttribute('class', 'phc'); ph.parentNode.insertBefore(c, ph); }
+      a.classList.add('lit');
+    }
+    document.querySelectorAll('.wkf').forEach(function(a){ a.addEventListener('click', function(){ wkLit(a); }); });
+    document.addEventListener('touchstart', function(e){ if(!(e.target && e.target.closest && e.target.closest('.wkf'))) wkLit(null); }, {passive:true});
+  }
   /* (v102: the light now lives on the frame itself — see .wkf:hover in the sheet — so it travels with the photo) */
   /* (v95: the frames' ink moved to an svg filter in the defs — see build5_v74 DEFS/wkink2 — because WebKit never paints CSS filter functions on an svg <use>.) */
   /* video facades: the real YouTube thumbnail replaces the placeholder when it can be loaded (blocked in the preview sandbox, fine on the public site) */
   document.querySelectorAll('a.vid[href*="youtu"]').forEach(function(a){
     var m = a.getAttribute('href').match(/(?:youtu\.be\/|v=)([\w-]{6,})/), th = a.querySelector('img.th');
     if(!m || !th) return;
-    var id = m[1], tries = ['maxresdefault', 'hqdefault'];
+    var id = m[1], tries = ['maxresdefault', 'sddefault', 'hqdefault'];   /* v270: 1280 → 640 → 480 の順。無い解像度は 404 で次へ */
     (function next(){
       var name = tries.shift(); if(!name) return;
       var im = new Image();

@@ -2160,3 +2160,8 @@
   body:not(.past) .cta-fx{pointer-events:none; visibility:hidden; transition:opacity .6s var(--ease), transform .6s var(--ease), visibility 0s .6s}
   /* v269: 写真の拡大（.lb）は、世の中ゼンブ、デザインじゃん。の注釈の札（.anno 90）より上に。ヘッダー 88、幕 96 の間 */
   .lb{z-index:92}
+  /* v270: スマホ — タップで色が付くとき、白黒のフィルタは外さない（.ph はそのまま）。下に敷いた色の写真（.phc）を、白黒を透明にして見せる */
+  .wkf .phc{filter:none; opacity:.92}
+  html.pcview.phone .wkf:hover .ph,html.pcview.phone .wkf:focus-visible .ph{filter:url(#wkink2) !important; opacity:.92}
+  html.pcview.phone .wkf.lit .ph{opacity:0 !important}
+  html.pcview.phone .wkf.lit .phc{opacity:1}
