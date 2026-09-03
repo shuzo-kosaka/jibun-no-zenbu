@@ -2269,3 +2269,12 @@
   html.pcview.phone #top .toc{display:none}
   html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 21px)}
   html.pcview.phone #top .sub,html.pcview.phone #top .rot{transform:translateY(-173px)}
+  /* v296
+     ・横持ちの案内が出ているあいだは、帯の色のもとになる #tint も案内と同じ色にする
+       （iOS は画面の端の固定要素から色を採るので、html の地だけ朱にしても帯は前の場面の色のままだった）
+     ・スマホの TOP：流れる文字と SEVEN CHECKPOINTS を写真の下まで下げる
+     ・スマホの TOP：右の「コサカシュウゾウの ポートフォリオ」は題字と高さを揃えず、少し上へ */
+  html.rotvup #tint{background-color:var(--shu)}
+  html.rotvup:not(.rotvup0) #tint{background-color:var(--rvbg, var(--shu))}
+  html.pcview.phone #top .sub,html.pcview.phone #top .rot{transform:translateY(-81px)}
+  html.pcview.phone #top .tag{margin-top:-46px}

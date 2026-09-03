@@ -408,6 +408,7 @@
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
       var sv = rv.querySelector('svg'); if(sv){ sv.style.display = 'none'; void sv.offsetWidth; sv.style.display = ''; }   /* v281: 端末の絵の動きを頭から。止まったまま出ると縦横の絵が重なって見える */
       rv.classList.remove('gone'); H.classList.add('rotvup'); if(window.__setTheme) window.__setTheme((c && c.bg) || '#E84518');
+      if(window.__retint) window.__retint();   /* v296: 帯の色を採り直させる（iOS は画面の端の固定要素＝#tint から採る） */
     }
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
