@@ -397,6 +397,7 @@
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
+      var sv = rv.querySelector('svg'); if(sv){ sv.style.display = 'none'; void sv.offsetWidth; sv.style.display = ''; }   /* v281: 端末の絵の動きを頭から。止まったまま出ると縦横の絵が重なって見える */
       rv.classList.remove('gone'); H.classList.add('rotvup'); if(window.__setTheme) window.__setTheme((c && c.bg) || '#E84518');
     }
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
@@ -1908,6 +1909,7 @@
     h.querySelector('b').textContent = n + (en ? (n === 1 ? ' YEAR' : ' YEARS') : '年');
     h.querySelector('span').textContent = d > 0 ? (en ? 'FAST-FORWARD' : '早送り') : (en ? 'REWIND' : '巻き戻し');   /* v259: スキップ → 早送り */
     h.classList.remove('on'); void h.offsetWidth; h.classList.add('on');
+    clearTimeout(skipHud.safe); skipHud.safe = setTimeout(function(){ if(window.__skipHudOff) window.__skipHudOff(); }, 5200);   /* v281: 万一どの経路も通らなくても、札は 5 秒あまりで畳む */
   }
   /* 先頭へ／末尾へ：年が一つずつ巻き戻る（進む）数字。幕の間に読ませる */
   function jumpHud(fromY, toY, onDone){
@@ -1974,8 +1976,8 @@
   }
   function flyTo(y, rew){
     y = Math.max(0, Math.round(y)); var start = window.scrollY, dist = y - start;
-    if(Math.abs(dist) < 2) return;
-    if(reduce){ window.scrollTo({top:y, behavior:'instant'}); return; }
+    if(Math.abs(dist) < 2){ if(window.__skipHudOff) window.__skipHudOff(); return; }
+    if(reduce){ window.scrollTo({top:y, behavior:'instant'}); if(window.__skipHudOff) window.__skipHudOff(); return; }   /* v281: 一足で着く経路も札を畳む（動きを止めた設定のとき、章へ飛ぶたびに札が残っていた） */
     cancelAnimationFrame(flyRaf);
     /* v106: the button at the end winds the page back like tape — a long spool that runs fast and eases out, the page stepping backwards a frame at a time */
     var dur = rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
@@ -2072,7 +2074,7 @@
     window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
     window.addEventListener('keydown', function(){ if(active){ active = false; cancelAnimationFrame(raf); raf = 0; } }, {passive:true});
   })();
-  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); }
+  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
   document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');   /* v108: the mark and the name wind the page back too */
