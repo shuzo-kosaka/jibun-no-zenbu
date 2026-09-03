@@ -2221,11 +2221,11 @@
   html.pcview.phone .menu-in{padding-bottom:56px}
   html.cpopen .cpage.in{background:var(--paper)}
   #cprot{position:fixed; right:3.4%; bottom:calc(3.4% + env(safe-area-inset-bottom, 0px)); z-index:97; display:flex; align-items:center; gap:14px;
-    padding:14px 20px 14px 16px; border:1px solid var(--line); border-radius:14px; background:var(--card, #FAFAF8); color:var(--fg);
+    padding:14px 20px 14px 16px; border:1px solid #D6D4CE; border-radius:14px; background:#FAFAF8; color:#1C1B19;   /* 章の地色に連れて --card が半透明になる場面があり、透けて見えていた。紙の色で固定（メールの紙面は常に明るい） */
     box-shadow:0 10px 30px rgba(28,27,25,.10); pointer-events:none; opacity:0; transform:translateY(10px);
     transition:opacity .5s var(--ease), transform .6s cubic-bezier(.2,.8,.2,1); max-width:min(78vw, 620px)}
   #cprot.on{opacity:1; transform:none}
-  #cprot svg{width:56px; height:56px; flex:none; color:var(--fg)}
+  #cprot svg{width:56px; height:56px; flex:none; color:#1C1B19}
   #cprot .pP,#cprot .pL{transform-origin:110px 100px}
   #cprot .pP{animation:rvP 4.4s cubic-bezier(.45,0,.15,1) infinite reverse}
   #cprot .pL{animation:rvL 4.4s cubic-bezier(.45,0,.15,1) infinite reverse; opacity:0}
@@ -2233,8 +2233,14 @@
   #cprot .ok{transform-origin:162px 76px; animation:cpOK 4.4s cubic-bezier(.2,.9,.3,1) infinite}
   @keyframes cpOK{0%,72%{transform:scale(.3); opacity:0} 80%{transform:scale(1.18); opacity:1} 84%,100%{transform:scale(1); opacity:1}}
   #cprot .cprot-tx{display:flex; flex-direction:column; gap:4px; min-width:0}
-  #cprot .cprot-tx b{font-family:var(--mincho); font-weight:700; font-size:17px; letter-spacing:.04em; line-height:1.5; white-space:nowrap}
-  #cprot .cprot-tx span{font-family:var(--sans); font-size:12px; letter-spacing:.06em; color:var(--fg2)}
-  html.pcview.phone #cprot .cprot-tx b{font-size:26px} html.pcview.phone #cprot .cprot-tx span{font-size:18px}
+  #cprot .cprot-tx b{font-family:var(--mincho); font-weight:700; font-size:13.5px; letter-spacing:.04em; line-height:1.5; white-space:nowrap}
+  #cprot .cprot-tx b .ch{display:inline-block}
+  #cprot .cprot-tx b .ch.kj{font-family:var(--sans); font-weight:700; font-size:.94em; letter-spacing:.005em}
+  #cprot .cprot-tx b .ch.kn{font-family:var(--mincho); font-weight:900; font-size:1.02em}
+  #cprot .cprot-tx b .ch.pt{font-family:var(--mincho); letter-spacing:-.06em; color:#E84518}
+  #cprot .cprot-tx b .ch.big{font-size:1.26em}
+  html[lang="en"] #cprot .cprot-tx b .ch{font-family:inherit; font-weight:inherit; font-size:1em; margin:0}
+  #cprot .cprot-tx > span{font-family:var(--sans); font-size:12px; letter-spacing:.06em; color:#5A5853}
+  html.pcview.phone #cprot .cprot-tx b{font-size:21px} html.pcview.phone #cprot .cprot-tx > span{font-size:18px}
   html.pcview.phone #cprot svg{width:86px; height:86px}
-  html.pcview.tablet #cprot .cprot-tx b{font-size:20px} html.pcview.tablet #cprot .cprot-tx span{font-size:14px}
+  html.pcview.tablet #cprot .cprot-tx b{font-size:16px} html.pcview.tablet #cprot .cprot-tx > span{font-size:14px}

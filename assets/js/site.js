@@ -88,7 +88,7 @@
   ttlWords(true);
   /* ch7's two subheads (.mixed): set like a chapter title — split per character (the <br> kept), kanji gothic / kana mincho, the data-big words larger, kerned by pair, the lines optically aligned */
   function mixedSubs(ja){
-    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed, .rotv .rtl.mixed').forEach(function(sub){
+    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed, .rotv .rtl.mixed, #cprot .cprot-tx b.mixed').forEach(function(sub){
       var w = sub.querySelector('.w'); if(!w) return;
       if(!w.querySelector('.ch')){
         var frag = document.createDocumentFragment(), i = 0;
@@ -373,13 +373,20 @@
     var H = document.documentElement;
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
-      ja: {small:'細かな点までご覧いただき、ありがとうございます。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'いただいたご連絡は、ありがたく拝読いたします。'},
-      en: {small:'Thank you for looking this closely.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Anything you send, I will read with care.'}
+      ja: {
+        rot:  {small:'おっと、縦持ちになったようです。', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'できれば、横持ちでお楽しみください。'},
+        mail: {small:'いただいたご連絡は、ありがたく拝読いたします。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'細かな点までご覧いただき、ありがとうございます。'}
+      },
+      en: {
+        rot:  {small:'Oops — it seems we are in portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'If you can, enjoy it in landscape.'},
+        mail: {small:'Anything you send, I will read with care.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Thank you for looking this closely.'}
+      }
     };
-    var recopied = false;
+    var recopied = '', rvKind = 'rot';   /* v289: メールを閉じた直後だけ、お礼の文面（mail）。ふつうの回転は元の文面（rot） */
     function recopy(){
-      if(recopied) return; recopied = true;
-      var en = (typeof curLang !== 'undefined' && curLang === 'en'), c = en ? RECOPY.en : RECOPY.ja;
+      var kind = rvKind, lang = (typeof curLang !== 'undefined' ? curLang : 'ja');
+      if(recopied === kind + lang) return; recopied = kind + lang;
+      var en = lang === 'en', c = (en ? RECOPY.en : RECOPY.ja)[kind] || (en ? RECOPY.en : RECOPY.ja).rot;
       var sm = rv.querySelector('small'), b = rv.querySelector('b.rtl'), w = b && b.querySelector('.w'), note = rv.querySelector('.rnote');
       if(sm) sm.textContent = c.small;
       if(note) note.textContent = c.note;
@@ -406,7 +413,7 @@
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
     window.__rvSuppress = function(){ hide(); };   /* v286: メールを送るを開いたとき（閉じたら戻す。閉じたことにはしない） */
-    window.__rvPortrait = function(){ if(!land.matches && started){ muted = false; show(); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
+    window.__rvPortrait = function(){ if(!land.matches && started){ muted = false; rvKind = 'mail'; show(); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
     window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
     else setTimeout(function(){ if(!started){ hide(true); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
@@ -454,8 +461,8 @@
                 : vcols(['ありがと', 'うござい', 'ました'], [120, 100, 80], 15.5, 84, 16.5);   /* v287: お礼の判に */
       } else if(rotOkN === 2){
         h = '<path class="pt" d="' + sp + '"/>';
-        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="12">THANK YOU</text><text x="100" y="118" text-anchor="middle" font-size="19">TOO</text>'
-                : vcols(['こちらこそ', 'ありがとう'], [110, 89], 15.5, 84, 16);
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">ENJOY</text><text x="100" y="118" text-anchor="middle" font-size="17">THE REST</text>'
+                : vcols(['引き続き', 'お楽しみ', 'ください'], [120, 100, 80], 15.5, 84, 16.5);
       } else {
         h = '<circle class="pt" cx="100" cy="100" r="88"/><circle class="rg" cx="100" cy="100" r="79"/>';
         h += en ? '<text x="100" y="94" text-anchor="middle" font-size="13">THANKS</text><text x="100" y="116" text-anchor="middle" font-size="17">AGAIN</text>'
@@ -471,7 +478,7 @@
       clearTimeout(onOrient.t);
       /* v282: 縦にしたときは待たずに出す。430ms 待ってから薄く現れていたので、そのあいだ下の紙面が見えていた。
          横にしたときだけ 430ms 待つ（回している最中の一瞬の判定で幕が消えないように） */
-      if(!m){ if(started) show(); return; }
+      if(!m){ if(started){ rvKind = 'rot'; show(); } return; }
       onOrient.t = setTimeout(function(){
         var wasUp = started && !rv.classList.contains('gone'); muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520);
       }, 430);
@@ -480,7 +487,7 @@
     else if(land.addListener) land.addListener(onOrient);
     /* v258: 別のタブへ行っている間に向きが変わると change が届かないことがある。戻ってきたときに向きを見直す */
     document.addEventListener('visibilitychange', function(){ if(document.hidden || !started) return;
-      if(!land.matches){ if(rv.classList.contains('gone')) show(); }
+      if(!land.matches){ if(rv.classList.contains('gone')){ rvKind = 'rot'; show(); } }
       else if(!rv.classList.contains('gone')){ muted = false; hide(); } });
   })();
 
@@ -2599,7 +2606,8 @@
     }
     var t = cpRotEl.querySelector('.cprot-tx');
     t.innerHTML = en ? '<b>Portrait is fine here.</b><span>Sorry for the trouble so far.</span>'
-                     : '<b>縦持ちでも、大丈夫です。</b><span>ここまでご不便をおかけしました。</span>';
+                     : '<b class="mixed" data-big="縦持ち|大丈夫"><span class="w">縦持ちでも、大丈夫です。</span></b><span>ここまでご不便をおかけしました。</span>';
+    if(!en && typeof mixedSubs === 'function') mixedSubs(true);   /* v289: 見出しと同じ混植（漢字ゴシック・かな明朝、要の語を大きく、句読点は朱） */
     cpRotEl.classList.remove('on'); void cpRotEl.offsetWidth; cpRotEl.classList.add('on');
     clearTimeout(cpRotT); cpRotT = setTimeout(function(){ cpRotEl.classList.remove('on'); }, 5200);
   }
