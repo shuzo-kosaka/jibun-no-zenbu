@@ -2354,26 +2354,11 @@
   html.pcview.tablet #cprot svg{width:100px; height:100px}
   html:not(.handheld) .ft-qr{gap:10px}
   html.pcview.phone #top .mean{top:calc(var(--hdh, 116px) + 206px)}
-  /* v308: 窓が狭いことの知らせ（PC のみ）。押すか、幅を戻すと消える */
-  #narrow{position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom, 0px)); z-index:96; transform:translate(-50%, 12px); display:flex; align-items:center; gap:14px; padding:13px 20px 13px 16px; border:1px solid #D6D4CE; border-radius:14px; background:#F2F2EE; color:#1C1B19; box-shadow:0 10px 30px rgba(28,27,25,.10); opacity:0; pointer-events:none; max-width:min(86vw, 560px); transition:opacity .5s var(--ease), transform .6s cubic-bezier(.2,.8,.2,1)}
-  #narrow.on{opacity:1; transform:translate(-50%, 0); pointer-events:auto; cursor:pointer}
-  #narrow .nw-ic{flex:none; display:block; width:56px; height:35px}
-  #narrow .nw-ic svg{width:100%; height:100%; display:block; fill:none; stroke:#1C1B19; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
-  #narrow .nw-ic .nw-fr{stroke-width:2.4}
-  #narrow .nw-ic .nw-ar{stroke:#E84518}
-  #narrow .nw-ic .nw-l{animation:nwL 2.2s ease-in-out infinite}
-  #narrow .nw-ic .nw-r{animation:nwR 2.2s ease-in-out infinite}
-  @keyframes nwL{0%,100%{transform:translateX(0)} 50%{transform:translateX(-5px)}}
-  @keyframes nwR{0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)}}
-  #narrow .nw-tx{display:flex; flex-direction:column; gap:2px; min-width:0}
-  #narrow .nw-tx b{font-family:var(--mincho); font-weight:700; font-size:14px; line-height:1.4; letter-spacing:.04em}
-  #narrow .nw-tx > span{font-family:var(--sans); font-size:11.5px; line-height:1.5; letter-spacing:.06em; color:#5A5853}
-  html.cpopen #narrow{display:none}
   /* v309: スマホを縦持ちにしたときのメールを送る画面。
      この端末は幅 1280 の組みを画面に縮めて映すので、横持ちでは 0.66 倍、縦持ちでは 0.30 倍になる。
      縦持ちだけ字と欄をおよそ二倍にして、横持ちと同じくらいの大きさで読めるようにする */
   @media (orientation:portrait){
-    html.pcview.phone .cpage .cp-in{width:92vw; padding:4vh 0 12vh}
+    html.pcview.phone .cpage .cp-in{width:84vw; padding:4vh 0 12vh}
     html.pcview.phone .cpage .cp-ttl{font-size:78px; line-height:1.4; white-space:normal; margin-bottom:34px}
     html.pcview.phone .cpage .cp-lead{font-size:33px; line-height:1.95; margin-bottom:52px}
     html.pcview.phone .cpage .cp-form{grid-template-columns:1fr; gap:46px 0}
@@ -2395,3 +2380,38 @@
     html.pcview.phone .cp-close{width:80px; height:80px}
     html.pcview.phone .cp-close i{width:34px; height:2.6px}
   }
+  /* v310
+     ・「縦持ちでも、大丈夫です。」の箱：絵の余白を落として縦を詰める（絵そのものは大きいまま）
+     ・PC で窓が狭くなったときの知らせは、縦持ちの案内と同じ作りで画面いっぱいに
+     ・縦持ちのメールを送る画面は、左右にもう少しゆとりを */
+  #cprot{padding:12px 20px 12px 14px}
+  #cprot .cprot-tx{gap:0}
+  html.pcview.phone #cprot svg{width:136px; height:auto; aspect-ratio:160/126}
+  html.pcview.tablet #cprot svg{width:104px; height:auto; aspect-ratio:160/126}
+  #cprot svg{width:84px; height:auto; aspect-ratio:160/126}
+  #narrow{position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2.2vh; text-align:center; padding:6vh 8vw; box-sizing:border-box; background:var(--shu); color:#FBF7F2;
+    opacity:0; pointer-events:none; -webkit-user-select:none; user-select:none; transition:opacity .42s var(--ease)}
+  #narrow.on{opacity:1; pointer-events:auto}
+  #narrow > *{opacity:0; transform:translateY(-18px); transition:opacity .5s var(--ease), transform .72s cubic-bezier(.2,.8,.2,1)}
+  #narrow.on > *{opacity:1; transform:none}
+  #narrow.on > svg{transition-delay:.12s} #narrow.on > small{transition-delay:.20s}
+  #narrow.on > .nw-ttl{transition-delay:.28s} #narrow.on > .nw-note{transition-delay:.36s}
+  #narrow svg{width:min(26vh, 300px); height:min(26vh, 300px); display:block; fill:none; stroke:currentColor; stroke-width:4; stroke-linecap:round; stroke-linejoin:round}
+  #narrow .nw-bar,#narrow .nw-ln{stroke-width:3.4; opacity:.62}
+  #narrow .nw-ln{stroke-width:3; opacity:.42}
+  #narrow .nw-ar{opacity:.55; animation:nwAr 3.6s cubic-bezier(.45,0,.15,1) infinite}
+  @keyframes nwAr{0%,10%{opacity:0} 22%,46%{opacity:.6} 66%,100%{opacity:0}}
+  #narrow small{font-family:var(--mincho); font-weight:400; font-size:min(1.5vw, 17px); letter-spacing:.12em; opacity:.76}
+  #narrow .nw-ttl{display:block; font-family:var(--mincho); font-weight:900; font-size:min(4.4vw, 54px); line-height:1.42; letter-spacing:-.005em; font-feature-settings:"palt"}
+  #narrow .nw-ttl .w .ch{display:inline-block}
+  #narrow .nw-ttl .ch.kj{font-family:var(--sans); font-weight:700; font-size:.94em; letter-spacing:.005em}
+  #narrow .nw-ttl .ch.kn{font-family:var(--mincho); font-weight:900; font-size:1.02em}
+  #narrow .nw-ttl .ch.pt{font-family:var(--mincho); letter-spacing:-.06em}
+  #narrow .nw-ttl .ch.big{font-size:1.26em}
+  html[lang="en"] #narrow .nw-ttl{font-family:var(--optima); font-weight:400; letter-spacing:.005em; font-feature-settings:normal; line-height:1.24}
+  #narrow .nw-note{font-family:var(--mono); font-size:min(1.1vw, 12.5px); letter-spacing:.14em; opacity:.7; margin-top:1.2vh}
+  /* v311: 海外の判が、スマホでは上が切れていた（この章はピン留めの枠が中身を切る）。
+     枠の中に収まる位置まで下げる。PC・タブレットは輪の外の余白が切れているだけなので触らない */
+  html.pcview.phone #ch5map .chseal{top:calc(var(--y1) - 30px)}
+  html.pcview.phone #ch5pin .chseal{top:calc(var(--y2) - 128px)}

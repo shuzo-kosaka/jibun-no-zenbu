@@ -88,7 +88,7 @@
   ttlWords(true);
   /* ch7's two subheads (.mixed): set like a chapter title — split per character (the <br> kept), kanji gothic / kana mincho, the data-big words larger, kerned by pair, the lines optically aligned */
   function mixedSubs(ja){
-    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed, .rotv .rtl.mixed, #cprot .cprot-tx b.mixed').forEach(function(sub){
+    document.querySelectorAll('.ch7x .solopin .sub.mixed, .cp-ttl.mixed, .wk-vt.mixed, .rotv .rtl.mixed, #cprot .cprot-tx b.mixed, #narrow .nw-ttl.mixed').forEach(function(sub){
       var w = sub.querySelector('.w'); if(!w) return;
       if(!w.querySelector('.ch')){
         var frag = document.createDocumentFragment(), i = 0;
@@ -2631,6 +2631,7 @@
       Array.prototype.forEach.call(sv.querySelectorAll('[clip-path]'), function(el){ el.setAttribute('clip-path', el.getAttribute('clip-path').replace(')', 'c)')); });
       var ok = sv.querySelector('.ok'), pP = sv.querySelector('.pP');
       if(ok && pP){ var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'okpos'); g.setAttribute('transform', 'translate(-24,-26)'); g.appendChild(ok); pP.appendChild(g); }   /* 印は縦の姿の右肩へ */
+      sv.setAttribute('viewBox', '38 36 160 126');   /* v310: 絵のまわりの余白を落として、箱の縦を詰める（絵そのものは大きくなる） */
       cpRotEl.appendChild(sv);
       var tx = document.createElement('div'); tx.className = 'cprot-tx';
       cpRotEl.appendChild(tx);
@@ -2984,39 +2985,60 @@
       cb.addEventListener('change', sync); sync();
     });
   })();
-  /* v308: PC で窓を狭めていくと、ある幅からタブレット向けの組みに切り替わる。
-     切り替わったところで一度だけ、もう少し広げてみませんかと伝える（指の端末では出さない）。
-     押すか、幅を戻すと消える。この節のあいだは二度と出さない */
+  /* v310: PC で窓を狭めていくと、ある幅からタブレット向けの組みに切り替わる。
+     そこから先は、縦持ちのときと同じ作りの案内で画面をいったん覆い、窓を広げてもらう。
+     幅を戻すと消える（指の端末では出さない） */
   (function(){
     var H = document.documentElement;
     if(H.classList.contains('handheld')) return;
-    var mq = window.matchMedia('(max-width:1024px)'), el = null, off = false, t = 0;
+    var mq = window.matchMedia('(max-width:1024px)'), el = null, copied = '';
+    var NWCOPY = {
+      ja: {small:'おっと、タブが少し狭いようです。', b:'目を細める前に、<br>窓を大きく。', big:'目|窓', note:'できれば、ゆとりのある幅でお楽しみください。'},
+      en: {small:'Oops — the window is a little narrow.', b:'Before you squint,<br>widen the window.', big:'squint|window', note:'If you can, enjoy it with a bit more room.'}
+    };
+    function icon(){
+      return '<svg viewBox="0 0 220 200" aria-hidden="true">' +
+        '<g class="nw-ar"><path d="M46 100h-18M34 92l-8 8 8 8"/><path d="M174 100h18M186 92l8 8-8 8"/></g>' +
+        '<rect class="nw-fr" x="78" y="60" width="64" height="80" rx="8">' +
+          '<animate attributeName="x" values="78;78;36;36;78" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
+          '<animate attributeName="width" values="64;64;148;148;64" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
+          '<animate attributeName="y" values="60;60;66;66;60" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
+          '<animate attributeName="height" values="80;80;68;68;80" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></rect>' +
+        '<path class="nw-bar" d="M78 78h64">' +
+          '<animate attributeName="d" values="M78 78h64;M78 78h64;M36 84h148;M36 84h148;M78 78h64" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
+        '<path class="nw-ln" d="M90 98h40">' +
+          '<animate attributeName="d" values="M90 98h40;M90 98h40;M50 102h120;M50 102h120;M90 98h40" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
+        '<path class="nw-ln" d="M90 112h26">' +
+          '<animate attributeName="d" values="M90 112h26;M90 112h26;M50 116h78;M50 116h78;M90 112h26" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
+        '</svg>';
+    }
     function build(){
       if(el) return el;
-      el = document.createElement('div'); el.id = 'narrow'; el.setAttribute('role', 'status');
-      el.innerHTML = '<i class="nw-ic" aria-hidden="true"><svg viewBox="0 0 64 40"><rect class="nw-fr" x="7" y="6" width="50" height="28" rx="3"/>' +
-        '<path class="nw-ar nw-l" d="M20 20h-9M14 16l-4 4 4 4"/><path class="nw-ar nw-r" d="M44 20h9M50 16l4 4-4 4"/></svg></i>' +
-        '<span class="nw-tx"><b></b><span></span></span>';
+      el = document.createElement('div'); el.id = 'narrow'; el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite');
+      el.innerHTML = icon() + '<small></small><b class="nw-ttl"></b><span class="nw-note"></span>';
       document.body.appendChild(el);
-      el.addEventListener('click', function(){ off = true; hide(); });
       return el;
     }
     function words(){
-      var en = (typeof curLang !== 'undefined' && curLang === 'en');
-      return en ? ['The window is a little narrow.', 'Widen it a touch, and the page returns to the setting it was made for.']
-                : ['画面の幅が、少し狭いようです。', 'もう少しゆとりを持たせると、本来の組みでご覧いただけます。'];
+      var lang = (typeof curLang !== 'undefined' ? curLang : 'ja');
+      var e = build(), c = NWCOPY[lang === 'en' ? 'en' : 'ja'];
+      if(copied === lang) return; copied = lang;
+      e.querySelector('small').textContent = c.small;
+      var b = e.querySelector('.nw-ttl');
+      b.innerHTML = '<span class="w">' + c.b + '</span>';
+      if(lang !== 'en'){ b.className = 'nw-ttl rtl mixed'; b.setAttribute('data-big', c.big); if(typeof mixedSubs === 'function') mixedSubs(true); }
+      else { b.className = 'nw-ttl'; b.removeAttribute('data-big'); }
+      e.querySelector('.nw-note').textContent = c.note;
     }
-    function show(){
-      if(off || H.classList.contains('handheld')) return;
-      var e = build(), w = words();
-      e.querySelector('.nw-tx b').textContent = w[0]; e.querySelector('.nw-tx > span').textContent = w[1];
-      e.classList.add('on'); clearTimeout(t); t = setTimeout(hide, 9000);
+    function check(){
+      if(H.classList.contains('handheld')) return;
+      if(mq.matches){ words(); build().classList.add('on'); }
+      else if(el) el.classList.remove('on');
     }
-    function hide(){ if(el) el.classList.remove('on'); clearTimeout(t); }
-    function check(){ if(mq.matches){ if(!H.classList.contains('cpopen')) show(); } else hide(); }
     if(mq.addEventListener) mq.addEventListener('change', check); else if(mq.addListener) mq.addListener(check);
+    window.addEventListener('resize', check, {passive:true});
     window.__narrowCheck = check;
-    setTimeout(function(){ if(mq.matches) show(); }, 2600);   /* 最初から狭いときも一度だけ */
+    setTimeout(check, 900);
   })();
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
