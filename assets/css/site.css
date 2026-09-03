@@ -2147,7 +2147,8 @@
   #ch1pin .dg.walk .dg-ring{opacity:0; transition:opacity .9s ease .15s}
   /* v262: 輪の線はもう少しゆっくり消す */
   #ch1pin .dg.walk .dg-ring{transition:opacity 1.5s ease .15s}
-  /* v264: 足跡が判に着くと判が光る（JS は .hit を付けていたが、対応する CSS がなかった）。
-     判の下の紙が一瞬あたたかく灯り、周りにやわらかい光が広がって消える。判の transform には触れない（.in の遷移と競合しない） */
-  #ch1pin .dg-node.hit .paper{animation:dghit 1s ease-out}
-  @keyframes dghit{0%{fill:var(--bg); filter:drop-shadow(0 0 0 rgba(232,69,24,0))} 16%{fill:#FFE6D0; filter:drop-shadow(0 0 16px rgba(232,69,24,.6))} 100%{fill:var(--bg); filter:drop-shadow(0 0 0 rgba(232,69,24,0))}}
+  /* v265: 足跡が着いた判は「いま」の判。人生のチェックポイントの現在地と同じ波紋（細い朱の枠が中心から広がって消える）を、
+     判の外枠と同じ角丸で繰り返す。次の判に着くと移る。光る演出（v264）は撤去 */
+  #ch1pin .dgpulse{fill:none; stroke:var(--acc); stroke-width:1.5; opacity:0; transform-box:fill-box; transform-origin:center; pointer-events:none}
+  #ch1pin .dg-node.now .dgpulse{animation:dgpulse 2.4s ease-out infinite}
+  @keyframes dgpulse{0%{transform:scale(.85); opacity:1} 100%{transform:scale(1.22); opacity:0}}

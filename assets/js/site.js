@@ -1545,14 +1545,14 @@
   var orbitN = 0;
   (function orbit(now){
     /* v224: 指の端末では 2 フレームに 1 回（点が動くたびに図全体が描き直される。半分で十分なめらか） */
-    if(!dgOn){ if(dgWasOn){ dgWasOn = false; if(dgTrail) for(var tj = 0; tj < dgTrail.length; tj++) dgTrail[tj].style.opacity = '0'; } }
+    if(!dgOn){ if(dgWasOn){ dgWasOn = false; if(dgTrail) for(var tj = 0; tj < dgTrail.length; tj++) dgTrail[tj].style.opacity = '0'; dgNodes.forEach(function(n){ n.classList.remove('now'); }); } }
     else if(dgSat && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
       if(!dgWasOn){ dgWasOn = true; dgT0 = now; dgLastA = DG_A0; }   /* v260: 輪が描き終わって歩き出すたび起点から。v263: 起点は判の下（判の縁から足跡が伸びて見える） */
       var w = (now - dgT0) / 18000, a = ((w * 360 + DG_A0) % 360 + 360) % 360, rad = a * Math.PI / 180;
       /* v257: 点はやめ、足跡が輪を歩く。歩き手の位置 f（輪の経路の割合、左端 a=180° から反時計回り）に対して、
          通り過ぎたばかりの足跡ほど濃く、古いものから薄れて消える（後ろ 30% ぶんだけ残る） */
       if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = w - dgTrailF[ti], op = 0; if(age >= 0){ age %= 1; op = age < .02 ? age / .02 : age < .26 ? 1 : age < .44 ? 1 - (age - .26) / .18 : 0; }   /* v262: 残す足跡を増やす（一周の 44% ぶん） */ dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
-      DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
+      DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes.forEach(function(n){ n.classList.remove('now'); }); dgNodes[i].classList.add('now'); } });   /* v265: 足跡が着いた判に、チェックポイントの現在地と同じ波紋を */
       dgLastA = a;
     }
     requestAnimationFrame(orbit);
@@ -1636,6 +1636,11 @@
     dgTrail = g.querySelectorAll('.dgrp'); dgTrailF = [];
     for(var i = 0; i < dgTrail.length; i++) dgTrailF.push((((start + i * step) / L - DG_F0) % 1 + 1) % 1);   /* v263: 起点（判）からの道のり */
   }
+  function dgPulseBuild(){   /* v265: 各判に波紋の枠。判の外枠（208×208, rx14）と同じ位置・傾きの角丸で、中心から広がって消える */
+    dgNodes.forEach(function(n){ if(n.querySelector('.dgpulse')) return; var seal = n.querySelector('g.seal:not(.sealimg)'); if(!seal) return;
+      var w = svgEl('g', {class:'dgpulse-w'}), tr = seal.getAttribute('transform'); if(tr) w.setAttribute('transform', tr);
+      w.appendChild(svgEl('rect', {class:'dgpulse', x:-104, y:-104, width:208, height:208, rx:14})); n.appendChild(w); });
+  }
   function dgFlag(){
     var svg = document.getElementById('dgsvg'), t = svg && svg.querySelector('.dg-title'); if(!t || t.querySelector('.dgflag')) return;
     var big = t.querySelector('.big'); if(!big) return;
@@ -1647,7 +1652,7 @@
     while(fl.firstChild) gi.appendChild(fl.firstChild);
     ga.appendChild(gi); g.appendChild(ga); (big.parentNode).appendChild(g);
   }
-  window.addEventListener('load', function(){ setTimeout(function(){ dgTrailBuild(); dgFlag(); }, 120); });
+  window.addEventListener('load', function(){ setTimeout(function(){ dgTrailBuild(); dgFlag(); dgPulseBuild(); }, 120); });
   window.addEventListener('resize', function(){ clearTimeout(dgTrailBuild.t); dgTrailBuild.t = setTimeout(dgTrailBuild, 300); }, {passive:true});
   function dgBuild(){
     var svg = document.getElementById('dgsvg'), inp = document.getElementById('dgin'); if(!svg || !inp) return;
