@@ -6,7 +6,7 @@
   var body = document.body, top = document.getElementById('top');
   /* 開発者ツールを開いてくださった方へ */
   try{
-    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n   コードの中まで見ていただけるのは、つくった側として何よりうれしいことです。\n   このサイトも、ひとつずつ手を動かしてつくりました。どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far. Every part of this site was made by hand, one piece at a time. Enjoy the rest of it. — Shuzo Kosaka',
+    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n   コードの中まで見ていただけるのは、つくった側として何よりうれしいことです。\n   このサイトは、まず Illustrator などで素材を制作し、ノーコードの Web 制作ツールでいちど形にしました。\n   そこから AI との対話を重ねて HTML を組み立て、試作は 94 版を数えています。\n   そのコードをもとに書いてもらったコードを実装し、179 回のやりとりを経て、なんとかこの形になりました。\n   どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far. I drew the assets in Illustrator, built a first version in a no-code tool,\n   then assembled the HTML through a long dialogue with AI — 94 drafts there, and 179 exchanges in the editor\n   where the code was written and implemented. Enjoy the rest of it. — Shuzo Kosaka',
       'display:inline-block; background:#E84518; color:#FBF7F2; font:700 14px/1 serif; padding:6px 7px; border-radius:50%; margin-right:6px', 'color:#1C1B19; font:13px/1.7 -apple-system, system-ui, sans-serif');
   }catch(e){}
 
