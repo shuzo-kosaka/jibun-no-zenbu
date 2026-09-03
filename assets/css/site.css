@@ -2277,4 +2277,6 @@
   html.rotvup #tint{background-color:var(--shu)}
   html.rotvup:not(.rotvup0) #tint{background-color:var(--rvbg, var(--shu))}
   html.pcview.phone #top .sub,html.pcview.phone #top .rot{transform:translateY(-81px)}
-  html.pcview.phone #top .tag{margin-top:-46px}
+  html.pcview.phone #top .tag{margin-top:-38px}
+  /* v297: スマホの TOP — 「生まれた街も…」も右の帯と同じだけ上げる（v285 の -18px に、帯と同じ 38px 分を足す） */
+  html.pcview.phone #top .mean{margin-top:-56px}
