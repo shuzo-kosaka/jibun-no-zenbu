@@ -2290,7 +2290,3 @@
   html.rotvup0 body::after{background:var(--shu) !important}
   body.menuclosing .hd{--fg:#1C1B19; --fg2:#5A5955; --acc:#E84518; --bg:#F2F2EE; color:var(--fg)}
   html.pcview.phone .menu .mseals .t,html.pcview.phone .menu .mseals .y{display:none}
-  /* v299: スマホのメニューの判は、番号だけにする（判の輪の英字と、真ん中の地名を出さない）。番号は大きく */
-  html.pcview.phone .menu .mseals .st .ring,html.pcview.phone .menu .mseals .st .place{display:none}
-  html.pcview.phone .menu .mseals .cp{font-size:13px; letter-spacing:.2em}
-  html.pcview.phone .menu .mseals .cp b{font-size:40px; letter-spacing:.02em; line-height:1.1; margin-top:2px}
