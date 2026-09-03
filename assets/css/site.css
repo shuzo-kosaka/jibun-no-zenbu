@@ -2461,3 +2461,40 @@
     html.pcview.phone .cpage .cp-form input,html.pcview.phone .cpage .cp-form textarea{font-size:34px}
     html.pcview.phone .cpage #cpdone.cp-done{font-size:26px; padding:20px 24px}
   }
+  /* v315: 感謝の印は包み（span）ごと動かす。実機の Safari は svg そのものに割合の移動を掛けると
+     位置の取り方が変わり、画面の外へ出てしまうことがある。ほかの判と同じ作りに合わせた */
+  #cpyay .yay-seal{position:absolute; left:50%; top:44%; width:min(38vh, 300px); height:min(38vh, 300px); display:block;
+    transform:translate(-50%,-50%) rotate(-9deg) scale(1.52); opacity:0; mix-blend-mode:multiply; pointer-events:none}
+  #cpyay .yay-seal svg{width:100%; height:100%; display:block; overflow:visible}
+  html.pcview.phone #cpyay .yay-seal{width:min(52vh, 300px); height:min(52vh, 300px)}
+  @media (orientation:portrait){
+    html.pcview.phone #cpyay .yay-seal{width:88vw; height:88vw; top:46%}
+  }
+  /* v316: 感謝の印が実機の Safari で出ないことへの手当て。
+     ・組の動きが走らなくても見えるよう、判の「ふだんの姿」を押し終えた状態にしておく（動きは 0 から始める）
+     ・重ね方（乗算）と、親の不透明度を使った出し入れをやめる。iOS はこの組み合わせで中身を描かないことがある
+     ・置いてから組を足すのではなく、置く前に .on を付ける */
+  #cpyay{opacity:1; transition:opacity .55s var(--ease)}
+  #cpyay.gone{opacity:0}
+  #cpyay .yay-seal{opacity:.94; mix-blend-mode:normal; transform:translate(-50%,-50%) rotate(-9deg)}
+  #cpyay.on .yay-seal{animation:yayPress .64s cubic-bezier(.2,.9,.3,1)}
+  @keyframes yayPress{
+    0%{opacity:0; transform:translate(-50%,-50%) rotate(-16deg) scale(1.52)}
+    38%{opacity:.98}
+    58%{opacity:.98; transform:translate(-50%,-50%) rotate(-9deg) scale(.955)}
+    76%{transform:translate(-50%,-50%) rotate(-9deg) scale(1.018)}
+    100%{opacity:.94; transform:translate(-50%,-50%) rotate(-9deg) scale(1)}}
+  /* v318: 窓が狭いときの知らせ
+     ・地と字は、いま見ている場面の色を借りる（朱に決め打ちしない）
+     ・案内が出ているあいだも、カーソルの演出は見えるように前へ出す
+     ・窓の絵は、枠・見出しの棒・行・左右の矢・右下の斜めの矢が同じ拍で一緒に広がる */
+  #narrow{background:var(--nwbg, var(--shu)); color:var(--nwfg, #FBF7F2)}
+  html.nwon .cur{z-index:301}
+  #narrow svg{stroke:currentColor; stroke-width:3.6}
+  #narrow .nw-fr{stroke-width:4.2}
+  #narrow .nw-bar{stroke-width:3.4; opacity:.72}
+  #narrow .nw-ln{stroke-width:3; opacity:.42}
+  #narrow .nw-ar{stroke:var(--nwac, #E84518); stroke-width:3.6; opacity:.9; animation:none}
+  #narrow .nw-dg{opacity:.72}
+  #narrow small{opacity:.72}
+  #narrow .nw-note{opacity:.66}

@@ -421,7 +421,10 @@
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
     window.__rvSuppress = function(){ hide(); };   /* v286: メールを送るを開いたとき（閉じたら戻す。閉じたことにはしない） */
-    window.__rvPortrait = function(){ if(!land.matches && started){ muted = false; rvKind = 'mail'; show(); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
+    window.__rvPortrait = function(){ if(!land.matches && started){ muted = false; rvKind = 'mail'; show();
+      /* v317: メールの紙面（紙色）が消えきる前に色を採ると、帯が白のまま残る。最初の案内と同じように何度か採り直す */
+      var rt2 = function(){ if(window.__retint) window.__retint(); if(window.__setTheme){ var c2 = window.__landCols; window.__setTheme((c2 && c2.bg) || '#E84518'); } };
+      requestAnimationFrame(function(){ requestAnimationFrame(rt2); }); setTimeout(rt2, 350); setTimeout(rt2, 700); setTimeout(rt2, 1200); setTimeout(rt2, 2200); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
     window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
     else setTimeout(function(){ if(!started){ hide(true); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
@@ -489,8 +492,37 @@
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
+    /* v317: 向きを変えると、章の高さ（vh 基準）がまるごと変わる。画面の位置（px）はそのままなので、
+       戻したときに別の章に居ることがあった。読んでいた場所を覚えておき、組み直しが落ち着くまで何度か戻す */
+    var rvAnc = null, rvLock = 0, rvRaf = 0;
+    /* 覚え方は「どの章の、どこまで進んだか」。向きが変わると章の高さそのものが変わるので、
+       画素ではなく章の中の割合で持っておくのがいちばん狂わない */
+    function rvMark(){
+      if(rvLock || H.classList.contains('rotvup') || !land.matches) return;
+      var secs = document.querySelectorAll('section[id]'), sec = null, top0 = 0, y = window.scrollY;
+      for(var i = 0; i < secs.length; i++){ var o = langDocTop(secs[i]), h = secs[i].offsetHeight;   /* 節は入れ子のこともあるので、紙面の頭からの位置で測る */
+        if(y >= o - 2 && y < o + h){ sec = secs[i]; top0 = o; break; } }
+      if(!sec) return;
+      rvAnc = {id:sec.id, p:(y - top0) / Math.max(1, sec.offsetHeight)};
+    }
+    function rvKeep(){ if(rvRaf) return; rvRaf = requestAnimationFrame(function(){ rvRaf = 0; rvMark(); }); }
+    var rvUn = 0;
+    window.addEventListener('resize', function(){ rvLock = 1; clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800); }, {passive:true});   /* 画面の作り直しが始まったら、その間の位置は覚えない（向きの合図より先に scroll が来ることがある） */
+
+    window.addEventListener('scroll', rvKeep, {passive:true});
+    setTimeout(rvKeep, 1200);
+    function rvPut(){ if(!rvAnc) return; var s0 = document.getElementById(rvAnc.id); if(!s0) return;
+      var y0 = Math.round(langDocTop(s0) + rvAnc.p * s0.offsetHeight);
+      if(Math.abs(y0 - window.scrollY) > 2) window.scrollTo({top:y0, behavior:'instant'});   /* html は scroll-behavior:smooth。ふつうに呼ぶと滑る途中で次の呼び出しに上書きされ、途中で止まる */ }
+    function rvReflow(){
+      rvLock = 1;
+      requestAnimationFrame(function(){ requestAnimationFrame(rvPut); });
+      setTimeout(rvPut, 140); setTimeout(rvPut, 380); setTimeout(rvPut, 760); setTimeout(rvPut, 1200); setTimeout(rvPut, 1800); setTimeout(rvPut, 2500);
+      clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800);
+    }
     function onOrient(e){
       var m = e.matches;
+      rvReflow();
       clearTimeout(onOrient.t);
       /* v282: 縦にしたときは待たずに出す。430ms 待ってから薄く現れていたので、そのあいだ下の紙面が見えていた。
          横にしたときだけ 430ms 待つ（回している最中の一瞬の判定で幕が消えないように） */
@@ -2608,6 +2640,7 @@
     cpage.hidden = false; cpage.classList.remove('out'); void cpage.offsetWidth; cpage.classList.add('in');
     if(mkbtn){ if(mkbtn.__t === undefined) mkbtn.__t = mkbtn.title; mkbtn.title = 'ちょっとしたサプライズの表示／非表示'; }
     document.documentElement.classList.add('cpopen'); if(window.__rvSuppress) window.__rvSuppress();   /* v286 */
+    cpZoom(true);   /* v315: 欄を押しても画面が寄らないように（この画面のあいだだけ） */
     cpRot();   /* v288: 横持ちで開いたなら「ここは縦持ちでも大丈夫」と伝える */
     if(menu && menu.classList.contains('open')) setMenu(false); togFit();
     clearTimeout(surHintT); document.documentElement.classList.add('surhint'); surHintT = setTimeout(function(){ document.documentElement.classList.remove('surhint'); }, 7000);   /* v93: the surprise toggle blinks for a while, so a visitor who came to write notices it */
@@ -2622,7 +2655,7 @@
   var cpYayT = 0;
   function cpYaySeal(){
     var sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    sv.setAttribute('viewBox', '0 0 200 200'); sv.setAttribute('class', 'yay-seal'); sv.setAttribute('aria-hidden', 'true');
+    sv.setAttribute('viewBox', '0 0 200 200'); sv.setAttribute('aria-hidden', 'true');
     var id = 'yayink' + (Math.random() * 1e6 | 0);
     var ring = 'THANK YOU FOR WRITING · 2026 · KOSAKA SHUZO · ';
     sv.innerHTML = '<defs>' +
@@ -2643,7 +2676,8 @@
   function cpYay(){
     var old = document.getElementById('cpyay'); if(old) old.remove(); clearTimeout(cpYayT);
     var el = document.createElement('div'); el.id = 'cpyay'; el.setAttribute('aria-hidden', 'true');
-    el.appendChild(cpYaySeal());
+    var seal = document.createElement('span'); seal.className = 'yay-seal';   /* v315: 判は包みに入れて動かす（svg そのものを動かすと、実機の Safari で行方が変わる） */
+    seal.appendChild(cpYaySeal()); el.appendChild(seal);
     var ring = document.createElement('i'); ring.className = 'yay-ring'; el.appendChild(ring);   /* 押した拍子の輪 */
     var ring2 = document.createElement('i'); ring2.className = 'yay-ring yay-ring2'; el.appendChild(ring2);
     if(!reduce){
@@ -2663,9 +2697,8 @@
       }
       el.appendChild(bits);
     }
-    document.body.appendChild(el);
-    void el.offsetWidth; el.classList.add('on');
-    cpYayT = setTimeout(function(){ el.classList.remove('on'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 900); }, reduce ? 2400 : 3000);
+    el.classList.add('on'); document.body.appendChild(el);   /* v316: 置く前に .on を付ける。実機の Safari は、置いた直後に付け足した組の動きを取りこぼすことがある */
+    cpYayT = setTimeout(function(){ el.classList.add('gone'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 800); }, reduce ? 2400 : 3000);
   }
   /* v288: メールを送るを横持ちで開いたときの小さな知らせ。案内の端末の絵をそのまま借り、動きだけ逆に回して
      「横 → 縦」に見せる（確認の印は縦の姿の側へ移す）。紙面の操作は妨げない */
@@ -2696,10 +2729,27 @@
     cpRotEl.classList.remove('on'); void cpRotEl.offsetWidth; cpRotEl.classList.add('on');
     clearTimeout(cpRotT); cpRotT = setTimeout(function(){ cpRotEl.classList.remove('on'); }, 5200);
   }
+  /* v315: 実機の Safari は、幅を決め打ちにした紙面で入力欄に触れると、その欄が読める大きさまで
+     画面を寄せてしまう。字を 16px 以上にしても、紙面ごと縮めて映しているこの作りでは止まらない。
+     そこで「メールを送る」を開いているあいだだけ、拡大の自動追従を切る。閉じたら元に戻す。
+     指でのつまむ操作は iOS では残る（この指定は自動の寄せにだけ効く） */
+  var cpVpWas = null;
+  function cpZoom(on){
+    if(!document.documentElement.classList.contains('handheld')) return;
+    var m = document.querySelector('meta[name="viewport"]'); if(!m) return;
+    if(on){
+      if(cpVpWas === null) cpVpWas = m.getAttribute('content') || '';
+      var c = cpVpWas.replace(/,?\s*(user-scalable|maximum-scale)=[^,]*/g, '');
+      m.setAttribute('content', c + ',maximum-scale=1,user-scalable=no');
+    } else if(cpVpWas !== null){
+      m.setAttribute('content', cpVpWas); cpVpWas = null;
+    }
+  }
   function cpClose(fromPop){
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
     cpage.classList.remove('in'); cpage.classList.add('out'); document.documentElement.classList.remove('cpopen');
+    cpZoom(false);   /* v315: 拡大の自動追従を元に戻す */
     if(cpRotEl){ clearTimeout(cpRotT); cpRotEl.classList.remove('on'); }   /* v288 */
     if(window.__rvPortrait) window.__rvPortrait();   /* v286: 閉じた時点で縦持ちなら案内を出す */
     var bar = cpage.querySelector('.cp-bar'), cpx1 = document.getElementById('cpx'), cpl1 = document.querySelector('.hd .cp-lab'); if(bar){ if(cpl1) bar.appendChild(cpl1); if(cpx1) bar.appendChild(cpx1); }   /* and back into the page */
@@ -3050,19 +3100,25 @@
       en: {small:'Oops — the window is a little narrow.', b:'Before you squint,<br>widen the window.', big:'squint|window', note:'If you can, enjoy it with a bit more room.'}
     };
     function icon(){
+      /* 窓が斜めに広がる。枠・見出しの棒・中の行・左右の矢・右下の斜めの矢が、同じ拍で一緒に動く */
+      var K = ' keyTimes="0;.14;.44;.84;1" dur="3.8s" repeatCount="indefinite" calcMode="spline" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1"';
+      function A(n, v){ return '<animate attributeName="' + n + '" values="' + v + '"' + K + '/>'; }
+      function T(v){ return '<animateTransform attributeName="transform" type="translate" values="' + v + '"' + K + '/>'; }
       return '<svg viewBox="0 0 220 200" aria-hidden="true">' +
-        '<g class="nw-ar"><path d="M46 100h-18M34 92l-8 8 8 8"/><path d="M174 100h18M186 92l8 8-8 8"/></g>' +
-        '<rect class="nw-fr" x="78" y="60" width="64" height="80" rx="8">' +
-          '<animate attributeName="x" values="78;78;36;36;78" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
-          '<animate attributeName="width" values="64;64;148;148;64" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
-          '<animate attributeName="y" values="60;60;66;66;60" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/>' +
-          '<animate attributeName="height" values="80;80;68;68;80" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></rect>' +
-        '<path class="nw-bar" d="M78 78h64">' +
-          '<animate attributeName="d" values="M78 78h64;M78 78h64;M36 84h148;M36 84h148;M78 78h64" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
-        '<path class="nw-ln" d="M90 98h40">' +
-          '<animate attributeName="d" values="M90 98h40;M90 98h40;M50 102h120;M50 102h120;M90 98h40" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
-        '<path class="nw-ln" d="M90 112h26">' +
-          '<animate attributeName="d" values="M90 112h26;M90 112h26;M50 116h78;M50 116h78;M90 112h26" keyTimes="0;.16;.46;.86;1" dur="3.6s" repeatCount="indefinite"/></path>' +
+        '<rect class="nw-fr" x="76" y="70" width="68" height="52" rx="6">' +
+          A('x', '76;76;30;30;76') + A('y', '70;70;46;46;70') +
+          A('width', '68;68;160;160;68') + A('height', '52;52;108;108;52') + '</rect>' +
+        '<path class="nw-bar" d="M76 86h68">' +
+          A('d', 'M76 86h68;M76 86h68;M30 64h160;M30 64h160;M76 86h68') + '</path>' +
+        '<path class="nw-ln" d="M88 100h44">' +
+          A('d', 'M88 100h44;M88 100h44;M44 84h132;M44 84h132;M88 100h44') + '</path>' +
+        '<path class="nw-ln" d="M88 111h26">' +
+          A('d', 'M88 111h26;M88 111h26;M44 100h84;M44 100h84;M88 111h26') + '</path>' +
+        '<path class="nw-ln" d="M88 122h34" opacity="0">' +
+          A('d', 'M88 122h34;M88 122h34;M44 116h108;M44 116h108;M88 122h34') + A('opacity', '0;0;.42;.42;0') + '</path>' +
+        '<g class="nw-ar"><path d="M68 96h-14M58 90l-6 6 6 6"/>' + T('0,0;0,0;-46,0;-46,0;0,0') + '</g>' +
+        '<g class="nw-ar"><path d="M152 96h14M162 90l6 6-6 6"/>' + T('0,0;0,0;46,0;46,0;0,0') + '</g>' +
+        '<g class="nw-ar nw-dg"><path d="M148 126l14 12M150 138h12v-12"/>' + T('0,0;0,0;28,18;28,18;0,0') + '</g>' +
         '</svg>';
     }
     function build(){
@@ -3083,10 +3139,20 @@
       else { b.className = 'nw-ttl'; b.removeAttribute('data-big'); }
       e.querySelector('.nw-note').textContent = c.note;
     }
+    function tone(){   /* いま見ている場面の地と字の色を借りる */
+      if(!el) return;
+      var c = getComputedStyle(document.body), g = function(n, d){ var v = (c.getPropertyValue(n) || '').trim(); return v || d; };
+      el.style.setProperty('--nwbg', g('--bg', '#E84518'));
+      el.style.setProperty('--nwfg', g('--fg', '#FBF7F2'));
+      el.style.setProperty('--nwac', g('--acc', '#E84518'));
+      el.style.setProperty('--nwln', g('--line', 'rgba(255,255,255,.3)'));
+    }
+    var toneRaf = 0;
+    window.addEventListener('scroll', function(){ if(!el || !el.classList.contains('on') || toneRaf) return; toneRaf = requestAnimationFrame(function(){ toneRaf = 0; tone(); }); }, {passive:true});
     function check(){
       if(H.classList.contains('handheld')) return;
-      if(mq.matches){ words(); build().classList.add('on'); }
-      else if(el) el.classList.remove('on');
+      if(mq.matches){ words(); build(); tone(); el.classList.add('on'); H.classList.add('nwon'); }
+      else if(el){ el.classList.remove('on'); H.classList.remove('nwon'); }
     }
     if(mq.addEventListener) mq.addEventListener('change', check); else if(mq.addListener) mq.addListener(check);
     window.addEventListener('resize', check, {passive:true});
