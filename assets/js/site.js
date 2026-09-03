@@ -1,6 +1,11 @@
 
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* v280: OS の「動きを減らす」設定は見ない。Windows ではこの設定が省電力の既定や企業の管理設定でオフ（＝reduce）になっていることが多く、
+     macOS の「視差効果を減らす」と違って本人の意思表示とは限らない。そのまま従うとオープニング・カーソル演出・楕円の入れ替わり・
+     作品の帯・本文の浮上がまとめて消え、別のサイトのように見えてしまう。どの環境でも同じ見え方にし、止めて見たいときは ?reduce=1 を付ける */
+  reduce = /[?&]reduce=1/.test(location.search);
+  if(reduce) document.documentElement.classList.add('rm');
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var vh = function(){ return window.innerHeight; };
   var body = document.body, top = document.getElementById('top');

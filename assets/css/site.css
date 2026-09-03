@@ -481,7 +481,7 @@
   .wkt a i.v{top:0; bottom:0; width:1px; transform:scaleY(0); transform-origin:top} .wkt a i.h{left:0; right:0; height:1px; transform:scaleX(0); transform-origin:left}
   .wkt a:hover i,.wkt a:focus-visible i{transform:none}
   .wkt a em{position:absolute; left:8px; top:6px; font-style:normal; font-family:var(--mono); font-size:10px; color:var(--l-red); opacity:0; transition:opacity .3s} .wkt a:hover em{opacity:1}
-  @media (prefers-reduced-motion: reduce){ .wkt{animation:none} }
+  html.rm .wkt{animation:none}
   @media (max-width:1024px){ .wkm{grid-column:1/6} .wkt a{width:38vw} }
   /* ---- v74 ---- */
   .mi .bird{display:none} .ft-cta:hover .mi .env,.cp-send:hover .mi .env{opacity:1; transform:none}   /* the envelope stays */
@@ -672,11 +672,8 @@
   .rise{opacity:0; transform:translateY(10px); transition:opacity .8s var(--ease), transform .8s var(--ease); transition-delay:calc(.25s + var(--i,0)*.12s)}
   .in .rise,.rise.in{opacity:1; transform:none}
   .cnt{font-variant-numeric:tabular-nums}
-  @media (prefers-reduced-motion:reduce){
-    .split .ch,.p,.rise,mark,.marg img,.sub .w{transition:none !important; transform:none !important; opacity:1 !important; filter:none !important; background-size:100% .92em !important}
-    .sub::after{animation:none !important} .cur{display:none !important}
-    .cta-fx svg{animation:none}
-  }
+  html.rm .split .ch,html.rm .p,html.rm .rise,html.rm mark,html.rm .marg img,html.rm .sub .w{transition:none !important; transform:none !important; opacity:1 !important; filter:none !important; background-size:100% .92em !important}
+    html.rm .sub::after{animation:none !important} html.rm .cur{display:none !important}html.rm .cta-fx svg{animation:none}
 
   /* ---------- hero ---------- */
   #top{grid-template-rows:14vh 18vh 39vh 29vh; padding-bottom:0}
@@ -1745,7 +1742,7 @@
   html[lang="en"] .rotv b{font-family:var(--optima); font-weight:400; letter-spacing:.005em; font-feature-settings:normal; line-height:1.2}
   html[lang="en"] .rotv .rtl .ch{font-family:inherit; font-weight:inherit; font-size:1em; margin:0}
   .rotv .rnote{font-family:var(--mincho); font-weight:400; font-size:min(2.95vw, 3.5vh); line-height:1.9; letter-spacing:.03em; opacity:.8; white-space:nowrap}   /* 一行に収める（「す。」だけ折り返していた） */
-  @media (prefers-reduced-motion:reduce){ .rotv .ph{animation:none; transform:rotate(-90deg)} .rotv .ar{animation:none; opacity:.5} }
+  html.rm .rotv .ph{animation:none; transform:rotate(-90deg)}html.rm .rotv .ar{animation:none; opacity:.5}
 
   /* 写真の枚数の丸は、その章が画面をつかんでいるあいだだけ（画面に固定したので、章の外にも出てしまっていた） */
   #ch5pin .bgdot{opacity:0; transition:opacity .45s var(--ease)}
@@ -1836,7 +1833,7 @@
   @keyframes rvL{0%,20%{transform:rotate(90deg); opacity:0} 29%{opacity:0} 33%{opacity:1} 38%{transform:rotate(0deg); opacity:1} 90%{transform:rotate(0deg); opacity:1} 96%,100%{transform:rotate(0deg); opacity:0}}
   @keyframes rvC{0%,5%{transform:translateX(0)} 9%{transform:translateX(-7px)} 13%{transform:translateX(0)} 100%{transform:translateX(0)}}
   @keyframes rvOK{0%,44%{transform:scale(.3); opacity:0} 50%{transform:scale(1.18); opacity:1} 54%{transform:scale(1); opacity:1} 88%{transform:scale(1); opacity:1} 94%,100%{transform:scale(1); opacity:0}}
-  @media (prefers-reduced-motion:reduce){ .rotv .pP,.rotv .pc{animation:none; display:none} .rotv .pL,.rotv .ok{animation:none; opacity:1; transform:none} }
+  html.rm .rotv .pP,html.rm .rotv .pc{animation:none; display:none}html.rm .rotv .pL,html.rm .rotv .ok{animation:none; opacity:1; transform:none}
 
   /* スマホのメニュー：判の絵（少し傾いて枠より大きい）が案内行の線に掛かっていた。線から離し、その分を下で詰める */
   html.pcview.phone .menu-in{padding-top:calc(var(--hdh, 116px) + 25px); padding-bottom:0}
@@ -2170,3 +2167,6 @@
      画面の高さ（vh）で決めていた段の位置（--y1〜--y3）も TOP の高さに追随させる。ノッチの無い機種（100vh ≥ 685）は今までどおり。
      大きさ・横の配置・cover はそのまま。はみ出した分は最初の一画面の下に入り、少しスクロールすると現れる */
   html.pcview.phone #top{height:max(100vh, 685px); min-height:max(100vh, 685px); --y1:calc(.14 * max(100vh, 685px)); --y2:calc(.32 * max(100vh, 685px)); --y3:calc(.71 * max(100vh, 685px))}
+  /* v280: Windows のハイコントラスト（forced-colors）でも、この紙面の色そのものが内容なので自前の色を保つ。
+     指定しないと地の朱・墨・判の色が OS の 2 色に置き換わり、オープニングの文字だけが白地に残る */
+  @media (forced-colors: active){ html{forced-color-adjust:none} }
