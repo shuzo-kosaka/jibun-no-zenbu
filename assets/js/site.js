@@ -6,7 +6,7 @@
   var body = document.body, top = document.getElementById('top');
   /* 開発者ツールを開いてくださった方へ */
   try{
-    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n   コードの中まで見ていただけるのは、つくった側として何よりうれしいことです。\n   このサイトは、まず Illustrator などで素材を制作し、ノーコードの Web 制作ツールでいちど形にしました。\n   そこから AI との対話を重ねて HTML を組み立て、試作は 94 版を数えています。\n   そのコードをもとに書いてもらったコードを実装し、179 回のやりとりを経て、なんとかこの形になりました。\n   どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far. I drew the assets in Illustrator, built a first version in a no-code tool,\n   then assembled the HTML through a long dialogue with AI — 94 drafts there, and 179 exchanges in the editor\n   where the code was written and implemented. Enjoy the rest of it. — Shuzo Kosaka',
+    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n\n   このサイトは、まず Illustrator などで素材を制作したうえで、ワイヤーフレームとしてノーコードの Web 制作ツールを使い、一度形にしました。\n   そこから AI との対話を重ねて HTML を組み立て、その内容をもとに書いてもらったコードを実装し、約 500 回のやりとりを経て、なんとかこの形になりました。\n   地道な作業ではありましたが、AI を活用した Web 制作は自分自身初めてで、発見だらけの日々となりました。\n\n   このような制作の機会をいただき、ありがとうございます。\n   どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far.\n\n   I began by making the assets in Illustrator, then built a first version as a wireframe in a no-code web tool.\n   From there I assembled the HTML through a dialogue with AI, implemented the code that came back, and after\n   some 500 exchanges it finally became this. Patient work — and my first time building a site with AI, so it was\n   full of discoveries.\n\n   Thank you for the opportunity to make it. Enjoy the rest of it. — Shuzo Kosaka',
       'display:inline-block; background:#E84518; color:#FBF7F2; font:700 14px/1 serif; padding:6px 7px; border-radius:50%; margin-right:6px', 'color:#1C1B19; font:13px/1.7 -apple-system, system-ui, sans-serif');
   }catch(e){}
 
