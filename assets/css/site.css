@@ -2180,7 +2180,7 @@
   /* v282: 縦にした瞬間の覆いは CSS で。JS が向きの変化を受け取るまでの間（実機では回転の動きのあいだ）に
      下の紙面が見えていた。案内を閉じたあと（html.rvmute）は覆わない */
   @media (orientation:portrait){
-    html.handheld:not(.rvmute) .rotv,html.handheld:not(.rvmute) .rotv.gone,html.handheld:not(.rvmute) .rotv.gone.off{display:flex !important; opacity:1 !important; transition:none}
+    html.handheld:not(.rvmute):not(.cpopen) .rotv,html.handheld:not(.rvmute):not(.cpopen) .rotv.gone,html.handheld:not(.rvmute):not(.cpopen) .rotv.gone.off{display:flex !important; opacity:1 !important; transition:none}   /* v286: 「メールを送る」を開いている間は覆わない */
   }
   /* v283: スマホの TOP — 題字と CONTENTS の組を、左上へ寄せる（添付の指示）。左へ 60px、上へ 8px。
      スマホだけ。下の SEVEN CHECKPOINTS・回転文・SCROLL は元の柱（--x1）のまま */

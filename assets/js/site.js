@@ -394,6 +394,7 @@
       rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); clearTimeout(hide.t); hide.t = setTimeout(function(){ if(rv.classList.contains('gone')){ rv.classList.add('off'); if(window.__retint) window.__retint(); } }, 1000); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
     function show(){
       if(muted) return;
+      if(H.classList.contains('cpopen')) return;   /* v286: 「メールを送る」を開いている間は出さない */
       clearTimeout(hide.t); rv.classList.remove('off'); H.classList.remove('rvmute');
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
@@ -404,6 +405,8 @@
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
     /* v213: v211 の差し替えで落ちていた最初の分岐を戻す。
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
+    window.__rvSuppress = function(){ hide(); };   /* v286: メールを送るを開いたとき（閉じたら戻す。閉じたことにはしない） */
+    window.__rvPortrait = function(){ if(!land.matches && started){ muted = false; show(); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
     window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
     else setTimeout(function(){ if(!started){ hide(true); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
@@ -2559,7 +2562,8 @@
     if(hdEl && cpl0) hdEl.insertBefore(cpl0, hdEl.firstChild); if(nav0 && cpx0) nav0.appendChild(cpx0);
     cpage.hidden = false; cpage.classList.remove('out'); void cpage.offsetWidth; cpage.classList.add('in');
     if(mkbtn){ if(mkbtn.__t === undefined) mkbtn.__t = mkbtn.title; mkbtn.title = 'ちょっとしたサプライズの表示／非表示'; }
-    document.documentElement.classList.add('cpopen'); if(menu && menu.classList.contains('open')) setMenu(false); togFit();
+    document.documentElement.classList.add('cpopen'); if(window.__rvSuppress) window.__rvSuppress();   /* v286 */
+    if(menu && menu.classList.contains('open')) setMenu(false); togFit();
     clearTimeout(surHintT); document.documentElement.classList.add('surhint'); surHintT = setTimeout(function(){ document.documentElement.classList.remove('surhint'); }, 7000);   /* v93: the surprise toggle blinks for a while, so a visitor who came to write notices it */
     try{ history.pushState({cp:1}, '', '#write'); cpPushed = true; }catch(e){ cpPushed = false; }
     var done = document.getElementById('cpdone'); if(done) done.hidden = true; var err = document.getElementById('cperr'); if(err) err.textContent = '';
@@ -2569,6 +2573,7 @@
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
     cpage.classList.remove('in'); cpage.classList.add('out'); document.documentElement.classList.remove('cpopen');
+    if(window.__rvPortrait) window.__rvPortrait();   /* v286: 閉じた時点で縦持ちなら案内を出す */
     var bar = cpage.querySelector('.cp-bar'), cpx1 = document.getElementById('cpx'), cpl1 = document.querySelector('.hd .cp-lab'); if(bar){ if(cpl1) bar.appendChild(cpl1); if(cpx1) bar.appendChild(cpx1); }   /* and back into the page */
     cpT = setTimeout(function(){ cpage.hidden = true; cpage.classList.remove('out'); }, 620);
     if(mkbtn && mkbtn.__t !== undefined) mkbtn.title = mkbtn.__t; togFit();
