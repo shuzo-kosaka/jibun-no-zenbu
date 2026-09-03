@@ -2264,3 +2264,8 @@
   html.cpopen{background-color:var(--paper) !important}   /* 画面の地そのもの。固定の箱がどう狂っても、ここは必ず全面を塗る（案内用の !important に勝たせる） */
   html.cpopen body::after{background:var(--paper) !important; transition:none}
   html.cpopen body > section,html.cpopen body > footer,html.cpopen body > .yr,html.cpopen body > .rew,html.cpopen body > .remain,html.cpopen body > .cta-fx{visibility:hidden}
+  /* v295: スマホの TOP — CONTENTS の一覧は出さない。空いた縦の分だけ、題字を下へ、
+     SEVEN CHECKPOINTS と流れる文字を上へ寄せて、画面の中ほどで釣り合うように置く（左端は今までどおり） */
+  html.pcview.phone #top .toc{display:none}
+  html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 21px)}
+  html.pcview.phone #top .sub,html.pcview.phone #top .rot{transform:translateY(-173px)}
