@@ -404,6 +404,7 @@
     function show(){
       if(muted) return;
       if(H.classList.contains('cpopen')) return;   /* v286: 「メールを送る」を開いている間は出さない */
+      if(H.classList.contains('nwon')) return;   /* v321: 窓が細いときの案内が出ているなら、そちらを優先する */
       clearTimeout(hide.t); rv.classList.remove('off'); H.classList.remove('rvmute');
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
@@ -425,9 +426,10 @@
       /* v317: メールの紙面（紙色）が消えきる前に色を採ると、帯が白のまま残る。最初の案内と同じように何度か採り直す */
       var rt2 = function(){ if(window.__retint) window.__retint(); if(window.__setTheme){ var c2 = window.__landCols; window.__setTheme((c2 && c2.bg) || '#E84518'); } };
       requestAnimationFrame(function(){ requestAnimationFrame(rt2); }); setTimeout(rt2, 350); setTimeout(rt2, 700); setTimeout(rt2, 1200); setTimeout(rt2, 2200); } };   /* v286: 閉じたとき、縦持ちなら案内を出す */
+    window.__rvRecheck = function(){ if(!started) return; if(land.matches) hide(); else { rvKind = 'rot'; show(); } };   /* v321 */
     window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
-    else setTimeout(function(){ if(!started){ hide(true); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
+    else setTimeout(function(){ if(started && land.matches) hide(); }, 5000);   /* v321: 最初の案内は時間では消さない。横持ちになるか、触られるまで出したままにする */
     rv.addEventListener('click', function(){ muted = true; hide(true); startOpening(); });
     /* 先生の判（参考画像に合わせて）：桜型は花びら 5 枚・先に小さな切れ込み・丸い山。中は縦書き。
        押される回数で中身と形が変わる：1 回目「たいへんよくできました」（二重線の花）、
@@ -2697,16 +2699,54 @@
         b.style.background = col[i % col.length];
         b.style.width = (5 + Math.random() * 6).toFixed(1) + 'px';
         b.style.height = (8 + Math.random() * 10).toFixed(1) + 'px';
-        b.style.animationDelay = (Math.random() * .5).toFixed(2) + 's';
-        b.style.animationDuration = (1.5 + Math.random() * 1.1).toFixed(2) + 's';
-        b.style.setProperty('--sx', ((Math.random() * 2 - 1) * 90).toFixed(0) + 'px');
-        b.style.setProperty('--sp', (Math.random() * 2 - 1 > 0 ? 1 : -1) * (360 + Math.random() * 540) + 'deg');
+        b.__del = Math.round(Math.random() * 500); b.__dur = Math.round(1500 + Math.random() * 1100);
+        b.__sx = Math.round((Math.random() * 2 - 1) * 90); b.__sp = Math.round((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540));
+        b.style.animationDelay = (b.__del / 1000).toFixed(2) + 's';
+        b.style.animationDuration = (b.__dur / 1000).toFixed(2) + 's';
+        b.style.setProperty('--sx', b.__sx + 'px');
+        b.style.setProperty('--sp', b.__sp + 'deg');
         bits.appendChild(b);
       }
       el.appendChild(bits);
     }
-    el.classList.add('on'); document.body.appendChild(el);   /* v316: 置く前に .on を付ける。実機の Safari は、置いた直後に付け足した組の動きを取りこぼすことがある */
-    cpYayT = setTimeout(function(){ el.classList.add('gone'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 950); }, reduce ? 2400 : 3000);
+    /* v323: 組（CSS animation）は、置いたばかりの要素だと実機の Safari が取りこぼすことがある。
+       動かせる環境では JavaScript の側から直に動かす（こちらは必ず頭から走る）。
+       使えない環境のためだけに、これまでの CSS の組も .on として残してある */
+    var WA = typeof el.animate === 'function';
+    if(!WA) el.classList.add('on');
+    document.body.appendChild(el);
+    if(WA){
+      var EI = 'cubic-bezier(.2,.9,.3,1)', T0 = 'translate(-50%,-50%) rotate(-9deg)';
+      seal.animate([
+        {opacity:0, transform:'translate(-50%,-50%) rotate(-16deg) scale(1.52)', offset:0},
+        {opacity:.98, offset:.38},
+        {opacity:.98, transform:T0 + ' scale(.955)', offset:.58},
+        {opacity:.96, transform:T0 + ' scale(1.018)', offset:.76},
+        {opacity:.94, transform:T0 + ' scale(1)', offset:1}
+      ], {duration:640, easing:EI, fill:'both'});
+      [ring, ring2].forEach(function(r, k){
+        r.animate([{opacity:0, transform:'translate(-50%,-50%) scale(.72)', offset:0},
+                   {opacity:.5, offset:.14},
+                   {opacity:0, transform:'translate(-50%,-50%) scale(1.5)', offset:1}],
+                  {duration:1150, delay:340 + k * 220, easing:'cubic-bezier(.2,.75,.3,1)', fill:'both'});
+      });
+      if(!reduce) Array.prototype.forEach.call(el.querySelectorAll('.yay-bits i'), function(b){
+        var sx = b.__sx, sp = b.__sp;
+        b.animate([{opacity:0, transform:'translate3d(0,-8vh,0) rotate(0deg)', offset:0},
+                   {opacity:1, offset:.08}, {opacity:1, offset:.82},
+                   {opacity:0, transform:'translate3d(' + sx + 'px,112vh,0) rotate(' + sp + 'deg)', offset:1}],
+                  {duration:b.__dur, delay:b.__del, easing:'cubic-bezier(.3,.5,.5,1)', fill:'both'});
+      });
+    }
+    cpYayT = setTimeout(function(){
+      if(WA){
+        seal.animate([{opacity:.94, transform:'translate(-50%,-50%) rotate(-9deg) scale(1)'},
+                      {opacity:0, transform:'translate(-50%,-50%) rotate(-9deg) scale(1.1)'}],
+                     {duration:640, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards'});
+        el.animate([{opacity:1}, {opacity:0}], {duration:640, delay:60, easing:'ease-out', fill:'forwards'});
+      } else el.classList.add('gone');
+      setTimeout(function(){ if(el.parentNode) el.remove(); }, 820);
+    }, reduce ? 2400 : 3000);
   }
   /* v288: メールを送るを横持ちで開いたときの小さな知らせ。案内の端末の絵をそのまま借り、動きだけ逆に回して
      「横 → 縦」に見せる（確認の印は縦の姿の側へ移す）。紙面の操作は妨げない */
@@ -3130,7 +3170,7 @@
           A('d', 'M88 122h34;M88 122h34;M44 116h108;M44 116h108;M88 122h34') + A('opacity', '0;0;.42;.42;0') + '</path>' +
         '<g class="nw-ar"><path d="M68 96h-14M58 90l-6 6 6 6"/>' + T('0,0;0,0;-46,0;-46,0;0,0') + '</g>' +
         '<g class="nw-ar"><path d="M152 96h14M162 90l6 6-6 6"/>' + T('0,0;0,0;46,0;46,0;0,0') + '</g>' +
-        '<g class="nw-ar nw-dg"><path d="M148 126l14 12M150 138h12v-12"/>' + T('0,0;0,0;28,18;28,18;0,0') + '</g>' +
+        '<g class="nw-ar nw-dg"><path d="M152 130l11 9M154 139h9v-9"/>' + T('0,0;0,0;46,32;46,32;0,0') + '</g>' +
         '</svg>';
     }
     function build(){
@@ -3167,7 +3207,8 @@
     window.addEventListener('touchmove', nwBlock, {passive:false});
     function check(){
       if(narrowNow()){ words(); build(); tone(); el.classList.add('on'); H.classList.add('nwon'); }
-      else if(el){ el.classList.remove('on'); H.classList.remove('nwon'); }
+      else if(el){ el.classList.remove('on'); H.classList.remove('nwon');
+        if(window.__rvRecheck) setTimeout(window.__rvRecheck, 260); }   /* v321: 窓を広げたあと、縦持ちならそちらの案内へ */
     }
     if(mq.addEventListener) mq.addEventListener('change', check); else if(mq.addListener) mq.addListener(check);
     window.addEventListener('resize', check, {passive:true});
