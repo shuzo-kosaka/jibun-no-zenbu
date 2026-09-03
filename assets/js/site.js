@@ -2063,6 +2063,11 @@
     /* v218: 指の端末では、巻き戻しボタンと長い飛行（画面 3 つ分より遠く）は幕を下ろして一足で着く。
        全章を通り抜ける飛行は iOS の描画プロセスを落とし、Safari がページを黙って読み直していた */
     if(document.documentElement.classList.contains('handheld') && (rew || Math.abs(dist) > innerHeight * 3)){ curtainJump(y, land, rew); return; }
+    clearTimeout(flyTo.safe); flyTo.safe = setTimeout(function(){   /* v320: どこかで引っかかっても、必ず片づける */
+      if(flying) return; var HH = document.documentElement;
+      if(HH.classList.contains('rewind') || HH.classList.contains('fwd') || HH.classList.contains('flying')){
+        HH.classList.remove('flying', 'rewind', 'fwd'); if(window.__skipHudOff) window.__skipHudOff(); onScroll(); }
+    }, dur + 900);
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
@@ -2148,7 +2153,10 @@
     window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
     window.addEventListener('keydown', function(){ if(active){ active = false; cancelAnimationFrame(raf); raf = 0; } }, {passive:true});
   })();
-  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false; document.documentElement.classList.remove('flying'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
+  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false;
+    /* v320: 巻き戻しの帯（rewind / fwd）も一緒に外す。ここで残ると、途中で止まったまま帯が出っぱなしになり、
+       html.rewind * { transition:none } のせいで紙面の動きまで止まっていた */
+    document.documentElement.classList.remove('flying', 'rewind', 'fwd'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
   document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');
@@ -2698,7 +2706,7 @@
       el.appendChild(bits);
     }
     el.classList.add('on'); document.body.appendChild(el);   /* v316: 置く前に .on を付ける。実機の Safari は、置いた直後に付け足した組の動きを取りこぼすことがある */
-    cpYayT = setTimeout(function(){ el.classList.add('gone'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 800); }, reduce ? 2400 : 3000);
+    cpYayT = setTimeout(function(){ el.classList.add('gone'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 950); }, reduce ? 2400 : 3000);
   }
   /* v288: メールを送るを横持ちで開いたときの小さな知らせ。案内の端末の絵をそのまま借り、動きだけ逆に回して
      「横 → 縦」に見せる（確認の印は縦の姿の側へ移す）。紙面の操作は妨げない */
@@ -3093,8 +3101,12 @@
      幅を戻すと消える（指の端末では出さない） */
   (function(){
     var H = document.documentElement;
-    if(H.classList.contains('handheld')) return;
+    if(H.classList.contains('phone')) return;   /* スマホは横持ちの案内があるので出さない */
+    var TAB = H.classList.contains('tablet');
     var mq = window.matchMedia('(max-width:1024px)'), el = null, copied = '';
+    /* v319: タブレットは幅を 1280 に決め打ちしているので、窓を狭めても幅の合図は来ない。
+       そのかわり画面の形（縦横の比）で見る。窓が細くなるほど、決め打ちの幅に対して縦が長くなる */
+    function narrowNow(){ return TAB ? (window.innerHeight / Math.max(1, window.innerWidth) >= 1.45) : mq.matches; }
     var NWCOPY = {
       ja: {small:'おっと、タブが少し狭いようです。', b:'目を細める前に、<br>窓を大きく。', big:'目|窓', note:'できれば、ゆとりのある幅でお楽しみください。'},
       en: {small:'Oops — the window is a little narrow.', b:'Before you squint,<br>widen the window.', big:'squint|window', note:'If you can, enjoy it with a bit more room.'}
@@ -3149,15 +3161,19 @@
     }
     var toneRaf = 0;
     window.addEventListener('scroll', function(){ if(!el || !el.classList.contains('on') || toneRaf) return; toneRaf = requestAnimationFrame(function(){ toneRaf = 0; tone(); }); }, {passive:true});
+    /* v320: 案内が出ているあいだは紙面を動かさない（縦持ちの案内と同じ扱い） */
+    function nwBlock(e){ if(H.classList.contains('nwon')) e.preventDefault(); }
+    window.addEventListener('wheel', nwBlock, {passive:false});
+    window.addEventListener('touchmove', nwBlock, {passive:false});
     function check(){
-      if(H.classList.contains('handheld')) return;
-      if(mq.matches){ words(); build(); tone(); el.classList.add('on'); H.classList.add('nwon'); }
+      if(narrowNow()){ words(); build(); tone(); el.classList.add('on'); H.classList.add('nwon'); }
       else if(el){ el.classList.remove('on'); H.classList.remove('nwon'); }
     }
     if(mq.addEventListener) mq.addEventListener('change', check); else if(mq.addListener) mq.addListener(check);
     window.addEventListener('resize', check, {passive:true});
     window.__narrowCheck = check;
     setTimeout(check, 900);
+    window.addEventListener('orientationchange', function(){ setTimeout(check, 420); });
   })();
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */

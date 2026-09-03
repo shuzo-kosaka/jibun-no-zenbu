@@ -2498,3 +2498,20 @@
   #narrow .nw-dg{opacity:.72}
   #narrow small{opacity:.72}
   #narrow .nw-note{opacity:.66}
+  /* v319
+     ・伏せるの升目は自前で描く。既定の升目は、別のタブを触ると色が抜け、
+       サプライズで写しが飛ぶと（変数が届かず）青くなっていた。色は決め打ちにして、写しにも同じ見た目を届ける
+     ・感謝の印は、紙から持ち上げるように退場する
+     ・タブレットでも、窓が細いときは同じ案内を出す */
+  .cp-form input[type="checkbox"]{-webkit-appearance:none; appearance:none; width:13px; height:13px; flex:none; margin:0;
+    border:1.4px solid #8E8B84; border-radius:2px; background:transparent; cursor:pointer; vertical-align:middle;
+    background-repeat:no-repeat; background-position:center; background-size:78% 78%; transition:background-color .2s, border-color .2s}
+  .cp-form input[type="checkbox"]:checked{background-color:#E84518; border-color:#E84518;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23FAFAF8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' d='M3.4 8.4l3 3 6.2-7'/%3E%3C/svg%3E")}
+  .cp-form input[type="checkbox"]:focus-visible{outline:2px solid #E84518; outline-offset:2px}
+  @media (orientation:portrait){ html.pcview.phone .cpage .cp-form input[type="checkbox"]{width:26px; height:26px; border-width:2px; border-radius:3px} }
+  #cpyay.gone .yay-seal{transform:translate(-50%,-50%) rotate(-9deg) scale(1.07); transition:transform .66s cubic-bezier(.2,.8,.2,1)}
+  #cpyay.gone .yay-bits i{animation-play-state:paused}
+  /* v320: 窓が狭いときの案内が出ているあいだは、下の紙面を動かさない */
+  html.nwon,html.nwon body{overflow:hidden}
+  #narrow{touch-action:none; overscroll-behavior:contain}
