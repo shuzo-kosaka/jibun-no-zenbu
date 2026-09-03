@@ -390,10 +390,11 @@
     function rvBlock(e){ if(!rv.classList.contains('gone')) e.preventDefault(); }
     window.addEventListener('touchmove', rvBlock, {passive:false});
     window.addEventListener('wheel', rvBlock, {passive:false});
-    function hide(){ rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); clearTimeout(hide.t); hide.t = setTimeout(function(){ if(rv.classList.contains('gone')){ rv.classList.add('off'); if(window.__retint) window.__retint(); } }, 1000); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
+    function hide(mute){ H.classList.toggle('rvmute', !!mute);   /* v282: 触って閉じた・5 秒で閉じたときだけ CSS の覆いも外す。横向きで閉じるときは残す（次に縦にした瞬間、JS を待たずに覆えるように） */
+      rv.classList.add('gone'); H.classList.remove('rotvup', 'rotvup0'); clearTimeout(hide.t); hide.t = setTimeout(function(){ if(rv.classList.contains('gone')){ rv.classList.add('off'); if(window.__retint) window.__retint(); } }, 1000); if(window.__setTheme){ var cur = (getComputedStyle(document.body).getPropertyValue('--bg') || '').trim(); if(cur) window.__setTheme(cur); } }
     function show(){
       if(muted) return;
-      clearTimeout(hide.t); rv.classList.remove('off');
+      clearTimeout(hide.t); rv.classList.remove('off'); H.classList.remove('rvmute');
       recopy();
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
@@ -405,8 +406,8 @@
        すでに横向きなら案内は要らない → すぐ幕へ。縦なら 5 秒で自分から閉じる。触っても閉じる。 */
     window.__rvHide = function(){ if(land.matches && !H.classList.contains('rotvup') === false) hide(); };   /* v232: 横向きなら帯の色（rotvup/rotvup0）を必ず外す */
     if(land.matches){ hide(); startOpening(); }
-    else setTimeout(function(){ if(!started){ hide(); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
-    rv.addEventListener('click', function(){ muted = true; hide(); startOpening(); });
+    else setTimeout(function(){ if(!started){ hide(true); startOpening(); } else if(land.matches) hide(); }, 5000);   /* v232: 別経路で始まっていても、横向きなら帯の色は外す */
+    rv.addEventListener('click', function(){ muted = true; hide(true); startOpening(); });
     /* 先生の判（参考画像に合わせて）：桜型は花びら 5 枚・先に小さな切れ込み・丸い山。中は縦書き。
        押される回数で中身と形が変わる：1 回目「たいへんよくできました」（二重線の花）、
        2 回目「がんばりましょう」（一重線の花）、3 回目から「もういちど復習しよう」（二重丸） */
@@ -465,9 +466,11 @@
     function onOrient(e){
       var m = e.matches;
       clearTimeout(onOrient.t);
+      /* v282: 縦にしたときは待たずに出す。430ms 待ってから薄く現れていたので、そのあいだ下の紙面が見えていた。
+         横にしたときだけ 430ms 待つ（回している最中の一瞬の判定で幕が消えないように） */
+      if(!m){ if(started) show(); return; }
       onOrient.t = setTimeout(function(){
-        if(m){ var wasUp = started && !rv.classList.contains('gone'); muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520); }
-        else if(started) show();
+        var wasUp = started && !rv.classList.contains('gone'); muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520);
       }, 430);
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);

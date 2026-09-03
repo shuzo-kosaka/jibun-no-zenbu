@@ -2174,3 +2174,11 @@
      .pP（縦）と .pL（横）は 4.4 秒の動きで交互に見せているが、どちらも既定は不透明のままだったので、
      動きが走っていない瞬間（画面を離れて戻ったとき、案内を出し直したときなど）に縦と横が重なって見えていた */
   .rotv .pL{opacity:0}
+  /* v282: 案内が現れるときは一息で覆う（0.42 秒かけて薄く現れるあいだ、下の紙面が透けていた）。
+     中の文字と絵は今までどおり順に出る。退場（.gone）の速さは変えない */
+  html.handheld .rotv{transition:opacity .14s var(--ease)}
+  /* v282: 縦にした瞬間の覆いは CSS で。JS が向きの変化を受け取るまでの間（実機では回転の動きのあいだ）に
+     下の紙面が見えていた。案内を閉じたあと（html.rvmute）は覆わない */
+  @media (orientation:portrait){
+    html.handheld:not(.rvmute) .rotv,html.handheld:not(.rvmute) .rotv.gone,html.handheld:not(.rvmute) .rotv.gone.off{display:flex !important; opacity:1 !important; transition:none}
+  }
