@@ -2295,3 +2295,19 @@
      色のある章ではヘッダーの帯が地と同じ色＋ぼかしなので、下の紙面（点・地図の線・START · 2025 の文字など）が
      ボタンの後ろに透けて、JA と EN の上下に線が入っているように見えていた */
   .lang{background:var(--bg)}
+  /* v303: フッターの QR（PC だけ）。「小坂脩蔵」の行と頭を揃え、白で置く */
+  .ft-qr{display:none}
+  html:not(.handheld) .ft-top{grid-template-columns:minmax(0,1fr) auto auto; gap:40px 4vw}
+  html:not(.handheld) .ft-qr{display:flex; align-items:flex-start; gap:16px; max-width:min(30vw, 420px); margin-top:-19px}
+  html:not(.handheld) .ft-qr svg{width:92px; height:92px; flex:none; color:var(--fg); opacity:.92}
+  html:not(.handheld) .ft-qrtx{margin:0; display:flex; flex-direction:column; gap:8px}
+  html:not(.handheld) .ft-qrtx b{font-family:var(--mincho); font-weight:700; font-size:13.5px; line-height:1.75; letter-spacing:.04em; color:var(--fg)}
+  html:not(.handheld) .ft-qrtx span{font-family:var(--sans); font-size:10.5px; line-height:1.9; letter-spacing:.06em; color:var(--fg3)}
+  @media (max-width:1180px){ html:not(.handheld) .ft-qrtx{display:none} html:not(.handheld) .ft-qr{max-width:none} }
+  /* v304: 匿名で送る。名前とメールアドレスを伏せたいときのための一行 */
+  .cp-anon{display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 12px; cursor:pointer; margin-top:-6px}
+  .cp-anon input{width:16px; height:16px; accent-color:var(--acc); flex:none; align-self:center; margin:0}
+  .cp-anon span{font-family:var(--mincho); font-weight:700; font-size:13px; letter-spacing:.04em; color:var(--fg2)}
+  .cp-anon i{font-style:normal; font-family:var(--sans); font-size:11px; letter-spacing:.06em; color:var(--fg3)}
+  .cp-form.anon label:has(input[name="name"]),.cp-form.anon label:has(input[name="email"]){opacity:.42}
+  .cp-form.anon label:has(input[name="name"]) input,.cp-form.anon label:has(input[name="email"]) input{pointer-events:none}

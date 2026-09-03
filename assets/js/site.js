@@ -2669,9 +2669,11 @@
     e.preventDefault();
     var en = curLang === 'en', g = function(n){ var el = cpform.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; }, name = g('name'), mail = g('email'), subj = g('subject'), msg = g('msg'), err = document.getElementById('cperr'), bad = [];
     cpform.querySelectorAll('label').forEach(function(l){ l.classList.remove('bad'); });
-    if(!name) bad.push('name'); if(!mail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) bad.push('email'); if(!msg) bad.push('msg');
+    var anonEl = cpform.querySelector('[name="anon"]'), anon = !!(anonEl && anonEl.checked);   /* v304: 伏せて送る */
+    if(!anon){ if(!name) bad.push('name'); if(!mail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) bad.push('email'); }
+    if(!msg) bad.push('msg');
     bad.forEach(function(n){ var el = cpform.querySelector('[name="' + n + '"]'); if(el && el.closest('label')) el.closest('label').classList.add('bad'); });
-    if(bad.length){ if(err) err.textContent = en ? 'Please fill in your name, a valid email address and a message.' : 'お名前・正しいメールアドレス・メッセージをご記入ください。'; var f = cpform.querySelector('[name="' + bad[0] + '"]'); if(f) f.focus(); return; }
+    if(bad.length){ if(err) err.textContent = anon ? (en ? 'Please write a message.' : 'メッセージをご記入ください。') : (en ? 'Please fill in your name, a valid email address and a message.' : 'お名前・正しいメールアドレス・メッセージをご記入ください。'); var f = cpform.querySelector('[name="' + bad[0] + '"]'); if(f) f.focus(); return; }
     if(err) err.textContent = '';
     var subject = subj || ((en ? 'From the portfolio site' : 'ポートフォリオサイトより') + ' — ' + name);
     var bodyTxt = msg + '\n\n' + (en ? 'Name: ' : 'お名前：') + name + '\n' + (en ? 'Email: ' : 'メールアドレス：') + mail;
@@ -2683,6 +2685,11 @@
     function release(){ if(btn) btn.disabled = false; if(lab) lab.textContent = labWas; }
     function openMail(){ var a = document.createElement('a'); a.href = href; a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); }, 1000); }   /* a link click rather than location.href: the page stays where it is */
     function fallback(){   /* the page could not send it — hand it to the mail app, and say so */
+      if(anon){   /* v304: 伏せて送るときは、メールソフト（＝送り主の宛先が出る）は開かない */
+        release();
+        show(en ? 'Could not send just now. Please try again in a little while.' : 'いま送ることができませんでした。少し時間をおいて、もう一度お試しください。');
+        return;
+      }
       release(); openMail();
       show(en ? 'Could not send from the page, so your mail app has been opened instead. If nothing happened, please try again in a little while.'
              : 'ページからは送れなかったため、お使いのメールソフトを開きました。何も起きないときは、少し時間をおいてもう一度お試しください。');
@@ -2694,7 +2701,7 @@
     var settled = false, giveUp = setTimeout(function(){ if(!settled){ settled = true; fallback(); } }, 12000);
     /* text/plain keeps this a simple request: Apps Script answers no preflight */
     fetch(CONTACT_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({
-      name:name, email:mail, subject:subj, msg:msg, company:g('company'), lang: en ? 'en' : 'ja'
+      name: anon ? '' : name, email: anon ? '' : mail, subject:subj, msg:msg, company:g('company'), anon: anon, lang: en ? 'en' : 'ja'
     })}).then(function(r){ return r.json().catch(function(){ return {ok: r.ok}; }); })
       .then(function(res){
         if(settled) return; settled = true; clearTimeout(giveUp);
@@ -2866,8 +2873,34 @@
       if(alive) requestAnimationFrame(frame);
     })(t0);
   }
+  /* v302: 言語を切り替えると文の長さが変わり、読んでいた場所が上下にずれていた。
+     切り替える前に「画面の上端にいちばん近い一文」を覚えておき、組み直しが落ち着くたびに同じ位置へ戻す。
+     ピン留めの場面は文ではなく進み具合（節の中の割合）で覚える */
+  var LANGSEL = 'p.p, .sub, h2, figure, .vid';
+  function langAnchor(){
+    var vhh = vh(), secs = document.querySelectorAll('section[id]'), sec = null;
+    for(var i = 0; i < secs.length; i++){ var r = secs[i].getBoundingClientRect(); if(r.top <= 8 && r.bottom > 8){ sec = secs[i]; break; } }
+    if(!sec) return null;
+    if(sec.classList.contains('pin')) return {id:sec.id, pin:true, p:(window.scrollY - sec.offsetTop) / Math.max(1, sec.offsetHeight - vhh)};
+    var list = sec.querySelectorAll(LANGSEL), best = -1, bestTop = 1e9;
+    for(var j = 0; j < list.length; j++){ var t = list[j].getBoundingClientRect().top; if(t > -60 && t < vhh * .9 && t < bestTop){ bestTop = t; best = j; } }
+    if(best < 0) return {id:sec.id, off:window.scrollY - sec.offsetTop};
+    return {id:sec.id, idx:best, top:bestTop};
+  }
+  function langRestore(a){
+    if(!a) return;
+    var sec = document.getElementById(a.id); if(!sec) return;
+    var y;
+    if(a.pin) y = sec.offsetTop + a.p * Math.max(1, sec.offsetHeight - vh());
+    else if(a.idx !== undefined){ var el = sec.querySelectorAll(LANGSEL)[a.idx]; if(!el) return; y = window.scrollY + (el.getBoundingClientRect().top - a.top); }
+    else y = sec.offsetTop + a.off;
+    y = Math.max(0, Math.round(y));
+    if(Math.abs(y - window.scrollY) < 2) return;
+    window.scrollTo(0, y); langRestore.y = y;
+  }
   function setLang(lang, quiet){
     var en = lang === 'en'; if(lang === curLang) return;
+    var langAnc = langAnchor(); langRestore.y = undefined;
     /* v120: the switch is a pass of the translator's rule — a ruled band sweeps the screen, carrying the pair of
        languages with it, and the page changes tongue as it goes by. The text swap below happens under the band. */
     (function(){
@@ -2911,7 +2944,16 @@
     setTimeout(function(){ rallyBuild(); }, 60);
     setTimeout(togFit, 720);   /* the toggles' labels are typed in first */
     setTimeout(function(){ if(window.__wkTryFit) window.__wkTryFit(); }, 120);   /* the sketch round the works' heading follows its new shape */
+    if(langAnc && !quiet){   /* v302: 組み直しが落ち着くたびに、読んでいた場所へ戻す（自分でスクロールしたら、そこでやめる） */
+      var keep = function(){ if(langRestore.y !== undefined && Math.abs(window.scrollY - langRestore.y) > 40) return; langRestore(langAnc); };
+      requestAnimationFrame(function(){ requestAnimationFrame(keep); });
+      setTimeout(keep, 90); setTimeout(keep, 300); setTimeout(keep, 820); setTimeout(keep, 1400);
+    }
   }
+  (function(){ var f = document.getElementById('cpform'), a = f && f.querySelector('[name="anon"]'); if(!f || !a) return;
+    var sync = function(){ f.classList.toggle('anon', a.checked); if(a.checked){ ['name','email'].forEach(function(n){ var el = f.querySelector('[name="' + n + '"]'); if(el) el.value = ''; }); } };
+    a.addEventListener('change', sync); sync();
+  })();
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
