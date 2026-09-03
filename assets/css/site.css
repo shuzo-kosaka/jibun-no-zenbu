@@ -2182,3 +2182,8 @@
   @media (orientation:portrait){
     html.handheld:not(.rvmute) .rotv,html.handheld:not(.rvmute) .rotv.gone,html.handheld:not(.rvmute) .rotv.gone.off{display:flex !important; opacity:1 !important; transition:none}
   }
+  /* v283: スマホの TOP — 題字と CONTENTS の組を、左上へ寄せる（添付の指示）。左へ 60px、上へ 8px。
+     スマホだけ。下の SEVEN CHECKPOINTS・回転文・SCROLL は元の柱（--x1）のまま */
+  html.pcview.phone #top .lbl,html.pcview.phone #top .toc{left:calc(var(--x1) - 60px)}
+  html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 6px)}
+  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 276px)}
