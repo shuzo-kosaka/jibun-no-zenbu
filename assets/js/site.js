@@ -453,24 +453,27 @@
         el.innerHTML = '<svg class="bkg" viewBox="0 0 200 200"></svg><div class="ink"><svg viewBox="0 0 200 200"></svg></div>';
         document.body.appendChild(el);
       }
-      rotOkN++;
-      var kind = rvKind;   /* v291: 直前の案内に合わせて判を選ぶ（メールを閉じた後は「引き続きお楽しみください」、ふつうの回転はお礼） */
+      var kind = rvKind, n = (kind === 'mail') ? 0 : ++rotOkN;   /* v292: ふつうの回転は先生の判の系列（回を重ねて変わる）、メールを閉じた後は「引き続きお楽しみください」 */
       var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('.ink svg'), bkg = el.querySelector('svg.bkg'), sp = sakuraPath(), h = '';
       if(kind === 'mail'){
         h = '<path class="pt" d="' + sp + '"/>';
         h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">ENJOY</text><text x="100" y="118" text-anchor="middle" font-size="17">THE REST</text>'
                 : vcols(['引き続き', 'お楽しみ', 'ください'], [120, 100, 80], 15.5, 84, 16.5);
-      } else if(rotOkN === 1){
+      } else if(n === 1){
         h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
-        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="14">THANK</text><text x="100" y="119" text-anchor="middle" font-size="19">YOU</text>'
-                : vcols(['ありがと', 'うござい', 'ました'], [120, 100, 80], 15.5, 84, 16.5);
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">VERY WELL</text><text x="100" y="118" text-anchor="middle" font-size="19">DONE</text>'
+                : vcols(['たいへん', 'よくでき', 'ました'], [120, 100, 80], 15.5, 84, 16.5);
+      } else if(n === 2){
+        h = '<path class="pt" d="' + sp + '"/>';
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">KEEP IT</text><text x="100" y="118" text-anchor="middle" font-size="19">UP</text>'
+                : vcols(['がんばり', 'ましょう'], [110, 89], 16.5, 86, 17);
       } else {
         h = '<circle class="pt" cx="100" cy="100" r="88"/><circle class="rg" cx="100" cy="100" r="79"/>';
-        h += en ? '<text x="100" y="94" text-anchor="middle" font-size="13">THANKS</text><text x="100" y="116" text-anchor="middle" font-size="17">AGAIN</text>'
-                : vcols(['なんども', 'ありがとう'], [111, 89], 15.5, 80, 16.5);
+        h += en ? '<text x="100" y="94" text-anchor="middle" font-size="12">ONE MORE</text><text x="100" y="116" text-anchor="middle" font-size="17">TIME</text>'
+                : vcols(['もういちど', '復習しよう'], [111, 89], 15.5, 78, 16.5);
       }
       svg.innerHTML = h;
-      bkg.innerHTML = (kind === 'mail' || rotOkN === 1) ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
+      bkg.innerHTML = (kind === 'mail' || n <= 2) ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
