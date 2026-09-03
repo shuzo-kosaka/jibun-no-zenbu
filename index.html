@@ -30,10 +30,10 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" id="themec" content="#E84518">
 <style>body{margin:0;font-size:14px;font-family:system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
-<link rel="stylesheet" href="assets/css/site.css?v=d7a2156d">
+<link rel="stylesheet" href="assets/css/site.css?v=5f4797ea">
 <script src="assets/js/i18n.js?v=8e6c81fb" defer></script>
 <script src="assets/js/matter.min.js?v=d79ceded" defer></script>
-<script src="assets/js/site.js?v=ccab1cd5" defer></script>
+<script src="assets/js/site.js?v=3d49a4c6" defer></script>
 </head>
 <body>
 <!--
@@ -139,9 +139,9 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
       <h2 class="cp-ttl mixed" id="cpttl" data-big="気軽"><span class="w">お気軽に、<br>お問い合わせください。</span></h2>
       <p class="cp-lead">お仕事のご相談、ポートフォリオへのご質問、ご感想など、どんなことでもお気軽にご連絡ください。このページから直接お送りいただけます。</p>
       <form class="cp-form" id="cpform" novalidate>
-        <label><span>お名前</span><input type="text" name="name" autocomplete="name"></label>
-        <label><span>メールアドレス</span><input type="email" name="email" autocomplete="email"></label>
-        <label class="cp-anon wide"><input type="checkbox" name="anon"><span data-ja="お名前とメールアドレスを伏せて送る" data-en="Send without your name or address">お名前とメールアドレスを伏せて送る</span><i data-ja="お返事はできませんが、たしかに受け取ります。" data-en="I cannot reply, but it reaches me all the same.">お返事はできませんが、たしかに受け取ります。</i></label><label class="wide"><span>件名</span><input type="text" name="subject"></label>
+        <label><span>お名前<i class="cp-hide"><input type="checkbox" name="hideName"><b data-ja="伏せる" data-en="hide">伏せる</b></i></span><input type="text" name="name" autocomplete="name"></label>
+        <label><span>メールアドレス<i class="cp-hide"><input type="checkbox" name="hideMail"><b data-ja="伏せる" data-en="hide">伏せる</b></i></span><input type="email" name="email" autocomplete="email"></label>
+        <label class="wide"><span>件名</span><input type="text" name="subject"></label>
         <label class="wide"><span>メッセージ</span><textarea name="msg" rows="5"></textarea></label><input class="cp-hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
         <p class="cp-err" id="cperr" role="alert"></p>
         <div class="cp-act"><button class="cp-send" type="submit"><b>送る</b><svg class="mi" viewBox="0 0 26 18" aria-hidden="true"><g class="env"><rect x="1" y="1" width="24" height="16" rx="2"/><path d="M1.6 2.2 13 10.6 24.4 2.2"/><path d="M1.6 16 9.6 9.2 M24.4 16 16.4 9.2"/></g></svg></button></div>
