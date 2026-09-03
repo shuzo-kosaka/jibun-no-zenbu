@@ -2289,4 +2289,5 @@
   html.rotvup body::after{background:var(--rvbg, var(--shu)) !important; transition:none}
   html.rotvup0 body::after{background:var(--shu) !important}
   body.menuclosing .hd{--fg:#1C1B19; --fg2:#5A5955; --acc:#E84518; --bg:#F2F2EE; color:var(--fg)}
-  html.pcview.phone .menu .mseals .t,html.pcview.phone .menu .mseals .y{display:none}
+  /* v300: スマホのみ、画面上部に出続ける帯の章名は「CHECKPOINT 01」まで。それ以降の日本語（章の題）は出さない */
+  html.pcview.phone .hd .chap .t{display:none}
