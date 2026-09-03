@@ -2320,7 +2320,7 @@
      ・スマホの帯の「03」などの番号を大きく
      ・スマホの TOP：「生まれた街も…」を左の題字と流れる文字のあいだへ、横組・左揃えで置く
      ・メールを送るの「匿名で送る」「返信は不要」は、見出しと高さを揃える */
-  html.pcview.phone .hd::before{background:linear-gradient(var(--bg) 46%, color-mix(in srgb, var(--bg) 86%, transparent)); -webkit-backdrop-filter:blur(26px) saturate(1.05); backdrop-filter:blur(26px) saturate(1.05); -webkit-mask-image:linear-gradient(#000 88%, transparent); mask-image:linear-gradient(#000 88%, transparent)}
+  html.pcview.phone .hd::before{background:linear-gradient(color-mix(in srgb, var(--bg) 78%, transparent), color-mix(in srgb, var(--bg) 44%, transparent)); -webkit-backdrop-filter:blur(26px) saturate(1.05); backdrop-filter:blur(26px) saturate(1.05); -webkit-mask-image:linear-gradient(#000 68%, transparent); mask-image:linear-gradient(#000 68%, transparent)}
   .hd .lang{position:relative; z-index:1; isolation:isolate; background-color:var(--bg)}
   .hd .lang button{background-color:var(--bg)}
   .hd .lang button[aria-pressed="true"]{background-color:var(--fg)}
@@ -2331,3 +2331,67 @@
   html.pcview.phone[lang="en"] #top .mean .nb{white-space:normal}
   .cp-form label > span{align-items:center}
   .cp-hide input{width:13px; height:13px}
+  /* v308
+     ・人生のチェックポイント：スマホだけパスポートをもっと左へ（判子と重なっていた）
+     ・スマホのハンバーガーメニューは、開くときだけ速く（閉じる速さは変えない）
+     ・「縦持ちでも、大丈夫です。」の知らせ：行間を詰めて箱の中央へ、端末の絵を大きく、地は紙と同じ色に
+     ・フッターの QR：文章を QR に寄せる
+     ・PC で窓が狭くなり、タブレットの組みに切り替わったときの知らせ
+     ・メールを送る：宛先の側は「伏せる / 返信は不要」
+     ・スマホの TOP：「生まれた街も…」をほんの少し下げる */
+  html.pcview.phone #contents .ttl .pass{margin-left:-104px}
+  html.pcview.phone .menu.open{transition-duration:.42s}
+  html.pcview.phone .menu.shown li{transition-delay:calc(var(--i)*26ms + .18s)}
+  html.pcview.phone .menu.shown .mmsg{transition-delay:.12s}
+  html.pcview.phone .menu.shown .mmsg .st{animation-delay:.26s}
+  html.pcview.phone .menu.shown .mseals li,html.pcview.phone .menu.shown .mlinks a{transition-delay:calc(var(--i)*34ms + .16s)}
+  html.pcview.phone .menu.shown .mseals .st,html.pcview.phone .menu.shown .mlinks .st{animation-delay:calc(var(--i)*62ms + .3s)}
+  #cprot{background:#F2F2EE}
+  #cprot .cprot-tx{gap:1px; justify-content:center}
+  #cprot .cprot-tx b{line-height:1.38}
+  #cprot .cprot-tx > span{line-height:1.45}
+  html.pcview.phone #cprot svg{width:132px; height:132px}
+  html.pcview.tablet #cprot svg{width:100px; height:100px}
+  html:not(.handheld) .ft-qr{gap:10px}
+  html.pcview.phone #top .mean{top:calc(var(--hdh, 116px) + 206px)}
+  /* v308: 窓が狭いことの知らせ（PC のみ）。押すか、幅を戻すと消える */
+  #narrow{position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom, 0px)); z-index:96; transform:translate(-50%, 12px); display:flex; align-items:center; gap:14px; padding:13px 20px 13px 16px; border:1px solid #D6D4CE; border-radius:14px; background:#F2F2EE; color:#1C1B19; box-shadow:0 10px 30px rgba(28,27,25,.10); opacity:0; pointer-events:none; max-width:min(86vw, 560px); transition:opacity .5s var(--ease), transform .6s cubic-bezier(.2,.8,.2,1)}
+  #narrow.on{opacity:1; transform:translate(-50%, 0); pointer-events:auto; cursor:pointer}
+  #narrow .nw-ic{flex:none; display:block; width:56px; height:35px}
+  #narrow .nw-ic svg{width:100%; height:100%; display:block; fill:none; stroke:#1C1B19; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+  #narrow .nw-ic .nw-fr{stroke-width:2.4}
+  #narrow .nw-ic .nw-ar{stroke:#E84518}
+  #narrow .nw-ic .nw-l{animation:nwL 2.2s ease-in-out infinite}
+  #narrow .nw-ic .nw-r{animation:nwR 2.2s ease-in-out infinite}
+  @keyframes nwL{0%,100%{transform:translateX(0)} 50%{transform:translateX(-5px)}}
+  @keyframes nwR{0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)}}
+  #narrow .nw-tx{display:flex; flex-direction:column; gap:2px; min-width:0}
+  #narrow .nw-tx b{font-family:var(--mincho); font-weight:700; font-size:14px; line-height:1.4; letter-spacing:.04em}
+  #narrow .nw-tx > span{font-family:var(--sans); font-size:11.5px; line-height:1.5; letter-spacing:.06em; color:#5A5853}
+  html.cpopen #narrow{display:none}
+  /* v309: スマホを縦持ちにしたときのメールを送る画面。
+     この端末は幅 1280 の組みを画面に縮めて映すので、横持ちでは 0.66 倍、縦持ちでは 0.30 倍になる。
+     縦持ちだけ字と欄をおよそ二倍にして、横持ちと同じくらいの大きさで読めるようにする */
+  @media (orientation:portrait){
+    html.pcview.phone .cpage .cp-in{width:92vw; padding:4vh 0 12vh}
+    html.pcview.phone .cpage .cp-ttl{font-size:78px; line-height:1.4; white-space:normal; margin-bottom:34px}
+    html.pcview.phone .cpage .cp-lead{font-size:33px; line-height:1.95; margin-bottom:52px}
+    html.pcview.phone .cpage .cp-form{grid-template-columns:1fr; gap:46px 0}
+    html.pcview.phone .cpage .cp-form label.wide,html.pcview.phone .cpage .cp-err,html.pcview.phone .cpage .cp-act{grid-column:1}
+    html.pcview.phone .cpage .cp-form label > span{font-size:24px; letter-spacing:.16em; margin-bottom:12px; gap:18px}
+    html.pcview.phone .cpage .cp-form input,html.pcview.phone .cpage .cp-form textarea{font-size:34px; padding:16px 0; border-bottom-width:2px}
+    html.pcview.phone .cpage .cp-hide input{width:26px; height:26px}
+    html.pcview.phone .cpage .cp-hide b{font-size:24px}
+    html.pcview.phone .cpage .cp-err{font-size:22px; margin-top:-14px}
+    html.pcview.phone .cpage .cp-act{gap:40px; margin-top:12px}
+    html.pcview.phone .cpage .cp-send{font-size:34px; padding:26px 42px 24px; gap:20px}
+    html.pcview.phone .cpage .cp-send .mi{width:44px; height:31px}
+    html.pcview.phone .cpage .cp-cancel{font-size:22px; padding:12px 0}
+    html.pcview.phone .cpage .cp-done{font-size:30px; line-height:1.85; padding:26px 30px; margin-top:44px}
+    html.pcview.phone .cpage .cp-note{font-size:23px; letter-spacing:.06em; margin-top:52px; line-height:1.8}
+    html.pcview.phone .cpage .cp-bar{padding:26px 4%}
+    html.pcview.phone .hd .cp-lab,html.pcview.phone .cpage .cp-lab{font-size:22px; letter-spacing:.2em}
+    html.pcview.phone .cpage .cp-backbtn,html.pcview.phone .hd .cp-backbtn{font-size:22px}
+    html.pcview.phone .cp-close{width:80px; height:80px}
+    html.pcview.phone .cp-close i{width:34px; height:2.6px}
+  }

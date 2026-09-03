@@ -2226,7 +2226,8 @@
       var cp = getComputedStyle(menu).clipPath;
       if(cp && cp !== 'none'){ menu.style.clipPath = cp; menu.classList.remove('open'); void menu.offsetWidth; menu.style.clipPath = ''; }
     }
-    if(open){ menuFlag(); requestAnimationFrame(menuLine); setTimeout(menuLine, 260); }
+    /* v308: 旗と点線は幕を出したあとの一枚めで組む。先に測ると、その分だけ幕の動き出しが遅れていた */
+    if(open) requestAnimationFrame(function(){ menuFlag(); menuLine(); setTimeout(menuLine, 240); });
     menu.classList.toggle('open', open); burger.classList.toggle('open', open); body.classList.toggle('menuopen', open); burger.setAttribute('aria-expanded', open ? 'true' : 'false'); menu.setAttribute('aria-hidden', open ? 'false' : 'true');
     /* .shown carries the seals' pressed state through the closing sweep: if it were dropped with .open, a seal still being pressed would snap back while the sheet is on screen */
     clearTimeout(menuShownT); if(open) menu.classList.add('shown'); else menuShownT = setTimeout(function(){ menu.classList.remove('shown'); }, 850);
@@ -2982,6 +2983,40 @@
       var sync = function(){ if(lab) lab.classList.toggle('hid', cb.checked); if(cb.checked) inp.value = ''; };
       cb.addEventListener('change', sync); sync();
     });
+  })();
+  /* v308: PC で窓を狭めていくと、ある幅からタブレット向けの組みに切り替わる。
+     切り替わったところで一度だけ、もう少し広げてみませんかと伝える（指の端末では出さない）。
+     押すか、幅を戻すと消える。この節のあいだは二度と出さない */
+  (function(){
+    var H = document.documentElement;
+    if(H.classList.contains('handheld')) return;
+    var mq = window.matchMedia('(max-width:1024px)'), el = null, off = false, t = 0;
+    function build(){
+      if(el) return el;
+      el = document.createElement('div'); el.id = 'narrow'; el.setAttribute('role', 'status');
+      el.innerHTML = '<i class="nw-ic" aria-hidden="true"><svg viewBox="0 0 64 40"><rect class="nw-fr" x="7" y="6" width="50" height="28" rx="3"/>' +
+        '<path class="nw-ar nw-l" d="M20 20h-9M14 16l-4 4 4 4"/><path class="nw-ar nw-r" d="M44 20h9M50 16l4 4-4 4"/></svg></i>' +
+        '<span class="nw-tx"><b></b><span></span></span>';
+      document.body.appendChild(el);
+      el.addEventListener('click', function(){ off = true; hide(); });
+      return el;
+    }
+    function words(){
+      var en = (typeof curLang !== 'undefined' && curLang === 'en');
+      return en ? ['The window is a little narrow.', 'Widen it a touch, and the page returns to the setting it was made for.']
+                : ['画面の幅が、少し狭いようです。', 'もう少しゆとりを持たせると、本来の組みでご覧いただけます。'];
+    }
+    function show(){
+      if(off || H.classList.contains('handheld')) return;
+      var e = build(), w = words();
+      e.querySelector('.nw-tx b').textContent = w[0]; e.querySelector('.nw-tx > span').textContent = w[1];
+      e.classList.add('on'); clearTimeout(t); t = setTimeout(hide, 9000);
+    }
+    function hide(){ if(el) el.classList.remove('on'); clearTimeout(t); }
+    function check(){ if(mq.matches){ if(!H.classList.contains('cpopen')) show(); } else hide(); }
+    if(mq.addEventListener) mq.addEventListener('change', check); else if(mq.addListener) mq.addListener(check);
+    window.__narrowCheck = check;
+    setTimeout(function(){ if(mq.matches) show(); }, 2600);   /* 最初から狭いときも一度だけ */
   })();
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
