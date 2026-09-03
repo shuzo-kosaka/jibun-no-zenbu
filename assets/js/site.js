@@ -454,22 +454,23 @@
         document.body.appendChild(el);
       }
       rotOkN++;
+      var kind = rvKind;   /* v291: 直前の案内に合わせて判を選ぶ（メールを閉じた後は「引き続きお楽しみください」、ふつうの回転はお礼） */
       var en = (typeof curLang !== 'undefined' && curLang === 'en'), svg = el.querySelector('.ink svg'), bkg = el.querySelector('svg.bkg'), sp = sakuraPath(), h = '';
-      if(rotOkN === 1){
-        h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
-        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="14">THANK</text><text x="100" y="119" text-anchor="middle" font-size="19">YOU</text>'
-                : vcols(['ありがと', 'うござい', 'ました'], [120, 100, 80], 15.5, 84, 16.5);   /* v287: お礼の判に */
-      } else if(rotOkN === 2){
+      if(kind === 'mail'){
         h = '<path class="pt" d="' + sp + '"/>';
         h += en ? '<text x="100" y="97" text-anchor="middle" font-size="13">ENJOY</text><text x="100" y="118" text-anchor="middle" font-size="17">THE REST</text>'
                 : vcols(['引き続き', 'お楽しみ', 'ください'], [120, 100, 80], 15.5, 84, 16.5);
+      } else if(rotOkN === 1){
+        h = '<path class="pt" d="' + sp + '"/><path class="rg" d="' + sp + '" transform="translate(100 100) scale(.84) translate(-100 -100)"/>';
+        h += en ? '<text x="100" y="97" text-anchor="middle" font-size="14">THANK</text><text x="100" y="119" text-anchor="middle" font-size="19">YOU</text>'
+                : vcols(['ありがと', 'うござい', 'ました'], [120, 100, 80], 15.5, 84, 16.5);
       } else {
         h = '<circle class="pt" cx="100" cy="100" r="88"/><circle class="rg" cx="100" cy="100" r="79"/>';
         h += en ? '<text x="100" y="94" text-anchor="middle" font-size="13">THANKS</text><text x="100" y="116" text-anchor="middle" font-size="17">AGAIN</text>'
                 : vcols(['なんども', 'ありがとう'], [111, 89], 15.5, 80, 16.5);
       }
       svg.innerHTML = h;
-      bkg.innerHTML = rotOkN <= 2 ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
+      bkg.innerHTML = (kind === 'mail' || rotOkN === 1) ? '<path class="bk" d="' + sp + '"/>' : '<circle class="bk" cx="100" cy="100" r="88"/>';
       el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
       clearTimeout(rotOk.t); rotOk.t = setTimeout(function(){ el.classList.remove('on'); }, 2700);
     }
@@ -479,8 +480,11 @@
       /* v282: 縦にしたときは待たずに出す。430ms 待ってから薄く現れていたので、そのあいだ下の紙面が見えていた。
          横にしたときだけ 430ms 待つ（回している最中の一瞬の判定で幕が消えないように） */
       if(!m){ if(started){ rvKind = 'rot'; show(); } return; }
+      /* v291: 案内が出ていたかは「横になった時点」で見る。430ms 待つあいだに別の経路（章の切り替えなど）が
+         案内を引っ込めることがあり、その場合に花の判が出ないままだった */
+      var wasUp = started && !rv.classList.contains('gone');
       onOrient.t = setTimeout(function(){
-        var wasUp = started && !rv.classList.contains('gone'); muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520);
+        muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520);
       }, 430);
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);
@@ -1970,11 +1974,16 @@
   /* v242: Safari（iOS 26）に帯・ツールバーの色を採り直させる。#tint（fixed、場面の色、透明）の display を切り替える */
   var tintEl = document.createElement('div'); tintEl.id = 'tint'; tintEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tintEl);
   window.__retint = function(){ tintEl.style.display = 'none'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tintEl.style.display = ''; }); }); };
-  window.addEventListener('resize', function(){   /* v288: メールを送るを開いたまま向きを変えると、iOS が固定の箱を前の向きの大きさのまま残し、下に紙面が見えていた。組み直させる */
+  function cpRelayout(){   /* v288/v291: メールを送るを開いたまま向きを変えると、iOS が固定の箱を前の向きの大きさのまま残し、下に紙面が見えていた。
+     向きの合図はどれが来るか端末任せなので、resize・orientationchange・visualViewport のすべてで受け、少し遅れても効くよう二度組み直す */
     if(!document.documentElement.classList.contains('cpopen')) return;
     var c = document.getElementById('cpage'); if(!c) return;
     c.style.display = 'none'; void c.offsetWidth; c.style.display = '';
-  }, {passive:true});
+  }
+  function cpRelayoutSoon(){ cpRelayout(); clearTimeout(cpRelayoutSoon.t1); clearTimeout(cpRelayoutSoon.t2); cpRelayoutSoon.t1 = setTimeout(cpRelayout, 180); cpRelayoutSoon.t2 = setTimeout(cpRelayout, 520); }
+  window.addEventListener('resize', cpRelayoutSoon, {passive:true});
+  window.addEventListener('orientationchange', cpRelayoutSoon, {passive:true});
+  if(window.visualViewport && window.visualViewport.addEventListener) window.visualViewport.addEventListener('resize', cpRelayoutSoon, {passive:true});
   window.__setTheme = function(c){ var m = document.getElementById('themec'); if(!m){ m = document.createElement('meta'); m.name = 'theme-color'; m.id = 'themec'; document.head.appendChild(m); } if(c && m.getAttribute('content') !== c) m.setAttribute('content', c); };
   var jcur = null;
   function curtainJump(y, done, rew){
@@ -2179,6 +2188,12 @@
       '<g><polygon points="7.5,5 28,12 7.5,19.5" fill="var(--acc)"/><animateTransform attributeName="transform" type="skewY" values="0;-5;0;4;0" dur="2.6s" repeatCount="indefinite" additive="sum"/></g></g>';
     return sv;
   }
+  function menuLine(){   /* v291: 判をつなぐ点線は、判の中心を測って引く（スマホだけ組みが違い、中心から 20px ずれていた） */
+    var ul = document.querySelector('.menu .mseals'), sl = ul && ul.querySelector('.slot'); if(!ul || !sl) return;
+    var r = ul.getBoundingClientRect(), b = sl.getBoundingClientRect(); if(!b.height) return;
+    ul.style.setProperty('--mline', (b.top - r.top + b.height / 2).toFixed(1) + 'px');
+  }
+  window.addEventListener('resize', function(){ clearTimeout(menuLine.t); menuLine.t = setTimeout(menuLine, 200); }, {passive:true});
   function setMenu(open){
     /* v203: 開閉の最中、幕の高さを px で留める。clip-path は要素の高さへの割合なので、
        実機でツールバーが出入りして高さが動くと、幕の端が引き戻されて見える。
@@ -2196,7 +2211,8 @@
       var cp = getComputedStyle(menu).clipPath;
       if(cp && cp !== 'none'){ menu.style.clipPath = cp; menu.classList.remove('open'); void menu.offsetWidth; menu.style.clipPath = ''; }
     }
-    if(open) menuFlag(); menu.classList.toggle('open', open); burger.classList.toggle('open', open); body.classList.toggle('menuopen', open); burger.setAttribute('aria-expanded', open ? 'true' : 'false'); menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if(open){ menuFlag(); requestAnimationFrame(menuLine); setTimeout(menuLine, 260); }
+    menu.classList.toggle('open', open); burger.classList.toggle('open', open); body.classList.toggle('menuopen', open); burger.setAttribute('aria-expanded', open ? 'true' : 'false'); menu.setAttribute('aria-hidden', open ? 'false' : 'true');
     /* .shown carries the seals' pressed state through the closing sweep: if it were dropped with .open, a seal still being pressed would snap back while the sheet is on screen */
     clearTimeout(menuShownT); if(open) menu.classList.add('shown'); else menuShownT = setTimeout(function(){ menu.classList.remove('shown'); }, 850);
     clearTimeout(menuCloseT); if(!open){ body.classList.add('menuclosing'); menuCloseT = setTimeout(function(){ body.classList.remove('menuclosing'); }, 900); } else body.classList.remove('menuclosing'); }

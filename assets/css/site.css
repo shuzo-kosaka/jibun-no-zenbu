@@ -2248,3 +2248,12 @@
   .menu .mseals .y{padding-bottom:14px}
   html.pcview.phone .menu .mseals .y{padding-bottom:18px}
   html.pcview.tablet .menu .mseals .y{padding-bottom:16px}
+  /* v291
+     ・メニューの点線は、判の中心を測った値（--mline）で引く
+     ・メールを送るは開いている間つねに紙の地（向きを変えた瞬間も下の紙面を見せない）
+     ・「縦持ちでも大丈夫」の端末の絵を、収まる範囲で大きく */
+  .menu .mseals::before{top:var(--mline, calc(min(9.4vw,128px) / 2))}
+  html.cpopen .cpage{background:var(--paper)}
+  #cprot svg{width:72px; height:72px}
+  html.pcview.phone #cprot svg{width:104px; height:104px}
+  html.pcview.tablet #cprot svg{width:84px; height:84px}
