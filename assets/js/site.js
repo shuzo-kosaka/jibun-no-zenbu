@@ -2613,6 +2613,7 @@
     clearTimeout(surHintT); document.documentElement.classList.add('surhint'); surHintT = setTimeout(function(){ document.documentElement.classList.remove('surhint'); }, 7000);   /* v93: the surprise toggle blinks for a while, so a visitor who came to write notices it */
     try{ history.pushState({cp:1}, '', '#write'); cpPushed = true; }catch(e){ cpPushed = false; }
     var done = document.getElementById('cpdone'); if(done) done.hidden = true; var err = document.getElementById('cperr'); if(err) err.textContent = '';
+    var act0 = cpage.querySelector('.cp-act'); if(act0 && done && done.parentNode !== act0) act0.appendChild(done);   /* v314: 送れた知らせは「送る」の右隣に */
     setTimeout(function(){ var f = cpage.querySelector('input'); if(f) f.focus(); }, 500);
   }
   /* v312: 便りが届いた合図。紙面と同じ道具立てで——中央に朱の印を一つ押し、
@@ -2636,7 +2637,6 @@
           '<textPath href="#' + id + 'p" startOffset="0">' + ring + '</textPath></text>' +
         '<text x="100" y="88" text-anchor="middle" font-family="var(--mincho)" font-weight="900" font-size="46" fill="#E84518" stroke="none">感</text>' +
         '<text x="100" y="136" text-anchor="middle" font-family="var(--mincho)" font-weight="900" font-size="46" fill="#E84518" stroke="none">謝</text>' +
-        '<line x1="62" y1="100" x2="80" y2="100" stroke-width="1.6"/><line x1="120" y1="100" x2="138" y2="100" stroke-width="1.6"/>' +
       '</g>';
     return sv;
   }
@@ -2644,6 +2644,8 @@
     var old = document.getElementById('cpyay'); if(old) old.remove(); clearTimeout(cpYayT);
     var el = document.createElement('div'); el.id = 'cpyay'; el.setAttribute('aria-hidden', 'true');
     el.appendChild(cpYaySeal());
+    var ring = document.createElement('i'); ring.className = 'yay-ring'; el.appendChild(ring);   /* 押した拍子の輪 */
+    var ring2 = document.createElement('i'); ring2.className = 'yay-ring yay-ring2'; el.appendChild(ring2);
     if(!reduce){
       var bits = document.createElement('div'); bits.className = 'yay-bits';
       var col = ['#E84518', '#FF7A50', '#F2F2EE', '#1C1B19', '#E84518', '#FAFAF8'];
