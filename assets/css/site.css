@@ -2147,3 +2147,7 @@
   #ch1pin .dg.walk .dg-ring{opacity:0; transition:opacity .9s ease .15s}
   /* v262: 輪の線はもう少しゆっくり消す */
   #ch1pin .dg.walk .dg-ring{transition:opacity 1.5s ease .15s}
+  /* v264: 足跡が判に着くと判が光る（JS は .hit を付けていたが、対応する CSS がなかった）。
+     判の下の紙が一瞬あたたかく灯り、周りにやわらかい光が広がって消える。判の transform には触れない（.in の遷移と競合しない） */
+  #ch1pin .dg-node.hit .paper{animation:dghit 1s ease-out}
+  @keyframes dghit{0%{fill:var(--bg); filter:drop-shadow(0 0 0 rgba(232,69,24,0))} 16%{fill:#FFE6D0; filter:drop-shadow(0 0 16px rgba(232,69,24,.6))} 100%{fill:var(--bg); filter:drop-shadow(0 0 0 rgba(232,69,24,0))}}
