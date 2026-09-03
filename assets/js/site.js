@@ -1541,13 +1541,14 @@
   var dgSat = document.getElementById('dgsat'), dgNodes = document.querySelectorAll('#ch1pin .dg-node'), dgStick = document.querySelector('#ch1pin .dg'), dgOn = false, dgLastA = 0;
   var dgTrail = null, dgTrailF = [], dgWasOn = false, dgT0 = 0;   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1）。v260: 見えるたびに輪の起点から歩き直す */
   var DG_ANG = [-90, 148.4, 31.6];
+  var DG_A0 = ((360 - DG_ANG[1]) % 360 + 360) % 360, DG_F0 = ((DG_A0 - 180) / 360 + 1) % 1;   /* v263: 歩き出す起点は「場をつくる力」の判（角度と、輪の経路上の割合） */
   var orbitN = 0;
   (function orbit(now){
     /* v224: 指の端末では 2 フレームに 1 回（点が動くたびに図全体が描き直される。半分で十分なめらか） */
     if(!dgOn){ if(dgWasOn){ dgWasOn = false; if(dgTrail) for(var tj = 0; tj < dgTrail.length; tj++) dgTrail[tj].style.opacity = '0'; } }
     else if(dgSat && !(document.documentElement.classList.contains('handheld') && (++orbitN & 1))){
-      if(!dgWasOn){ dgWasOn = true; dgT0 = now; dgLastA = 180; }   /* v260: 輪が描き終わって歩き出すたび、起点（左端）から */
-      var w = (now - dgT0) / 18000, a = ((w * 360 + 180) % 360 + 360) % 360, rad = a * Math.PI / 180;
+      if(!dgWasOn){ dgWasOn = true; dgT0 = now; dgLastA = DG_A0; }   /* v260: 輪が描き終わって歩き出すたび起点から。v263: 起点は判の下（判の縁から足跡が伸びて見える） */
+      var w = (now - dgT0) / 18000, a = ((w * 360 + DG_A0) % 360 + 360) % 360, rad = a * Math.PI / 180;
       /* v257: 点はやめ、足跡が輪を歩く。歩き手の位置 f（輪の経路の割合、左端 a=180° から反時計回り）に対して、
          通り過ぎたばかりの足跡ほど濃く、古いものから薄れて消える（後ろ 30% ぶんだけ残る） */
       if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = w - dgTrailF[ti], op = 0; if(age >= 0){ age %= 1; op = age < .02 ? age / .02 : age < .26 ? 1 : age < .44 ? 1 - (age - .26) / .18 : 0; }   /* v262: 残す足跡を増やす（一周の 44% ぶん） */ dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
@@ -1633,7 +1634,7 @@
       g.insertBefore(w, pth); w.appendChild(h); w.appendChild(pth);
     });
     dgTrail = g.querySelectorAll('.dgrp'); dgTrailF = [];
-    for(var i = 0; i < dgTrail.length; i++) dgTrailF.push(((start + i * step) / L) % 1);
+    for(var i = 0; i < dgTrail.length; i++) dgTrailF.push((((start + i * step) / L - DG_F0) % 1 + 1) % 1);   /* v263: 起点（判）からの道のり */
   }
   function dgFlag(){
     var svg = document.getElementById('dgsvg'), t = svg && svg.querySelector('.dg-title'); if(!t || t.querySelector('.dgflag')) return;
