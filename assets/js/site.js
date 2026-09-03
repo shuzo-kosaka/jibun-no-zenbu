@@ -485,8 +485,8 @@
       '<svg class="ar" viewBox="0 0 26 30" aria-hidden="true"><path d="M13 3 V21.5 M5.5 15 L13 23 L20.5 15"/></svg>';
     cd.appendChild(cdLab);
     function suckHold(t){   /* v153: caught by the badge, and held until the pointer is well clear of it */
-      var over = !!(t && t.closest && t.closest('.cta-fx'));
-      if(!ctaFx) return suckSet(over);
+      var over = !!(t && t.closest && t.closest('.cta-fx')) && body.classList.contains('past');   /* v269: TOP では丸は隠れている（.past 前）。隠れている間は吸い付かない */
+      if(!ctaFx || !body.classList.contains('past')) return suckSet(false);
       var br = ctaFx.getBoundingClientRect(), cx = br.left + br.width / 2, cy = br.top + br.height / 2;
       var d = Math.sqrt((mx - cx) * (mx - cx) + (my - cy) * (my - cy)), R = Math.max(br.width, br.height) / 2;
       suckSet(over || (suckOn && d < R * 2.8));
@@ -1078,6 +1078,7 @@
     lbImg.style.transition = 'none';
     lbImg.style.transform = 'translate(' + r.left + 'px,' + r.top + 'px) scale(' + (r.width/tw) + ',' + (r.height/th) + ')';
     lb.classList.add('open'); lbOpen = true;
+    if(typeof annoClear === 'function') annoClear();   /* v269: 世の中全部、デザインじゃん。の注釈の札は、写真を開いたら畳む */
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
       lbImg.style.transition = 'transform .65s cubic-bezier(.2,.7,.2,1)';
       lbImg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(1,1)';

@@ -2155,3 +2155,8 @@
      hover:none の除外は :hover だけで :focus-visible に効いておらず、タップで一度点滅して見えていた。色は 0.55 秒でそのまま付く */
   html.pcview.phone .wkf:hover .ph,html.pcview.phone .wkf:focus-visible .ph{animation:none !important}
   html.pcview.phone .wkf:hover .fl,html.pcview.phone .wkf:focus-visible .fl{animation:none !important; opacity:0}
+  /* v269: 右下の丸（TALK TO ME）は TOP では隠れているだけで、当たり判定が残っていた（カーソルが吸い付き、末尾へ飛べる状態）。
+     .past が付くまでは当たり判定ごと消す。消え方は今までの 0.6 秒の透過のまま */
+  body:not(.past) .cta-fx{pointer-events:none; visibility:hidden; transition:opacity .6s var(--ease), transform .6s var(--ease), visibility 0s .6s}
+  /* v269: 写真の拡大（.lb）は、世の中ゼンブ、デザインじゃん。の注釈の札（.anno 90）より上に。ヘッダー 88、幕 96 の間 */
+  .lb{z-index:92}
