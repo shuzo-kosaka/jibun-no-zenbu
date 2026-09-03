@@ -2312,3 +2312,22 @@
   .cp-hide b{font-family:var(--sans); font-weight:400; font-size:10.5px; letter-spacing:.06em; color:var(--fg3)}
   .cp-hide:hover b,.cp-form label.hid .cp-hide b{color:var(--acc)}
   .cp-form label.hid > input{opacity:.34; pointer-events:none}
+  /* v307
+     ・スマホのヘッダーの帯：下の紙面が読めるほど透けていたため、写真や本文の行が JA / EN のすぐ上下を
+       横切り、切り替えボタンに線が入って見えていた（PC は帯の下が余白なので目立たなかった）。
+       スマホだけ、すりガラスの濃さとぼかしを上げて、紙面の形が抜けないようにする。
+     ・切り替えボタン自身も、地・各面それぞれに色を敷き、帯のぼかし層より前に置く
+     ・スマホの帯の「03」などの番号を大きく
+     ・スマホの TOP：「生まれた街も…」を左の題字と流れる文字のあいだへ、横組・左揃えで置く
+     ・メールを送るの「匿名で送る」「返信は不要」は、見出しと高さを揃える */
+  html.pcview.phone .hd::before{background:linear-gradient(var(--bg) 46%, color-mix(in srgb, var(--bg) 86%, transparent)); -webkit-backdrop-filter:blur(26px) saturate(1.05); backdrop-filter:blur(26px) saturate(1.05); -webkit-mask-image:linear-gradient(#000 88%, transparent); mask-image:linear-gradient(#000 88%, transparent)}
+  .hd .lang{position:relative; z-index:1; isolation:isolate; background-color:var(--bg)}
+  .hd .lang button{background-color:var(--bg)}
+  .hd .lang button[aria-pressed="true"]{background-color:var(--fg)}
+  html.pcview.phone .hd .chap .n{font-size:26px; letter-spacing:.01em}
+  html.pcview.phone #top .mean{right:auto; left:calc(var(--x1) - 60px); top:calc(var(--hdh, 116px) + 190px); margin-top:0; writing-mode:horizontal-tb; text-orientation:mixed; inline-size:min(312px, 25vw); max-inline-size:none; text-align:left; line-height:2.0}
+  html.pcview.phone[lang="en"] #top .mean{inline-size:min(312px, 25vw); line-height:1.95}
+  html.pcview.phone[lang="en"] #top .mean .mc{display:inline}   /* 横組では一字ずつの箱が語間を潰す。拡大鏡は指の端末では動かないので、ここでは要らない */
+  html.pcview.phone[lang="en"] #top .mean .nb{white-space:normal}
+  .cp-form label > span{align-items:center}
+  .cp-hide input{width:13px; height:13px}
