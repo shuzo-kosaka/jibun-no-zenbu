@@ -2615,6 +2615,56 @@
     var done = document.getElementById('cpdone'); if(done) done.hidden = true; var err = document.getElementById('cperr'); if(err) err.textContent = '';
     setTimeout(function(){ var f = cpage.querySelector('input'); if(f) f.focus(); }, 500);
   }
+  /* v312: 便りが届いた合図。紙面と同じ道具立てで——中央に朱の印を一つ押し、
+     紙・墨・朱の紙吹雪がひとしきり降る。二秒半ほどで引き、要素は片づける。
+     動きを控える設定の端末では、印だけを静かに出す */
+  var cpYayT = 0;
+  function cpYaySeal(){
+    var sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    sv.setAttribute('viewBox', '0 0 200 200'); sv.setAttribute('class', 'yay-seal'); sv.setAttribute('aria-hidden', 'true');
+    var id = 'yayink' + (Math.random() * 1e6 | 0);
+    var ring = 'THANK YOU FOR WRITING · 2026 · KOSAKA SHUZO · ';
+    sv.innerHTML = '<defs>' +
+      '<filter id="' + id + '" x="-14%" y="-14%" width="128%" height="128%">' +
+        '<feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" result="n"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>' +
+      '<path id="' + id + 'p" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/></defs>' +
+      '<g filter="url(#' + id + ')" fill="none" stroke="#E84518">' +
+        '<circle cx="100" cy="100" r="86" stroke-width="4.4"/>' +
+        '<circle cx="100" cy="100" r="60" stroke-width="2.2"/>' +
+        '<text font-family="var(--mono)" font-size="10.5" letter-spacing="2.6" fill="#E84518" stroke="none">' +
+          '<textPath href="#' + id + 'p" startOffset="0">' + ring + '</textPath></text>' +
+        '<text x="100" y="88" text-anchor="middle" font-family="var(--mincho)" font-weight="900" font-size="46" fill="#E84518" stroke="none">感</text>' +
+        '<text x="100" y="136" text-anchor="middle" font-family="var(--mincho)" font-weight="900" font-size="46" fill="#E84518" stroke="none">謝</text>' +
+        '<line x1="62" y1="100" x2="80" y2="100" stroke-width="1.6"/><line x1="120" y1="100" x2="138" y2="100" stroke-width="1.6"/>' +
+      '</g>';
+    return sv;
+  }
+  function cpYay(){
+    var old = document.getElementById('cpyay'); if(old) old.remove(); clearTimeout(cpYayT);
+    var el = document.createElement('div'); el.id = 'cpyay'; el.setAttribute('aria-hidden', 'true');
+    el.appendChild(cpYaySeal());
+    if(!reduce){
+      var bits = document.createElement('div'); bits.className = 'yay-bits';
+      var col = ['#E84518', '#FF7A50', '#F2F2EE', '#1C1B19', '#E84518', '#FAFAF8'];
+      for(var i = 0; i < 38; i++){
+        var b = document.createElement('i');
+        b.style.left = (Math.random() * 100).toFixed(1) + '%';
+        b.style.background = col[i % col.length];
+        b.style.width = (5 + Math.random() * 6).toFixed(1) + 'px';
+        b.style.height = (8 + Math.random() * 10).toFixed(1) + 'px';
+        b.style.animationDelay = (Math.random() * .5).toFixed(2) + 's';
+        b.style.animationDuration = (1.5 + Math.random() * 1.1).toFixed(2) + 's';
+        b.style.setProperty('--sx', ((Math.random() * 2 - 1) * 90).toFixed(0) + 'px');
+        b.style.setProperty('--sp', (Math.random() * 2 - 1 > 0 ? 1 : -1) * (360 + Math.random() * 540) + 'deg');
+        bits.appendChild(b);
+      }
+      el.appendChild(bits);
+    }
+    document.body.appendChild(el);
+    void el.offsetWidth; el.classList.add('on');
+    cpYayT = setTimeout(function(){ el.classList.remove('on'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 900); }, reduce ? 2400 : 3000);
+  }
   /* v288: メールを送るを横持ちで開いたときの小さな知らせ。案内の端末の絵をそのまま借り、動きだけ逆に回して
      「横 → 縦」に見せる（確認の印は縦の姿の側へ移す）。紙面の操作は妨げない */
   var cpRotEl = null, cpRotT = 0;
@@ -2714,7 +2764,8 @@
         if(settled) return; settled = true; clearTimeout(giveUp);
         if(res && res.ok){
           release(); cpform.reset();
-          show(en ? 'Sent — thank you. I will write back within a few days.' : '送信しました。ありがとうございます。数日のうちにお返事します。');
+          show(en ? 'Sent — thank you.' : '送信しました。ありがとうございます。');
+          cpYay();   /* v312: 届いた合図に、印を一つ押して紙吹雪 */
         } else fallback();
       })
       .catch(function(){ if(settled) return; settled = true; clearTimeout(giveUp); fallback(); });

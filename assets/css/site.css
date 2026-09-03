@@ -2415,3 +2415,18 @@
      枠の中に収まる位置まで下げる。PC・タブレットは輪の外の余白が切れているだけなので触らない */
   html.pcview.phone #ch5map .chseal{top:calc(var(--y1) - 30px)}
   html.pcview.phone #ch5pin .chseal{top:calc(var(--y2) - 128px)}
+  /* v312: 便りが届いた合図。中央に朱の印が押され、紙・墨・朱の紙吹雪が降る */
+  #cpyay{position:fixed; inset:0; z-index:98; pointer-events:none; opacity:0; transition:opacity .5s var(--ease); overflow:hidden}
+  #cpyay.on{opacity:1}
+  #cpyay .yay-seal{position:absolute; left:50%; top:44%; width:min(38vh, 300px); height:min(38vh, 300px); transform:translate(-50%,-50%) rotate(-9deg) scale(1.5); opacity:0;
+    transition:transform .52s cubic-bezier(.18,.94,.32,1.02), opacity .3s var(--ease); mix-blend-mode:multiply}
+  #cpyay.on .yay-seal{transform:translate(-50%,-50%) rotate(-9deg) scale(1); opacity:.94}
+  html.pcview.phone #cpyay .yay-seal{width:min(52vh, 300px); height:min(52vh, 300px)}
+  #cpyay .yay-bits{position:absolute; inset:-14% 0 0}
+  #cpyay .yay-bits i{position:absolute; top:0; display:block; border-radius:1px; opacity:0; animation:yayFall 2s cubic-bezier(.3,.5,.5,1) forwards}
+  @keyframes yayFall{
+    0%{opacity:0; transform:translate3d(0,-8vh,0) rotate(0deg)}
+    8%{opacity:1}
+    82%{opacity:1}
+    100%{opacity:0; transform:translate3d(var(--sx,0px),112vh,0) rotate(var(--sp,540deg))}}
+  @media (prefers-reduced-motion: reduce){ #cpyay .yay-bits{display:none} }
