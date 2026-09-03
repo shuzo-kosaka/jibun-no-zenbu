@@ -2684,11 +2684,14 @@
   document.querySelectorAll('a.vid[href*="youtu"]').forEach(function(a){
     var m = a.getAttribute('href').match(/(?:youtu\.be\/|v=)([\w-]{6,})/), th = a.querySelector('img.th');
     if(!m || !th) return;
-    var id = m[1], tries = ['maxresdefault', 'sddefault', 'hqdefault'];   /* v270: 1280 → 640 → 480 の順。無い解像度は 404 で次へ */
+    /* v274: 自前の絵が 1280 幅で用意されている（公開版の srcset）なら YouTube には取りに行かない。
+       この動画の YouTube 側の最大は 640 で、自前の方が細かい。無い場合だけ 1280 の maxresdefault を一度だけ試す */
+    var ss = th.getAttribute('srcset') || ''; if(/\b1[2-9]\d\dw\b/.test(ss)) return;
+    var id = m[1], tries = ['maxresdefault'];
     (function next(){
       var name = tries.shift(); if(!name) return;
       var im = new Image();
-      im.onload = function(){ if(im.naturalWidth > 200){ th.style.opacity = '0'; setTimeout(function(){ var pic = th.parentNode; if(pic && pic.tagName === 'PICTURE'){ Array.prototype.slice.call(pic.querySelectorAll('source')).forEach(function(so){ so.remove(); }); } th.removeAttribute('srcset'); th.removeAttribute('sizes'); th.src = im.src; th.style.opacity = '1'; }, 300);   /* v273: 公開版は <picture> の <source>（webp）が img より優先される。仮の絵の source を外してから差し替える */ } else next(); };   /* v272: 公開版は仮の絵に srcset が付く。srcset は src より優先されるので、外してから差し替える */
+      im.onload = function(){ if(im.naturalWidth >= 1280){ th.style.opacity = '0'; setTimeout(function(){ var pic = th.parentNode; if(pic && pic.tagName === 'PICTURE'){ Array.prototype.slice.call(pic.querySelectorAll('source')).forEach(function(so){ so.remove(); }); } th.removeAttribute('srcset'); th.removeAttribute('sizes'); th.src = im.src; th.style.opacity = '1'; }, 300);   /* v273: 公開版は <picture> の <source>（webp）が img より優先される。仮の絵の source を外してから差し替える */ } else next(); };   /* v272: 公開版は仮の絵に srcset が付く。srcset は src より優先されるので、外してから差し替える */
       im.onerror = next;
       im.src = 'https://img.youtube.com/vi/' + id + '/' + name + '.jpg';
     })();
