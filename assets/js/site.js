@@ -1374,10 +1374,10 @@
       '<path id="ring' + uid + '" d="M 78 78 m -57 0 a 57 57 0 1 1 114 0 a 57 57 0 1 1 -114 0"/></defs>' +
       '<g filter="url(#' + id + ')" fill="none" stroke="var(--acc)">' +
       '<circle cx="78" cy="78" r="70" stroke-width="3.4"/><circle cx="78" cy="78" r="46" stroke-width="1.4"/>' +
-      '<text font-family="var(--mono)" font-size="9.6" font-weight="500" letter-spacing="2" fill="var(--acc)" stroke="none"><textPath href="#ring' + uid + '" startOffset="1%">' + (li.getAttribute('data-ring') || ('CHECKPOINT ' + num + ' \u00b7 ' + en + ' \u00b7 ' + year + ' \u00b7 KOSAKA')) + '</textPath></text>' +
+      '<text class="ring" font-family="var(--mono)" font-size="9.6" font-weight="500" letter-spacing="2" fill="var(--acc)" stroke="none"><textPath href="#ring' + uid + '" startOffset="1%">' + (li.getAttribute('data-ring') || ('CHECKPOINT ' + num + ' \u00b7 ' + en + ' \u00b7 ' + year + ' \u00b7 KOSAKA')) + '</textPath></text>' +
       (place.length > 1 ?
-        '<text x="78" y="72" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? 14 : 17) + '" fill="var(--acc)" stroke="none">' + place[0] + '</text><text x="78" y="92" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? 14 : 17) + '" fill="var(--acc)" stroke="none">' + place[1] + '</text>' :
-        '<text x="78" y="87" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? (place[0].length > 6 ? 15 : 19) : (place[0].length > 3 ? 20 : 26)) + '" fill="var(--acc)" stroke="none">' + place[0] + '</text>') +
+        '<text class="place" x="78" y="72" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? 14 : 17) + '" fill="var(--acc)" stroke="none">' + place[0] + '</text><text class="place" x="78" y="92" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? 14 : 17) + '" fill="var(--acc)" stroke="none">' + place[1] + '</text>' :
+        '<text class="place" x="78" y="87" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (curLang === 'en' ? (place[0].length > 6 ? 15 : 19) : (place[0].length > 3 ? 20 : 26)) + '" fill="var(--acc)" stroke="none">' + place[0] + '</text>') +
       '</g>';
     return sv;
   }
