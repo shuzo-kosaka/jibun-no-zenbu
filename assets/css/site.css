@@ -2261,6 +2261,6 @@
      iOS は向きが変わっても固定の箱の大きさを前の向きのまま持ち続けることがあり、はみ出した部分から章の地色と本文が見えていた。
      箱の大きさに頼らず、紙面（節・締め・年・足跡）を伏せ、地の板と html の地を紙の色にする。
      閉じ始めた瞬間に cpopen が外れるので、下りていく動きは今までどおり紙面の上を滑る */
-  html.cpopen{background:var(--paper)}
+  html.cpopen{background-color:var(--paper) !important}   /* 画面の地そのもの。固定の箱がどう狂っても、ここは必ず全面を塗る（案内用の !important に勝たせる） */
   html.cpopen body::after{background:var(--paper) !important; transition:none}
   html.cpopen body > section,html.cpopen body > footer,html.cpopen body > .yr,html.cpopen body > .rew,html.cpopen body > .remain,html.cpopen body > .cta-fx{visibility:hidden}
