@@ -2540,7 +2540,10 @@
   #narrow.on > svg{transform:none}
   .cp-send b{transform:translateY(-1.5px)}   /* 「送る」の字を少し上へ。封筒の絵と目で見て中央にそろえる */
   @media (orientation:portrait){ html.pcview.phone .cpage .cp-send b{transform:translateY(-3px)} }
-  #narrow{padding:4vh 8vw calc(4vh + var(--nwic) + var(--nwgap)); gap:var(--nwgap)}
+  #narrow{padding:4vh 8vw; gap:var(--nwgap)}   /* v326: 絵と文字をひとつの塊として、画面の中央に置く */
+  /* 実機の Safari は、位置を固定した箱の高さを「道具の帯が隠れているとき」の高さで測る。
+     帯が出ていると、その分だけ中身が下に寄って見える。いま見えている高さ（dvh）で測り直す */
+  @supports (height:100dvh){ #narrow{bottom:auto; height:100dvh} }
   #cpdone.cp-done{flex:1 1 auto; font-size:16px; line-height:1.35; padding:18px 18px 17px; font-family:var(--mincho); font-weight:700; letter-spacing:.04em}
   @media (orientation:portrait){
     html.pcview.phone .cpage #cpdone.cp-done{font-size:34px; padding:33px 30px 31px; line-height:1.35}
