@@ -2187,3 +2187,13 @@
   html.pcview.phone #top .lbl,html.pcview.phone #top .toc{left:calc(var(--x1) - 60px)}
   html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) + 6px)}
   html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 276px)}
+  /* v284: スマホの TOP（指示の 4 点）
+     ・題字・CONTENTS・SEVEN CHECKPOINTS・流れる文字を 22px 上へ（題字の上端を「ジブンのゼンブを。」の上端に合わせる）
+     ・流れる文字と、その上の SEVEN CHECKPOINTS の左端を、題字の文字（JIBUN no）の左端に合わせる
+     ・「生まれた街も…」を 48px 上へ
+     ・CONTENTS の字だけを MASTER'S STUDENT の左端に合わせる（縦線の位置は変えず、字だけ右へ 6px） */
+  html.pcview.phone #top .lbl{top:calc(var(--hdh, 116px) - 16px)}
+  html.pcview.phone #top .toc{top:calc(var(--hdh, 116px) + 254px)}
+  html.pcview.phone #top .sub,html.pcview.phone #top .rot{left:calc(var(--x1) - 40px); transform:translateY(-22px)}
+  html.pcview.phone #top .mean{margin-top:-48px}
+  html.pcview.phone #top .toc .k{padding-left:18.5px}
