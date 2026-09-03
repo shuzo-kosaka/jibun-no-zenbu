@@ -2145,3 +2145,5 @@
   .dgrp{opacity:0; fill:var(--fg2)} .dgrp .dgrpi{fill:var(--fg2)} .dgrp .dgrph{fill:var(--bg); stroke:var(--bg); stroke-width:2.4; stroke-linejoin:round}
   /* v261: 足跡が歩き出したら輪の線そのものを消す（描き終わりを見せてから薄れる）。戻って描き直すときは再び出る */
   #ch1pin .dg.walk .dg-ring{opacity:0; transition:opacity .9s ease .15s}
+  /* v262: 輪の線はもう少しゆっくり消す */
+  #ch1pin .dg.walk .dg-ring{transition:opacity 1.5s ease .15s}

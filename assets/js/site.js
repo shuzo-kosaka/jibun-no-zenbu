@@ -1550,7 +1550,7 @@
       var w = (now - dgT0) / 18000, a = ((w * 360 + 180) % 360 + 360) % 360, rad = a * Math.PI / 180;
       /* v257: 点はやめ、足跡が輪を歩く。歩き手の位置 f（輪の経路の割合、左端 a=180° から反時計回り）に対して、
          通り過ぎたばかりの足跡ほど濃く、古いものから薄れて消える（後ろ 30% ぶんだけ残る） */
-      if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = w - dgTrailF[ti], op = 0; if(age >= 0){ age %= 1; op = age < .02 ? age / .02 : age < .16 ? 1 : age < .30 ? 1 - (age - .16) / .14 : 0; } dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
+      if(dgTrail){ for(var ti = 0; ti < dgTrail.length; ti++){ var age = w - dgTrailF[ti], op = 0; if(age >= 0){ age %= 1; op = age < .02 ? age / .02 : age < .26 ? 1 : age < .44 ? 1 - (age - .26) / .18 : 0; }   /* v262: 残す足跡を増やす（一周の 44% ぶん） */ dgTrail[ti].style.opacity = (op * .85).toFixed(2); } }
       DG_ANG.forEach(function(t, i){ var tt = ((360 - t) % 360 + 360) % 360,   /* the nodes are met in the mirrored order, so each one still lights as the dot arrives */ prev = dgLastA, cur = a; var crossed = prev <= cur ? (prev < tt && tt <= cur) : (prev < tt || tt <= cur); if(crossed && dgNodes[i] && dgNodes[i].classList.contains('in')){ dgNodes[i].classList.remove('hit'); void dgNodes[i].offsetWidth; dgNodes[i].classList.add('hit'); } });
       dgLastA = a;
     }
