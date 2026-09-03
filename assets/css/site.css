@@ -2529,3 +2529,16 @@
   /* v323: 紙吹雪の CSS の組も .on のときだけに（JavaScript で動かすときに二重にならないように） */
   #cpyay .yay-bits i{opacity:0; animation:none}
   #cpyay.on .yay-bits i{animation:yayFall 2s cubic-bezier(.3,.5,.5,1) forwards}
+  /* v324
+     ・窓が狭いときの案内：文字の組を画面のちょうど中央に置き、窓の絵はその上に浮かせる
+       （絵の分だけ文字が下がっていた）
+     ・送れた知らせは「送る」と同じ高さ・同じ字の大きさにし、右端を入力欄の右端に合わせる */
+  #narrow > svg{position:absolute; left:50%; bottom:calc(50% + 7.2vh); margin:0; transform:translateX(-50%) translateY(-18px)}
+  #narrow.on > svg{transform:translateX(-50%)}
+  .cp-send b{transform:translateY(-1.5px)}   /* 「送る」の字を少し上へ。封筒の絵と目で見て中央にそろえる */
+  @media (orientation:portrait){ html.pcview.phone .cpage .cp-send b{transform:translateY(-3px)} }
+  #narrow{padding:4vh 8vw; gap:min(1.6vh, 1.6vw)}
+  #cpdone.cp-done{flex:1 1 auto; font-size:16px; line-height:1.35; padding:18px 18px 17px; font-family:var(--mincho); font-weight:700; letter-spacing:.04em}
+  @media (orientation:portrait){
+    html.pcview.phone .cpage #cpdone.cp-done{font-size:34px; padding:33px 30px 31px; line-height:1.35}
+  }
