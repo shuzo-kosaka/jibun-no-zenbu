@@ -2291,3 +2291,7 @@
   body.menuclosing .hd{--fg:#1C1B19; --fg2:#5A5955; --acc:#E84518; --bg:#F2F2EE; color:var(--fg)}
   /* v300: スマホのみ、画面上部に出続ける帯の章名は「CHECKPOINT 01」まで。それ以降の日本語（章の題）は出さない */
   html.pcview.phone .hd .chap .t{display:none}
+  /* v301: 言語の切り替えは、その場面の地の色を自分で敷く。
+     色のある章ではヘッダーの帯が地と同じ色＋ぼかしなので、下の紙面（点・地図の線・START · 2025 の文字など）が
+     ボタンの後ろに透けて、JA と EN の上下に線が入っているように見えていた */
+  .lang{background:var(--bg)}
