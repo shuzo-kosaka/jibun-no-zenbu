@@ -2214,3 +2214,27 @@
   body.menuopen .hd::after{opacity:0}
   body.menuopen .hd{color:var(--fg)}
   html.cover .hd::before,html.cover .hd::after{left:calc(-1 * env(safe-area-inset-left, 0px)); right:calc(-1 * env(safe-area-inset-right, 0px))}
+  /* v288
+     ・スマホのメニューは下に少し余白を足す（最後の行が縁に貼りついていた）
+     ・メールを送るは、開いている間だけ紙の地を敷く（向きを変えた瞬間に下の紙面が見えないように。閉じる動きは今までどおり）
+     ・横持ちで開いたときの小さな知らせ。案内の絵をそのまま借り、動きだけ逆に回して「横 → 縦」に見せる */
+  html.pcview.phone .menu-in{padding-bottom:56px}
+  html.cpopen .cpage.in{background:var(--paper)}
+  #cprot{position:fixed; right:3.4%; bottom:calc(3.4% + env(safe-area-inset-bottom, 0px)); z-index:97; display:flex; align-items:center; gap:14px;
+    padding:14px 20px 14px 16px; border:1px solid var(--line); border-radius:14px; background:var(--card, #FAFAF8); color:var(--fg);
+    box-shadow:0 10px 30px rgba(28,27,25,.10); pointer-events:none; opacity:0; transform:translateY(10px);
+    transition:opacity .5s var(--ease), transform .6s cubic-bezier(.2,.8,.2,1); max-width:min(78vw, 620px)}
+  #cprot.on{opacity:1; transform:none}
+  #cprot svg{width:56px; height:56px; flex:none; color:var(--fg)}
+  #cprot .pP,#cprot .pL{transform-origin:110px 100px}
+  #cprot .pP{animation:rvP 4.4s cubic-bezier(.45,0,.15,1) infinite reverse}
+  #cprot .pL{animation:rvL 4.4s cubic-bezier(.45,0,.15,1) infinite reverse; opacity:0}
+  #cprot .pc{animation:rvC 4.4s ease-in-out infinite reverse}
+  #cprot .ok{transform-origin:162px 76px; animation:cpOK 4.4s cubic-bezier(.2,.9,.3,1) infinite}
+  @keyframes cpOK{0%,72%{transform:scale(.3); opacity:0} 80%{transform:scale(1.18); opacity:1} 84%,100%{transform:scale(1); opacity:1}}
+  #cprot .cprot-tx{display:flex; flex-direction:column; gap:4px; min-width:0}
+  #cprot .cprot-tx b{font-family:var(--mincho); font-weight:700; font-size:17px; letter-spacing:.04em; line-height:1.5; white-space:nowrap}
+  #cprot .cprot-tx span{font-family:var(--sans); font-size:12px; letter-spacing:.06em; color:var(--fg2)}
+  html.pcview.phone #cprot .cprot-tx b{font-size:26px} html.pcview.phone #cprot .cprot-tx span{font-size:18px}
+  html.pcview.phone #cprot svg{width:86px; height:86px}
+  html.pcview.tablet #cprot .cprot-tx b{font-size:20px} html.pcview.tablet #cprot .cprot-tx span{font-size:14px}

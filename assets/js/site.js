@@ -373,8 +373,8 @@
     var H = document.documentElement;
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
-      ja: {small:'メールも、文字の遊びも、ありがとうございました。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'いただいたご連絡は、私にまっすぐ届きます。'},
-      en: {small:'Thank you — for the message, and for playing with the letters.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Whatever you send comes straight to me.'}
+      ja: {small:'細かな点までご覧いただき、ありがとうございます。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'いただいたご連絡は、ありがたく拝読いたします。'},
+      en: {small:'Thank you for looking this closely.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Anything you send, I will read with care.'}
     };
     var recopied = false;
     function recopy(){
@@ -1963,6 +1963,11 @@
   /* v242: Safari（iOS 26）に帯・ツールバーの色を採り直させる。#tint（fixed、場面の色、透明）の display を切り替える */
   var tintEl = document.createElement('div'); tintEl.id = 'tint'; tintEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tintEl);
   window.__retint = function(){ tintEl.style.display = 'none'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tintEl.style.display = ''; }); }); };
+  window.addEventListener('resize', function(){   /* v288: メールを送るを開いたまま向きを変えると、iOS が固定の箱を前の向きの大きさのまま残し、下に紙面が見えていた。組み直させる */
+    if(!document.documentElement.classList.contains('cpopen')) return;
+    var c = document.getElementById('cpage'); if(!c) return;
+    c.style.display = 'none'; void c.offsetWidth; c.style.display = '';
+  }, {passive:true});
   window.__setTheme = function(c){ var m = document.getElementById('themec'); if(!m){ m = document.createElement('meta'); m.name = 'theme-color'; m.id = 'themec'; document.head.appendChild(m); } if(c && m.getAttribute('content') !== c) m.setAttribute('content', c); };
   var jcur = null;
   function curtainJump(y, done, rew){
@@ -2564,16 +2569,45 @@
     cpage.hidden = false; cpage.classList.remove('out'); void cpage.offsetWidth; cpage.classList.add('in');
     if(mkbtn){ if(mkbtn.__t === undefined) mkbtn.__t = mkbtn.title; mkbtn.title = 'ちょっとしたサプライズの表示／非表示'; }
     document.documentElement.classList.add('cpopen'); if(window.__rvSuppress) window.__rvSuppress();   /* v286 */
+    cpRot();   /* v288: 横持ちで開いたなら「ここは縦持ちでも大丈夫」と伝える */
     if(menu && menu.classList.contains('open')) setMenu(false); togFit();
     clearTimeout(surHintT); document.documentElement.classList.add('surhint'); surHintT = setTimeout(function(){ document.documentElement.classList.remove('surhint'); }, 7000);   /* v93: the surprise toggle blinks for a while, so a visitor who came to write notices it */
     try{ history.pushState({cp:1}, '', '#write'); cpPushed = true; }catch(e){ cpPushed = false; }
     var done = document.getElementById('cpdone'); if(done) done.hidden = true; var err = document.getElementById('cperr'); if(err) err.textContent = '';
     setTimeout(function(){ var f = cpage.querySelector('input'); if(f) f.focus(); }, 500);
   }
+  /* v288: メールを送るを横持ちで開いたときの小さな知らせ。案内の端末の絵をそのまま借り、動きだけ逆に回して
+     「横 → 縦」に見せる（確認の印は縦の姿の側へ移す）。紙面の操作は妨げない */
+  var cpRotEl = null, cpRotT = 0;
+  function cpRot(){
+    var H = document.documentElement;
+    if(!H.classList.contains('handheld')) return;
+    if(!window.matchMedia('(orientation:landscape)').matches) return;
+    var src = document.getElementById('rotv'), svg0 = src && src.querySelector('svg'); if(!svg0) return;
+    var en = (typeof curLang !== 'undefined' && curLang === 'en');
+    if(!cpRotEl){
+      cpRotEl = document.createElement('div'); cpRotEl.id = 'cprot'; cpRotEl.setAttribute('aria-hidden', 'true');
+      var sv = svg0.cloneNode(true);
+      Array.prototype.forEach.call(sv.querySelectorAll('clipPath'), function(cp){ cp.id = cp.id + 'c'; });
+      Array.prototype.forEach.call(sv.querySelectorAll('[clip-path]'), function(el){ el.setAttribute('clip-path', el.getAttribute('clip-path').replace(')', 'c)')); });
+      var ok = sv.querySelector('.ok'), pP = sv.querySelector('.pP');
+      if(ok && pP){ var g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'okpos'); g.setAttribute('transform', 'translate(-24,-26)'); g.appendChild(ok); pP.appendChild(g); }   /* 印は縦の姿の右肩へ */
+      cpRotEl.appendChild(sv);
+      var tx = document.createElement('div'); tx.className = 'cprot-tx';
+      cpRotEl.appendChild(tx);
+      document.body.appendChild(cpRotEl);
+    }
+    var t = cpRotEl.querySelector('.cprot-tx');
+    t.innerHTML = en ? '<b>Portrait is fine here.</b><span>Sorry for the trouble so far.</span>'
+                     : '<b>縦持ちでも、大丈夫です。</b><span>ここまでご不便をおかけしました。</span>';
+    cpRotEl.classList.remove('on'); void cpRotEl.offsetWidth; cpRotEl.classList.add('on');
+    clearTimeout(cpRotT); cpRotT = setTimeout(function(){ cpRotEl.classList.remove('on'); }, 5200);
+  }
   function cpClose(fromPop){
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
     cpage.classList.remove('in'); cpage.classList.add('out'); document.documentElement.classList.remove('cpopen');
+    if(cpRotEl){ clearTimeout(cpRotT); cpRotEl.classList.remove('on'); }   /* v288 */
     if(window.__rvPortrait) window.__rvPortrait();   /* v286: 閉じた時点で縦持ちなら案内を出す */
     var bar = cpage.querySelector('.cp-bar'), cpx1 = document.getElementById('cpx'), cpl1 = document.querySelector('.hd .cp-lab'); if(bar){ if(cpl1) bar.appendChild(cpl1); if(cpx1) bar.appendChild(cpx1); }   /* and back into the page */
     cpT = setTimeout(function(){ cpage.hidden = true; cpage.classList.remove('out'); }, 620);
