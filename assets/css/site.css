@@ -2151,3 +2151,7 @@
   #ch1pin .dgpulse{fill:none; stroke:var(--acc); stroke-width:1.5; opacity:0; transform-box:fill-box; transform-origin:center; pointer-events:none}
   #ch1pin .dg-node.now .dgpulse{animation:dgpulse 2.4s ease-out 2}   /* v266: 二回。一番外側の線から広がる */
   @keyframes dgpulse{0%{transform:scale(1); opacity:1} 100%{transform:scale(1.36); opacity:0}}
+  /* v268: スマホでは、タップで色が付くときの「蛍光灯がつくまでの点滅」（wkFlick）と光の揺れ（wkGlow）を止める。
+     hover:none の除外は :hover だけで :focus-visible に効いておらず、タップで一度点滅して見えていた。色は 0.55 秒でそのまま付く */
+  html.pcview.phone .wkf:hover .ph,html.pcview.phone .wkf:focus-visible .ph{animation:none !important}
+  html.pcview.phone .wkf:hover .fl,html.pcview.phone .wkf:focus-visible .fl{animation:none !important; opacity:0}
