@@ -782,7 +782,7 @@
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
   var pins = document.querySelectorAll('.pin'), hw = document.getElementById('hw'), hwv = document.getElementById('hwv'), hwPlayed = false;
-  var hwDone = false, hwDoneT = 0, hwShown = false, hwStartAt = 0, hwArrAt = 0, hwDur = 0, hwLastScroll = 0;
+  var hwDone = false, hwDoneT = 0, hwStartAt = 0, hwArrAt = 0, hwDur = 0, hwLastScroll = 0;
   window.addEventListener('scroll', function(){ hwLastScroll = now(); }, {passive:true});   /* v345: 送っている最中に次へ進めないための目印 */   /* v345: 一度出したら、待たせる側へは戻さない */   /* v344: 手書きが描き終わったか（終わったら、スクロールを待たずに次の一文を出す） */
 
   /* v130: the bar screen changes photograph as you go down it — a row of dots says how many there are and
@@ -820,18 +820,30 @@
     if(hwDone || !hwStartAt) return false;
     var sec = document.getElementById('message'); if(!sec) return false;
     var r = sec.getBoundingClientRect();
-    if(!(r.top <= vh() * .40 && r.bottom >= vh())){ hwArrAt = 0; return false; }
+    if(!(r.top <= vh() * .55 && r.bottom >= vh())){ hwArrAt = 0; return false; }   /* v346: 送り切れていなくても、次の一枚へ自分で送るので構わない */
     var t = now(); if(!hwArrAt) hwArrAt = t;
     if(t < hwStartAt + hwDur + 260) return false;   /* 描き終わり */
     if(t < hwArrAt + 900) return false;             /* 画面に収まってから一拍 */
     if(t - hwLastScroll < 700) return false;        /* 指が止まってから */
     hwDone = true; return true;
   }
+  /* v346: 描き終わったら、次の一枚（サイバーエージェントの皆さまへ）まで自分で送る。
+     読み込んで最初の一度だけ。すでに読み手が先へ進んでいるときは何もしない。
+     手書きは左の丸の一つめとして残るので、戻ればまた描かれる */
+  function hwAdvance(){
+    var sec = document.getElementById('message'); if(!sec) return;
+    var run = sec.offsetHeight - vh(); if(run <= 0) return;
+    var r = sec.getBoundingClientRect(), p = Math.max(0, Math.min(1, (-r.top) / run));
+    if(p > .06) return;
+    var h = sec.querySelector('[data-athw]'), at = h ? (parseFloat(h.getAttribute('data-at')) || .12) : .12;
+    var y = r.top + window.scrollY + run * at + 6;
+    if(typeof flyTo === 'function') flyTo(y); else window.scrollTo({top:y, behavior:'smooth'});
+  }
   function hwWatch(){
     if(hwDoneT || hwDone) return;
     var cap = 0;
     hwDoneT = setInterval(function(){
-      if(hwDone || hwCheck()){ clearInterval(hwDoneT); hwDoneT = 0; pinUpdate(); return; }
+      if(hwDone || hwCheck()){ clearInterval(hwDoneT); hwDoneT = 0; window.__hwDone = true; hwAdvance(); pinUpdate(); if(window.__tailUpdate) window.__tailUpdate(); return; }
       if(++cap > 900){ clearInterval(hwDoneT); hwDoneT = 0; }   /* 見張りは三分で切る */
     }, 200);
   }
@@ -850,10 +862,8 @@
       var p = (-r.top) / total; p = Math.max(0, Math.min(1, p));
       pin.querySelectorAll('[data-at]').forEach(function(el){ var at = parseFloat(el.getAttribute('data-at')), off = el.getAttribute('data-off');
         /* v344: data-athw のものは、手書きが描き終わった時点でも出す（スクロールしなくても次へ進む） */
-        var hwa = el.getAttribute('data-athw') !== null;
-        var on = (p >= at || (hwDone && hwa)) && (off === null || p < parseFloat(off));
-        if(hwa && hwHold && !hwShown) on = false;   /* v345: 手書きが描き終わるまでは出さない */
-        if(hwa && on) hwShown = true;   /* 一度出したら、あとで待たせ直さない（送って戻ったときのちらつき除け） */
+        var on = (p >= at) && (off === null || p < parseFloat(off));
+        if(hwHold && el.getAttribute('data-athw') !== null) on = false;   /* v345: 手書きが描き終わるまでは出さない */
         el.classList.toggle('in', on); el.classList.toggle('on', on); });
       var imgs = pin.querySelectorAll('.bgph img');
       if(imgs.length){ var idx = Math.min(imgs.length-1, Math.floor(p * imgs.length * .999)); imgs.forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
@@ -874,7 +884,7 @@
         /* v157: these two were fractions of the old 620vh screen. The screen is 840vh now, so in real distance
            the handwriting was still bright when the address arrived (they printed over each other) and the first
            paragraph came while the address was still standing in the middle. Both are back where they were. */
-        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', (p >= .10 || hwDone) && (!hwHold || hwShown));   /* v344: 描き終わったら、スクロールを待たずに手書きを奥へ引く／v345: 描いている間は引かない */   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
+        var ms = document.getElementById('msgstick'); ms.classList.toggle('dim', p >= .10 && !hwHold);   /* v344: 描き終わったら、スクロールを待たずに手書きを奥へ引く／v345: 描いている間は引かない */   /* v231: 手書きは少し早く薄く（最初の文が来るまでの間を詰める） */
         ms.classList.toggle('hold', r.top <= 0 && r.bottom >= vh());
         var wasDone = ms.classList.contains('mdone'), nowDone = r.bottom < vh();
         if(nowDone !== wasDone){ ms.classList.toggle('mdone', nowDone);
@@ -894,7 +904,7 @@
           for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
         }
         ms.classList.toggle('mtail', p >= .90);   /* v254 */
-        hwStill((p >= .10 && (!hwHold || hwShown)) || hwDone);   /* v345: 描いている途中で静止画に差し替えない（描き終わりが飛んで見えていた） */   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
+        hwStill(p >= .10 && !hwHold);   /* v345: 描いている途中で静止画に差し替えない（描き終わりが飛んで見えていた） */   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
         if(!msgFitDone) msgSoloFit(); ms.classList.toggle('solo', p < .27);   /* v254: 止まりを詰めた分（最初の段落は .30 から） */
         var s2 = p >= .50 && p < .66;   /* v254: 二つ目の見出しは .50 で来て、.68 の段落の少し前に退く */
         if(s2 && !ms.classList.contains('solo2')) msgSoloFit();   /* v172: measured again as it takes the middle — the window may have changed width since the page loaded */
@@ -2288,7 +2298,7 @@
       var H = vh(), r = sec.getBoundingClientRect(), here = r.top < H * .5 && r.bottom > H * .5;
       var p = Math.max(0, Math.min(1, (-r.top) / Math.max(1, sec.offsetHeight - H))), cur = -1;
       items.forEach(function(el, i){ if(p >= parseFloat(el.getAttribute('data-at'))) cur = i; });
-      nav.classList.toggle('on', here && cur >= 0);   /* v168: nothing to count while the handwriting still has the screen to itself */
+      nav.classList.toggle('on', here && cur >= 0 && !!window.__hwDone);   /* v346: 手書きが描き終わってから出す */   /* v168: nothing to count while the handwriting still has the screen to itself */
       if(!here) return;
       dots.forEach(function(d, i){ d.classList.toggle('now', i === cur); d.classList.toggle('past', i < cur); });
     };
