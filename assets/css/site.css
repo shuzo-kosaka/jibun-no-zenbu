@@ -2567,7 +2567,7 @@
   /* スクロールを促す薄い丸（スマホの TOP だけ） */
   #top .scdot{display:none}
   html.pcview.phone #top .scdot{display:block; position:absolute; z-index:3; pointer-events:none; opacity:0; transition:opacity .9s var(--ease) 1.2s}
-  html.pcview.phone #top .scdot i{position:absolute; left:0; bottom:0; width:100%; aspect-ratio:1; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 5.2s cubic-bezier(.35,0,.3,1) infinite}
+  html.pcview.phone #top .scdot i{position:absolute; left:0; bottom:0; width:100%; aspect-ratio:1; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 3.9s cubic-bezier(.35,0,.3,1) infinite}
   html.pcview.phone #top .scdot i + i{display:none}   /* 一つが消えきってから、次の一つ */
   @keyframes scdot{0%{opacity:0; transform:translateY(0)} 12%{opacity:.2} 52%{opacity:.17} 68%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))} 100%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))}}
   html.pcview.phone #top:not(.scat) .scdot{opacity:1}
