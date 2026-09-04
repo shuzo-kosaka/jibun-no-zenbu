@@ -2572,3 +2572,8 @@
   @keyframes scdot{0%{opacity:0; transform:translateY(0)} 12%{opacity:.2} 52%{opacity:.17} 68%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))} 100%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))}}
   html.pcview.phone #top:not(.scat) .scdot{opacity:1}
   @media (prefers-reduced-motion: reduce){ html.pcview.phone #top .scdot i{animation:none; opacity:.28} html.pcview.phone #top .scdot i + i{display:none} }
+  /* v334: 「メッセージを送る」を開くと、ヘッダーの銘と三本線が消えて CONTACT の札が入るため、
+     並びの段が一つずれて、右の JA / EN が横に動いていた。段を明示して動かないようにする */
+  html.cpopen .hd .cp-lab{grid-column:1; grid-row:1; justify-self:start; align-self:center}
+  html.cpopen .hd .nav{grid-column:3; grid-row:1}
+  html.pcview.phone.cpopen .hd .cp-close{margin-left:42px}   /* スマホは三本線（70px）より × が小さいので、その差だけ間を空けて JA / EN を動かさない */

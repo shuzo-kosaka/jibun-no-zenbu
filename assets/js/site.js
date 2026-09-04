@@ -2727,14 +2727,17 @@
     if(!WA) el.classList.add('on');
     document.body.appendChild(el);
     if(WA){
-      var EI = 'cubic-bezier(.2,.9,.3,1)', T0 = 'translate(-50%,-50%) rotate(-9deg)';
+      var T0 = 'translate(-50%,-50%) rotate(-9deg)';
+      /* v334: 全体に掛けていた ease が前へ寄りすぎて、降りてくるところが一瞬で終わっていた。
+         区切りごとに動きを付け、降りる間をはっきり見せる */
       seal.animate([
-        {opacity:0, transform:'translate(-50%,-50%) rotate(-16deg) scale(1.52)', offset:0},
-        {opacity:.98, offset:.38},
-        {opacity:.98, transform:T0 + ' scale(.955)', offset:.58},
-        {opacity:.96, transform:T0 + ' scale(1.018)', offset:.76},
+        {opacity:0, transform:'translate(-50%,-50%) rotate(-17deg) scale(1.58)', offset:0, easing:'cubic-bezier(.35,0,.25,1)'},
+        {opacity:.55, transform:'translate(-50%,-50%) rotate(-13deg) scale(1.3)', offset:.34, easing:'cubic-bezier(.4,0,.2,1)'},
+        {opacity:.9, transform:'translate(-50%,-50%) rotate(-10deg) scale(1.08)', offset:.62, easing:'cubic-bezier(.3,0,.2,1)'},
+        {opacity:.98, transform:T0 + ' scale(.952)', offset:.8, easing:'cubic-bezier(.3,0,.3,1)'},
+        {opacity:.96, transform:T0 + ' scale(1.022)', offset:.9},
         {opacity:.94, transform:T0 + ' scale(1)', offset:1}
-      ], {duration:640, easing:EI, fill:'both'});
+      ], {duration:760, easing:'linear', fill:'both'});
       [ring, ring2].forEach(function(r, k){
         r.animate([{opacity:0, transform:'translate(-50%,-50%) scale(.72)', offset:0},
                    {opacity:.5, offset:.14},
