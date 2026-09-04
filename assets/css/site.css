@@ -2219,7 +2219,6 @@
      ・メールを送るは、開いている間だけ紙の地を敷く（向きを変えた瞬間に下の紙面が見えないように。閉じる動きは今までどおり）
      ・横持ちで開いたときの小さな知らせ。案内の絵をそのまま借り、動きだけ逆に回して「横 → 縦」に見せる */
   html.pcview.phone .menu-in{padding-bottom:56px}
-  html.cpopen .cpage.in{background:var(--paper)}
   #cprot{position:fixed; right:3.4%; bottom:calc(3.4% + env(safe-area-inset-bottom, 0px)); z-index:97; display:flex; align-items:center; gap:14px;
     padding:14px 20px 14px 16px; border:1px solid #D6D4CE; border-radius:14px; background:#FAFAF8; color:#1C1B19;   /* 章の地色に連れて --card が半透明になる場面があり、透けて見えていた。紙の色で固定（メールの紙面は常に明るい） */
     box-shadow:0 10px 30px rgba(28,27,25,.10); pointer-events:none; opacity:0; transform:translateY(10px);
@@ -2261,9 +2260,7 @@
      iOS は向きが変わっても固定の箱の大きさを前の向きのまま持ち続けることがあり、はみ出した部分から章の地色と本文が見えていた。
      箱の大きさに頼らず、紙面（節・締め・年・足跡）を伏せ、地の板と html の地を紙の色にする。
      閉じ始めた瞬間に cpopen が外れるので、下りていく動きは今までどおり紙面の上を滑る */
-  html.cpopen{background-color:var(--paper) !important}   /* 画面の地そのもの。固定の箱がどう狂っても、ここは必ず全面を塗る（案内用の !important に勝たせる） */
-  html.cpopen body::after{background:var(--paper) !important; transition:none}
-  html.cpopen body > section,html.cpopen body > footer,html.cpopen body > .yr,html.cpopen body > .rew,html.cpopen body > .remain,html.cpopen body > .cta-fx{visibility:hidden}
+  html.cphid{background-color:var(--paper) !important}   /* 画面の地そのもの。固定の箱がどう狂っても、ここは必ず全面を塗る（案内用の !important に勝たせる） */
   /* v295: スマホの TOP — CONTENTS の一覧は出さない。空いた縦の分だけ、題字を下へ、
      SEVEN CHECKPOINTS と流れる文字を上へ寄せて、画面の中ほどで釣り合うように置く（左端は今までどおり） */
   html.pcview.phone #top .toc{display:none}
@@ -2563,3 +2560,15 @@
     html.handheld .rotv{height:var(--vvh, 100dvh)}
     #narrow{height:var(--vvh, 100dvh)}
   }
+  /* v330
+     ・「メッセージを送る」を開いた瞬間に紙面を伏せていたため、紙（シート）が上がってくるまでの
+       0.6 秒ほど画面が白く見えていた。伏せるのは紙が上がりきってから（.cphid）にする
+     ・スマホの TOP：カタカナの下に、下へ促す薄い丸を置く */
+  /* スクロールを促す薄い丸（スマホの TOP だけ） */
+  #top .scdot{display:none}
+  html.pcview.phone #top .scdot{display:block; position:absolute; width:11px; height:38px; z-index:3; pointer-events:none; opacity:0; transition:opacity .9s var(--ease) 1.2s}
+  html.pcview.phone #top:not(.scat) .scdot{opacity:1}
+  html.pcview.phone #top .scdot i{position:absolute; left:0; top:0; width:11px; height:11px; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 2.8s cubic-bezier(.35,0,.25,1) infinite}
+  html.pcview.phone #top .scdot i + i{animation-delay:1.4s}
+  @keyframes scdot{0%{opacity:0; transform:translateY(-3px)} 20%{opacity:.4} 58%{opacity:.32} 100%{opacity:0; transform:translateY(27px)}}
+  @media (prefers-reduced-motion: reduce){ html.pcview.phone #top .scdot i{animation:none; opacity:.28} html.pcview.phone #top .scdot i + i{display:none} }
