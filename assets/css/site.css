@@ -2618,3 +2618,5 @@
      箱に下限の幅を持たせて、縮んでも地名が中央に留まるようにする（落ち着いた状態の見た目は変わらない） */
   .yr{min-width:26px}
   #message .hwstop{display:none}
+  /* v347: MESSAGE の左の丸は、「目の前のヒトが、いちばんの教科書だった。」の丸と同じ出入りに */
+  .remain{transition:opacity .45s var(--ease)}
