@@ -2597,3 +2597,8 @@
   /* v338: 隠し svg は大きさ 0 にしない（WebKit が中の filter や clipPath を手放すことがある）。
      1px にして、目には見えないまま置いておく */
   .wkdefs{position:absolute; left:0; top:0; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; z-index:-1}
+  /* v340: 棒の下の地名（NEXT / CONTACT など）が、章の変わり目に右へ跳ねて戻っていた。
+     入れ替えの一瞬だけ年の欄が幅 1px に縮み、親の箱もそれに合わせて縮む。
+     地名は幅 18px の塊なので、親より広くなった分だけ右へはみ出して置かれていた。
+     箱に下限の幅を持たせて、縮んでも地名が中央に留まるようにする（落ち着いた状態の見た目は変わらない） */
+  .yr{min-width:26px}
