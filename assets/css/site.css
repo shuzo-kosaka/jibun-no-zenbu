@@ -2553,7 +2553,8 @@
        実機の Safari は固定の箱を「道具の帯が隠れているときの高さ」で測るので、帯が出ていると中身が下に寄って見えていた
      ・窓が狭いときの案内が出ているあいだは、紙面を動かさない（念のため二重に留める） */
   @supports (height:100dvh){
-    html.handheld .rotv{bottom:auto; height:100dvh}
+    html.handheld .rotv{bottom:auto; height:100dvh; padding-bottom:6vh}   /* v328: 画面より下へ伸ばしていた分（bottom:-24vh / padding-bottom:30vh）は、
+       高さを実測するようになったので不要。残しておくと中身が 12vh ぶん上に寄っていた */
     #cprot{bottom:calc(3.4% + env(safe-area-inset-bottom, 0px) + (100vh - 100dvh))}
   }
   html.nwon,html.nwon body{overflow:hidden !important; touch-action:none}
