@@ -167,8 +167,11 @@
     /* v331: スクロールを促す丸。大きさはカタカナの段の幅に合わせ、下の流れる文字の高さから上へ昇る */
     var sd = top.querySelector('.scdot'), nmEl = top.querySelector('.name'), rotEl = top.querySelector('.rot');
     if(sd && nmEl && rotEl){
-      var size = Math.max(24, Math.round(tag.offsetWidth)), travel = Math.round(size * 1.9);
-      var nr = nmEl.getBoundingClientRect(), rr = rotEl.getBoundingClientRect();
+      var size = Math.max(24, Math.round(tag.offsetWidth)), END = .46, gap = Math.round(size * .33);
+      var nr = nmEl.getBoundingClientRect(), rr = rotEl.getBoundingClientRect(), tr = tag.getBoundingClientRect();
+      /* v343: 昇りきる高さは、カタカナの段の下端の手前まで。消えぎわに段へ差し掛からないよう、
+         終わりの縮み（END）で見た目が小さくなるぶんと余白（gap）を引いて測る */
+      var travel = Math.max(Math.round(size * 1.9), Math.round(rr.bottom - tr.bottom - size + size * (1 - END) / 2 - gap));
       sd.style.width = size + 'px'; sd.style.height = (travel + size) + 'px';
       sd.style.left = Math.round(tag.offsetLeft + tag.offsetWidth / 2 - size / 2) + 'px';
       sd.style.top = Math.round(rr.bottom - nr.top - travel - size) + 'px';   /* 起点は流れる文字の下端 */
