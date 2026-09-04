@@ -2624,3 +2624,12 @@
      ひと巡りを長くし、灯っている時間を伸ばし、消えぎわをなだらかに */
   #message .mfp{animation-duration:4.8s; animation-delay:calc(var(--k,0) * .21s)}
   @keyframes mwalk{0%{opacity:0} 6%{opacity:calc(.85 * var(--fade,1))} 58%{opacity:calc(.85 * var(--fade,1))} 80%{opacity:0} 100%{opacity:0}}
+  /* v353: 白い点滅の元断ち——MESSAGE の章に、自分の地の色を持たせる。
+     これまでは地が画面全体で一枚きりで、次の章が画面のまん中に来てはじめて色が渡っていた。
+     そのため「中身が抜けたのに地はまだ紙色」という真っ白な一枚ができていた。
+     章そのものが朱の地を連れて上がってくれば、その一枚は生まれない */
+  #message{background-color:var(--shu)}
+  /* 同じことが「英語が、まったくわからない教室」（夜）と「やっぱり、デザインで人を楽しませたい」（朱）でも
+     起きていた（節が画面の半分を覆っても地は紙色のまま＝明るい一枚）。同じ手当てを */
+  #ch2{background-color:var(--night, #0E1826)}
+  #ch7{background-color:var(--shu)}
