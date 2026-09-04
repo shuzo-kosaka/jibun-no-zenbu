@@ -2577,3 +2577,17 @@
   html.cpopen .hd .cp-lab{grid-column:1; grid-row:1; justify-self:start; align-self:center}
   html.cpopen .hd .nav{grid-column:3; grid-row:1}
   html.pcview.phone.cpopen .hd .cp-close{margin-left:42px}   /* スマホは三本線（70px）より × が小さいので、その差だけ間を空けて JA / EN を動かさない */
+  /* v337（実機の iPhone を横持ちで見て見つけたもの）
+     ・右端の年（2001 など）が Dynamic Island の下に潜っていた。右端で位置を決め、島の幅ぶん内側へ
+     ・ハンバーガーメニューの右端（七つめの判・案内文）も島に隠れていた。幕そのものに安全域の余白を持たせる
+     ・縦持ちのメッセージ画面で、上の帯だけ字が小さいままだった */
+  html.cover .yr,html.cover.pcview .yr{left:calc(100% - env(safe-area-inset-right, 0px) - 14px); transform:translateX(-100%)}
+  html.cover .menu{box-sizing:border-box; padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
+  html.cover .menu-in{padding-left:3.4%; padding-right:3.4%}
+  @media (orientation:portrait){
+    html.pcview.phone.cpopen .hd .gridbtn{font-size:20px}
+    html.pcview.phone.cpopen .hd .lang{font-size:24px}
+    html.pcview.phone.cpopen .hd .lang button{padding:10px 16px}
+    html.pcview.phone.cpopen .hd .cp-lab{font-size:22px; letter-spacing:.2em}
+    html.pcview.phone.cpopen .hd .nav{gap:34px}
+  }
