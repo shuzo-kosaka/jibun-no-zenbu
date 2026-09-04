@@ -2790,22 +2790,6 @@
     cpRotEl.classList.remove('on'); void cpRotEl.offsetWidth; cpRotEl.classList.add('on');
     clearTimeout(cpRotT); cpRotT = setTimeout(function(){ cpRotEl.classList.remove('on'); }, 5200);
   }
-  /* v315: 実機の Safari は、幅を決め打ちにした紙面で入力欄に触れると、その欄が読める大きさまで
-     画面を寄せてしまう。字を 16px 以上にしても、紙面ごと縮めて映しているこの作りでは止まらない。
-     そこで「メールを送る」を開いているあいだだけ、拡大の自動追従を切る。閉じたら元に戻す。
-     指でのつまむ操作は iOS では残る（この指定は自動の寄せにだけ効く） */
-  var cpVpWas = null, cpHidT = 0, cpZoomT = 0;
-  function cpZoom(on){
-    if(!document.documentElement.classList.contains('handheld')) return;
-    var m = document.querySelector('meta[name="viewport"]'); if(!m) return;
-    if(on){
-      if(cpVpWas === null) cpVpWas = m.getAttribute('content') || '';
-      var c = cpVpWas.replace(/,?\s*(user-scalable|maximum-scale)=[^,]*/g, '');
-      m.setAttribute('content', c + ',maximum-scale=1,user-scalable=no');
-    } else if(cpVpWas !== null){
-      m.setAttribute('content', cpVpWas); cpVpWas = null;
-    }
-  }
   function cpClose(fromPop){
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
