@@ -2591,3 +2591,6 @@
     html.pcview.phone.cpopen .hd .cp-lab{font-size:26px; letter-spacing:.2em}
     html.pcview.phone.cpopen .hd .nav{gap:34px}
   }
+  /* v338: 隠し svg は大きさ 0 にしない（WebKit が中の filter や clipPath を手放すことがある）。
+     1px にして、目には見えないまま置いておく */
+  .wkdefs{position:absolute; left:0; top:0; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; z-index:-1}
