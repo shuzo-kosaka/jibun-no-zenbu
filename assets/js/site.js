@@ -2790,6 +2790,7 @@
     cpRotEl.classList.remove('on'); void cpRotEl.offsetWidth; cpRotEl.classList.add('on');
     clearTimeout(cpRotT); cpRotT = setTimeout(function(){ cpRotEl.classList.remove('on'); }, 5200);
   }
+  var cpHidT = 0;   /* 紙が上がりきってから紙面を伏せるまでの待ち */
   function cpClose(fromPop){
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
