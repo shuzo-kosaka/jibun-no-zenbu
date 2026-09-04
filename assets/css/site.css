@@ -2569,7 +2569,15 @@
   html.pcview.phone #top .scdot{display:block; position:absolute; z-index:3; pointer-events:none; opacity:0; transition:opacity .9s var(--ease) 1.2s}
   html.pcview.phone #top .scdot i{position:absolute; left:0; bottom:0; width:100%; aspect-ratio:1; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 3.9s cubic-bezier(.35,0,.3,1) infinite}
   html.pcview.phone #top .scdot i + i{display:none}   /* 一つが消えきってから、次の一つ */
-  @keyframes scdot{0%{opacity:0; transform:translateY(0)} 12%{opacity:.2} 52%{opacity:.17} 68%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))} 100%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))}}
+  /* v341: 指で画面をぎゅっと押し込む感じを足す。ふっとふくらんでから、
+     上へ流れながら小さくなって消える */
+  @keyframes scdot{
+    0%{opacity:0; transform:translateY(0) scale(.6); animation-timing-function:cubic-bezier(.2,.9,.3,1.25)}
+    9%{opacity:.22; transform:translateY(1px) scale(1.1); animation-timing-function:cubic-bezier(.35,0,.4,1)}
+    17%{opacity:.21; transform:translateY(-1px) scale(.97); animation-timing-function:cubic-bezier(.3,0,.3,1)}
+    52%{opacity:.16; transform:translateY(calc(-.62 * var(--sctv, 74px))) scale(.8)}
+    68%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px))) scale(.54)}
+    100%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px))) scale(.54)}}
   html.pcview.phone #top:not(.scat) .scdot{opacity:1}
   @media (prefers-reduced-motion: reduce){ html.pcview.phone #top .scdot i{animation:none; opacity:.28} html.pcview.phone #top .scdot i + i{display:none} }
   /* v334: 「メッセージを送る」を開くと、ヘッダーの銘と三本線が消えて CONTACT の札が入るため、
