@@ -2619,7 +2619,7 @@
   .yr{min-width:26px}
   #message .hwstop{display:none}
   /* v347: MESSAGE の左の丸は、「目の前のヒトが、いちばんの教科書だった。」の丸と同じ出入りに */
-  .remain{transition:opacity .45s var(--ease)}
+  .remain{transition:opacity .95s var(--ease)}   /* v352: 手書きのあとに出るときは、ふわりと */
   /* v350: MESSAGE の最後の足跡——一巡が速く、出ては消えるのが忙しなかった。
      ひと巡りを長くし、灯っている時間を伸ばし、消えぎわをなだらかに */
   #message .mfp{animation-duration:4.8s; animation-delay:calc(var(--k,0) * .21s)}

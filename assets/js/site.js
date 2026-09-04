@@ -881,7 +881,7 @@
         pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
         pin.querySelectorAll('.bgdot i').forEach(function(d,i){ d.classList.toggle('on', i === idx); }); }
       if(r.top <= 0 && r.bottom >= vh()){ pin.querySelectorAll('.marg').forEach(function(m){ m.classList.add('in'); }); }
-      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgP = total > 0 ? (-r.top) / total : 0; dgLeave = p >= (window.__DGT || .88);   /* v351: 薄れは節を出たあとも続けられるよう、頭打ちしない進みで測る */   /* v351: 中央（.76）を読む間を 18vh 取り、そこから輪を描きはじめる */
+      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgP = total > 0 ? (-r.top) / total : 0; dgLeave = p >= (window.__DGT || .86);   /* v352: 中央（.76）から 15vh 空けて描きはじめ、一周に 22.5vh 使う */   /* v351: 薄れは節を出たあとも続けられるよう、頭打ちしない進みで測る */   /* v351: 中央（.76）を読む間を 18vh 取り、そこから輪を描きはじめる */
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
         fpFade = Math.max(0, Math.min(1, p / .16)); } if(pin.id === 'ch5map') mapUpdate(p); }
       if(pin.id === 'ch5pin'){ pin.classList.toggle('dotson', r.top <= 0 && r.bottom >= vh()); pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
@@ -985,12 +985,14 @@
         it.style.setProperty('--sx', (cx - sw / 2).toFixed(1) + 'px'); it.style.setProperty('--sy', (cy - sw / 2).toFixed(1) + 'px');
       });
     }
-    sp.__fit = true;
+    /* v352: 判の幅が取れない（まだ組み上がっていない）うちは、測り直しの余地を残す */
+    if(!(W > 200 && H > 200) || (seals.length && !seals[0].offsetWidth)) return;
+    sp.__fit = true; sp.__fitW = W; sp.__fitH = H; sp.__fitN = seals.length;
   }
   function soloUpdate(){
     solos.forEach(function(sp){
       var r = sp.getBoundingClientRect(), total = Math.max(1, r.height - vh()), p = (-r.top) / total; p = Math.max(0, Math.min(1, p)); if(reduce) p = 1;
-      if(!sp.__fit) soloFit(sp);
+      if(!sp.__fit || sp.__fitW !== window.innerWidth || sp.__fitH !== vh() || sp.__fitN !== sp.querySelectorAll('.seals i').length) soloFit(sp);   /* v352: 画面の寸法か判の数が変わっていたら測り直す（判を組み直したあと測り直されず、八つとも中央に積まれていた） */
       var soloAt = parseFloat(sp.getAttribute('data-solo')); if(isNaN(soloAt)) soloAt = .5;
       sp.classList.toggle('solo', p < soloAt);   /* v131: the section can say where its heading settles — the length of these screens is not the same any more */
       sp.querySelectorAll('[data-at]').forEach(function(el){
@@ -1733,8 +1735,8 @@
       else if(dgFinT0){
         /* v350: 描くのも薄れるのもスクロールに連れて。送れば輪が継ぎ足され、戻せばそのぶん戻る。
            送りはじめの足跡（snap）は残したまま、そこへ輪を重ねるので、切り替わりで飛ばない */
-        var u = dgP - dgFinP0, q = Math.max(0, Math.min(1, u / .085));   /* v351: 一周を描き切るまでを 6.8vh → 12.8vh に */
-        var fade = 1 - Math.max(0, Math.min(1, (u - .085) / .035));
+        var u = dgP - dgFinP0, q = Math.max(0, Math.min(1, u / .15));   /* v352: 一周を描き切るまでを 12.8vh → 22.5vh に */
+        var fade = 1 - Math.max(0, Math.min(1, (u - .15) / .05));
         var f0 = ((dgFinW0 % 1) + 1) % 1;
         if(dgTrail) for(var tf = 0; tf < dgTrail.length; tf++){
           var d = ((dgTrailF[tf] - f0) % 1 + 1) % 1, o2 = 0;
@@ -2044,7 +2046,7 @@
     window.__mFps = fs;
   }
   window.addEventListener('resize', function(){ clearTimeout(msgTrail.t); msgTrail.t = setTimeout(msgTrail, 220); }, {passive:true});
-  function rallyBuild(){ srBuild(); dgBuild(); brBuild(); chsealBuild(); soloSealsBuild(); wkBuild(); fpMeasure(); fpUpdate(); passPlace(); msgTrail(); }
+  function rallyBuild(){ srBuild(); dgBuild(); brBuild(); chsealBuild(); soloSealsBuild(); wkBuild(); fpMeasure(); fpUpdate(); passPlace(); msgTrail(); setTimeout(onScroll, 0);   /* v352: 組み直したら位置も測り直す（スクロールが来ないと測られないままだった） */ }
   if(window.ResizeObserver && document.getElementById('contents')){ var roT, roH = 0; new ResizeObserver(function(es){ var h = es[0].contentRect.height; if(Math.abs(h - roH) < 1) return; roH = h; clearTimeout(roT); roT = setTimeout(rallyBuild, 80); }).observe(document.getElementById('contents')); }
   if(sr){ rallyBuild(); if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(rallyBuild, 50); }); window.addEventListener('load', function(){ setTimeout(rallyBuild, 100); setTimeout(fpMeasure, 1500); }); var srT; window.addEventListener('resize', function(){ clearTimeout(srT); srT = setTimeout(rallyBuild, 120); }); }
 
