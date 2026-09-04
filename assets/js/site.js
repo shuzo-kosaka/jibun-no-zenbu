@@ -881,7 +881,7 @@
         pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
         pin.querySelectorAll('.bgdot i').forEach(function(d,i){ d.classList.toggle('on', i === idx); }); }
       if(r.top <= 0 && r.bottom >= vh()){ pin.querySelectorAll('.marg').forEach(function(m){ m.classList.add('in'); }); }
-      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgP = p; dgLeave = p >= (window.__DGT || .64);   /* v348: 輪も判も出そろってから。ここから先へ送られたら、足跡は最後の一周へ */
+      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgP = p; dgLeave = p >= (window.__DGT || .82);   /* v349: 輪・判・中央（デザイン × ヒト＝.76）まで出そろい、読み終えて送るところで。それまで足跡は歩き続ける */
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
         fpFade = Math.max(0, Math.min(1, p / .16)); } if(pin.id === 'ch5map') mapUpdate(p); }
       if(pin.id === 'ch5pin'){ pin.classList.toggle('dotson', r.top <= 0 && r.bottom >= vh()); pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
@@ -1681,7 +1681,27 @@
     if(window.__chFps){ window.__chFps.forEach(function(f){ var r = f.getBoundingClientRect(); fpList.push({el:f, y:r.top + r.height / 2 + sy}); }); }
     if(window.__wkFps){ window.__wkFps.forEach(function(f){ var r = f.getBoundingClientRect(); fpList.push({el:f, y:r.top + r.height / 2 + sy}); }); }
   }
+  /* v349: 入ってくる足跡が「WHAT I'M MADE OF」の字の上を踏んでいた。
+     字に掛かるものだけ伏せて、言葉の後ろを通っていく形にする（題字が落ち着いてから一度だけ測る） */
+  var dgHideList = null;
+  function dgHideUnderTitle(){
+    var svg = document.getElementById('dgsvg'); if(!svg) return;
+    var fps = window.__dgFps, tt = svg.querySelector('.dg-title');
+    if(!fps || !fps.length || !tt) return;
+    if(!dgHideList){
+      var tr = tt.getBoundingClientRect(); if(!(tr.width > 0)) return;
+      var L = tr.left - 20, R = tr.right + 20, T = tr.top - 32, B = tr.bottom + 20;   /* 落ち着く前の下げ幅ぶん、上に余裕を */
+      dgHideList = [];
+      Array.prototype.forEach.call(fps, function(e){
+        var b = e.getBoundingClientRect();
+        if(b.right > L && b.left < R && b.bottom > T && b.top < B) dgHideList.push(e);
+      });
+    }
+    var on = tt.classList.contains('in');   /* 題字が出ている間だけ伏せる（字が無いところに穴を空けない） */
+    for(var i = 0; i < dgHideList.length; i++) dgHideList[i].classList.toggle('hidt', on);
+  }
   function fpUpdate(){
+    dgHideUnderTitle();
     if(!fpList.length) return;
     var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
     fpList.forEach(function(o, i){ o.el.classList.toggle('on', (i >= gone || i >= fpMainN) && o.y < front); });
@@ -1732,7 +1752,7 @@
       else if(dgFinT0){
         /* v348: 一周ぶんは一息に描き（1.2 秒）、薄れるのはスクロールに連れて（下へ送るほど消えていく） */
         var el = now - dgFinT0, q = Math.min(1, el / 1200);
-        var fade = 1 - Math.max(0, Math.min(1, (dgP - dgFinP0) / .16));
+        var fade = 1 - Math.max(0, Math.min(1, (dgP - dgFinP0) / .12));
         var f0 = ((dgFinW0 % 1) + 1) % 1;
         if(dgTrail) for(var tf = 0; tf < dgTrail.length; tf++){
           var d = ((dgTrailF[tf] - f0) % 1 + 1) % 1, o2 = 0;
@@ -1866,6 +1886,7 @@
     var old = svg.querySelector('.dgfps'); if(old) old.remove();
     var rest = (window.__srFpRest !== undefined) ? window.__srFpRest : 0, cnt = window.__srFpCount || 0;
     window.__dgFps = footprints(svg, inp, 'dgfp', k, FP_STEP - rest, cnt % 2).querySelectorAll('.dgfp');
+    dgHideList = null;   /* v349: 題字に掛かる足跡の測り直し */
   }
   /* the passport: an upright rectangular seal pressed over「ポイント」in the contents heading */
   function passSvg(seed){

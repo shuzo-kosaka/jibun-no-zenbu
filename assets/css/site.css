@@ -2620,3 +2620,6 @@
   #message .hwstop{display:none}
   /* v347: MESSAGE の左の丸は、「目の前のヒトが、いちばんの教科書だった。」の丸と同じ出入りに */
   .remain{transition:opacity .45s var(--ease)}
+  /* v349: 入ってくる足跡が「WHAT I'M MADE OF」の字を踏んでいた。字に掛かるものは、
+     題字が出ている間だけ伏せる（言葉の後ろを通っていくように） */
+  #ch1pin .dgfp.hidt{opacity:0 !important; transition:opacity .35s var(--ease)}
