@@ -2585,9 +2585,9 @@
   html.cover .menu{box-sizing:border-box; padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
   html.cover .menu-in{padding-left:3.4%; padding-right:3.4%}
   @media (orientation:portrait){
-    html.pcview.phone.cpopen .hd .gridbtn{font-size:20px}
-    html.pcview.phone.cpopen .hd .lang{font-size:24px}
+    html.pcview.phone.cpopen .hd .gridbtn{font-size:26px}
+    html.pcview.phone.cpopen .hd .lang{font-size:30px}
     html.pcview.phone.cpopen .hd .lang button{padding:10px 16px}
-    html.pcview.phone.cpopen .hd .cp-lab{font-size:22px; letter-spacing:.2em}
+    html.pcview.phone.cpopen .hd .cp-lab{font-size:26px; letter-spacing:.2em}
     html.pcview.phone.cpopen .hd .nav{gap:34px}
   }
