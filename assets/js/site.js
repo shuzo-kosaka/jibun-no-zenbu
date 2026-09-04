@@ -3198,14 +3198,21 @@
       el.style.setProperty('--nwac', g('--acc', '#E84518'));
       el.style.setProperty('--nwln', g('--line', 'rgba(255,255,255,.3)'));
     }
-    var toneRaf = 0;
-    window.addEventListener('scroll', function(){ if(!el || !el.classList.contains('on') || toneRaf) return; toneRaf = requestAnimationFrame(function(){ toneRaf = 0; tone(); }); }, {passive:true});
+    /* v327: 案内が出ているあいだは、色も位置もその場に留める。
+       窓の大きさを変えると紙面がひとりでに動き、その動きにつれて地の色が変わり続けていた */
+    var nwY = 0;
+    window.addEventListener('scroll', function(){
+      if(!el || !el.classList.contains('on')) return;
+      if(Math.abs(window.scrollY - nwY) > 1) window.scrollTo({top:nwY, behavior:'instant'});
+    }, {passive:true});
     /* v320: 案内が出ているあいだは紙面を動かさない（縦持ちの案内と同じ扱い） */
     function nwBlock(e){ if(H.classList.contains('nwon')) e.preventDefault(); }
     window.addEventListener('wheel', nwBlock, {passive:false});
     window.addEventListener('touchmove', nwBlock, {passive:false});
     function check(){
-      if(narrowNow()){ words(); build(); tone(); el.classList.add('on'); H.classList.add('nwon'); }
+      if(narrowNow()){ var was = el && el.classList.contains('on'); words(); build();
+        if(!was){ tone(); nwY = window.scrollY; }   /* 色と居場所は、出たときの一度だけ */
+        el.classList.add('on'); H.classList.add('nwon'); }
       else if(el){ el.classList.remove('on'); H.classList.remove('nwon');
         if(window.__rvRecheck) setTimeout(window.__rvRecheck, 260); }   /* v321: 窓を広げたあと、縦持ちならそちらの案内へ */
     }

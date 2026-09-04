@@ -2548,3 +2548,12 @@
   @media (orientation:portrait){
     html.pcview.phone .cpage #cpdone.cp-done{font-size:34px; padding:33px 30px 31px; line-height:1.35}
   }
+  /* v327
+     ・横持ちの案内と「縦持ちでも、大丈夫です。」も、いま見えている高さ（dvh）で測る。
+       実機の Safari は固定の箱を「道具の帯が隠れているときの高さ」で測るので、帯が出ていると中身が下に寄って見えていた
+     ・窓が狭いときの案内が出ているあいだは、紙面を動かさない（念のため二重に留める） */
+  @supports (height:100dvh){
+    html.handheld .rotv{bottom:auto; height:100dvh}
+    #cprot{bottom:calc(3.4% + env(safe-area-inset-bottom, 0px) + (100vh - 100dvh))}
+  }
+  html.nwon,html.nwon body{overflow:hidden !important; touch-action:none}
