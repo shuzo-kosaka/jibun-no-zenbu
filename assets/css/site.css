@@ -2558,3 +2558,8 @@
     #cprot{bottom:calc(3.4% + env(safe-area-inset-bottom, 0px) + (100vh - 100dvh))}
   }
   html.nwon,html.nwon body{overflow:hidden !important; touch-action:none}
+  /* v329: 案内の高さは、いま見えている高さ（--vvh）で。無いときは dvh、それも無ければ従来どおり */
+  @supports (height:100dvh){
+    html.handheld .rotv{height:var(--vvh, 100dvh)}
+    #narrow{height:var(--vvh, 100dvh)}
+  }

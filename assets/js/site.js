@@ -3222,6 +3222,20 @@
     setTimeout(check, 900);
     window.addEventListener('orientationchange', function(){ setTimeout(check, 420); });
   })();
+  /* v329: 画面いっぱいの案内は「いま実際に見えている高さ」に合わせる。
+     100vh は道具の帯が隠れている前提の値、100dvh も窓を掴んで動かしている最中は追いつかないことがある。
+     visualViewport は動かしている最中も毎回知らせてくれるので、その値を --vvh として配る */
+  (function(){
+    var vv = window.visualViewport, H = document.documentElement, t = 0;
+    function put(){
+      var h = vv ? vv.height : window.innerHeight;
+      if(h > 0) H.style.setProperty('--vvh', Math.round(h) + 'px');
+    }
+    put();
+    if(vv){ vv.addEventListener('resize', put); vv.addEventListener('scroll', put); }
+    window.addEventListener('resize', function(){ put(); clearTimeout(t); t = setTimeout(put, 260); }, {passive:true});
+    window.addEventListener('orientationchange', function(){ setTimeout(put, 60); setTimeout(put, 420); });
+  })();
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
