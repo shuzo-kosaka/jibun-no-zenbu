@@ -164,8 +164,16 @@
     if(curLang !== 'en'){ var S = 4; cv.width = Math.ceil(f * S * 1.6); cv.height = Math.ceil(f * S * 1.6); cx.clearRect(0, 0, cv.width, cv.height); cx.font = tc.fontStyle + ' ' + tc.fontWeight + ' ' + (f * S) + 'px ' + tc.fontFamily; cx.textBaseline = 'top'; cx.fillStyle = '#000'; cx.fillText(sp.textContent.trim().charAt(0), f * S * .3, 0); var d = cx.getImageData(0, 0, cv.width, cv.height).data, found = -1; for(var y = 0; y < cv.height && found < 0; y++){ for(var x = 0; x < cv.width; x++){ if(d[(y * cv.width + x) * 4 + 3] > 40){ found = y; break; } } } if(found >= 0) ink = found / S; }
     var spTop = offY(sp) + (lh - f) / 2 + ink;   /* the top of the first glyph's ink, in the vertical line */
     top.style.setProperty('--tagtop', (tag.offsetTop + (rjTop - spTop)).toFixed(1) + 'px');
-    var sd = top.querySelector('.scdot');   /* v330: スクロールを促す丸は、タグの真下・横は中央に */
-    if(sd){ sd.style.left = (tag.offsetLeft + tag.offsetWidth / 2 - 5.5) + 'px'; sd.style.top = (tag.offsetTop + tag.offsetHeight + 24) + 'px'; }
+    /* v331: スクロールを促す丸。大きさはカタカナの段の幅に合わせ、下の流れる文字の高さから上へ昇る */
+    var sd = top.querySelector('.scdot'), nmEl = top.querySelector('.name'), rotEl = top.querySelector('.rot');
+    if(sd && nmEl && rotEl){
+      var size = Math.max(24, Math.round(tag.offsetWidth)), travel = Math.round(size * 1.9);
+      var nr = nmEl.getBoundingClientRect(), rr = rotEl.getBoundingClientRect();
+      sd.style.width = size + 'px'; sd.style.height = (travel + size) + 'px';
+      sd.style.left = Math.round(tag.offsetLeft + tag.offsetWidth / 2 - size / 2) + 'px';
+      sd.style.top = Math.round(rr.top + rr.height / 2 - nr.top - travel - size) + 'px';
+      sd.style.setProperty('--sctv', travel + 'px');
+    }
     var mean = top.querySelector('.mean'), Hh = document.documentElement;   /* the note's columns centred under the tag's */
     if(mean){ if(Hh.classList.contains('pcview') && Hh.classList.contains('phone')){ mean.style.right = ''; mean.style.left = ''; }   /* v307: スマホでは題字の下、左の段へ回すので、タグの真下には揃えない */
       else { mean.style.right = 'auto'; mean.style.left = (tag.offsetLeft + tag.offsetWidth / 2 - mean.offsetWidth / 2).toFixed(1) + 'px'; } }

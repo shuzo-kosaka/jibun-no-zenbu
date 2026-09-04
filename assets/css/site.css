@@ -2566,9 +2566,9 @@
      ・スマホの TOP：カタカナの下に、下へ促す薄い丸を置く */
   /* スクロールを促す薄い丸（スマホの TOP だけ） */
   #top .scdot{display:none}
-  html.pcview.phone #top .scdot{display:block; position:absolute; width:11px; height:38px; z-index:3; pointer-events:none; opacity:0; transition:opacity .9s var(--ease) 1.2s}
+  html.pcview.phone #top .scdot{display:block; position:absolute; z-index:3; pointer-events:none; opacity:0; transition:opacity .9s var(--ease) 1.2s}
+  html.pcview.phone #top .scdot i{position:absolute; left:0; bottom:0; width:100%; aspect-ratio:1; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 4.6s cubic-bezier(.35,0,.3,1) infinite}
+  html.pcview.phone #top .scdot i + i{animation-delay:2.3s}
+  @keyframes scdot{0%{opacity:0; transform:translateY(0)} 26%{opacity:.2} 66%{opacity:.15} 100%{opacity:0; transform:translateY(calc(-1 * var(--sctv, 74px)))}}
   html.pcview.phone #top:not(.scat) .scdot{opacity:1}
-  html.pcview.phone #top .scdot i{position:absolute; left:0; top:0; width:11px; height:11px; border-radius:50%; background:var(--fg3); opacity:0; animation:scdot 2.8s cubic-bezier(.35,0,.25,1) infinite}
-  html.pcview.phone #top .scdot i + i{animation-delay:1.4s}
-  @keyframes scdot{0%{opacity:0; transform:translateY(-3px)} 20%{opacity:.4} 58%{opacity:.32} 100%{opacity:0; transform:translateY(27px)}}
   @media (prefers-reduced-motion: reduce){ html.pcview.phone #top .scdot i{animation:none; opacity:.28} html.pcview.phone #top .scdot i + i{display:none} }
