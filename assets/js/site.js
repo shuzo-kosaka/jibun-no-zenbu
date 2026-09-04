@@ -782,7 +782,7 @@
 
   /* pinned sections: progress -> reveals, photos, handwriting video, title drift */
   var pins = document.querySelectorAll('.pin'), hw = document.getElementById('hw'), hwv = document.getElementById('hwv'), hwPlayed = false;
-  var hwDone = false, hwDoneT = 0, hwStartAt = 0, hwArrAt = 0, hwDur = 0, hwLastScroll = 0;
+  var hwDone = false, hwDoneT = 0, hwStartAt = 0, hwArrAt = 0, hwDur = 0, hwLastScroll = 0, hwLockOff = false;
   window.addEventListener('scroll', function(){ hwLastScroll = now(); }, {passive:true});   /* v345: 送っている最中に次へ進めないための目印 */   /* v345: 一度出したら、待たせる側へは戻さない */   /* v344: 手書きが描き終わったか（終わったら、スクロールを待たずに次の一文を出す） */
 
   /* v130: the bar screen changes photograph as you go down it — a row of dots says how many there are and
@@ -839,11 +839,22 @@
     var y = r.top + window.scrollY + run * at + 6;
     if(typeof flyTo === 'function') flyTo(y); else window.scrollTo({top:y, behavior:'smooth'});
   }
+  /* v348: 初回の手書きが描いている間だけ、スクロールを止める。
+     途中で送られると、見出しと本文が一度に出てしまい、順番が崩れていた。
+     止めるのは一度きり。描き終われば（自分で次へ送るので）すぐ外れる。長くても描き終わり＋2.6 秒で外す */
+  window.__hwLock = function(){
+    if(hwDone || hwLockOff || !hwStartAt || reduce) return false;
+    var sec = document.getElementById('message'); if(!sec) return false;
+    var r = sec.getBoundingClientRect();
+    if(!(r.top <= vh() * .75 && r.bottom >= vh() * .5)) return false;
+    if(now() - hwStartAt > hwDur + 2600){ hwLockOff = true; return false; }
+    return true;
+  };
   function hwWatch(){
     if(hwDoneT || hwDone) return;
     var cap = 0;
     hwDoneT = setInterval(function(){
-      if(hwDone || hwCheck()){ clearInterval(hwDoneT); hwDoneT = 0; window.__hwDone = true; hwAdvance(); pinUpdate(); if(window.__tailUpdate) window.__tailUpdate(); return; }
+      if(hwDone || hwCheck()){ clearInterval(hwDoneT); hwDoneT = 0; hwLockOff = true; window.__hwDone = true; hwAdvance(); pinUpdate(); if(window.__tailUpdate) window.__tailUpdate(); return; }
       if(++cap > 900){ clearInterval(hwDoneT); hwDoneT = 0; }   /* 見張りは三分で切る */
     }, 200);
   }
@@ -856,7 +867,7 @@
     if(!hwDone) hwCheck();
     if(hwPlayed && !hwDone){ var msec = document.getElementById('message');
       if(msec){ var mr = msec.getBoundingClientRect(), mt = mr.height - vh();
-        hwHold = mt > 0 ? ((-mr.top) / mt) < .34 : true; } }
+        hwHold = mt > 0 ? ((-mr.top) / mt) < .12 : true; } }   /* v348: 見出しの来るところまで。ここを越えたら、ふつうの順に任せる（以前は .34 まで抑えていて、見出しと本文が一度に出ていた） */
     pins.forEach(function(pin){
       var r = pin.getBoundingClientRect(); var total = r.height - vh();
       var p = (-r.top) / total; p = Math.max(0, Math.min(1, p));
@@ -870,7 +881,7 @@
         pin.querySelectorAll('.spot img').forEach(function(im,i){ im.classList.toggle('on', i === idx && r.top < vh() && r.bottom > 0); });
         pin.querySelectorAll('.bgdot i').forEach(function(d,i){ d.classList.toggle('on', i === idx); }); }
       if(r.top <= 0 && r.bottom >= vh()){ pin.querySelectorAll('.marg').forEach(function(m){ m.classList.add('in'); }); }
-      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgLeave = p >= .42;   /* v347: ここから先へ送られたら、足跡は最後の一周へ */
+      var st = pin.querySelector('.stick'); if(st){ st.style.setProperty('--pp', p.toFixed(3)); if(pin.id === 'ch1pin'){ st.classList.toggle('ringdone', p * 1.9 >= 1); st.classList.toggle('drawing', p * 1.9 > .012); st.classList.toggle('walk', p * 3.4 >= 1);   /* v261: 輪が描き終わって足跡が歩き出したら、輪の線は消す */   /* v225: 輪も 1.9 倍ゆっくり描く（判や札と同じ歩み） */ dgOn = p * 3.4 >= 1 && r.top < vh() && r.bottom > 0; dgP = p; dgLeave = p >= (window.__DGT || .64);   /* v348: 輪も判も出そろってから。ここから先へ送られたら、足跡は最後の一周へ */
         /* the footprints walk in with the scroll and are gone once the ring starts to draw */
         fpFade = Math.max(0, Math.min(1, p / .16)); } if(pin.id === 'ch5map') mapUpdate(p); }
       if(pin.id === 'ch5pin'){ pin.classList.toggle('dotson', r.top <= 0 && r.bottom >= vh()); pin.style.setProperty('--pp', p.toFixed(3)); if(!fine){ pin.style.setProperty('--sx', (30 + p * 40).toFixed(1) + '%'); pin.style.setProperty('--sy', '52%'); } }
@@ -900,8 +911,13 @@
           /* v202: 足跡は SCROLL の縦棒の代わりなので、スクロールしなくても歩き続ける（CSS のループ）。
              ここでは「一文の画面に居るか」の出し入れと、終盤に上から一歩ずつ消していく分だけを持つ。 */
           ms.classList.toggle('mwalkon', p >= .858);
-          var mOut = Math.round(Math.max(0, Math.min(1, (p - .95) / .05)) * mfs.length);   /* v347: 消え始めを遅らせて、足跡が見えている間を倍以上に（送る量は変えない） */
-          for(var mi = 0; mi < mfs.length; mi++) mfs[mi].classList.toggle('off', mi < mOut);
+            /* v348: 一つずつ切って消していたので断片的に見えていた。上から順に、濃さを連なりで落としていく */
+          var mt = Math.max(0, Math.min(1, (p - .93) / .07)), mn = Math.max(1, mfs.length - 1);
+          for(var mi = 0; mi < mfs.length; mi++){
+            var mf = 1 - Math.max(0, Math.min(1, (mt * 1.5 - mi / mn) / .5));
+            mfs[mi].style.setProperty('--fade', mf.toFixed(3));
+            if(mfs[mi].classList.contains('off')) mfs[mi].classList.remove('off');
+          }
         }
         ms.classList.toggle('mtail', p >= .90);   /* v254 */
         hwStill(p >= .10 && !hwHold);   /* v345: 描いている途中で静止画に差し替えない（描き終わりが飛んで見えていた） */   /* v230: 薄くなったら手書きのアニメーション WebP を静止画に（ループのデコードで CPU 40% 食っていた） */   /* v179: the last screen is fixed to the viewport — outside the pinned stretch it must not be there at all */
@@ -1698,7 +1714,7 @@
   }
   /* the diagram's incoming line arrives at the NEXT slot's x, then bends into the ring */
   var dgSat = document.getElementById('dgsat'), dgNodes = document.querySelectorAll('#ch1pin .dg-node'), dgStick = document.querySelector('#ch1pin .dg'), dgOn = false, dgLastA = 0;
-  var dgTrail = null, dgTrailF = [], dgWasOn = false, dgT0 = 0, dgNowPend = -1, dgLeave = false, dgFinT0 = 0, dgFinW0 = 0, dgGone = false;   /* v347: 最後の一周 */   /* dgNowPend: 歩き出しの判にまだ .in がないとき、付くまで待って波紋を */   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1）。v260: 見えるたびに輪の起点から歩き直す */
+  var dgTrail = null, dgTrailF = [], dgWasOn = false, dgT0 = 0, dgNowPend = -1, dgLeave = false, dgFinT0 = 0, dgFinW0 = 0, dgFinP0 = 0, dgP = 0, dgGone = false;   /* v347: 最後の一周 */   /* dgNowPend: 歩き出しの判にまだ .in がないとき、付くまで待って波紋を */   /* v257: 輪を歩く足跡と、それぞれの経路上の位置（0〜1）。v260: 見えるたびに輪の起点から歩き直す */
   var DG_ANG = [-90, 148.4, 31.6];
   var DG_A0 = ((360 - DG_ANG[1]) % 360 + 360) % 360, DG_F0 = ((DG_A0 - 180) / 360 + 1) % 1;   /* v263: 歩き出す起点は「場をつくる力」の判（角度と、輪の経路上の割合） */
   var orbitN = 0;
@@ -1711,17 +1727,19 @@
       /* v347: 読み手が先へ送ったら、そのときの足跡の位置から一周ぶんを一息に描いて、輪ごと消える。
          戻ってくれば、また歩き出す（歩き続ける演出そのものは変えない） */
       if(!dgLeave && (dgFinT0 || dgGone)){ dgFinT0 = 0; dgGone = false; dgT0 = now - dgFinW0 * 18000; }
-      if(dgLeave && !dgFinT0 && !dgGone){ dgFinT0 = now; dgFinW0 = (now - dgT0) / 18000; }
+      if(dgLeave && !dgFinT0 && !dgGone){ dgFinT0 = now; dgFinW0 = (now - dgT0) / 18000; dgFinP0 = dgP; }
       if(dgGone){ if(dgTrail) for(var tg = 0; tg < dgTrail.length; tg++) dgTrail[tg].style.opacity = '0'; }
       else if(dgFinT0){
-        var el = now - dgFinT0, q = Math.min(1, el / 1300), fade = Math.max(0, 1 - Math.max(0, (el - 1500) / 640));
+        /* v348: 一周ぶんは一息に描き（1.2 秒）、薄れるのはスクロールに連れて（下へ送るほど消えていく） */
+        var el = now - dgFinT0, q = Math.min(1, el / 1200);
+        var fade = 1 - Math.max(0, Math.min(1, (dgP - dgFinP0) / .16));
         var f0 = ((dgFinW0 % 1) + 1) % 1;
         if(dgTrail) for(var tf = 0; tf < dgTrail.length; tf++){
           var d = ((dgTrailF[tf] - f0) % 1 + 1) % 1, o2 = 0;
           if(d <= q) o2 = (q - d) < .035 ? (q - d) / .035 : 1;   /* 通り過ぎたところから灯っていく */
           dgTrail[tf].style.opacity = (o2 * .85 * fade).toFixed(2);
         }
-        if(el > 2200) dgGone = true;
+        if(fade <= 0 && q >= 1) dgGone = true;
       }
       else {
       var w = (now - dgT0) / 18000, a = ((w * 360 + DG_A0) % 360 + 360) % 360;
@@ -2113,9 +2131,10 @@
   /* v234: オープニングの再生中は、指・ホイール・キーのどれでもスクロールさせない */
   (function(){
     function opening(){ return body.classList.contains('opening') || !!document.getElementById('ld'); }
-    window.addEventListener('touchmove', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
-    window.addEventListener('wheel', function(e){ if(opening() && e.cancelable) e.preventDefault(); }, {passive:false});
-    window.addEventListener('keydown', function(e){ if(opening() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
+    function held(){ return opening() || !!(window.__hwLock && window.__hwLock()); }   /* v348: 手書きが描いている間も */
+    window.addEventListener('touchmove', function(e){ if(held() && e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('wheel', function(e){ if(held() && e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('keydown', function(e){ if(held() && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| |Spacebar)$/.test(e.key)) e.preventDefault(); });
   })();
   /* v239: theme-color（Safari が枠・帯・タブの色に使う）を場面の色に合わせる。案内の間は朱 */
   /* v242: Safari（iOS 26）に帯・ツールバーの色を採り直させる。#tint（fixed、場面の色、透明）の display を切り替える */
