@@ -171,7 +171,7 @@
       var nr = nmEl.getBoundingClientRect(), rr = rotEl.getBoundingClientRect();
       sd.style.width = size + 'px'; sd.style.height = (travel + size) + 'px';
       sd.style.left = Math.round(tag.offsetLeft + tag.offsetWidth / 2 - size / 2) + 'px';
-      sd.style.top = Math.round(rr.top + rr.height / 2 - nr.top - travel - size) + 'px';
+      sd.style.top = Math.round(rr.bottom - nr.top - travel - size) + 'px';   /* 起点は流れる文字の下端 */
       sd.style.setProperty('--sctv', travel + 'px');
     }
     var mean = top.querySelector('.mean'), Hh = document.documentElement;   /* the note's columns centred under the tag's */
