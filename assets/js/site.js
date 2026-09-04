@@ -663,18 +663,27 @@
   /* ---------- scenes: the section under the viewport centre sets body[data-scene] ---------- */
   var curScene = 'paper', curSec = null, curTop = null, curBot = null, secList = Array.prototype.slice.call(secs);
   function sceneUpdate(){
-    var H = vh(), mid = H*.5, hit = null, tp = null, bt = null;
+    /* v354: 場面の色を切り替える合図を早める（画面のまん中 → 下から 28%）。
+       まん中で切り替えていたため、前の章の中身が抜けたのに地は前の色のまま、という明るい一枚ができていた。
+       年と地名の切り替えはこれまでどおり「まん中」で（早めると落ち着かないため） */
+    var H = vh(), midS = H*(window.__SCENEMID || .72), midL = H*.5, hitS = null, hit = null, tp = null, bt = null;
     for(var i=0;i<secList.length;i++){ var r = secList[i].getBoundingClientRect();
       if(r.top <= 2 && r.bottom > 2) tp = secList[i];
-      if(r.top <= mid && r.bottom > mid) hit = secList[i];
+      if(r.top <= midS && r.bottom > midS) hitS = secList[i];
+      if(r.top <= midL && r.bottom > midL) hit = secList[i];
       if(r.top <= H - 2 && r.bottom > H - 2){ bt = secList[i]; break; }   /* the sections are in document order, so the one under the foot of the screen is the last that can matter */
     }
     /* v123: on the phone every chapter paints its own ground, so the middle of the screen is no longer the whole
        truth — the header takes the colour of the chapter behind it, the year and the badge the one at the foot */
     var st = tp && (tp.getAttribute('data-scene') || 'paper'); if(st && st !== curTop){ curTop = st; body.setAttribute('data-scene-top', st); }
     var sb = bt && (bt.getAttribute('data-scene') || 'paper'); if(sb && sb !== curBot){ curBot = sb; body.setAttribute('data-scene-bot', sb); }
+    if(hitS && hitS !== curSecS){ curSecS = hitS; sceneCol(hitS); }
     if(!hit || hit === curSec) return; curSec = hit;
-    var sc = hit.getAttribute('data-scene') || 'paper';
+    setYear(hit.getAttribute('data-year')); setPlace(hit.getAttribute('data-place') || '');
+  }
+  var curSecS = null;
+  function sceneCol(hitS){
+    var sc = hitS.getAttribute('data-scene') || 'paper';
     if(sc !== curScene){ curScene = sc; body.setAttribute('data-scene', sc);
       var cs0 = getComputedStyle(body), bg0 = cs0.getPropertyValue('--bg') || '';
       document.documentElement.style.backgroundColor = bg0;
@@ -684,7 +693,6 @@
       /* v212: 横持ちで読んでいる章の色を覚えておく。縦にしたときの案内はこの色で塗る */
       if(!window.matchMedia || window.matchMedia('(orientation:landscape)').matches) window.__landCols = {bg: bg0.trim(), fg: (cs0.getPropertyValue('--fg') || '').trim()};
     }   /* v206: html の地も場面の色に（固定の地の下から紙色が覗かないように） */
-    setYear(hit.getAttribute('data-year')); setPlace(hit.getAttribute('data-place') || '');
   }
   /* the small name under the year: the letters scramble and lock in, top to bottom, and the tick is drawn again */
   var yrl = document.getElementById('yrl'), yrBox = document.querySelector('.yr'), plT = null, plCur = yrl ? yrl.textContent : '';
