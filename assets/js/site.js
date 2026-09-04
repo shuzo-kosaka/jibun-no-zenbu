@@ -2661,7 +2661,6 @@
     if(mkbtn){ if(mkbtn.__t === undefined) mkbtn.__t = mkbtn.title; mkbtn.title = 'ちょっとしたサプライズの表示／非表示'; }
     document.documentElement.classList.add('cpopen'); if(window.__rvSuppress) window.__rvSuppress();   /* v286 */
     clearTimeout(cpHidT); cpHidT = setTimeout(function(){ if(cpage && !cpage.hidden) document.documentElement.classList.add('cphid'); }, 480);   /* v330: 紙面を伏せるのは、紙が上がりきってから（先に伏せると一瞬白くなる） */
-    clearTimeout(cpZoomT); cpZoomT = setTimeout(function(){ if(cpage && !cpage.hidden) cpZoom(true); }, 520);   /* v330: 拡大の止め方を変えると組み直しが起きる。紙の裏で済ませる */
     cpRot();   /* v288: 横持ちで開いたなら「ここは縦持ちでも大丈夫」と伝える */
     if(menu && menu.classList.contains('open')) setMenu(false); togFit();
     clearTimeout(surHintT); document.documentElement.classList.add('surhint'); surHintT = setTimeout(function(){ document.documentElement.classList.remove('surhint'); }, 7000);   /* v93: the surprise toggle blinks for a while, so a visitor who came to write notices it */
@@ -2811,8 +2810,7 @@
     if(!cpage || cpage.hidden) return; clearTimeout(cpT);
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; cpage.classList.remove('surhid'); }
     cpage.classList.remove('in'); cpage.classList.add('out'); document.documentElement.classList.remove('cpopen');
-    clearTimeout(cpHidT); clearTimeout(cpZoomT); document.documentElement.classList.remove('cphid');
-    setTimeout(function(){ if(!cpage || cpage.hidden) cpZoom(false); }, 640);   /* v330: 戻すのも、紙が下りきってから */
+    clearTimeout(cpHidT); document.documentElement.classList.remove('cphid');
     if(cpRotEl){ clearTimeout(cpRotT); cpRotEl.classList.remove('on'); }   /* v288 */
     if(window.__rvPortrait) window.__rvPortrait();   /* v286: 閉じた時点で縦持ちなら案内を出す */
     var bar = cpage.querySelector('.cp-bar'), cpx1 = document.getElementById('cpx'), cpl1 = document.querySelector('.hd .cp-lab'); if(bar){ if(cpl1) bar.appendChild(cpl1); if(cpx1) bar.appendChild(cpx1); }   /* and back into the page */
