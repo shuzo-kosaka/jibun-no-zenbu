@@ -3953,6 +3953,27 @@
   /* v461 保存の紙面：説明の下地が朱の線を隠していた（本人）。板をやめて字のまわりだけ紙を光らせ、線は上に通す */
   .gm-sheet .gm-scap{background:none; text-shadow:0 0 9px var(--paper, #F2F1EC), 0 0 6px var(--paper, #F2F1EC), 0 0 3px var(--paper, #F2F1EC), 0 0 1px var(--paper, #F2F1EC); z-index:1}
   .gm-sheet .gm-sgrid{position:relative; z-index:2}
+  /* v462 確定の一連を四段に分ける（動き係：全部が同じフレームに出て 220ms で終わっていた）
+     あなたの線 →120ms→ 私の破線 →120ms→ ％の札 →160ms→ 右の列。ふわりと順に見えるように */
+  .gm-lines .gm-ln.mine.h{animation:gmdrawh .30s var(--ease) .12s both}
+  .gm-lines .gm-ln.mine.v{animation:gmdrawv .30s var(--ease) .12s both}
+  .gm-ln.you.now b{animation:gmstamp .22s var(--ease) .30s both}
+  .gm-ln.mine b{animation:gmstamp .22s var(--ease) .38s both}
+  .gm-res{transition:opacity .22s var(--ease) .22s}
+  html.rm .gm-lines .gm-ln.mine.h,html.rm .gm-lines .gm-ln.mine.v,html.rm .gm-ln.you.now b,html.rm .gm-ln.mine b{animation:none}
+  html.rm .gm-res{transition:none}
+  /* v463 本編へ戻る引き際。中身を順に引いてから、紙ごと持ち上げる（本人：戻る演出がなかった） */
+  .gm.out{transition:opacity .44s var(--ease), transform .44s var(--ease); opacity:0; transform:translateY(-10px) scale(.996)}
+  .gm.out .gm-stage{transition:opacity .30s var(--ease), transform .30s var(--ease); opacity:0; transform:scale(.985)}
+  .gm.out .gm-side{transition:opacity .24s var(--ease) .05s; opacity:0}
+  .gm.out .gm-hd{transition:opacity .24s var(--ease) .10s; opacity:0}
+  html.rm .gm.out,html.rm .gm.out .gm-stage,html.rm .gm.out .gm-side,html.rm .gm.out .gm-hd{transition:none}
+  /* v463 案内から盤面へは、もう少しゆっくり浮かび上がる（本人：ふわっとした感じに）。枠が育つ演出はそのまま */
+  .gm-in.enter .gm-stage{transform:scale(.992)}
+  .gm-in.enter.on .gm-stage{transform:none; transition:opacity .6s var(--ease) .5s, transform .7s var(--ease) .5s}
+  .gm-in.enter .gm-side{transform:translateY(8px)}
+  .gm-in.enter.on .gm-side{transform:none; transition:opacity .5s var(--ease) .62s, transform .6s var(--ease) .62s}
+  html.rm .gm-in.enter .gm-stage,html.rm .gm-in.enter .gm-side{transform:none; transition:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

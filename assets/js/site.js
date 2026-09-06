@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4187,7 +4187,7 @@
       ringT = setTimeout(function(){ r.classList.add('bye'); setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); if(ringCur === r) ringCur = null; }, 450); }, 1500);
       return r;
     }
-    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 650, 300], tr:[420, 2400, 300]};   /* 押印・滞在・退場（ms） */
+    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 1000, 300], tr:[420, 2400, 300]};   /* 押印・滞在・退場（ms） */
     function seal(en, jp, host, pos){
       sealOff(true);
       var sp = el('span', 'gm-seal ' + (pos || 'corner')), tm = SEALT[pos] || SEALT.corner; sp.setAttribute('aria-hidden', 'true');
@@ -4292,7 +4292,8 @@
         if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } return; }   /* v416: 二本目の指は線にしない（ピンチ） */
         if(e.target && e.target.closest && e.target.closest('.gm-turnb')) return;   /* 回すボタンの押下は線にしない */
         if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
-        if(stage.classList.contains('swapping') || performance.now() - boardAt < 700) return;   /* 作品の切替中の押下も線にしない */
+        if(stage.classList.contains('swapping')) return;   /* 作品の切替中の押下は線にしない */
+        if(performance.now() - boardAt < 700){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v462: 盤面が出た直後でも、実際に動かせば線にする（動き係：一本目の 0.85 秒が捨てられていた） */
         ptype = e.pointerType || 'mouse';
         if(state === 'compare'){ if(performance.now() - fixedAt < 350) return; nextTurn(); fresh = true; startedAt = performance.now() + 100; pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v417: そのまま動いたら次の線にする（pend） */   /* v416: 進めた直後 500ms の押下は線にしない（ダブルタップ） */   /* v403: 進めるための押下はここで終わり。同じ押下で仮の線を出さない（離すまで「押している」が残っていた） */
         else if(state === 'done'){ if(performance.now() - fixedAt < 350) return; if(doneFn) doneFn(); fresh = true; startedAt = performance.now() + 100; return; }
@@ -4594,7 +4595,7 @@
       introEl.classList.add('bye'); setTimeout(function(){ introEl.hidden = true; introEl.classList.remove('bye'); }, rm ? 0 : 720);   /* 文字と選択肢が先に消え（140ms）、線を残した地がゆっくり薄れる */
       start(); startedAt = performance.now();   /* 案内の操作を一手目へ持ち越さない：直後 400ms の押下は無視 */
       morphIn();
-      var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); }); }); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1100); }   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
+      var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1400); }); }); }   /* v462: 外す時刻を on から数える（動き係：盤面の出現の最後が切られていた） */   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
     }
     /* v392（Sol 第 16・Q4）：五面目で選んだ骨格の枠が、そのまま盤面の位置と大きさへ 700ms で育ち、四本を残したまま中に絵が現れる。拭きと拡縮は重ねない */
     function morphIn(){
@@ -4689,9 +4690,10 @@
     function close(){
       if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
+      gm.classList.add('out');   /* v463: 本編へ戻るときの引き際（本人：戻る演出がなかった）。盤面 → 右の列 → 見出しの順に引いて、紙ごと持ち上がる */
       gm.classList.remove('on', 'sheeton'); document.documentElement.classList.remove('gminfo', 'gms0', 'gms1', 'gms2', 'gms3', 'gms4');   /* v444: 閉じたあとに印が残っていた（確認係） */
       sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
-      offT = setTimeout(function(){ gm.hidden = true; if(window.__retint) window.__retint(); }, 520);
+      offT = setTimeout(function(){ gm.hidden = true; gm.classList.remove('out'); if(window.__retint) window.__retint(); }, 560);
       if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
     }
     /* 細長い絵（掛軸・横長の巻物）は画面に収めると小さくなる。紙を回して置き直すように −90° に回し、外郭の枠も横長に組み替える（小坂さんの指示）。
@@ -4788,7 +4790,7 @@
     function demoOff(){ if(demoEl && demoEl.parentNode) demoEl.parentNode.removeChild(demoEl); demoEl = null; }
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
-      if(bi === 0 && ti === 0 && !demoDone){ demoOn(); setTimeout(demoFit, 40); setTimeout(demoFit, 560); } else demoOff();
+      if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false;
       stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
