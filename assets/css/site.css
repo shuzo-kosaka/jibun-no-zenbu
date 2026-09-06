@@ -3905,6 +3905,16 @@
   .gm-side::-webkit-scrollbar{width:0; height:0; display:none}
   .gm-info-in{scrollbar-width:none; -ms-overflow-style:none}
   .gm-info-in::-webkit-scrollbar{width:0; height:0; display:none}
+  /* v449 測り方とQ&A の札：書体は本編と同じ混植に統一し、等幅は使わない（Sol） */
+  .gm-info-in .gm-info-t,.gm-info-in .gm-info-s,.gm-info-in .gm-catx,.gm-info-in .gm-info-l span{font-family:var(--mincho), var(--sans), serif}
+  .gm-info-in .gm-info-k{font-family:var(--sans); font-size:10.5px; letter-spacing:.14em; opacity:.6}
+  .gm-info-in .gm-howline{margin:.2em 0 1.4em}
+  .gm-info-in .gm-how{margin-top:1.6em}
+  html[lang="en"] .gm-info-in .gm-info-t,html[lang="en"] .gm-info-in .gm-info-s,html[lang="en"] .gm-info-in .gm-catx{font-family:var(--sans), sans-serif}
+  /* v449 一度だけの一言 */
+  .gm-once{margin:0 0 1em; padding:9px 11px; border-left:2px solid var(--acc); background:rgba(232,69,24,.06); font-size:12px; line-height:1.75; transition:opacity .8s var(--ease)}
+  .gm-once.bye{opacity:0}
+  @media (max-height:640px){ .gm-once{font-size:11.5px; padding:7px 9px} }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
