@@ -3710,6 +3710,27 @@
   .gm-stage .gm-seal.tr::before{transform:rotate(-9deg); transition:opacity .25s var(--ease)}
   .gm-stage .gm-seal.tr.on.bye::before{opacity:0; transition-duration:var(--sb, .3s)}
   html.rm .gm-stage .gm-seal.tr::before{transition:none}
+  /* v433 右の列の節（平均の画面）：札の中と同じ組みで */
+  .gm-side .gm-secq{display:flex; width:100%; justify-content:space-between; align-items:center; margin-top:1.1em; padding:9px 0; border:0; border-bottom:1px solid rgba(30,28,26,.14); background:none; color:inherit; font-family:var(--mincho); font-weight:900; font-size:13.5px; letter-spacing:.04em; cursor:pointer}
+  .gm-side .gm-secq i{width:8px; height:8px; border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:rotate(45deg); position:relative; top:-2px; margin-right:4px; transition:transform .2s var(--ease)}
+  .gm-side .gm-secq[aria-expanded="true"] i{transform:rotate(225deg)}
+  .gm-side .gm-catx{margin:.4em 0 .8em; padding:10px 12px; border:1px solid rgba(30,28,26,.14); border-radius:6px; background:rgba(30,28,26,.03)}
+  .gm-side .gm-catx .gm-avg{margin:0}
+  /* v433 案内の送りの筋は見せない（本人：PC で右にスクロールバーが出る） */
+  .gm-iscroll{scrollbar-width:none; -ms-overflow-style:none}
+  .gm-iscroll::-webkit-scrollbar{width:0; height:0; display:none}
+  /* v433 トレイ：三枚は灰の下地の中心に、絵は中心軸でそろえる（本人） */
+  .gm-tray{align-items:center; padding-top:6px}
+  .gm-slot{justify-content:center}
+  .gm-mini{align-self:center}
+  /* v433 絵の題の下に間を（分析カテゴリ・構図と近すぎた：本人） */
+  .gm-card strong{margin-bottom:10px}
+  .gm-card em{margin-top:6px}
+  /* v433 平均の観察：二文の間を空ける（本人） */
+  .gm-obs2{margin-top:1.9em}
+  /* v433 見出し行の遊び方と × を、ハンバーガー・言語切替に近い大きさに */
+  .gm-i{height:32px; line-height:30px}
+  .gm-x{font-size:28px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

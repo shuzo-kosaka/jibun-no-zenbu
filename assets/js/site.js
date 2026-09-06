@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4183,7 +4183,7 @@
       ringT = setTimeout(function(){ r.classList.add('bye'); setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); if(ringCur === r) ringCur = null; }, 450); }, 1500);
       return r;
     }
-    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 650, 300], tr:[420, 1400, 300]};   /* 押印・滞在・退場（ms） */
+    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 650, 300], tr:[420, 2400, 300]};   /* 押印・滞在・退場（ms） */
     function seal(en, jp, host, pos){
       sealOff(true);
       var sp = el('span', 'gm-seal ' + (pos || 'corner')), tm = SEALT[pos] || SEALT.corner; sp.setAttribute('aria-hidden', 'true');
@@ -4557,14 +4557,17 @@
       var g = el('div', 'gm-morph'); g.style.cssText = 'left:' + r0.left + 'px;top:' + r0.top + 'px;width:' + r0.width + 'px;height:' + r0.height + 'px';
       src.querySelectorAll('i.h, i.v').forEach(function(l){ var c = el('i', l.classList.contains('v') ? 'v' : 'h'); var st = l.getAttribute('style') || ''; var m = /(left|top):\s*([\d.]+%)/.exec(st); if(m) c.style[m[1]] = m[2]; g.appendChild(c); });
       document.body.appendChild(g);
-      function syncTo(){ var r1 = stage.getBoundingClientRect(); if(!r1.width) return false; g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px'; return true; }
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){
-        g.classList.add('go');
-        if(!syncTo()){ g.remove(); return; }
-        /* v426: 盤面は絵の縦横比が決まるまで形が変わる。育つ枠を途中で合わせ直し、着地の寸法を実物にそろえる（本人） */
-        [140, 300, 460, 620].forEach(function(ms){ setTimeout(syncTo, ms); });
+      /* v433: 盤面の寸法が落ち着くのを待ってから、一度で育てる（途中で合わせ直すと、一度大きくなってから戻って見えた：本人） */
+      var last = null, still = 0, t0 = performance.now();
+      (function wait(){
+        var r1 = stage.getBoundingClientRect();
+        if(r1.width && last && Math.abs(r1.width - last.w) < 1 && Math.abs(r1.height - last.h) < 1) still++; else still = 0;
+        last = {w:r1.width, h:r1.height};
+        if(still < 2 && performance.now() - t0 < 700){ requestAnimationFrame(wait); return; }
+        if(!r1.width){ g.remove(); return; }
+        g.classList.add('go'); g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px';
         setTimeout(function(){ g.classList.add('bye'); }, 760); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1300);
-      }); });
+      })();
     }
     function btn(label, fn, cls){ var b = el('button', 'gm-b' + (cls ? ' ' + cls : '')); b.type = 'button'; b.textContent = label; b.addEventListener('click', fn); goEl.appendChild(b); return b; }
     function focusBtn(){ if(ptype === 'touch') return; setTimeout(function(){ var b = goEl.querySelector('button:not(:disabled)'); if(b) b.focus({preventScroll:true}); }, 220); }
@@ -4777,7 +4780,7 @@
       resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir + 'の線', t.dire) + '</small></b></p>' +
         '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
-        (first ? '<p class="gm-note">' + L('絵の幅と高さを 100 として読みます。', 'Read the picture\'s width and height as 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('もう一度押すと、次の線。', 'Click again for the next line.')) + '</p>' : '');
+        (first ? '<p class="gm-note">' + L('絵の幅と高さを 100 として測ります。', 'Read the picture\'s width and height as 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('もう一度押すと、次の線。', 'Click again for the next line.')) + '</p>' : '');
       goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
     }
     /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
@@ -4862,9 +4865,9 @@
       else if(M >= 4){
         var t = LINES.filter(function(x){ return x.k === k; })[0], d = diff[k];
         out = '<p class="gm-obs">' + L('平均すると、主塊の' + (t.k === 'y1' || t.k === 'x1' ? '始まり' : '重心') + 'を私より' + dir(t, d) + 'に見ています。', 'On average, you placed the mass’s ' + (t.k === 'y1' || t.k === 'x1' ? 'start' : 'centre of weight') + ' ' + dir(t, d) + ' mine.', dir(t, d)) + '<small>' + dsz(t, d) + '</small></p>';
-        out += '<p class="gm-obs2">' + L('いちばん読みが分かれたのは、' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '・', 'Where our readings split most: ' + nm(w.t) + ' on ' + 'ABC'[w.i] + ' (') + '<span>' + dsz(w.t, w.d) + '</span>' + L('）。', ').') + '</p>';
+        out += '<p class="gm-obs2">' + L('いちばん解釈が分かれたのは、' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '・', 'Where our readings split most: ' + nm(w.t) + ' on ' + 'ABC'[w.i] + ' (') + '<span>' + dsz(w.t, w.d) + '</span>' + L('）。', ').') + '</p>';
       } else {
-        out = '<p class="gm-obs">' + L('平均は近く、いちばん読みが分かれたのは ' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '）でした。', 'The averages are close; our readings split most on ' + nm(w.t) + ' of ' + 'ABC'[w.i] + '.', '近く') + '<small>' + dsz(w.t, w.d) + '</small></p>';
+        out = '<p class="gm-obs">' + L('平均は近く、いちばん解釈が分かれたのは ' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '）でした。', 'The averages are close; our readings split most on ' + nm(w.t) + ' of ' + 'ABC'[w.i] + '.', '近く') + '<small>' + dsz(w.t, w.d) + '</small></p>';
       }
       return out;
     }
@@ -4896,12 +4899,13 @@
       stepEl.textContent = L('三枚の平均をとる', 'Averaging the three');
       resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
-        '<ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' +
+        sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><i class="you"></i>' + L('朱の四本：あなた', 'red four: you') + '<i class="mine"></i>' + L('薄い破線の三本：研究', 'faint dashed three: research') + '</p>' +
-        '<div class="gm-jw"><p class="gm-cmph">' + L('日本の絵と西洋の絵で、骨格はこれだけ違います。', 'Japanese and Western pictures differ this much.') + '</p><p class="gm-note">' + L('私の読みを、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と西洋を重ねる', 'Overlay Japan and the West') + '</button></div>' +
+        '<div class="gm-jw"><p class="gm-cmph">' + L('日本の絵と西洋の絵で、骨格はこれだけ違います。', 'Japanese and Western pictures differ this much.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と西洋を重ねる', 'Overlay Japan and the West') + '</button></div>' + '</div>' +
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
+      bindSecs(resEl);
       var jwb = resEl.querySelector('.gm-jwb'); if(jwb) jwb.addEventListener('click', jwOverlay);
       resEl.querySelectorAll('.gm-media button').forEach(function(b){ b.addEventListener('click', function(){
         resEl.querySelectorAll('.gm-media button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
@@ -4924,6 +4928,14 @@
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
     /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
     var infoEl = null, infoWantCat = false, infoWantHow = false;
+    function bindSecs(root){   /* v433: 右の列でも節を畳めるように（本人：平均の画面の情報量が多い） */
+      if(!root) return;
+      root.querySelectorAll('.gm-secq').forEach(function(q){
+        if(q.__bound) return; q.__bound = true;
+        var x = q.nextElementSibling; if(!x) return;
+        q.addEventListener('click', function(){ var on = x.hidden; x.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false'); });
+      });
+    }
     function sec(t){ return '<button type="button" class="gm-catq gm-secq" aria-expanded="false"><span>' + t + '</span><i></i></button>'; }   /* v394: i の札の節は畳んで、押すと開く（分析カテゴリと同じ作法） */
     function info(){
       if(!infoEl){
@@ -4934,7 +4946,7 @@
       }
       var b = picks[bi], body = '';
       if(introOn){
-        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。研究では、その始まりと重心の位置を、絵の端からの百分率で読みます。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
+        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。研究では、その始まりと重心の位置を、絵の端からの百分率で測ります。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
           sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
           sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合う所。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>' +
           sec(L('研究の目的', 'Why this research')) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + L('日本と西洋の絵を同じものさし（七本の機能線）で測り、主塊と余白の置き方の違いを百分率で比べる研究です。この遊びは、その手順を三枚でなぞります。', 'The research measures Japanese and Western pictures with the same ruler, seven functional lines, and compares in percent how the main mass and the empty space are placed. This game traces that procedure on three pictures.') + '</p></div>';
@@ -5016,7 +5028,7 @@
         gm.appendChild(takeEl);
       }
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
-      takeEl.querySelector('p').textContent = L('三枚の読みと平均のグリッド、それに一言を、一枚の画像にしました。保存して、手元のものさしに。', 'Your three readings, the average grid and a note, on one image. Save it and keep the ruler with you.');
+      takeEl.querySelector('p').textContent = L('三枚の解釈と平均のグリッド、それに一言を、一枚の画像にしました。保存して、手元のものさしに。', 'Your three readings, the average grid and a note, on one image. Save it and keep the ruler with you.');
       var ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
       a.querySelector('span').textContent = L('画像を保存', 'Save image'); a.download = 'monosashi-' + ymd + '.png';
       var sb0 = takeEl.querySelector('.gm-share'); sb0.setAttribute('aria-label', L('共有', 'Share')); sb0.title = L('共有（AirDrop・LINE など）', 'Share (AirDrop, LINE and more)'); takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
