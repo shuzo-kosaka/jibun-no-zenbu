@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5155,7 +5155,7 @@
       c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = 2; c.fillStyle = '#E84518'; c.font = '500 11px ' + FO;
       LINES.forEach(function(t){ var v = avg[t.k]; c.beginPath(); if(t.ax === 'v'){ c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); c.fillText(v + '%', gx + gw * v / 100 + 4, gy + 14); } else { c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); c.fillText(v + '%', gx + 4, gy + gh * v / 100 - 5); } });
       c.restore();
-      c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FS; c.fillText(L('あなた', 'you') + '　X ' + avg.x1 + ' · 28 · ' + avg.x3 + ' · 83%　／　Y ' + avg.y1 + ' · ' + avg.y2 + ' · 71%', gx, gy + gh + 34);
+      c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FS; c.fillText(L('あなたの四本', 'your four lines') + '　X ' + avg.x1 + ' · ' + avg.x3 + '%　／　Y ' + avg.y1 + ' · ' + avg.y2 + '%', gx, gy + gh + 34);
       c.fillStyle = '#5A5955'; c.font = '13px ' + FS; c.fillText(L('三点の骨格', 'three-work grid') + '　X 12 · 28 · 58 · 83%　／　Y 14 · 32 · 71%　（' + L('破線', 'dashed') + '）', gx, gy + gh + 58);
       c.fillStyle = '#8E8B84'; c.font = '11px ' + FO; var d = new Date(); c.fillText(d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) + '  ·  ' + L('絵の幅と高さを 100 とした％', 'percent of the outline as 100'), gx, gy + gh + 82);
       /* 判（静止） */
@@ -5204,7 +5204,7 @@
       sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
       var wx = [avg.x1, 28 - avg.x1, avg.x3 - 28, 83 - avg.x3, 17], wy = [avg.y1, avg.y2 - avg.y1, 71 - avg.y2, 29];
       sheetEl.style.setProperty('--sx1', avg.x1 + '%');   /* v394: 注記は X1（あなたの主塊開始線）から、Y3（71％）の下の帯に置く */
-      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなた', 'you') + '</em> X ' + avg.x1 + ' · 28 · ' + avg.x3 + ' · 83　Y ' + avg.y1 + ' · ' + avg.y2 + ' · 71<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83　Y 14 · 32 · 71';
+      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなたの四本', 'your four lines') + '</em> X ' + avg.x1 + ' · ' + avg.x3 + '　Y ' + avg.y1 + ' · ' + avg.y2 + '<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83　Y 14 · 32 · 71';
       sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between. Switch, and the same content sits on another grid.');
       sheetGrid('you');
       var mock = sheetEl.querySelector('.gm-mock'); mock.classList.remove('land'); void mock.offsetWidth;
