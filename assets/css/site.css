@@ -3952,7 +3952,7 @@
   .gm-info-pur{margin-bottom:1.2em}
   /* v461 保存の紙面：説明の下地が朱の線を隠していた（本人）。板をやめて字のまわりだけ紙を光らせ、線は上に通す */
   .gm-sheet .gm-scap{background:none; text-shadow:0 0 9px var(--paper, #F2F1EC), 0 0 6px var(--paper, #F2F1EC), 0 0 3px var(--paper, #F2F1EC), 0 0 1px var(--paper, #F2F1EC); z-index:1}
-  .gm-sheet .gm-sgrid{position:relative; z-index:2}
+  .gm-sheet .gm-sgrid{z-index:2}   /* v461 修正：position:relative にすると箱が高さ 0 になり、中の線が全部潰れていた（細部係） */
   /* v462 確定の一連を四段に分ける（動き係：全部が同じフレームに出て 220ms で終わっていた）
      あなたの線 →120ms→ 私の破線 →120ms→ ％の札 →160ms→ 右の列。ふわりと順に見えるように */
   .gm-lines .gm-ln.mine.h{animation:gmdrawh .30s var(--ease) .12s both}
@@ -3987,6 +3987,8 @@
   html.phone .gm-x::before,html.phone .gm-ix::before{inset:-20px}
   html.phone .gm-q::before,html.phone .gm-catq2::before{inset:-24px}
   html.phone .gm-idots i::after{inset:-16px -20px}
+  /* v468 測り終えた画面に、前の手番の問いが薄く残っていた（細部係） */
+  .gm-tip.hid{opacity:0 !important; pointer-events:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4928,13 +4928,13 @@
       function nm(t){ return L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')'); }
       function dir(t, d){ return t.ax === 'h' ? (d > 0 ? L('下', 'below') : L('上', 'above')) : (d > 0 ? L('右', 'to the right of') : L('左', 'to the left of')); }
       function dsz(t, d){ var a = Math.abs(Math.round(d)), w = t.ax === 'h' ? (d > 0 ? L('下に', 'below') : L('上に', 'above')) : (d > 0 ? L('右に', 'right') : L('左に', 'left')); return d === 0 ? L('同じ', 'same') : L(w + ' ' + a + PC, a + PC + ' ' + w); }   /* 「+14%」でなく「下に 14%」 */
-      if(E < 4) out = '<p class="gm-obs">' + L('三枚とも、私と近い位置に四本の線を引きました。', 'On all three pictures, your four lines were close to mine.', '近い') + '</p>';
+      if(E < 4) out = '<p class="gm-obs">' + body_(L('三枚とも、私と近い位置に四本の線を引きました。', 'On all three pictures, your four lines were close to mine.', '近い') ) + '</p>';
       else if(M >= 4){
         var t = LINES.filter(function(x){ return x.k === k; })[0], d = diff[k];
-        out = '<p class="gm-obs">' + L('平均すると、主塊の' + (t.k === 'y1' || t.k === 'x1' ? '始まり' : '重心') + 'を私より' + dir(t, d) + 'に見ています。', 'On average, you placed the mass’s ' + (t.k === 'y1' || t.k === 'x1' ? 'start' : 'centre of weight') + ' ' + dir(t, d) + ' mine.', dir(t, d)) + '<small>' + dsz(t, d) + '</small></p>';
-        out += '<p class="gm-obs2">' + L('いちばん解釈が分かれたのは、' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '・', 'Where our readings split most: ' + nm(w.t) + ' on ' + 'ABC'[w.i] + ' (') + '<span>' + dsz(w.t, w.d) + '</span>' + L('）。', ').') + '</p>';
+        out = '<p class="gm-obs">' + body_(L('平均すると、主塊の' + (t.k === 'y1' || t.k === 'x1' ? '始まり' : '重心') + 'を私より' + dir(t, d) + 'に見ています。', 'On average, you placed the mass’s ' + (t.k === 'y1' || t.k === 'x1' ? 'start' : 'centre of weight') + ' ' + dir(t, d) + ' mine.', dir(t, d)) ) + '<small>' + dsz(t, d) + '</small></p>';
+        out += '<p class="gm-obs2">' + (L('いちばん解釈が分かれたのは、' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '・', 'Where our readings split most: ' + nm(w.t) + ' on ' + 'ABC'[w.i] + ' (') + '<span>' + dsz(w.t, w.d) + '</span>' + L('）。', ').') ) + '</p>';
       } else {
-        out = '<p class="gm-obs">' + L('平均は近く、いちばん解釈が分かれたのは ' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '）でした。', 'The averages are close; our readings split most on ' + nm(w.t) + ' of ' + 'ABC'[w.i] + '.', '近く') + '<small>' + dsz(w.t, w.d) + '</small></p>';
+        out = '<p class="gm-obs">' + body_(L('平均は近く、いちばん解釈が分かれたのは ' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '）でした。', 'The averages are close; our readings split most on ' + nm(w.t) + ' of ' + 'ABC'[w.i] + '.', '近く') ) + '<small>' + dsz(w.t, w.d) + '</small></p>';
       }
       return out;
     }
@@ -4942,7 +4942,7 @@
     function average(){
       var avg = {}, kav = {}, diff = {}, per = [];
       LINES.forEach(function(t){ var s = 0, m = 0; res.forEach(function(r, k){ s += r[t.k]; m += picks[k].a[t.k]; per.push({i:k, t:t, d:r[t.k] - picks[k].a[t.k]}); }); avg[t.k] = Math.round(s / 3); kav[t.k] = Math.round(m / 3); diff[t.k] = (s - m) / 3; });
-      state = 'avg'; cardEl.hidden = true; hideLive(); clearDim(); helpOff(); sealOff(true); unturn(); tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
+      state = 'avg'; cardEl.hidden = true; if(tipEl) tipEl.classList.add('hid');   /* v468: 測り終えた画面に前の問いを残さない */ hideLive(); clearDim(); helpOff(); sealOff(true); unturn(); tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
       picEl.classList.add('swap'); linesEl.innerHTML = ''; stage.classList.remove('narrow');
       setTimeout(function(){ stage.style.transition = 'none'; stage.style.setProperty('--ar', (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3)); stage.classList.add('blank'); picEl.innerHTML = ''; picEl.classList.remove('swap'); void stage.offsetWidth; requestAnimationFrame(function(){ stage.style.transition = ''; }); }, rm ? 0 : 220);   /* v408: 幅だけ遷移して小箱が出る一瞬を無くす（細部係） */   /* 絵が薄れてから、白い盤面に目盛りが並ぶ */
       /* 目盛り→平均線。動きは left/top の transition（線は細く、集まったら平均線だけ濃く） */
