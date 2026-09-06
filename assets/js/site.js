@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4321,7 +4321,7 @@
         var lc = liveEl.querySelector('.gm-lcap'); if(lc){ lc.parentNode.removeChild(lc); lcapDone = true; } var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld);
         if(!down) return; down = false; liveEl.classList.remove('press');
         if(!ok || state !== 'trace') return;
-        if(fresh && moved < 6){ fresh = false; return; }   /* 「次へ」のための一押しは、そのまま離しても確定しない */
+        if(moved < 6){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 動かさずに離した押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。 操作は「押したまま動かし、離す」と案内しているので、それに合わせる */
         fresh = false; move(e); confirm();   /* 画像の外で離しても、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
       }
       stage.addEventListener('pointerup', function(e){ up(e, true); });
