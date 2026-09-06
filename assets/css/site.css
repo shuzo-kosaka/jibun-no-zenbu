@@ -3889,7 +3889,7 @@
   /* v447 背景に絵が流れるようになり、細い輪郭のボタンが絵に埋もれて見えなくなっていた（本人）。紙の地を敷く */
   /* v450 白い板はやめ（違和感があるとのこと）、輪郭を濃くし、紙の光で絵から浮かせる */
   .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{background:transparent; border-color:rgba(30,28,25,.62); box-shadow:0 0 12px 6px var(--ibg, #F2F1EC); text-shadow:0 0 8px var(--ibg, #F2F1EC), 0 0 4px var(--ibg, #F2F1EC)}
-  .gm-intro .gm-ix{background:transparent; box-shadow:0 0 12px 8px var(--ibg, #F2F1EC); text-shadow:0 0 8px var(--ibg, #F2F1EC)}
+  .gm-intro .gm-ix{background:transparent; box-shadow:none; text-shadow:0 0 10px var(--ibg, #F2F1EC), 0 0 6px var(--ibg, #F2F1EC), 0 0 3px var(--ibg, #F2F1EC), 0 0 1px var(--ibg, #F2F1EC)}   /* v459: 板の影が四角い縁に見えていた（本人）。字のまわりだけを明るくする */
   .gm-intro .gm-idots button{box-shadow:0 0 0 3px var(--ibg, #F2F1EC)}
   @media (hover:hover){ .gm-intro .gm-iskip:hover,.gm-intro .gm-ihow:hover{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19} }
   /* v447 iPhone：段が二つのときは丈を半分に */
@@ -3946,6 +3946,13 @@
   html:has(.lgsw.run) .cur .cc{color:#FBF7F2}
   /* v458 × の字は em の中心より上に出るので、一 px 下げて枠の中心に合わせる（目視と墨の重心の実測から） */
   .gm-hd .gm-x{top:1px}
+  /* v460 七つの分類は行の間を空けて読み下せるように（二段組みのまま） */
+  .gm-cats{gap:12px 24px}
+  .gm-cats li{padding:0}
+  .gm-info-pur{margin-bottom:1.2em}
+  /* v461 保存の紙面：説明の下地が朱の線を隠していた（本人）。板をやめて字のまわりだけ紙を光らせ、線は上に通す */
+  .gm-sheet .gm-scap{background:none; text-shadow:0 0 9px var(--paper, #F2F1EC), 0 0 6px var(--paper, #F2F1EC), 0 0 3px var(--paper, #F2F1EC), 0 0 1px var(--paper, #F2F1EC); z-index:1}
+  .gm-sheet .gm-sgrid{position:relative; z-index:2}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

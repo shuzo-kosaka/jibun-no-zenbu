@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -3384,10 +3384,10 @@
     function L(ja, en){ return document.documentElement.lang === 'en' ? en : ja; }
     /* 四本の機能線。k は盤面の答えの鍵、ax は線の向き（v＝たての線＝X の値）。q の %s には盤面ごとの対象（obj）が入る */
     var LINES = [
-      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの、てっぺんはどこだろう', qe:'Where is the top of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
-      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの、左の端はどこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
-      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さは、どの高さだろう', qe:'Where does the weight of the %s sit, top to bottom?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
-      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さは、左右のどこだろう', qe:'Where, left to right, does its weight sit?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
+      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
+      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
+      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
+      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is its centre of weight?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
     ];
     var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
     var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
@@ -4383,12 +4383,12 @@
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、私が引いた線との差を％で見比べます。') + '</p>' +
         '<p class="gm-ipur">' + body('十二本を引き終えると、あなたの平均グリッドができ、研究の骨格と重ねられます。') + '</p>' +
-        '<p class="gm-ick">測る絵を選んでください　　くわしくは右上の「遊び方」から</p>';
+        '<p class="gm-ick">測る絵を選んでください　　詳しくは右上の「測り方とQ&A」から</p>';
       var PE = '<p class="gm-ipur">Japanese and Western pictures are measured the same way, and your lines are compared with mine in percent.</p>' +
         '<p class="gm-ipur">After twelve lines your average grid is ready, to lay over the research grid.</p>' +
         '<p class="gm-ick">Choose the pictures　　details under How to play, top right</p>';
-      var RJ = '<p class="gm-ipur">' + body('私の研究では、形や余白の置かれ方を測り、日本画と西洋画の傾向を比べています。') + '</p>' +
-        '<p class="gm-ipur">' + body('ここで行うのは、主な形が始まる位置と見た目の中心だけを、三枚の絵で測る簡易版です。') + '</p>';
+      var RJ = '<p class="gm-ipur">' + body('私の研究では、形と余白の置かれ方を測り、日本の絵と西洋の絵の傾向を比べています。') + '</p>' +
+        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、主塊（いちばん大きなまとまり）の始まりと重心を示す四本を引きます。') + '</p>';
       var RE = '<p class="gm-ipur">In my research, I measure how forms and empty spaces are placed, then compare the tendencies of Japanese and Western pictures.</p>' +
         '<p class="gm-ipur">What you do here is a simplified version: three pictures, and only where the main form begins and where its visual centre falls.</p>';
       var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
@@ -4835,7 +4835,7 @@
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = body(L('この差は正解・不正解ではありません。私との解釈の違いとして見てください。', 'This difference is not right or wrong. See it as a difference of interpretation between us.'));
+        var once = el('p', 'gm-once'); once.innerHTML = body(L('この差が示すのは、正解・不正解ではなく、私との解釈の違いです。', 'This difference is not about right or wrong. It shows how your interpretation differs from mine.'));
         resEl.insertBefore(once, resEl.firstChild); setTimeout(function(){ if(once.parentNode) once.classList.add('bye'); }, 7000); setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); }, 8200); }
       first = false; setTimeout(reveal, 80);
     }
@@ -4843,7 +4843,7 @@
       resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir + 'の線', t.dire) + '</small></b></p>' +
         '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
-        (first ? '<p class="gm-note">' + L('絵の幅と高さを 100 として測ります。', 'Read the picture\'s width and height as 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('もう一度押すと、次の線。', 'Click again for the next line.')) + '</p>' : '');
+        (first ? '<p class="gm-note">' + L('絵の幅と高さをそれぞれ 100 として、線の位置を％で示します。', 'Line positions are shown as percentages, with the picture\'s width and height each set to 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('絵をもう一度押すと、次の線。', 'Click the picture again for the next line.')) + '</p>' : '');
       goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
     }
     /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
@@ -5044,15 +5044,17 @@
         gm.appendChild(infoEl);
       }
       var b = picks[bi], body = '';
+      /* v460: 研究の目的を札の一番上に置く（本人）。西洋の絵を参照する理由まで書く */
+      body += '<p class="gm-info-k">' + L('研究の目的', 'Why this research') + '</p><p class="gm-info-t gm-info-pur">' + body_(L('日本の絵に共通する比率を見つけることが、この研究の目的です。ただ、日本の絵だけを測っても、その比率が日本のものだとは言い切れません。そこで西洋の絵も同じものさしで測り、両方を見比べることで、日本の絵の傾向に根拠を持たせています。この遊びでは、その手順を三枚の絵でなぞります。', 'This research looks for the proportions that Japanese pictures share. Measuring only Japanese pictures cannot show that those proportions belong to them, so I measure Western pictures with the same ruler and compare the two. Here you follow that procedure on three pictures.')) + '</p>';
       if(introOn){
         body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。研究では、その始まりと重心の位置を、絵の端からの百分率で測ります。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
           sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
-          sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合う所。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>' +
-          sec(L('研究の目的', 'Why this research')) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + L('日本と西洋の絵を同じものさし（七本の機能線）で測り、主塊と余白の置き方の違いを百分率で比べる研究です。この遊びは、その手順を三枚でなぞります。', 'The research measures Japanese and Western pictures with the same ruler, seven functional lines, and compares in percent how the main mass and the empty space are placed. This game traces that procedure on three pictures.') + '</p></div>';
+          sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合う所。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>';
       } else if(b && state !== 'avg' && state !== 'idle'){
         body += '<p class="gm-info-k">' + L('いま測っている絵', 'The picture you are measuring') + '</p><h3>' + ttl(b) + '</h3>' +
           '<p class="gm-info-s">' + esc(L('構図の出典：', 'Composition diagram source: ')) + esc(L(b.src, b.srce).replace(/^構図：\s*/, '').replace(/^Composition:\s*/i, '')) + '</p>' + (b.note ? '<p class="gm-info-t gm-info-n">' + esc(L(b.note, b.notee)) + '</p>' : '') +
           '<p class="gm-info-s">' + L('分析カテゴリ：', 'Category: ') + esc(L(b.cat, b.cate)) + '　／　' + L('主塊：', 'Main mass: ') + esc(obj(b)) + '</p>' +
+            sec(L('七つの分析カテゴリ', 'The seven categories')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-cats">' +   /* v460: ul の開始が欠けていて、七つが素の箇条のまま散らばっていた（本人：乱雑に見える） */
             CATS.map(function(c){ return '<li' + (c[0] === b.cat ? ' class="on"' : '') + '><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul></div>';   /* 絵の時代背景と特徴、分析カテゴリの説明（押すと開く） */
       }
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>' +
