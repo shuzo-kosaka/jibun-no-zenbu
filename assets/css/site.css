@@ -3987,12 +3987,6 @@
   html.phone .gm-x::before,html.phone .gm-ix::before{inset:-20px}
   html.phone .gm-q::before,html.phone .gm-catq2::before{inset:-24px}
   html.phone .gm-idots i::after{inset:-16px -20px}
-  /* v467 低い画面（Safari の帯が出た 428px）で、案内の題と「測り方とQ&A」が重なる */
-  @media (max-height:480px){
-    .gm-intro .gm-isec.gm-ititle b{font-size:clamp(34px, 5.4vw, 62px)}
-    .gm-intro .gm-isecs{top:54%}
-    .gm-ihow{font-size:11px; padding:4px 9px}
-  }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
