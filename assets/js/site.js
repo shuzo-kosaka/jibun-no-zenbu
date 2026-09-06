@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4389,7 +4389,7 @@
         '<p class="gm-ick">測る絵を選んでください　　詳しくは右上の「測り方とQ&A」から</p>';
       var PE = '<p class="gm-ipur">Japanese and Western pictures are measured the same way, and your lines are compared with mine in percent.</p>' +
         '<p class="gm-ipur">After twelve lines your average grid is ready, to lay over the research grid.</p>' +
-        '<p class="gm-ick">Choose the pictures　　details under How to play, top right</p>';
+        '<p class="gm-ick">Choose the pictures　　details in “How to measure &amp; Q&amp;A”, top right</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、形と余白の置かれ方を測り、日本の絵と西洋の絵の傾向を比べています。') + '</p>' +
         '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、主塊（いちばん大きなまとまり）の始まりと重心を示す四本を引きます。') + '</p>';
       var RE = '<p class="gm-ipur">In my research, I measure how forms and empty spaces are placed, then compare the tendencies of Japanese and Western pictures.</p>' +

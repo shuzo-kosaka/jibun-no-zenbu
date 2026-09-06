@@ -3983,6 +3983,27 @@
   /* v466 ブラウザの帯で本編の見出し行が見えている枠の外へ出ると、☰ と JA/EN が消えて見える（本人：iPad で確認）。遊びの最中だけ枠の内側へ寄せる */
   html.gmopen .hd{transform:translateY(var(--vvt, 0px))}
   html.rm.gmopen .hd{transition:none}
+  /* v467 手の端末では 44pt（≒65px）が要る。見た目は変えず、当たりだけ広げる（スマホ係の実測：× 24pt、? 11pt、面の丸 5pt） */
+  html.phone .gm-x::before,html.phone .gm-ix::before{inset:-20px}
+  html.phone .gm-q::before,html.phone .gm-catq2::before{inset:-24px}
+  html.phone .gm-idots i::after{inset:-16px -20px}
+  /* v467 低い画面（Safari の帯が出た 428px）で、案内の題と「測り方とQ&A」が重なる */
+  @media (max-height:480px){
+    .gm-intro .gm-isec.gm-ititle b{font-size:clamp(34px, 5.4vw, 62px)}
+    .gm-intro .gm-isecs{top:54%}
+    .gm-ihow{font-size:11px; padding:4px 9px}
+  }
+  /* v467 Safari の帯が出た手の端末（高さ 428px）では、メニューの下の四つ（連絡・測る）が画面の外にあった（スマホ係の実測）。
+     低い画面のときだけ、上下の余白と判の大きさを詰めて一画面に収める */
+  @media (max-height:480px){
+    html.pcview.phone .menu-in,.menu .menu-in{padding-top:96px; padding-bottom:12px}
+    html.pcview.phone .menu .mmsg,.menu .mmsg{gap:8px}
+    html.pcview.phone .menu .mseals,.menu .mseals{padding-top:6px}
+    html.pcview.phone .menu-in,.menu .menu-in{zoom:.73}
+    html.pcview.phone .menu .mseals li .t,.menu .mseals li .t{font-size:12px; line-height:1.4}
+    html.pcview.phone .menu .mlinks,.menu .mlinks{padding-top:10px; gap:6px 25.6px}
+    html.pcview.phone .menu .mlinks a,.menu .mlinks a{padding-top:4px; padding-bottom:4px}
+  }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
