@@ -4037,6 +4037,18 @@
   .gm-isec.on .gm-ilist li:nth-child(5){animation-delay:1.06s}
   html.rm .gm-isec .gm-ilist li,html.rm .gm-isec.on .gm-ilist li{opacity:1; animation:none}
   @media (max-height:640px){ .gm-ilist li{grid-template-columns:34px 1fr; column-gap:12px; margin-bottom:.5em} .gm-ilist .ik{width:34px; height:34px} }
+  /* v486 遊びを朱や紫の章から開くと、見出し行の色が章のまま（紙色の字）で、遊びの紙地に溶けて消えていた（本人：☰ と JA/EN が出ない）。
+     実測：朱の章から開くと JA/EN の字が rgb(251,247,242)、地は rgb(242,242,238) でほぼ 1:1 */
+  html.gmopen .hd{--fg:#1C1B19; --fg2:#5A5955; --fg3:#8E8B84; --acc:#E84518; --bg:#F2F1EC; --line:#D6D4CE; --ul:#1C1B19}
+  /* v486 札を開いたとき、見出し行のところだけ白く残っていた（本人）。幕を上まで伸ばして揃える */
+  .gm-info,.gm-take{top:var(--vvt, 0px)}
+  .gm-info .gm-info-in{margin-top:calc(var(--hdh, 60px) * .5)}
+  /* v486b 変数だけでは章の色が残るので、遊びの最中は見出し行の色を直に押さえる */
+  html.gmopen .hd,html.gmopen .hd .brand,html.gmopen .hd .chap{color:#1C1B19}
+  html.gmopen .hd .lang{background-color:#F2F1EC; border-color:#1C1B19}
+  html.gmopen .hd .lang button{color:#5A5955; background-color:#F2F1EC}
+  html.gmopen .hd .lang button[aria-pressed="true"]{background-color:#1C1B19; color:#F2F1EC}
+  html.gmopen .burger i,html.gmopen .burger span{background-color:#1C1B19}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
