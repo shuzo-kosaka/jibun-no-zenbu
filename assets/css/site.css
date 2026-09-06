@@ -3938,6 +3938,12 @@
   /* v456 開いた札は、ブラウザの帯で隠れる分を除いた「見えている枠」に収める（実機係：iPad で上が切れ、閉じるが画面外へ） */
   .gm-info{top:calc(var(--hdh, 60px) + var(--vvt, 0px)); bottom:var(--vvb, 0px)}
   .gm-take{top:calc(var(--vvt, 0px)); bottom:var(--vvb, 0px)}
+  /* v457 遊びの最中にメニューを開くと、見出し行（z:101）とメニュー（z:100）がカーソルの上に来ていた（本人：言語切替でカーソルが下に出る） */
+  html.gmopen .cur{z-index:102}
+  /* v457 言語切替の朱の帯の上では、カーソルの輪と字を紙の色にする（同色で見えなかった：本人） */
+  html:has(.lgsw.run) .cur .cd{background:#FBF7F2}
+  html:has(.lgsw.run) .cur.hov .cd{background:transparent; border-color:#FBF7F2}
+  html:has(.lgsw.run) .cur .cc{color:#FBF7F2}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
