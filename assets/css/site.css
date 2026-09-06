@@ -3980,6 +3980,9 @@
   .gm-live{z-index:8}
   .gm-lines .gm-ln.you{z-index:7}
   .gm-turnb{z-index:9}
+  /* v466 ブラウザの帯で本編の見出し行が見えている枠の外へ出ると、☰ と JA/EN が消えて見える（本人：iPad で確認）。遊びの最中だけ枠の内側へ寄せる */
+  html.gmopen .hd{transform:translateY(var(--vvt, 0px))}
+  html.rm.gmopen .hd{transition:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

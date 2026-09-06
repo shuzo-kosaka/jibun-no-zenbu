@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4109,6 +4109,7 @@
       if(bm > 160) bm = 160; if(t > 160) t = 160; if(l > 160) l = 160; if(r > 160) r = 160;   /* 想定外の値で崩さない */
       gm.style.setProperty('--vvt', t + 'px'); gm.style.setProperty('--vvb', bm + 'px');
       gm.style.setProperty('--vvl', l + 'px'); gm.style.setProperty('--vvr', r + 'px');
+      de.style.setProperty('--vvt', t + 'px'); de.style.setProperty('--vvb', bm + 'px');   /* v466: 本編の見出し行も見えている枠へ寄せる（本人：遊びの最中に ☰ と JA/EN が出ないことがある） */
     }
     function tipFit(){   /* v426: 盤面が高いと札が見出し行に潜るので、帯の下に留める（本人） */
       if(!tipEl || document.documentElement.classList.contains('phone')) return;
