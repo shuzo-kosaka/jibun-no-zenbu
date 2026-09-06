@@ -3974,6 +3974,12 @@
   .gm-in.enter .gm-side{transform:translateY(8px)}
   .gm-in.enter.on .gm-side{transform:none; transition:opacity .5s var(--ease) .62s, transform .6s var(--ease) .62s}
   html.rm .gm-in.enter .gm-stage,html.rm .gm-in.enter .gm-side{transform:none; transition:none}
+  /* v465 引いている間も手番の問いを残す（本人：線を引き始めると消えていた）。薄めるだけにして、線の邪魔はしない */
+  .gm-tip.off{opacity:.5; transform:translate(-50%,0); pointer-events:none}
+  /* v465 引いている朱の線は、絵を囲う枠や目盛りより上に置く（本人） */
+  .gm-live{z-index:8}
+  .gm-lines .gm-ln.you{z-index:7}
+  .gm-turnb{z-index:9}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

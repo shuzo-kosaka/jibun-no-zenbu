@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4817,7 +4817,7 @@
     }
     /* なぞる：線は補間なしで追従。数値は指に隠れない位置——たての線は上端、よこの線は右端——に。目盛りには 0 からここまでの寸法 */
     function setLive(p){
-      var t = LINES[ti]; live = p; var s = p.toFixed(2) + '%'; listLive(p); mode(down ? L('押している', 'holding') : L('なぞる', 'trace'));
+      var t = LINES[ti]; live = p; var s = p.toFixed(2) + '%'; listLive(p); mode(down ? L('引いている', 'drawing') : L('なぞる', 'trace'));
       liveEl.className = 'gm-live ' + t.ax + ' on' + (down ? ' press' : '') + (p > 88 ? ' low' : '') + (p < 12 ? ' high' : '');   /* v418: 端では一言と札の置き場を変える（細部係） */
       if(down && p < 14) tipEl.classList.add('off'); readEl.className = 'gm-read ' + t.ax + ' on';
       if(t.ax === 'v'){ liveEl.style.left = s; liveEl.style.top = ''; readEl.style.left = rot ? 'clamp(46px, ' + s + ', calc(100% - 46px))' : 'min(' + s + ', calc(100% - 46px))'; readEl.style.top = ''; drv.style.width = s; drv.className = 'gm-dimr v on'; }
