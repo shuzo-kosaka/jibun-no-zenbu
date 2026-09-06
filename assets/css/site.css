@@ -3935,6 +3935,9 @@
   /* v455 英語の目盛りの見出しは横書きのままなので、盤面の上に横並びで置く（左枠と絵に重なっていた） */
   html[lang="en"] .gm-stage:not(.rot) .gm-axl.v{left:0; right:auto; top:-32px; transform:none; writing-mode:horizontal-tb}
   html[lang="en"] .gm-stage:not(.rot) .gm-axl.h{left:auto; right:0; top:-32px}
+  /* v456 開いた札は、ブラウザの帯で隠れる分を除いた「見えている枠」に収める（実機係：iPad で上が切れ、閉じるが画面外へ） */
+  .gm-info{top:calc(var(--hdh, 60px) + var(--vvt, 0px)); bottom:var(--vvb, 0px)}
+  .gm-take{top:calc(var(--vvt, 0px)); bottom:var(--vvb, 0px)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
