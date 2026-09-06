@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4819,7 +4819,7 @@
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
       var lead2 = gm.querySelector('.gm-lead2');
-      if(lead2){ if(bi === 0 && ti === 0){ lead2.hidden = false; lead2.innerHTML = '<b>' + L('絵から、ものさしを取り出す。', 'Taking a ruler out of a picture.') + '</b><span>' + body_(L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Four lines on each of three pictures; then their average.')) + '</span>'; }
+      if(lead2){ if(bi === 0 && ti === 0){ lead2.hidden = false; lead2.innerHTML = '<b>' + L('絵から、ものさしを取り出す。', 'Taking a ruler out of a picture.') + '</b><span>' + body_(L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Four lines on each of three pictures; then their average.')) + '</span><span class="how">' + body_(L('絵を押して、そのまま動かします。離したところに線が引かれます。', 'Press the picture and drag; the line is placed where you release.')) + '</span>';   /* v487: 列の下にあった操作の一文を、ここへまとめた（本人） */ }
         else if(!lead2.hidden){ lead2.classList.add('bye'); setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); } }   /* v477: 何をする遊びかを、いちばん先に目につく所へ（本人） */
       if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
@@ -4828,7 +4828,7 @@
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
       resEl.innerHTML =
         (first ? '<p class="gm-ask gm-lead"><b>' + mix('絵から、ものさしを取り出す。', 'Turn a picture into a ruler.', 'ものさし') + '</b>' + L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Draw four lines on each picture; the three are then averaged.') + '</p>' : '') +
-        (first ? '<p class="gm-note">' + L('絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 'Drag on the picture,<br>then release to place a line.') + '</p>' : '');   /* 線の名前は右の一覧が示す（帯・一覧・見出しの三重を避ける） */
+        '';   /* v487: 操作の一文は右の列の頭（.gm-lead2）へ移した（本人） */   /* 線の名前は右の一覧が示す（帯・一覧・見出しの三重を避ける） */
       goEl.innerHTML = '';
       if(bi === 0) help(t, false); else helpOff();
       hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
@@ -5073,7 +5073,17 @@
       root.querySelectorAll('.gm-secq').forEach(function(q){
         if(q.__bound) return; q.__bound = true;
         var x = q.nextElementSibling; if(!x) return;
-        q.addEventListener('click', function(){ var on = x.hidden; x.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false'); });
+        q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
+          if(rm){ x.hidden = !on; return; }
+          if(on){   /* 開く：0 から実寸へ。終わったら auto に戻して中身の高さに追従させる */
+            x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
+            x.style.height = x.scrollHeight + 'px';
+            setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260);
+          } else {   /* 閉じる：実寸から 0 へ */
+            x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight;
+            x.style.height = '0px';
+            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200);
+          } });   /* v487: 開閉を滑らかに（本人） */
       });
     }
     function sec(t){ return '<button type="button" class="gm-catq gm-secq" aria-expanded="false"><span>' + t + '</span><i></i></button>'; }   /* v394: i の札の節は畳んで、押すと開く（分析カテゴリと同じ作法） */
@@ -5106,7 +5116,14 @@
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
       infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
-        q.addEventListener('click', function(){ var on = x.hidden; x.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false'); if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: Math.min(top, q.offsetTop + x.offsetHeight - iin.clientHeight + 24 > top ? top : top), behavior:'smooth'}); }, 40); }); });
+        q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
+          if(rm){ x.hidden = !on; }
+          else if(on){ x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight; x.style.height = x.scrollHeight + 'px';
+            setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260); }
+          else { x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
+            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200); }
+          if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: top, behavior: 'smooth'}); }, 280); });
+      });   /* v487: 開閉を滑らかに（本人） */
       var cq = infoEl.querySelector('.gm-catq:not(.gm-secq)'), cx = cq && cq.nextElementSibling;
       if(infoWantCat && cq && cx){ cx.hidden = false; cq.setAttribute('aria-expanded', 'true'); setTimeout(function(){ iin.scrollTo({top: Math.max(0, cq.offsetTop - 12), behavior: rm ? 'auto' : 'smooth'}); }, 260); }
       document.documentElement.classList.add('gminfo');   /* v438: 札を開いている間は幕を見出し行の上まで（本編の帯だけ明るいままだった：本人） */

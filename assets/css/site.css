@@ -4049,6 +4049,10 @@
   html.gmopen .hd .lang button{color:#5A5955; background-color:#F2F1EC}
   html.gmopen .hd .lang button[aria-pressed="true"]{background-color:#1C1B19; color:#F2F1EC}
   html.gmopen .burger i,html.gmopen .burger span{background-color:#1C1B19}
+  /* v487 節の開閉を滑らかに */
+  .gm-catx.anim,.gm-secx.anim{overflow:hidden; transition:height .24s var(--ease)}
+  html.rm .gm-catx.anim,html.rm .gm-secx.anim{transition:none}
+  .gm-lead2 span.how{margin-top:.5em; color:var(--fg, #1C1B19)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
