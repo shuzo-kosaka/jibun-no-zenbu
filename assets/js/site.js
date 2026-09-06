@@ -1124,6 +1124,7 @@
     var y = window.scrollY + r.top + total * ((n - 1) / STEPS + .5 / STEPS);
     window.scrollTo({top: Math.round(y), behavior: reduce ? 'auto' : 'smooth'});
   }
+  window.__goStep = goStep;   /* v398: 遊びの「研究の手順 08 へ」から呼ぶ */
   /* v186: the grid lines are drawn by shrinking stroke-dashoffset over a stroke-dasharray of 1 against
      pathLength="1" — one dash the length of the whole line. But the stroke is vector-effect:non-scaling-stroke,
      and Blink measures that dash in the figure's own units while stroking it in screen pixels. On a wide screen
@@ -1744,7 +1745,7 @@
         /* v350: 描くのも薄れるのもスクロールに連れて。送れば輪が継ぎ足され、戻せばそのぶん戻る。
            送りはじめの足跡（snap）は残したまま、そこへ輪を重ねるので、切り替わりで飛ばない */
         var u = dgP - dgFinP0, q = Math.max(0, Math.min(1, u / .15));   /* v352: 一周を描き切るまでを 12.8vh → 22.5vh に */
-        var fade = 1 - Math.max(0, Math.min(1, (u - .15) / .05));
+        var fade = .18 + .82 * (1 - Math.max(0, Math.min(1, (u - .15) / .05)));   /* v355: 消えきらず、うっすら残す */
         var f0 = ((dgFinW0 % 1) + 1) % 1;
         if(dgTrail) for(var tf = 0; tf < dgTrail.length; tf++){
           var d = ((dgTrailF[tf] - f0) % 1 + 1) % 1, o2 = 0;
@@ -1752,7 +1753,7 @@
           var sn = (dgFinSnap && dgFinSnap[tf]) || 0;
           dgTrail[tf].style.opacity = (Math.max(sn, o2) * fade).toFixed(2);
         }
-        if(fade <= 0) dgGone = true;
+        if(fade <= .19 && u > .3) dgGone = false;   /* v355: 薄く残したままにする（消し切らない） */
       }
       else {
       var w = (now - dgT0) / 18000, a = ((w * 360 + DG_A0) % 360 + 360) % 360;
@@ -2264,6 +2265,7 @@
     }
     window.addEventListener('wheel', function(e){
       if(e.ctrlKey) return;
+      if(e.target && e.target.closest && e.target.closest('#gm')) return;   /* v409: 遊びの中はブラウザに任せる（右の列・案内・遊び方） */
       var sc = e.target && e.target.closest ? e.target.closest('.menu, .cpage, #lb, .cp-sheet') : null;
       if(sc){   /* those scroll on their own — but the page must not take over when they reach their end */
         var up = sc.scrollTop > 1, dn = sc.scrollTop + sc.clientHeight < sc.scrollHeight - 1;
@@ -2428,7 +2430,7 @@
     try{ if(localStorage.getItem('kosaka-deskview') === '1') apply(true); }catch(e){}
     btn.addEventListener('click', function(){ apply(!document.documentElement.classList.contains('deskview')); });
   })();
-  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } setTimeout(function(){ skipTo(id); }, 350); }); });   /* v220: 5 秒スキップの札つき */   /* v85: the CONTACT card opens the contact page */
+  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } if(a.classList.contains('mgame')){ setTimeout(function(){ if(window.__gmOpen) window.__gmOpen(); }, 420); return; }   /* v356: 遊び */ setTimeout(function(){ skipTo(id); }, 350); }); });   /* v220: 5 秒スキップの札つき */   /* v85: the CONTACT card opens the contact page */
   window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && menu.classList.contains('open')) setMenu(false); });
 
   /* grid toggle */
@@ -2466,7 +2468,7 @@
         out.push({kind:'ch', node:n, i:i, text:c, r:r, cs:cs, op:op, role:role});
       }
     }
-    root.querySelectorAll('input, textarea, button').forEach(function(el){ if(el.closest('[hidden]') || !el.offsetParent) return; var r = el.getBoundingClientRect(); if(!r.width || !r.height || r.top > H - 12) return; out.push({kind:'ctl', el:el, r:r, role:el.tagName === 'BUTTON' ? 'btn' : 'field'}); });
+    root.querySelectorAll('input, textarea, button').forEach(function(el){ if(el.closest('[hidden]') || !el.offsetParent || el.classList.contains('cp-hp')) return; var r = el.getBoundingClientRect(); if(!r.width || !r.height || r.top > H - 12 || r.right < 0 || r.left > window.innerWidth) return;   /* v386: 画面の外の欄（迷惑対策の隠し欄）は写さない */ out.push({kind:'ctl', el:el, r:r, role:el.tagName === 'BUTTON' ? 'btn' : 'field'}); });
     return out;
   }
   function surMake(p){
@@ -2477,6 +2479,7 @@
     } else {
       var el = p.el, c = el.cloneNode(true); c.removeAttribute('id'); c.tabIndex = -1; c.setAttribute('aria-hidden', 'true');
       if(el.tagName === 'BUTTON'){ s = c; s.classList.add('surp'); }
+      else if(el.type === 'checkbox'){ s = document.createElement('span'); s.className = 'surp cp-hide'; c.checked = el.checked; s.appendChild(c); }   /* v386: 升目の写しは元と同じ 14px の升目に（.cp-form の欄の余白と下線を受け継いで、一段下がって見えていた） */
       else { s = document.createElement('span'); s.className = 'surp cp-form'; c.value = el.value; s.appendChild(c); }
     }
     s.style.left = p.r.left + 'px'; s.style.top = p.r.top + 'px'; s.style.width = p.r.width + 'px'; s.style.height = p.r.height + 'px';
@@ -2950,8 +2953,8 @@
     if(!hideName && !name) bad.push('name');
     if(!hideMail && (!mail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail))) bad.push('email');
     if(!msg) bad.push('msg');
-    bad.forEach(function(n){ var el = cpform.querySelector('[name="' + n + '"]'); if(el && el.closest('label')) el.closest('label').classList.add('bad'); });
-    if(bad.length){ if(err) err.textContent = (en ? ('Please fill in ' + [bad.indexOf('name') >= 0 ? 'your name' : '', bad.indexOf('email') >= 0 ? 'a valid email address' : '', bad.indexOf('msg') >= 0 ? 'a message' : ''].filter(Boolean).join(', ') + '.')
+    bad.forEach(function(n){ var el = cpform.querySelector('[name="' + n + '"]'); if(el && el.closest('label')){ var lb = el.closest('label'); void lb.offsetWidth; lb.classList.add('bad'); }   /* v386: 揺れをやり直せるように一度描く */ });
+    if(bad.length){ if(err){ err.textContent = ''; void err.offsetWidth; } if(err) err.textContent = (en ? ('Please fill in ' + [bad.indexOf('name') >= 0 ? 'your name' : '', bad.indexOf('email') >= 0 ? 'a valid email address' : '', bad.indexOf('msg') >= 0 ? 'a message' : ''].filter(Boolean).join(', ') + '.')
                                                      : ([bad.indexOf('name') >= 0 ? 'お名前' : '', bad.indexOf('email') >= 0 ? '正しいメールアドレス' : '', bad.indexOf('msg') >= 0 ? 'メッセージ' : ''].filter(Boolean).join('・') + 'をご記入ください。')); var f = cpform.querySelector('[name="' + bad[0] + '"]'); if(f) f.focus(); return; }
     if(err) err.textContent = '';
     var subject = subj || ((en ? 'From the portfolio site' : 'ポートフォリオサイトより') + ' — ' + name);
@@ -3193,6 +3196,11 @@
   function setLang(lang, quiet){
     var en = lang === 'en'; if(lang === curLang) return;
     var langAnc = langAnchor();
+    (function(){   /* v409: 連絡欄の見出しの先頭の文字と、08 のボタンの読み上げ名も切り替える（本編係） */
+      var M = {'お名前':'Name', 'メールアドレス':'Email', '件名':'Subject', 'メッセージ':'Message', '本文':'Message'};
+      document.querySelectorAll('.cp-form label > span').forEach(function(sp){ var tn = sp.firstChild; if(!tn || tn.nodeType !== 3) return; var ja = tn.__ja || tn.nodeValue.trim(); if(!M[ja]) return; tn.__ja = ja; tn.nodeValue = en ? M[ja] : ja; });
+      var sq = document.getElementById('seqplay'); if(sq) sq.setAttribute('aria-label', en ? 'Open the game: Measure the composition.' : '遊びを開く：絵を、測る。');
+    })();
     /* v120: the switch is a pass of the translator's rule — a ruled band sweeps the screen, carrying the pair of
        languages with it, and the page changes tongue as it goes by. The text swap below happens under the band. */
     (function(){
@@ -3361,6 +3369,1660 @@
   document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); try{ localStorage.setItem('kosaka-lang', b.getAttribute('data-lang')); }catch(e){} }); });
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
+
+                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+     五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
+     ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
+     ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
+     ・点数はやめ、一行の観察（「重心を、私より右に読みました」）に。判定は三枚の平均だけでなく作品ごとの差も使う
+     ・三枚の平均は、同じ役割の三つの目盛りが一本に集まる過程を見せ、研究の三本を薄く補う——「あなたの4本＋研究の3本」
+     ・読みの比較（同じ三枚での あなた vs わたし）と、骨格としての比較（あなたの骨格 vs 研究の固定グリッド）を分ける
+     ・紙面（画面いっぱい）には見出し・本文・図版の枠を載せ、「あなたの骨格／研究の骨格」で切り替える
+     ・#play=id,id,id で三枚を指名して始められる（面接用）。結果から研究の手順 08 へ戻れる
+     研究の呼び名では Y1＝主塊開始線・X4＝前景／副次要素境界線。遊びの四手は「主塊開始線」「主塊重心線」を縦横で引く——研究の手順を四本で体験する */
+  (function(){
+    function L(ja, en){ return document.documentElement.lang === 'en' ? en : ja; }
+    /* 四本の機能線。k は盤面の答えの鍵、ax は線の向き（v＝たての線＝X の値）。q の %s には盤面ごとの対象（obj）が入る */
+    var LINES = [
+      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの、てっぺんはどこだろう', qe:'Where is the top of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
+      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの、左の端はどこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
+      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さは、どの高さだろう', qe:'Where does the weight of the %s sit, top to bottom?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
+      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さは、左右のどこだろう', qe:'Where, left to right, does its weight sit?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
+    ];
+    var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
+    var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
+    var BOARDS = /*BOARDS*/[
+          {
+                "id": "massaki",
+                "img": "{{BOARD_01}}",
+                "jp": true,
+                "ar": 0.667,
+                "t": "広重『隅田川水神の森真崎』",
+                "te": "Hiroshige, Suijin Grove at Massaki",
+                "src": "構図：歌川広重『名所江戸百景 隅田川水神の森真崎』（1856）",
+                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Suijin Shrine and Massaki on the Sumida River (1856)",
+                "cat": "前景フレームと奥行き",
+                "cate": "Foreground frame and depth",
+                "a": {
+                      "y1": 2,
+                      "x1": 1,
+                      "y2": 28,
+                      "x3": 58
+                },
+                "why": [
+                      "花の枝は上の縁から入る。",
+                      "左の縁のすぐ内側。花はここから。",
+                      "花と幹の塊は上に厚い。重心は上寄り。",
+                      "右の幹が重い。重心は中央より右。"
+                ],
+                "whye": [
+                      "The blossom branch enters from the top edge",
+                      "Just inside the left edge, where the blossoms start",
+                      "Blossoms and trunk are thick above: the weight sits high",
+                      "The trunk on the right is heavy: the weight sits right of centre"
+                ],
+                "obj": "花の枝と幹",
+                "obje": "blossom branch and trunk",
+                "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに、手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
+                "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject."
+          },
+          {
+                "id": "fuji",
+                "img": "{{BOARD_02}}",
+                "jp": true,
+                "ar": 1.5,
+                "t": "北斎『凱風快晴』",
+                "te": "Hokusai, Fine Wind, Clear Morning",
+                "src": "構図：葛飾北斎『冨嶽三十六景 凱風快晴』（1831 頃）",
+                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fine Wind, Clear Morning (c. 1831)",
+                "cat": "主塊と余白面",
+                "cate": "Mass and void",
+                "a": {
+                      "y1": 14,
+                      "x1": 30,
+                      "y2": 55,
+                      "x3": 68
+                },
+                "why": [
+                      "山頂。主塊はここから始まる。",
+                      "山裾が林に消える左端。",
+                      "下へ広がる三角。重心は下寄り。",
+                      "裾は左へ長く、右で切れる。重心は中央より右。"
+                ],
+                "whye": [
+                      "The summit: the mass begins here",
+                      "The left end, where the slope sinks into the forest",
+                      "A triangle widening downward: the weight sits low",
+                      "The skirt runs long to the left and is cut on the right: the weight sits right of centre"
+                ],
+                "obj": "山",
+                "obje": "mountain",
+                "note": "葛飾北斎『冨嶽三十六景』の一図で、1831 年ごろの錦絵です。夏の終わりから初秋の早朝、南風が晴れを呼ぶ朝の富士が赤く染まる一瞬を描きました。山だけで画面の大半を占め、空はベロ藍のぼかし、雲は横に流れる筋雲だけ。形を思い切って省いた構図の代表です。",
+                "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, printed around 1831. It catches the moment on a clear late-summer dawn when a south wind turns the mountain red. The mountain alone fills most of the sheet; the sky is a gradation of Prussian blue, the clouds mere streaks. A landmark of radical simplification."
+          },
+          {
+                "id": "milkmaid",
+                "img": "{{BOARD_05}}",
+                "jp": false,
+                "ar": 0.875,
+                "t": "フェルメール『牛乳を注ぐ女』",
+                "te": "Vermeer, The Milkmaid",
+                "src": "構図：ヨハネス・フェルメール『牛乳を注ぐ女』（1658 頃）",
+                "srce": "After Johannes Vermeer, The Milkmaid (c. 1658)",
+                "cat": "主塊と余白面",
+                "cate": "Mass and void",
+                "a": {
+                      "y1": 14,
+                      "x1": 29,
+                      "y2": 55,
+                      "x3": 60
+                },
+                "why": [
+                      "頭巾のいちばん上。",
+                      "肘の左端。人物はここから。",
+                      "裳が重い。重心は下寄り。",
+                      "窓と壁のあいだ。重心はやや右。"
+                ],
+                "whye": [
+                      "The top of the cap",
+                      "The left of the elbow, where the figure begins",
+                      "The skirt is heavy: the weight sits low",
+                      "Between window and wall: the weight sits a little right"
+                ],
+                "obj": "人物",
+                "obje": "figure",
+                "note": "ヨハネス・フェルメール『牛乳を注ぐ女』、1658 年ごろ、油彩。45×41cm の小さな画面に、左の窓からの光、テーブルの静物、注がれる牛乳の一筋。光を点で置く技法で、パンや壁の質感を描いています。生活の一瞬を静かに止めた作です。",
+                "notee": "Johannes Vermeer’s The Milkmaid, around 1658, oil on canvas. Within a small 45 by 41 cm panel: light from the left window, a still life on the table, a thin stream of milk. Dots of light render the bread and the wall. A quiet moment of ordinary life held still."
+          },
+          {
+                "id": "wanderer",
+                "img": "{{BOARD_06}}",
+                "jp": false,
+                "ar": 0.75,
+                "t": "フリードリヒ『雲海の上の旅人』",
+                "te": "Friedrich, Wanderer above the Sea of Fog",
+                "src": "構図：カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』（1818 頃）",
+                "srce": "After Caspar David Friedrich, Wanderer above the Sea of Fog (c. 1818)",
+                "cat": "前景フレームと奥行き",
+                "cate": "Foreground frame and depth",
+                "a": {
+                      "y1": 12,
+                      "x1": 4,
+                      "y2": 70,
+                      "x3": 50
+                },
+                "why": [
+                      "頭のいちばん上。",
+                      "人物と足元の岩をひとつの塊と読む。岩は左の縁近くから。",
+                      "岩の重さで、重心は下へ。",
+                      "ほぼ中央。人物の軸そのもの。"
+                ],
+                "whye": [
+                      "The top of the head",
+                      "Figure and rock read as one mass: the rock starts near the left edge",
+                      "The rock pulls the weight down",
+                      "Almost centred: the figure's own axis"
+                ],
+                "obj": "人と岩",
+                "obje": "figure and rock",
+                "note": "カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』、1818 年ごろ、油彩。後ろ姿の人物を画面の中心に立たせ、その向こうに霧の海と山を広げます。見る人が人物と同じ視線になるこの「後ろ姿」は、ドイツ・ロマン主義を代表する構図です。",
+                "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism."
+          },
+          {
+                "id": "gleaners",
+                "img": "{{BOARD_07}}",
+                "jp": false,
+                "ar": 1.333,
+                "t": "ミレー『落穂拾い』",
+                "te": "Millet, The Gleaners",
+                "src": "構図：ジャン＝フランソワ・ミレー『落穂拾い』（1857）",
+                "srce": "After Jean-François Millet, The Gleaners (1857)",
+                "cat": "反復と変奏",
+                "cate": "Repetition and variation",
+                "a": {
+                      "y1": 28,
+                      "x1": 14,
+                      "y2": 60,
+                      "x3": 50
+                },
+                "why": [
+                      "いちばん高い頭。",
+                      "左の人物の帽子。三人の塊はここから。",
+                      "かがんだ姿は下に重い。",
+                      "三人の真ん中。"
+                ],
+                "whye": [
+                      "The highest head",
+                      "The left figure's hat, where the three begin",
+                      "Bent figures are heavy below",
+                      "The middle of the three"
+                ],
+                "obj": "三人",
+                "obje": "three figures",
+                "note": "ジャン＝フランソワ・ミレー『落穂拾い』、1857 年、油彩。刈り入れ後の畑で落穂を拾う三人の女性を、地平線を高く取って手前に大きく描きます。遠くの豊かな収穫と手前の労働の対比が、発表当時は農民を描く政治的な絵として論争になりました。",
+                "notee": "Jean-François Millet’s The Gleaners, 1857, oil. Three women gather leftover grain after the harvest, drawn large against a high horizon. The abundant harvest in the distance against the labor in front caused controversy at the time as a political picture of the peasantry."
+          },
+          {
+                "id": "barrel",
+                "img": "{{BOARD_08}}",
+                "jp": true,
+                "ar": 1.5,
+                "t": "北斎『尾州不二見原』",
+                "te": "Hokusai, Fujimigahara in Owari",
+                "src": "構図：葛飾北斎『冨嶽三十六景 尾州不二見原』（1831 頃）",
+                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fujimigahara in Owari Province (c. 1831)",
+                "cat": "前景フレームと奥行き",
+                "cate": "Foreground frame and depth",
+                "a": {
+                      "y1": 20,
+                      "x1": 28,
+                      "y2": 57,
+                      "x3": 52
+                },
+                "why": [
+                      "桶の環の上端。環そのものが主塊。",
+                      "環の左端。",
+                      "職人が入る分、重心はやや下。",
+                      "環はほぼ中央。富士は環の中の右寄りに。"
+                ],
+                "whye": [
+                      "The top of the barrel's ring: the ring itself is the mass",
+                      "The left of the ring",
+                      "With the cooper inside, the weight sits a little low",
+                      "The ring is near the centre; Fuji sits inside it, to the right"
+                ],
+                "obj": "桶の環",
+                "obje": "barrel ring",
+                "note": "葛飾北斎『冨嶽三十六景』の「尾州不二見原」、1831 年ごろ。桶職人が大きな桶の胴を削る手前の場面と、桶の輪の中に小さく収まる富士。丸い枠で遠くの山を切り取る「見立て」の構図で、近くの人の営みと遠くの山を一枚に重ねています。",
+                "notee": "Hokusai’s Fujimigahara in Owari Province, Thirty-six Views, around 1831. A cooper shaves the inside of a huge barrel, and Fuji appears small through the barrel’s hoop. The round frame that crops the distant mountain layers everyday work in the foreground onto the far view."
+          },
+          {
+                "id": "kiss",
+                "img": "{{BOARD_11}}",
+                "jp": false,
+                "ar": 1.0,
+                "t": "クリムト『接吻』",
+                "te": "Klimt, The Kiss",
+                "src": "構図：グスタフ・クリムト『接吻』（1908）",
+                "srce": "After Gustav Klimt, The Kiss (1908)",
+                "cat": "主塊と余白面",
+                "cate": "Mass and void",
+                "a": {
+                      "y1": 2,
+                      "x1": 27,
+                      "y2": 45,
+                      "x3": 50
+                },
+                "why": [
+                      "頭のいちばん上。",
+                      "抱き合う二人をひとつの塊と読む。その左端。",
+                      "上から下まで、ほぼ一様な柱。重心は中央。",
+                      "中央の柱。重心も中央。"
+                ],
+                "whye": [
+                      "The top of the heads",
+                      "The two figures read as one mass: its left edge",
+                      "A near-uniform column from top to bottom: the weight is central",
+                      "A central column: the weight, too, is central"
+                ],
+                "obj": "二人",
+                "obje": "two figures",
+                "note": "グスタフ・クリムト『接吻』、1907〜08 年、油彩に金箔。ほぼ正方形の画面の中で、抱き合う二人が一つの金の塊になり、足元だけに花の草地が見えます。ウィーン分離派の装飾性と、人物をひとつの面に溶かす構図が特徴です。",
+                "notee": "Gustav Klimt’s The Kiss, 1907–08, oil and gold leaf. On an almost square canvas the embracing couple fuse into a single golden mass, with a flowered meadow only at their feet. It shows the ornament of the Vienna Secession and a composition that melts figures into one plane."
+          },
+          {
+                "id": "wave",
+                "img": "{{BOARD_13}}",
+                "jp": true,
+                "ar": 1.5,
+                "t": "北斎『神奈川沖浪裏』",
+                "te": "Hokusai, Under the Wave off Kanagawa",
+                "src": "構図：葛飾北斎『冨嶽三十六景 神奈川沖浪裏』（1831 頃）",
+                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Under the Wave off Kanagawa (c. 1831)",
+                "cat": "対置と中間領域",
+                "cate": "Opposition and the space between",
+                "a": {
+                      "y1": 6,
+                      "x1": 1,
+                      "y2": 45,
+                      "x3": 30
+                },
+                "why": [
+                      "波頭のいちばん上。",
+                      "波は左の縁から入る。",
+                      "爪のような波頭と胴を合わせて、重心は中ほど。",
+                      "大波は左に寄る。富士は右の余白に。"
+                ],
+                "whye": [
+                      "The top of the crest",
+                      "The wave enters from the left edge",
+                      "Crest and body together: the weight sits mid-height",
+                      "The great wave leans left; Fuji sits in the void on the right"
+                ],
+                "obj": "大波",
+                "obje": "great wave",
+                "note": "葛飾北斎『冨嶽三十六景』の一図、1831 年ごろ。手前で砕ける大波が画面を覆い、遠くに小さな富士が見えます。当時輸入されたばかりのベロ藍を使い、波の曲線が富士を包み込むように配されています。西洋の遠近法を学んだ北斎が、近景と遠景の大きさの逆転で奥行きをつくった図です。",
+                "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far."
+          },
+          {
+                "id": "ohashi",
+                "img": "{{BOARD_14}}",
+                "jp": true,
+                "ar": 0.667,
+                "t": "広重『大はしあたけの夕立』",
+                "te": "Hiroshige, Sudden Shower over Shin-Ōhashi Bridge",
+                "src": "構図：歌川広重『名所江戸百景 大はしあたけの夕立』（1857）",
+                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Sudden Shower over Shin-Ōhashi Bridge and Atake (1857)",
+                "cat": "水平分節と上下構成",
+                "cate": "Horizontal division, upper and lower",
+                "a": {
+                      "y1": 50,
+                      "x1": 1,
+                      "y2": 70,
+                      "x3": 52
+                },
+                "why": [
+                      "橋の右端の高さ。主塊＝橋はここから。",
+                      "橋は左の縁から入る。",
+                      "橋桁と杭を含めると、重さは下にある。",
+                      "橋の中ほど。人の群れもここに集まる。"
+                ],
+                "whye": [
+                      "The height of the bridge's right end: the mass, the bridge, begins here",
+                      "The bridge enters from the left edge",
+                      "With the deck and piles, the weight sits low",
+                      "The middle of the bridge, where the figures gather"
+                ],
+                "obj": "橋",
+                "obje": "bridge",
+                "note": "歌川広重『名所江戸百景』の「大はしあたけの夕立」、1857 年。夕立に打たれて橋を渡る人々を、細い雨の線と暗い空で描きます。橋を斜めに置き、対岸の安宅を薄く沈めた大胆な構図で、のちにゴッホが油彩で模写したことでも知られます。",
+                "notee": "Hiroshige’s Sudden Shower over Shin-Ōhashi Bridge and Atake, One Hundred Famous Views of Edo, 1857. People cross the bridge under thin lines of rain and a dark sky. The bridge cuts diagonally while the far bank sinks into mist, a bold layout that van Gogh later copied in oil."
+          },
+          {
+                "id": "kameido",
+                "img": "{{BOARD_15}}",
+                "jp": true,
+                "ar": 0.667,
+                "t": "広重『亀戸梅屋舗』",
+                "te": "Hiroshige, Plum Garden at Kameido",
+                "src": "構図：歌川広重『名所江戸百景 亀戸梅屋舗』（1857）",
+                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Plum Garden at Kameido (1857)",
+                "cat": "前景フレームと奥行き",
+                "cate": "Foreground frame and depth",
+                "a": {
+                      "y1": 1,
+                      "x1": 1,
+                      "y2": 60,
+                      "x3": 45
+                },
+                "why": [
+                      "幹は上の縁から入る。",
+                      "左下の縁から。幹はここから。",
+                      "幹は下で太い。重心は下寄り。",
+                      "斜めに走る幹の中ほど。やや左。"
+                ],
+                "whye": [
+                      "The trunk enters from the top edge",
+                      "From the lower-left edge, where the trunk begins",
+                      "The trunk is thick below: the weight sits low",
+                      "The middle of the diagonal trunk, a little left"
+                ],
+                "obj": "幹",
+                "obje": "trunk",
+                "note": "歌川広重『名所江戸百景』の「亀戸梅屋舗」、1857 年。臥龍梅と呼ばれた名木の幹を画面いっぱいに置き、枝の隙間から梅園と人々をのぞかせます。地平の赤い空と幹の黒の対比が強く、これもゴッホが模写した図です。",
+                "notee": "Hiroshige’s Plum Garden at Kameido, One Hundred Famous Views of Edo, 1857. The trunk of the famous “reclining dragon” plum fills the sheet, and the garden and visitors peek through the branches. The red horizon sky against the black trunk is another image van Gogh copied."
+          },
+          {
+                "id": "pines",
+                "img": "{{BOARD_17}}",
+                "jp": true,
+                "ar": 2.344,
+                "t": "等伯『松林図屏風』",
+                "te": "Tōhaku, Pine Trees",
+                "src": "構図：長谷川等伯『松林図屏風』左隻（16世紀末）",
+                "srce": "After Hasegawa Tōhaku, Pine Trees, left-hand screen (late 16th century)",
+                "cat": "密度差と空間の抜け",
+                "cate": "Density contrast and open space",
+                "a": {
+                      "y1": 20,
+                      "x1": 14,
+                      "y2": 58,
+                      "x3": 29
+                },
+                "why": [
+                      "いちばん濃い松のてっぺん。",
+                      "左の松林の左端。主塊はここから。",
+                      "幹は下へ伸びる。重心はやや下。",
+                      "左の群れの中心。右の群れは薄く、余白をはさむ。"
+                ],
+                "whye": [
+                      "The top of the darkest pine",
+                      "The left edge of the left grove: the mass begins here",
+                      "Trunks run down: the weight sits a little low",
+                      "The centre of the left grove; the right one is faint, across the void"
+                ],
+                "obj": "左の松林",
+                "obje": "left grove",
+                "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に、霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
+                "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between."
+          },
+          {
+                "id": "sesshu",
+                "img": "{{BOARD_18}}",
+                "jp": true,
+                "ar": 0.5,
+                "t": "雪舟『秋冬山水図（冬）』",
+                "te": "Sesshū, Winter Landscape",
+                "src": "構図：雪舟等楊『秋冬山水図』冬景（15世紀後半）",
+                "srce": "After Sesshū Tōyō, Autumn and Winter Landscapes: Winter (late 15th century)",
+                "cat": "垂直反復と高低差",
+                "cate": "Vertical repetition and height",
+                "a": {
+                      "y1": 12,
+                      "x1": 36,
+                      "y2": 55,
+                      "x3": 55
+                },
+                "why": [
+                      "崖の頂。一本の線がここから落ちる。",
+                      "崖の塊の左端。",
+                      "岩は下へ積み上がる。重心はやや下。",
+                      "縦の線のすぐ右。重心もそこに。"
+                ],
+                "whye": [
+                      "The top of the cliff, where the single line drops from",
+                      "The left edge of the cliff mass",
+                      "Rocks pile up downward: the weight sits a little low",
+                      "Just right of the vertical line, and so is the weight"
+                ],
+                "obj": "崖",
+                "obje": "cliff",
+                "note": "雪舟『秋冬山水図』の冬景、15 世紀後半、国宝。画面の中央を貫いて立ち上がる崖の輪郭線が有名で、上へ行くほど太く濃くなります。中国で学んだ水墨の骨法を、思い切った線で日本の画面に置き換えた一幅です。",
+                "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line."
+          },
+          {
+                "id": "kambara",
+                "img": "{{BOARD_03}}",
+                "jp": true,
+                "ar": 1.5,
+                "t": "広重『蒲原 夜之雪』",
+                "te": "Hiroshige, Kambara, Night Snow",
+                "src": "構図：歌川広重『東海道五十三次 蒲原 夜之雪』（1833 頃）",
+                "srce": "After Utagawa Hiroshige, Fifty-three Stations of the Tōkaidō: Kambara, Night Snow (c. 1833)",
+                "cat": "水平分節と上下構成",
+                "cate": "Horizontal division, upper and lower",
+                "a": {
+                      "y1": 38,
+                      "x1": 20,
+                      "y2": 58,
+                      "x3": 55
+                },
+                "why": [
+                      "いちばん高い屋根の上端。家並みはここから。",
+                      "左の家の左端。",
+                      "雪の屋根が重い。重心はやや下。",
+                      "家並みの中ほど。やや右。"
+                ],
+                "whye": [
+                      "The top of the highest roof: the row of houses begins here",
+                      "The left edge of the leftmost house",
+                      "Snowy roofs are heavy: the weight sits a little low",
+                      "The middle of the row, a little right"
+                ],
+                "obj": "家並み",
+                "obje": "row of houses",
+                "note": "歌川広重『東海道五十三次』の「蒲原 夜之雪」、1833〜34 年ごろ。雪の夜道を行く旅人を、ほぼ墨一色の階調で描きます。実際の蒲原は雪の少ない土地で、この静けさは広重の創作と言われます。人物の小ささと、山と空の広い余白が印象を決めています。",
+                "notee": "Hiroshige’s Kambara, Night Snow from the Fifty-three Stations of the Tōkaidō, around 1833–34. Travelers walk a snowy road in near monochrome. Kambara rarely sees snow; the stillness is Hiroshige’s invention. The tiny figures and the broad emptiness of hills and sky set the mood."
+          },
+          {
+                "id": "poppin",
+                "img": "{{BOARD_04}}",
+                "jp": true,
+                "ar": 0.667,
+                "t": "歌麿『ビードロを吹く娘』",
+                "te": "Utamaro, Young Woman Blowing a Poppin",
+                "src": "構図：喜多川歌麿『婦女人相十品 ポッピンを吹く娘』（1792 頃）",
+                "srce": "After Kitagawa Utamaro, Ten Physiognomies of Women: Young Woman Blowing a Glass Pipe (c. 1792)",
+                "cat": "主塊と余白面",
+                "cate": "Mass and void",
+                "a": {
+                      "y1": 10,
+                      "x1": 20,
+                      "y2": 58,
+                      "x3": 60
+                },
+                "why": [
+                      "髷の上端。人物の塊はここから。",
+                      "左の袖の張り出し。",
+                      "頭は上、着物の量は下。重心は中ほどより下。",
+                      "顔は左を向くが、身体の量は右へ。重心はやや右。"
+                ],
+                "whye": [
+                      "Top of the hair: the figure's mass starts here",
+                      "The left sleeve's furthest reach",
+                      "Head above, the bulk of the kimono below: the weight sits below the middle",
+                      "The face turns left but the body's bulk goes right: the weight sits slightly right"
+                ],
+                "obj": "人物",
+                "obje": "figure",
+                "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘が、ガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
+                "notee": "From Kitagawa Utamaro's series of large-head portraits, Ten Physiognomies of Women, c. 1792. A young woman in a checked kimono blows a glass toy called a poppin. Against a mica ground the figure sits large, slightly right of centre; the sleeve pattern and the black hair make the mass."
+          },
+          {
+                "id": "whistler",
+                "img": "{{BOARD_09}}",
+                "jp": false,
+                "ar": 1.126,
+                "t": "ホイッスラー『母の肖像』",
+                "te": "Whistler, Arrangement in Grey and Black No. 1",
+                "src": "構図：ジェームズ・マクニール・ホイッスラー『灰色と黒のアレンジメント 第1番（母の肖像）』（1871）",
+                "srce": "After James McNeill Whistler, Arrangement in Grey and Black No. 1 (1871)",
+                "cat": "対置と中間領域",
+                "cate": "Opposition and the space between",
+                "a": {
+                      "y1": 16,
+                      "x1": 34,
+                      "y2": 62,
+                      "x3": 62
+                },
+                "why": [
+                      "白い頭巾の上端。",
+                      "裾の左端。足台より右。",
+                      "黒い衣の量は下半分に。重心は下寄り。",
+                      "人物は右寄り、椅子の背で止まる。"
+                ],
+                "whye": [
+                      "Top of the white cap",
+                      "Left end of the skirt, right of the footstool",
+                      "The black dress bulks in the lower half: the weight sits low",
+                      "The figure sits right of centre, stopped by the chair back"
+                ],
+                "obj": "人物",
+                "obje": "figure",
+                "note": "ジェームズ・マクニール・ホイッスラーが 1871 年にロンドンで描いた油彩（オルセー美術館）。黒い服の母を横向きに座らせ、灰色の壁、黒いカーテン、額の矩形で画面を組みました。題名が示すとおり肖像というより色面の配置の絵で、人物は画面の右寄りに置かれています。",
+                "notee": "Oil by James McNeill Whistler, painted in London in 1871 (Musee d'Orsay). His mother sits in profile in black against a grey wall, a black curtain and the rectangles of framed pictures. As the title says, it is an arrangement of tones more than a portrait, and the figure sits to the right."
+          },
+          {
+                "id": "scream",
+                "img": "{{BOARD_10}}",
+                "jp": false,
+                "ar": 0.8,
+                "t": "ムンク『叫び』",
+                "te": "Munch, The Scream",
+                "src": "構図：エドヴァルド・ムンク『叫び』（1893）",
+                "srce": "After Edvard Munch, The Scream (1893)",
+                "cat": "前景フレームと奥行き",
+                "cate": "Foreground frame and depth",
+                "a": {
+                      "y1": 56,
+                      "x1": 32,
+                      "y2": 80,
+                      "x3": 46
+                },
+                "why": [
+                      "頭の上端。人物はここから下に。",
+                      "身体の左端（手すりの手前）。",
+                      "頭は小さく、身体は下へ広がる。重心は下。",
+                      "人物は中央よりわずかに左。"
+                ],
+                "whye": [
+                      "Top of the head: the figure runs down from here",
+                      "Left edge of the body, in front of the railing",
+                      "Small head, body widening downward: the weight sits low",
+                      "The figure stands slightly left of centre"
+                ],
+                "obj": "人物",
+                "obje": "figure",
+                "note": "エドヴァルド・ムンクが 1893 年に描いた最初の『叫び』（オスロ国立美術館）。オスロ近郊の丘の道で夕焼けが血の色に変わったときの不安を、うねる線で描きました。左から右下へ走る手すりの対角線が奥行きを作り、前景の人物を画面の右下寄りに置きます。",
+                "notee": "The first version of The Scream, painted by Edvard Munch in 1893 (National Museum, Oslo). On a hill path near Oslo the sunset turned blood red and he felt a scream through nature, drawn in waving lines. The railing runs from the left down to the lower right and makes the depth; the figure stands lower right."
+          },
+          {
+                "id": "fujinraijin",
+                "img": "{{BOARD_12}}",
+                "jp": true,
+                "ar": 2.381,
+                "t": "宗達『風神雷神図屏風』",
+                "te": "Sōtatsu, Wind God and Thunder God",
+                "src": "構図：俵屋宗達『風神雷神図屏風』（17世紀前半）",
+                "srce": "After Tawaraya Sōtatsu, Wind God and Thunder God (early 17th century)",
+                "cat": "対置と中間領域",
+                "cate": "Opposition and the space between",
+                "a": {
+                      "y1": 8,
+                      "x1": 63,
+                      "y2": 45,
+                      "x3": 80
+                },
+                "why": [
+                      "白い布の弧の上端。風神の塊はここから。",
+                      "黒い雲の左端。金地はここまで。",
+                      "頭と胴が上寄り、雲が下に垂れる。重心はやや上。",
+                      "風神は右端に寄る。重心は 80 付近。"
+                ],
+                "whye": [
+                      "Top of the white cloth arc: the wind god's mass starts here",
+                      "Left edge of the black cloud; the gold ends here",
+                      "Head and torso sit high, the clouds hang below: the weight is slightly high",
+                      "The wind god is pushed to the right edge: the weight sits near 80"
+                ],
+                "obj": "右の風神",
+                "obje": "wind god on the right",
+                "note": "俵屋宗達が 17 世紀前半に描いた二曲一双の屏風で、建仁寺に伝わりました。金地の画面の左右の端に雷神と風神を寄せ、中央を大きく空けた構図です。二神は画面からはみ出すほど外側に置かれ、その間の何もない金地が緊張を生みます。のちに光琳、抱一が写した、琳派を象徴する一作です。",
+                "notee": "A pair of two-panel screens by Tawaraya Sotatsu, painted in the early 17th century and handed down at Kennin-ji. The thunder god and the wind god are pushed to the far left and right of the gold ground, leaving the centre empty; the empty gold between them carries the tension. Korin and Hoitsu later copied it, and it stands for the Rinpa school."
+          },
+          {
+                "id": "irises",
+                "img": "{{BOARD_16}}",
+                "jp": true,
+                "ar": 2.532,
+                "t": "光琳『燕子花図屏風』",
+                "te": "Kōrin, Irises",
+                "src": "構図：尾形光琳『燕子花図屏風』（18世紀初頭）",
+                "srce": "After Ogata Kōrin, Irises (early 18th century)",
+                "cat": "反復と変奏",
+                "cate": "Repetition and variation",
+                "a": {
+                      "y1": 8,
+                      "x1": 1,
+                      "y2": 48,
+                      "x3": 10
+                },
+                "why": [
+                      "左の花群のいちばん高い花。",
+                      "花群は左端に接する。",
+                      "花は上半分、葉は下へ。重心は中ほど。",
+                      "左端の群れの中心。"
+                ],
+                "whye": [
+                      "The highest flower of the left cluster",
+                      "The cluster touches the left edge",
+                      "Flowers in the upper half, leaves running down: the weight sits mid-height",
+                      "The centre of the leftmost cluster"
+                ],
+                "note": "尾形光琳が 1701 年ごろに描いた六曲一双の屏風（根津美術館）。伊勢物語の八橋の段を、橋も水も描かず、金地に群青と緑青の燕子花だけで表しました。花群を左から右へ、高さを変えながら並べる反復が主題で、同じ形の型を繰り返し使ったとも言われます。",
+                "notee": "A pair of six-panel screens by Ogata Korin, c. 1701 (Nezu Museum). The Yatsuhashi episode of the Tales of Ise is shown with no bridge and no water: only irises in ultramarine and malachite green on gold. The subject is repetition, clusters set left to right at changing heights, possibly with reused stencils.",
+                "obj": "左の花群",
+                "obje": "left cluster"
+          },
+          {
+                "id": "mondrian",
+                "img": "{{BOARD_19}}",
+                "jp": false,
+                "ar": 1.0,
+                "t": "モンドリアン『赤・青・黄のコンポジション』",
+                "te": "Mondrian, Composition II in Red, Blue, and Yellow",
+                "src": "構図：ピート・モンドリアン『赤・青・黄のコンポジション II』（1930）",
+                "srce": "After Piet Mondrian, Composition II in Red, Blue, and Yellow (1930)",
+                "cat": "主塊と余白面",
+                "cate": "Mass and void",
+                "a": {
+                      "y1": 1,
+                      "x1": 25,
+                      "y2": 33,
+                      "x3": 63
+                },
+                "why": [
+                      "赤い面は上辺から始まる。",
+                      "太い黒の縦線の右。赤はここから。",
+                      "赤は上三分の二を占める。重心はその中ほど。",
+                      "赤の左右の中心。右辺に接するぶん右寄り。"
+                ],
+                "whye": [
+                      "The red plane starts at the top edge",
+                      "Right of the thick black vertical: red begins here",
+                      "Red fills the upper two thirds: the weight sits in its middle",
+                      "The centre of the red, right of centre because it touches the right edge"
+                ],
+                "note": "ピート・モンドリアンが 1930 年に描いた油彩（チューリヒ美術館）。黒い直線で画面を割り、赤・青・黄の三原色と白だけで組む「新造形主義」の代表作です。大きな赤い面を右上に置き、小さな青と黄で釣り合いを取ります。",
+                "notee": "Oil on canvas by Piet Mondrian, 1930 (Kunsthaus Zurich). Black straight lines divide the plane, and only the three primaries and white fill it: the emblem of Neoplasticism. A large red plane sits top right, balanced by a small blue and a small yellow.",
+                "obj": "赤い面",
+                "obje": "red plane"
+          }
+    ]/*/BOARDS*/;
+    var listEl = null, modeEl = null, lastAvg = null;
+    var ORD = ['一枚目', '二枚目', '三枚目'], ORDE = ['first', 'second', 'third'], PC = '<small class="gm-pc">%</small>';   /* 数字はすべて外郭を 100 とした％ */
+    var gm = null, stage, picEl, linesEl, liveEl, readEl, tipEl, stepEl, resEl, goEl, cardEl, sheetEl, dimEl, drv, drh, introEl, iscroll, introSeen = false, introOn = false;
+    var pend = null, startedAt = 0, doneFn = null, picks = [], bi = 0, ti = 0, res = [], live = -1, state = 'idle', down = false, fresh = false, moved = 0, downX = 0, downY = 0, fixedAt = 0, offT = 0, lastFocus = null, first = true;
+    var ptype = window.matchMedia('(hover:none),(pointer:coarse)').matches ? 'touch' : 'mouse';   /* 最初の触れ方が分かるまでの仮の見立て */
+    var rm = document.documentElement.classList.contains('rm');
+    function el(t, c, html){ var e = document.createElement(t); if(c) e.className = c; if(html != null) e.innerHTML = html; return e; }
+    function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function sg(n){ return (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n); }
+    /* 目立たせる見出しは本編と同じ組み——漢字・カタカナはゴシック、かなは明朝（mixSet）、句読点は朱、強調語は一回り大きく。EN は混植を解く */
+    /* 見出しの折り返しは文節の切れ目だけ：読点・空白の後ろと、助詞（を・は・が・に・で・と・へ・より・から）の後ろで区切り、各文節を inline-block に。
+       一文字だけが次の行に落ちる、といった半端な折り返しをなくす（小坂さんの指示）。助詞の後ろは、次が漢字・カタカナのときだけ切る */
+    function phrases(s){
+      var out = [], cur = '';
+      for(var i = 0; i < s.length; i++){
+        var ch = s[i], nx = s[i + 1] || ''; cur += ch;
+        if(!nx) break;
+        var close = /[、。」』）%％]/.test(nx), kata = /[一-龥々〆ヵヶァ-ヴー]/.test(nx);
+        var brk = (/[、。 ]/.test(ch) && !close) || (/[をはがにでとへ]/.test(ch) && kata && cur.length >= 2) || (/(より|から)$/.test(cur) && kata);
+        if(brk){ out.push(cur); cur = ''; }
+      }
+      if(cur) out.push(cur); return out;
+    }
+    function mix(ja, en, big){
+      var out = el('span', 'mx');
+      if(document.documentElement.lang === 'en' || typeof mixSet !== 'function'){ out.textContent = document.documentElement.lang === 'en' ? en : ja; return out.outerHTML; }
+      ja = ja.replace(/\u3000/g, ' ');
+      phrases(ja).forEach(function(ph){
+        var w = el('span', 'ph'), i = big ? ph.indexOf(big) : -1, parts = i >= 0 ? [ph.slice(0, i), big, ph.slice(i + big.length)] : [ph];
+        parts.forEach(function(pt, k){ if(!pt) return; var sp = el('span', i >= 0 && k === 1 ? 'big' : ''); sp.textContent = pt; mixSet(sp); w.appendChild(sp); });
+        out.appendChild(w);
+      });
+      return out.outerHTML;
+    }
+    /* 本文：日本語は文節ごとに折る（語の途中で改行しない）。英語はそのまま */
+    function body(t){ if(document.documentElement.lang === 'en') return esc(t); return phrases(t).map(function(ph){ return '<span class="ph">' + esc(ph) + '</span>'; }).join(''); }
+    /* 作品名：作者と『題』のあいだでだけ折る */
+    function ttl(b){
+      var t = L(b.t, b.te); if(document.documentElement.lang === 'en') return esc(t);
+      var i = t.indexOf('『'); return i > 0 ? '<span class="ph">' + esc(t.slice(0, i)) + '</span><span class="ph">' + esc(t.slice(i)) + '</span>' : esc(t);
+    }
+    function picOf(b){
+      var im = document.createElement('img'); im.className = 'gm-img'; im.alt = ''; im.draggable = false; im.decoding = 'async';
+      im.addEventListener('load', function(){ if(im.naturalWidth && im.naturalHeight && picEl.contains(im)) stage.style.setProperty('--ar', (im.naturalWidth / im.naturalHeight).toFixed(3)); });
+      im.src = b.img; return im;
+    }
+    function preload(list){ list.forEach(function(b){ var im = new Image(); im.src = b.img; if(im.decode) im.decode().catch(function(){}); }); }   /* 始める前に読み込み・デコードしておく */
+    /* 線は HTML の要素で引く（SVG を縦横比なしに伸ばすと文字まで伸びる） */
+    function mkLine(host, ax, p, cls, label){
+      var d = el('i', 'gm-ln ' + ax + (cls ? ' ' + cls : '') + (+p > 86 ? ' edge' : ''));   /* v400: 端に近い線の札は内側へ（見切れない） */
+      d.style[ax === 'v' ? 'left' : 'top'] = (+p).toFixed(2) + '%';
+      if(label != null){ var b = el('b'); b.textContent = label; d.appendChild(b); }
+      host.appendChild(d); return d;
+    }
+    function ruler(host, n){ for(var i = 0; i <= 10; i++){ var t = el('i', i % 5 ? '' : 'big'); t.style[n === 'v' ? 'left' : 'top'] = (i * 10) + '%'; host.appendChild(t); } }
+    /* 盤面の高さの上限は、欄（.gm-sw）の実寸から。vh／svh は iOS の帯ぶん小さく評価され、盤面が画面の四割ほどにしかならなかった */
+    function fit(){
+      if(!gm || gm.hidden) return; var sw = gm.querySelector('.gm-sw'), r = sw.getBoundingClientRect(), rs = gm.querySelector('.gm-side').getBoundingClientRect();
+      hdFit(); tbFit();
+      if(r.height > 0 && rs.left >= r.left + r.width - 2) stage.style.setProperty('--sh', Math.max(120, Math.round(r.height - 22 - (rot ? 26 : 0))) + 'px');   /* 回した絵では下に目盛りが来るぶん低く */   /* 右欄が横に並ぶ二列のときだけ。一列（タブレット縦）では欄の高さが盤面から決まるので CSS の上限に任せる */
+      else stage.style.removeProperty('--sh');
+    }
+    /* 線の役割の小さな図：枠＝外郭、丸い塊＝主塊、朱＝その線（開始線は塊の縁、重心線は塊の中心を通る） */
+    function pict(k, cls){
+      var s = '<svg class="gm-pi' + (cls ? ' ' + cls : '') + '" viewBox="0 0 34 26" aria-hidden="true"><rect x="1" y="1" width="32" height="24"/><path class="m" d="M11 8 C14 5 22 5 25 8 C28 11 28 17 25 20 C22 23 14 23 11 20 C8 17 8 11 11 8Z"/>';
+      if(k === 'y1') s += '<line class="a" x1="1" y1="6" x2="33" y2="6"/>';
+      else if(k === 'x1') s += '<line class="a" x1="9" y1="1" x2="9" y2="25"/>';
+      else if(k === 'y2') s += '<line class="a" x1="1" y1="14" x2="33" y2="14"/><circle class="a" cx="18" cy="14" r="2.2"/>';
+      else s += '<line class="a" x1="18" y1="1" x2="18" y2="25"/><circle class="a" cx="18" cy="14" r="2.2"/>';
+      return s + '</svg>';
+    }
+    /* 注釈：手番の始まりに、盤面の左上へ「この線の役割」を一時的に出す（用語をいきなり見せない）。押せば消え、見出しの ? で呼び戻せる */
+    var bandEl = null, helpT = 0, trayEl = null;
+    function trayReset(){
+      trayEl.innerHTML = 'ABC'.split('').map(function(c, i){ var b = picks[i]; return '<i class="gm-slot"><b>' + c + '</b>' + (b ? '<div class="gm-mini pre" style="--ar:' + b.ar + '"><img src="' + b.img + '" alt="" draggable="false"></div>' : '') + '</i>'; }).join('');   /* 三枚を最初から薄く見せる（手本から）：三枚で一巡だと分かる */
+    }
+    /* 右の列の四本の一覧：番号・図・名前・向き・値。いまの線は朱、押している最中は値が動く（手本から） */
+    function listBuild(){ if(!listEl) return; listEl.innerHTML = LINES.map(function(t, i){ return '<li data-k="' + t.k + '"><span class="n">' + (i + 1) + '</span>' + pict(t.k) + '<b>' + esc(L(t.n, t.ne)) + '<small>' + esc(L(t.dir, t.dire)) + '</small><button class="gm-q" type="button" aria-label="' + L('この線の役割', 'What this line means') + '">?</button></b><em>\u00b7</em></li>'; }).join(''); listEl.hidden = false;
+      listEl.querySelectorAll('.gm-q').forEach(function(q, i){ q.addEventListener('click', function(){ help(LINES[i], true); }); }); }
+    function listState(){ if(!listEl) return; var r = res[bi] || {}; LINES.forEach(function(t, i){ var li = listEl.children[i]; if(!li) return; li.className = (i === ti && state !== 'done' ? 'on' : '') + (r[t.k] != null ? ' done' : ''); li.querySelector('em').innerHTML = r[t.k] != null ? r[t.k] + PC : '\u00b7'; }); }
+    function listLive(p){ if(!listEl) return; var li = listEl.children[ti]; if(li) li.querySelector('em').innerHTML = Math.round(p) + PC; }
+    function mode(t){ if(modeEl) modeEl.textContent = t; }
+    function cnt(n){ return (n < 10 ? '0' : '') + n + ' / 12'; }
+    function trayFill(i){
+      var b = picks[i], r = res[i], slot = trayEl.children[i]; if(!slot || !r || slot.classList.contains('on')) return;
+      var pre = slot.querySelector('.gm-mini.pre'); if(pre) pre.parentNode.removeChild(pre);
+      var m = el('div', 'gm-mini'); m.style.setProperty('--ar', b.ar); var im = document.createElement('img'); im.src = b.img; im.alt = ''; im.draggable = false; m.appendChild(im);
+      LINES.forEach(function(t){ if(r[t.k] != null) mkLine(m, t.ax, r[t.k], 'you'); });
+      slot.appendChild(m); slot.classList.add('on');
+    }
+    /* 帯（標識）：画面の上端に朱の帯で「この線の役割」を出す。絵やグリッドの上には出さない。一枚目の各手番で自動、? で呼び戻し。押下で消える */
+    function help(t, hold){
+      clearTimeout(helpT);
+      bandEl.innerHTML = pict(t.k) + '<b>' + esc(L(t.n, t.ne)) + '<small>' + esc(L(t.dir, t.dire)) + '</small></b><span>' + esc(L(t.h, t.he)) + '</span>';
+      var hd = gm.querySelector('.gm-hd').getBoundingClientRect(), g = gm.getBoundingClientRect(); bandEl.style.minHeight = Math.round(hd.bottom - g.top) + 'px';   /* ヘッダーの帯をちょうど覆う高さ（題字が半分だけ覗かない） */
+      bandEl.classList.add('on'); retint(80);
+      helpT = setTimeout(helpOff, hold ? 5200 : 4400);
+    }
+    function helpOff(){ clearTimeout(helpT); if(bandEl && bandEl.classList.contains('on')){ bandEl.classList.remove('on'); retint(480); setTimeout(function(){ if(!bandEl.classList.contains('on') && window.__retint) window.__retint(); }, 1000); } }   /* 二度採り直す（一度目が帯の去り際に当たると薄い朱が残る） */
+    /* iOS 26 の Safari は画面の端の固定要素の色をツールバーに写す。帯が出入りしたら、本編と同じ仕掛けで色を採り直させる（帯が引っ込んでも朱が残らないように） */
+    var retintT = 0;
+    function retint(ms){ if(!window.__retint) return; clearTimeout(retintT); retintT = setTimeout(function(){ window.__retint(); }, ms || 0); }
+    /* 判が押される（小坂さんの指示）：一枚測り終えたら盤面の右下（落款の位置）に「壱／弐／参」、平均が出たら中央に「平均」、紙面には「骨格」。
+       本編の感謝の印と同じ押し方——少し大きく傾いて降り、紙に当たって僅かに沈み、輪がひとつ広がる。一拍おいて、紙から離れるように退場 */
+    var sealT = 0, ringT = 0, lastX = -1, lastY = -1, ringHold = null;
+    function ringText(txt){ if(ringHold){ var tp = ringHold.querySelector('textPath'); if(tp) tp.textContent = txt; } }
+    /* 触れているあいだ、カーソルに付いて回る輪（案内の矢印ボタン）。本編の「画面下部へ移動します」の吸い付きと同じ言葉づかい */
+    function cringHold(txt){
+      if(ptype === 'touch' || rm) return; cringOff(true);
+      var r = cring(txt); if(!r) return; clearTimeout(ringT); r.classList.add('hold'); ringHold = r;
+    }
+    function cringOff(now){ var r = ringHold; ringHold = null; if(!r) return; if(now){ if(r.parentNode) r.parentNode.removeChild(r); return; } r.classList.add('bye'); setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); }, 450); }
+    function cring(txt){
+      if(ptype === 'touch' || rm || lastX < 0) return;
+      var old = gm.querySelector('.gm-cring'); if(old && old.parentNode) old.parentNode.removeChild(old); clearTimeout(ringT);
+      var r = el('i', 'gm-cring'), id = 'gmcr' + (Date.now() % 100000);
+      var t0 = txt; while(txt.length < 40) txt += t0;   /* 輪を一周ぶん埋める（短い文は繰り返す） */
+      r.innerHTML = '<svg viewBox="0 0 140 140" aria-hidden="true"><defs><path id="' + id + '" d="M70,70 m-54,0 a54,54 0 1,1 108,0 a54,54 0 1,1 -108,0"/></defs>' +
+        '<circle cx="70" cy="70" r="66" fill="none" stroke="var(--acc)" stroke-width="2.6"/><circle cx="70" cy="70" r="40" fill="none" stroke="var(--acc)" stroke-width="1" opacity=".5"/>' +
+        '<text font-family="var(--mono)" font-size="9.5" letter-spacing="2.2" fill="var(--acc)"><textPath href="#' + id + '" startOffset="0">' + esc(txt) + '</textPath></text></svg>';
+      r.style.left = lastX + 'px'; r.style.top = lastY + 'px';
+      (introOn ? introEl : gm).appendChild(r); void r.offsetWidth; r.classList.add('on');   /* 案内の上では案内の色（地に合わせた --acc）で */
+      ringT = setTimeout(function(){ r.classList.add('bye'); setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); }, 450); }, 1500);
+      return r;
+    }
+    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 650, 300], tr:[420, 1400, 300]};   /* 押印・滞在・退場（ms） */
+    function seal(en, jp, host, pos){
+      sealOff(true);
+      var sp = el('span', 'gm-seal ' + (pos || 'corner')), tm = SEALT[pos] || SEALT.corner; sp.setAttribute('aria-hidden', 'true');
+      sp.style.setProperty('--sp', tm[0] + 'ms'); sp.style.setProperty('--sb', tm[2] + 'ms');
+      var sv = null;
+      try{ if(typeof kakuSvg === 'function') sv = kakuSvg(en, jp, 40 + (Date.now() % 50)); }catch(x){ sv = null; }
+      if(!sv){ sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('viewBox', '0 0 156 156'); sv.innerHTML = '<rect x="9" y="9" width="138" height="138" rx="12" fill="none" stroke="var(--acc)" stroke-width="4.2"/><text x="78" y="94" text-anchor="middle" font-family="var(--sans)" font-size="26" font-weight="700" fill="var(--acc)">' + esc(jp) + '</text>'; }
+      sp.appendChild(sv); sp.appendChild(el('i', 'gm-sring'));
+      host.appendChild(sp); void sp.offsetWidth; sp.classList.add('on');
+      sealT = setTimeout(function(){ if(pos === 'center' && !rm) sealPark(sp); else sealOff(false); }, tm[0] + tm[1]);
+      return sp;
+    }
+    /* v389: 平均の判は消さず、盤面の右下へ小さく寄せて残す（小坂さん：判が見えない・消えている） */
+    function sealPark(sp){
+      if(!sp || !sp.parentNode || !stage) return;
+      var r = stage.getBoundingClientRect(), w = sp.offsetWidth, h = sp.offsetHeight, k = .5;
+      var dx = r.width / 2 - w * k / 2 - Math.max(8, r.width * .02), dy = r.height / 2 - h * k / 2 - Math.max(8, r.height * .03);
+      sp.classList.add('park'); sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(' + k + ')';
+    }
+    function sealOff(now){
+      clearTimeout(sealT); if(!gm) return;
+      gm.querySelectorAll('.gm-seal').forEach(function(x){
+        if(now || rm || x.classList.contains('bye')){ if(now || rm){ if(x.parentNode) x.parentNode.removeChild(x); } return; }
+        x.classList.add('bye'); setTimeout(function(){ if(x.parentNode) x.parentNode.removeChild(x); }, 420);
+      });
+    }
+    function inside(e){ var r = stage.getBoundingClientRect(); return e.clientX >= r.left - 1 && e.clientX <= r.right + 1 && e.clientY >= r.top - 1 && e.clientY <= r.bottom + 1; }
+    function build(){
+      if(gm) return;
+      gm = el('div', 'gm'); gm.id = 'gm'; gm.setAttribute('role', 'dialog'); gm.setAttribute('aria-modal', 'true'); gm.setAttribute('aria-label', '絵を、測る。'); gm.hidden = true;
+      gm.innerHTML =
+        '<div class="gm-in">' +
+          '<div class="gm-band" role="status" aria-live="polite"></div>' +
+          '<div class="gm-hd"><b class="gm-ttl"></b><span class="gm-sub"></span><button class="gm-i" type="button" aria-label="この絵と線について">i</button><button class="gm-x" type="button" aria-label="閉じる">×</button></div>' +
+          '<div class="gm-body">' +
+            '<div class="gm-sw"><div class="gm-stage" tabindex="0" role="application" aria-label="盤面">' +
+              '<div class="gm-turn">' +
+              '<div class="gm-pic"></div><i class="gm-axis v"></i><i class="gm-axis h"></i>' +
+              '<div class="gm-rt"><span>0</span><span>50</span><span>100</span></div><div class="gm-rl"><span>0</span><span>50</span><span>100</span></div><i class="gm-axl h"></i><i class="gm-axl v"></i>' +
+              '<i class="gm-dimr v"></i><i class="gm-dimr h"></i>' +
+              '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
+              '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' +
+            '</div></div>' +
+            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-btns"></div></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-iskip" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
+        '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
+          '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
+          '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
+      document.body.appendChild(gm);
+      stage = gm.querySelector('.gm-stage'); picEl = gm.querySelector('.gm-pic'); linesEl = gm.querySelector('.gm-lines');
+      liveEl = gm.querySelector('.gm-live'); readEl = gm.querySelector('.gm-read'); bandEl = gm.querySelector('.gm-band'); tipEl = gm.querySelector('.gm-tip'); dimEl = gm.querySelector('.gm-dim');
+      drv = gm.querySelector('.gm-dimr.v'); drh = gm.querySelector('.gm-dimr.h');
+      stepEl = gm.querySelector('.gm-step'); resEl = gm.querySelector('.gm-res'); goEl = gm.querySelector('.gm-btns'); listEl = gm.querySelector('.gm-list'); modeEl = gm.querySelector('.gm-mode');
+      cardEl = gm.querySelector('.gm-card'); try{ gm.querySelector('.gm-sheet').inert = true; }catch(x){} trayEl = gm.querySelector('.gm-tray'); sheetEl = gm.querySelector('.gm-sheet'); introEl = gm.querySelector('.gm-intro'); iscroll = gm.querySelector('.gm-iscroll');
+      iscroll.addEventListener('scroll', introScroll, {passive:true});
+      gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* スキップは「絵を選ぶ」の画面へ */
+      gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1); });
+      gm.querySelector('.gm-ix').addEventListener('click', close);
+      gm.querySelector('.gm-idots').addEventListener('click', function(e){ var i = Array.prototype.indexOf.call(e.currentTarget.children, e.target); if(i >= 0) introTo(i); });
+      iscroll.addEventListener('keydown', introKey);
+      ruler(gm.querySelector('.gm-rt'), 'v'); ruler(gm.querySelector('.gm-rl'), 'h');
+      gm.querySelector('.gm-x').addEventListener('click', close);
+      gm.querySelector('.gm-i').addEventListener('click', function(){ if(infoEl && infoEl.classList.contains('on')) infoOff(); else info(); });
+      /* 押したときの応答：どのボタンも一瞬わずかに沈んで戻る（0.18 秒）。動きを控える設定では出さない */
+      gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots i') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
+      turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb');
+      tbEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path class="r2" d="M10 14H23V21H10"/><path class="r1" d="M10 14V8H3V21H10"/><path class="rm" d="M10 14V21"/><path class="a" d="M7 4.6A12 12 0 0 1 19 10.9M15.6 9.9 19 10.9 20 7.5"/><path class="a2" d="M19 10.9A12 12 0 0 0 7 4.6M9.6 2.2 7 4.6 9.4 7.2"/></svg><span></span>';   /* v390: Astra の C 案「角をそろえる」（縦 7×13 と横 13×7 が角を共有、Material の rotate_90_degrees_cw の弧）。押した後は横が濃くなり、矢印が戻る向きに */   /* v388: 縦の絵（濃）が横（淡）になる、時計回りの矢印。写真アプリの「回転」と SF の rectangle.portrait.rotate の折衷。文字も添える */
+      tbEl.addEventListener('click', function(){ turnPic(!rot); }); tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+      tbEl.addEventListener('pointerenter', function(e){ if(e.pointerType === 'touch') return; lastX = e.clientX; lastY = e.clientY; cringHold(rot ? L('縦に戻す \u00b7 TURN BACK \u00b7 ', 'TURN BACK \u00b7 ') : L('絵を横にして、大きく \u00b7 TURN \u00b7 ', 'TURN THE PICTURE \u00b7 ')); });
+      tbEl.addEventListener('pointerleave', function(){ cringOff(false); });
+      tbLabel();
+      gm.querySelector('.gm-sx').addEventListener('click', sheetOff);
+      sheetEl.querySelectorAll('.gm-swk button').forEach(function(b){ b.addEventListener('click', function(){ sheetGrid(b.getAttribute('data-g')); }); });
+      /* 応答の五状態。なぞる：線が遅れなく追従／押す：端点が応える／離す：その位置で確定／比べる：わたしの線と寸法が残る／次へ：次の押下で次の手番 */
+      gm.addEventListener('pointermove', function(e){ if(e.pointerType !== 'touch'){ lastX = e.clientX; lastY = e.clientY; if(ringHold){ ringHold.style.left = lastX + 'px'; ringHold.style.top = lastY + 'px'; } } }, {passive:true});
+      var igo = gm.querySelector('.gm-igo');
+      igo.addEventListener('pointerenter', function(e){ if(e.pointerType === 'touch') return; lastX = e.clientX; lastY = e.clientY; var last = introAt() === ISECS.length - 1; cringHold(last ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 ')); });
+      igo.addEventListener('pointerleave', function(){ cringOff(false); });
+      stage.addEventListener('pointerdown', function(e){
+        if(demoEl){ demoDone = true; demoOff(); }
+        if(e.button != null && e.button !== 0) return;
+        if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } return; }   /* v416: 二本目の指は線にしない（ピンチ） */
+        if(e.target && e.target.closest && e.target.closest('.gm-turnb')) return;   /* 回すボタンの押下は線にしない */
+        if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
+        if(stage.classList.contains('swapping') || performance.now() - boardAt < 700) return;   /* 作品の切替中の押下も線にしない */
+        ptype = e.pointerType || 'mouse';
+        if(state === 'compare'){ if(performance.now() - fixedAt < 350) return; nextTurn(); fresh = true; startedAt = performance.now() + 100; pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v417: そのまま動いたら次の線にする（pend） */   /* v416: 進めた直後 500ms の押下は線にしない（ダブルタップ） */   /* v403: 進めるための押下はここで終わり。同じ押下で仮の線を出さない（離すまで「押している」が残っていた） */
+        else if(state === 'done'){ if(performance.now() - fixedAt < 350) return; if(doneFn) doneFn(); fresh = true; startedAt = performance.now() + 100; return; }
+        else fresh = false;
+        if(state !== 'trace') return;
+        if(performance.now() - startedAt < 400){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v421: 守りの窓でも、動いたら線にする（叩くだけは無視） */
+        down = true; moved = 0; downX = e.clientX; downY = e.clientY;
+        try{ stage.setPointerCapture(e.pointerId); }catch(x){}
+        liveEl.classList.add('press'); move(e);
+        if(bi === 0 && ti === 0 && !lcapDone && !rot){ var lc0 = el('i', 'gm-lcap'); lc0.textContent = L('離すと、ここに線が引かれます', 'Release to place the line'); liveEl.appendChild(lc0); liveEl.appendChild(el('i', 'gm-ldot')); }   /* v408: 手本の円を、押している間の線の中心にも */   /* v405: 一本目は、押している間だけ線に付いて回る一言（小坂さんの案） */
+      });
+      stage.addEventListener('pointermove', function(e){
+        if(e.pointerType) ptype = e.pointerType;
+        if(state !== 'trace') return;
+        if(pend && !down && e.pointerId === pend.id){ var pdx = e.clientX - pend.x, pdy = e.clientY - pend.y; if(pdx * pdx + pdy * pdy > 64){ pend = null; startedAt = 0; fresh = false; if(e.pointerType !== 'touch'){ try{ stage.setPointerCapture(e.pointerId); }catch(x){} } down = true; moved = 0; downX = e.clientX; downY = e.clientY; liveEl.classList.add('press'); } }   /* v423: 指はすでに絵が暗黙に捕まえている。ここで捕まえ直すと lostpointercapture が出て、なぞりが殺されていた（実機の記録で判明） */   /* v417: 進めるための押下がそのまま動いたら、その指で次の線を引き始める（実機で一回目のドラッグが消えていた） */
+        if(down){ moved = Math.max(moved, Math.abs(e.clientX - downX) + Math.abs(e.clientY - downY)); if(moved > 6) helpOff(); }   /* なぞり始めたら帯は引っ込める */
+        if(ptype === 'touch' && !down) return;
+        move(e);
+      });
+      var lcapDone = false;
+      function up(e, ok){
+        pend = null;
+        var lc = liveEl.querySelector('.gm-lcap'); if(lc){ lc.parentNode.removeChild(lc); lcapDone = true; } var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld);
+        if(!down) return; down = false; liveEl.classList.remove('press');
+        if(!ok || state !== 'trace') return;
+        if(fresh && moved < 6){ fresh = false; return; }   /* 「次へ」のための一押しは、そのまま離しても確定しない */
+        fresh = false; move(e); confirm();   /* 画像の外で離しても、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
+      }
+      stage.addEventListener('pointerup', function(e){ up(e, true); });
+      var tmY = null; gm.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true});
+      gm.addEventListener('touchmove', function(e){ if(!docMode || introOn) return; var sc = e.target && e.target.closest ? e.target.closest('.gm-side, .gm-iscroll, .gm-info-in, .gm-take-in, .gm-sheet') : null;
+        if(sc){ var y = e.touches[0] ? e.touches[0].clientY : tmY, dy = (tmY === null || y === null) ? 0 : y - tmY; tmY = y;   /* v398: 列の端で引いても紙面へ伝えない（帯が戻り、本編が見える） */
+          if(sc.classList.contains('gm-side') || sc.classList.contains('gm-info-in')){ var atTop = sc.scrollTop <= 0, atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1; if((atTop && dy > 0) || (atEnd && dy < 0) || sc.scrollHeight <= sc.clientHeight + 1) e.preventDefault(); }
+          return; }
+        e.preventDefault(); }, {passive:false});   /* v391: 盤面の間、指で紙面が動かないように */
+      stage.addEventListener('pointercancel', function(e){ up(e, false); if(state === 'trace') tipEl.classList.remove('off'); });
+      stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } });
+      stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); });   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
+      stage.addEventListener('keydown', function(e){
+        var k = e.key;
+        if(k === ' ' || k === 'Enter'){ if(state === 'compare') nextTurn(); else if(state === 'done' && doneFn) doneFn(); else if(state === 'trace' && live >= 0) confirm(); e.preventDefault(); return; }
+        if(state !== 'trace') return;
+        var st = e.shiftKey ? 5 : 1, t = LINES[ti];
+        if(k === 'ArrowLeft' || k === 'ArrowUp'){ setLive(Math.max(0, (live < 0 ? 50 : live) - st)); e.preventDefault(); }
+        else if(k === 'ArrowRight' || k === 'ArrowDown'){ setLive(Math.min(100, (live < 0 ? 50 : live) + st)); e.preventDefault(); }
+        else if(t && ((t.ax === 'v' && (k === 'ArrowUp' || k === 'ArrowDown')) || (t.ax === 'h' && (k === 'ArrowLeft' || k === 'ArrowRight')))) e.preventDefault();
+      });
+      window.addEventListener('resize', function(){ setTimeout(function(){ if(stage) stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 0); });
+      window.addEventListener('resize', fit); window.addEventListener('resize', function(){ setTimeout(moreMark, 80); }); (function(){ var sc = gm.querySelector('.gm-side'); if(sc){ sc.addEventListener('scroll', moreMark, {passive:true}); if(window.MutationObserver) new MutationObserver(function(){ setTimeout(moreMark, 60); setTimeout(moreMark, 700); }).observe(sc, {childList:true, subtree:true}); } })();   /* v420: 列の下端に続きの印 */ window.addEventListener('resize', function(){ if(introOn){ ibgBuild(); introBg(); } else if(state === 'compare' || state === 'done'){ setTimeout(reveal, 60); } });   /* v409: 帯の出入りで高さが変わってもボタンを見せる（想定外係 #3） */ window.addEventListener('orientationchange', function(){ setTimeout(fit, 80); setTimeout(fit, 400); });
+      if(window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+      document.addEventListener('click', function(e){   /* 遊びの最中にメニューの判（章・制作・プロフィール・連絡）を押したら、遊びを閉じてそこへ */
+        if(!gm || gm.hidden) return; var a = e.target && e.target.closest ? e.target.closest('.menu a[href]') : null;
+        if(a && !a.classList.contains('mgame')) close();
+      }, true);
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && gm && !gm.hidden){ if(infoEl && infoEl.classList.contains('on')) infoOff(); else if(takeEl && takeEl.classList.contains('on')) takeOff(); else if(gm.classList.contains('sheeton')) sheetOff(); else if(!introOn && state !== 'idle'){ /* v416: 途中の結果を Escape で捨てない（× で閉じる） */ } else close(); } });
+    }
+    /* ===== 案内：本編の MESSAGE 章と同じ「スクロールで一文ずつ現れる」形。四つの画面、右上にスキップ、最後に「はじめる」。
+       下の丸は TOP と同じスクロールの促し。左の点は進み具合。↓／Space で次の一文、Enter で開始、Esc で閉じる ===== */
+    var ISECS_ALL = [   /* 案内四面＋選択一面（Sol 第 11 ラウンドの構成）。v393 からは選ぶ一面だけを出す（小坂さんの指示）。iPhone は帯を畳むための起こし一面を前に置く */
+      {at:0,   big:'四本',   ja:['三枚の絵に、四本ずつ。',   '一枚に四本ずつ、三枚で十二本の線を引きます。二分ほどで、あなたの平均グリッドができます。'],
+                          en:['Four lines on each of three pictures.', 'You draw four lines on each picture, twelve in all. In about two minutes, your average grid is ready.']},
+      {at:.22, big:'主塊',   ja:['主塊を、見つける。',       '私は、絵の中でいちばん大きなまとまりを主塊と呼びます。その始まりと重心に、よこ・たての線を一本ずつ引きます。'],
+                          en:['Find the main mass.',        'I call the largest mass in a picture the main mass. You draw one line across and one down where it begins, and again at its centre of weight.']},
+      {at:.44, big:'位置',   ja:['絵の端から、位置を測る。', '線を引くと、私が同じ絵に引いた線が破線で現れます。絵の幅と高さを 100 として、あなたと私の位置と差を百分率で比べます。'],
+                          en:['Measure from the edge.',     'When you set a line, mine appears dashed on the same picture. With the width and height as 100, your position, mine, and the difference are read in percent.']},
+      {at:.66, big:'四本',   ja:['十二本を、四本にまとめる。', '三枚を測り終えると、同じ役割の三本が一本にまとまります。できた四本を、研究で得た骨格と重ねます。'],
+                          en:['Twelve lines become four.',  'After the third picture, the three lines of each role merge into one. Your four lines are then laid over the grid from my research.']},
+      {at:.88, big:'絵',     ja:['測る絵を、選ぶ。',         '研究で測った日本と海外の絵には、主塊の位置や間の取り方に違いがありました。測る絵を選ぶと三枚が無作為に出て、最後に二つの骨格を比べられます。'],
+                          en:['Choose the pictures.',       'In my research, Japanese and Western pictures placed the main mass and the empty space differently. Choose which to measure; three pictures are drawn at random, and the two grids are compared at the end.'], choice:true}
+    ];
+    var ISECS = [];
+    function isecsFor(){
+      var title = {k:4, at:0, title:true, big:'測る', ja:['絵を、測る。', ''], en:['Measure the picture.', '']};
+      var IK = ['<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6" height="12"/><rect x="9" y="6" width="6" height="12"/><rect x="16" y="6" width="6" height="12"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 12h18"/><circle class="d" cx="12" cy="12" r="2.6"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 10h18"/><path class="m" d="M3 15h18"/><text x="12" y="20.5" text-anchor="middle" font-size="7" font-weight="700">%</text></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M8 4v16M15 4v16M3 9h18M3 15h18"/></svg>'];
+      function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
+      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 1) + il('一本引くたびに、私の線が現れ、ずれが％で出ます。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>研究の骨格と重ねて見比べられます。', 3) + '</ul><p class="gm-ick">測る絵を選ぶ　　くわしくは右上の「遊び方」から</p>';
+      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>then release to place a line.', 1) + il('Each time you draw a line, mine appears on the same picture and the gap is shown in percent.', 2) + il('After twelve lines your average grid is ready. Lay it over the research grid and compare.', 3) + '</ul><p class="gm-ick">Choose the pictures　　details under How to play, top right</p>';
+      var choice = {k:0, at:1, html:true, choice:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
+      return [title, choice];
+    }
+    var cat = 'both';   /* 日本／海外／両方（小坂さんの指示）。最後に二つの骨格の違いも見せる */
+    /* 分析カテゴリ：研究で「作品全体をどんな構図として捉えるか」を七つに分けたもの。遊びでは各絵に一つ */
+    var CATS = [
+      ['主塊と余白面', 'Mass and void', '一つの大きなまとまりと、その周りの余白の面で画面が決まる構図。', 'One large mass and the empty area around it decide the picture.'],
+      ['前景フレームと奥行き', 'Foreground frame and depth', '手前の大きなもの（枝・窓・人物）が枠になり、その向こうに遠景を見せる構図。', 'A large near object, a branch, a window, a figure, frames the far view behind it.'],
+      ['対置と中間領域', 'Opposition and the middle ground', '二つのまとまりが向かい合い、そのあいだの空きが主役になる構図。', 'Two masses face each other and the gap between them becomes the subject.'],
+      ['反復と変奏', 'Repetition and variation', '同じ形が繰り返され、少しずつ変わることでリズムが生まれる構図。', 'A shape repeats with small changes, and the changes make the rhythm.'],
+      ['水平分節と上下構成', 'Horizontal division, upper and lower', '画面が横の帯に分かれ、上と下の重さの違いで成り立つ構図。', 'The picture splits into horizontal bands, balanced by the different weights of top and bottom.'],
+      ['密度差と空間の抜け', 'Density contrast and open space', '濃い所と薄い所の差と、何も描かない抜けで奥行きをつくる構図。', 'Depth comes from the contrast of dense and sparse, and from the untouched open space.'],
+      ['垂直反復と高低差', 'Vertical repetition and height', '縦の要素の繰り返しと高さの差で画面を立たせる構図。', 'Vertical elements repeat at different heights and hold the picture upright.']
+    ];
+    function catDef(name){ for(var i = 0; i < CATS.length; i++){ if(CATS[i][0] === name) return CATS[i]; } return null; }
+    function isecHTML(sx){
+      var hj = sx.ja[0].split('|'), he = sx.en[0].split('|');
+      return '<b>' + hj.map(function(t, k){ return '<u>' + mix(t, he[k] || (k === 0 ? sx.en[0] : ''), sx.big) + '</u>'; }).join('') + '</b><span>' + (sx.html ? L(sx.ja[1], sx.en[1]) : body(L(sx.ja[1], sx.en[1]))) + '</span>' +
+        (sx.choice ? '<div class="gm-ichoice"><button type="button" data-c="jp">' + L('日本の絵', 'Japanese') + '</button><button type="button" data-c="we">' + L('海外の絵', 'Western') + '</button><button type="button" data-c="both">' + L('両方', 'Both') + '</button></div>' : '');
+    }
+    function bindChoice(d){ d.querySelectorAll('.gm-ichoice button').forEach(function(bt){ bt.addEventListener('click', function(){ cat = bt.getAttribute('data-c'); var fs = introEl.querySelectorAll('.gm-ibg.b4 .jf'); fs.forEach(function(f){ if(cat === 'both' || (cat === 'jp' && f.classList.contains('l')) || (cat === 'we' && f.classList.contains('r'))) f.classList.add('pick'); }); if(rm) introEnd(false); else setTimeout(function(){ introEnd(false); }, 110); }); }); }   /* 選んだ側の枠が一瞬濃くなってから去る（応答） */
+    function jwMeans(){ var g = {jp:{}, we:{}}; ['jp', 'we'].forEach(function(k){ var bs = BOARDS.filter(function(b){ return k === 'jp' ? !!b.jp : !b.jp; }); LINES.forEach(function(t){ var sum = 0; bs.forEach(function(b){ sum += b.a[t.k]; }); g[k][t.k] = bs.length ? Math.round(sum / bs.length) : 0; }); }); return g; }
+    function jwTable(){ var g = jwMeans(); return '<table class="gm-tb gm-jwt"><thead><tr><th>' + L('線', 'line') + '</th><th>' + L('日本', 'Japan') + '</th><th>' + L('海外', 'West') + '</th><th>' + L('差', 'diff') + '</th></tr></thead><tbody>' + LINES.map(function(t){ return '<tr><td>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</td><td>' + g.jp[t.k] + PC + '</td><td>' + g.we[t.k] + PC + '</td><td>' + sg(g.we[t.k] - g.jp[t.k]) + PC + '</td></tr>'; }).join('') + '</tbody></table>'; }
+    function jwOverlay(){
+      var b = resEl.querySelector('.gm-jwb'); if(!b) return; var on = b.getAttribute('aria-pressed') === 'true'; b.setAttribute('aria-pressed', on ? 'false' : 'true');
+      linesEl.querySelectorAll('.jw').forEach(function(x){ x.parentNode.removeChild(x); }); linesEl.classList.toggle('jwon', !on); if(on) return;
+      var g = jwMeans(); LINES.forEach(function(t){ mkLine(linesEl, t.ax, g.jp[t.k], 'jw jp', L('日本 ', 'JP ') + g.jp[t.k] + '%'); mkLine(linesEl, t.ax, g.we[t.k], 'jw we', L('海外 ', 'West ') + g.we[t.k] + '%'); });
+    }
+    /* 案内の背景の図：①主塊に四本 ②外郭に目盛り ③同じ％を絵・紙・画面に ④三枚→平均グリッド→紙面。薄い線で、文の後ろで一巡ずつ動く */
+    /* 案内の背景：本編の「グリッド表示」（.lines）と同じ言葉——画面いっぱいの 1px の線、外周 10px の黄枠、中心軸、線を抜く小さな札。枠の中に閉じない（小坂さんの指摘） */
+    function ibgSvg(k){
+      function ln(cls, pos, lab, extra){ return '<i class="' + cls + '" style="' + pos + (extra || '') + '">' + (lab ? '<s>' + lab + '</s>' : '') + '</i>'; }
+      var cls = k; k = [5, 0, 1, 3, 4][k];   /* 画面 → 図：⓪三枠に四本ずつ ①主塊 ②外郭に目盛り ③平均 ④日本と海外 */
+      var o = '<div class="gm-ibg b' + cls + '" aria-hidden="true"><i class="frame"></i>';
+      if(k === 5){   /* ⓪：三枚の枠に、A→B→C の順に四本ずつ線が入る（Astra の案内の手本から） */
+        var vals = [[14, 30, 55, 68], [2, 1, 28, 58], [12, 36, 55, 55]], t0 = .3;
+        vals.forEach(function(v, fi){
+          var lines = '<i class="h" style="top:' + v[0] + '%; transition-delay:' + (t0 + fi * 1.2) + 's"></i><i class="v" style="left:' + v[1] + '%; transition-delay:' + (t0 + .3 + fi * 1.2) + 's"></i><i class="h" style="top:' + v[2] + '%; transition-delay:' + (t0 + .6 + fi * 1.2) + 's"></i><i class="v" style="left:' + v[3] + '%; transition-delay:' + (t0 + .9 + fi * 1.2) + 's"></i>';
+          o += '<b class="jf f' + fi + '" style="left:' + (6 + fi * 31) + '%; top:24%; width:26%; height:54%; transition-delay:' + (fi * .12) + 's"><s>' + 'ABC'[fi] + '</s>' + lines + (fi === 0 ? '<u class="fp" style="left:' + v[1] + '%"></u>' : '') + '</b>';   /* v392: A の枠に指の点（一本目を導く） */
+        });
+        return o + '</div>';
+      }
+      if(k === 4){   /* 五画面目（絵を選ぶ）：日本と海外の骨格を二つの枠に並べる（私の読みの平均。違いが見える。Astra の手本から） */
+        var g = jwMeans(), fr = [['jf l', 'left:7%; top:20%; width:37%; height:58%', L('日本の絵', 'Japanese'), g.jp], ['jf r', 'left:56%; top:20%; width:37%; height:58%', L('海外の絵', 'Western'), g.we]];
+        fr.forEach(function(f, fi){
+          var lines = ['<i class="h" style="top:' + f[3].y1 + '%; transition-delay:' + (.3 + fi * .15) + 's"></i>', '<i class="v" style="left:' + f[3].x1 + '%; transition-delay:' + (.6 + fi * .15) + 's"></i>', '<i class="h" style="top:' + f[3].y2 + '%; transition-delay:' + (.9 + fi * .15) + 's"></i>', '<i class="v" style="left:' + f[3].x3 + '%; transition-delay:' + (1.2 + fi * .15) + 's"></i>'].join('');
+          o += '<b class="' + f[0] + '" style="' + f[1] + '"><s>' + f[2] + '</s>' + lines + '</b>';
+        });
+        return o + '</div>';
+      }
+      if(k === 0){   /* 主塊：大きな塊。始まり（上・左）と重心に、端から端までの線が順に */
+        o += '<i class="c"></i><b class="blob"></b>' +
+          ln('h a1', 'top:27%', 'Y1 · ' + L('主塊開始', 'mass start') + ' 27%') + ln('v a2', 'left:26%', 'X1 · ' + L('主塊開始', 'mass start') + ' 26%') +
+          '<i class="dot a3" style="left:58%; top:58%"></i>' + ln('h a4', 'top:58%', 'Y2 · ' + L('主塊重心', 'mass centroid') + ' 58%') + ln('v a5', 'left:58%', 'X3 · ' + L('主塊重心', 'mass centroid') + ' 58%');
+      } else if(k === 1){   /* 外郭：外周の内側に 0〜100 の目盛りと巻き尺 */
+        for(var i = 0; i <= 10; i++){ var big = i % 5 === 0; o += '<i class="tk tkt t' + i + (big ? ' big' : '') + '" style="left:calc(10px + (100% - 20px) * ' + (i / 10) + ')"></i><i class="tk tkl s' + i + (big ? ' big' : '') + '" style="top:calc(10px + (100% - 20px) * ' + (i / 10) + ')"></i>'; }
+        o += '<i class="bd bdh"></i><i class="bd bdv"></i><b class="nm n0" style="left:16px; top:34px">0</b><b class="nm n5" style="left:50%; top:34px; transform:translateX(-50%)">50</b><b class="nm n10" style="right:16px; top:34px">100</b><b class="nm m10" style="left:22px; bottom:16px">100</b>';
+      } else if(k === 2){   /* 百分率：一本の 32% の線が、絵・紙・画面の三つの区画を横断する */
+        o += ln('v dv d1', 'left:46%; --to:38%') + ln('v dv d2', 'left:71%; --to:80%') + ln('h p1', 'top:32%') +
+          '<b class="nm q1" style="left:16px; top:calc(32% - 22px)">32%</b><b class="nm q2" style="left:calc(46% + 12px); top:calc(32% - 22px)">32%</b><b class="nm q3" style="left:calc(71% + 12px); top:calc(32% - 22px)">32%</b>' +
+          '<b class="cp c1" style="left:23%">' + L('絵', 'picture') + '</b><b class="cp c2" style="left:58.5%">' + L('紙', 'paper') + '</b><b class="cp c3" style="left:85.5%">' + L('画面', 'screen') + '</b>';
+      } else {   /* 平均：三枚ぶんの線が平均の位置（＝このサイトの骨格）へ寄り、研究の三本が破線で加わり、見出し・図版・本文が乗る */
+        var sets = [[3, -2.5, 2, -3], [-2, 2, -2.5, 2.5], [-1, -1, 1.5, 1]];   /* 三枚のずれ（vh／vw） */
+        sets.forEach(function(d, i){ o += ln('h st r1', 'top:14%; --oy:' + d[0] + 'vh') + ln('v st r2', 'left:12%; --ox:' + d[1] + 'vw') + ln('h st r3', 'top:32%; --oy:' + d[2] + 'vh') + ln('v st r4', 'left:58%; --ox:' + d[3] + 'vw'); });
+        o += ln('h g1', 'top:14%', 'Y1 14%') + ln('v g2', 'left:12%', 'X1 12%') + ln('h g3', 'top:32%', 'Y2 32%') + ln('v g4', 'left:58%', 'X3 58%') +
+          '<i class="fx v" style="left:28%"><s>X2 28%</s></i><i class="fx v" style="left:83%"><s>X4 83%</s></i><i class="fx h" style="top:71%"><s>Y3 71%</s></i>' +
+          '<b class="mk k1" style="left:calc(12% + 12px); top:calc(14% + 12px); width:20%; height:16px"></b><b class="mk k2" style="left:calc(12% + 12px); top:calc(32% + 12px); width:calc(46% - 24px); height:calc(39% - 24px)"></b>' +
+          '<b class="mk k3" style="left:calc(58% + 12px); top:calc(32% + 12px); width:22%; height:5px"></b><b class="mk k3" style="left:calc(58% + 12px); top:calc(32% + 26px); width:18%; height:5px"></b><b class="mk k3" style="left:calc(58% + 12px); top:calc(32% + 40px); width:21%; height:5px"></b>';
+      }
+      return o + '</div>';
+    }
+    var ibgW = 0;
+    function ibgBuild(){
+      var pin = introEl.querySelector('.gm-ipin'), key = document.documentElement.lang; if(ibgW === key) return; ibgW = key;   /* 位置は CSS の％なので組み直しは言語が変わったときだけ */
+      pin.querySelectorAll('.gm-ibg').forEach(function(x){ x.parentNode.removeChild(x); });
+      /* v396: 案内の背景の図はやめる（小坂さん：安っぽく見える）。図の要素を作らず、地色だけ */
+      ibgRuns = ISECS.map(function(){ return 0; });   /* 組み直した図は新しい要素なので、巡回の数も最初から（言語切替で二度呼ばれると図が動かないままになっていた） */
+    }
+    var ibgT = 0, ibgRuns = [0, 0, 0, 0, 0];
+    function introBg(){
+      if(!introOn) return; var cur = introAt();
+      if(ibgRuns[cur] >= 2 && introEl.classList.contains('s' + cur)) return;   /* 二巡したら完成状態のまま */
+      var onk = ISECS[cur].k; for(var i = 0; i < 5; i++){ introEl.classList.toggle('s' + i, i === onk); document.documentElement.classList.toggle('gms' + i, i === onk); }
+      var bg = introEl.querySelector('.gm-ibg.b' + ISECS[cur].k); if(bg){ bg.classList.remove('run'); void bg.offsetWidth; bg.classList.add('run'); ibgRuns[cur]++; }
+      clearTimeout(ibgT); ibgT = setTimeout(introBg, rm ? 60000 : 7600);   /* 一巡 7.6 秒でもう一度 */
+    }
+    function intro(){
+      introOn = true; introEl.hidden = false;
+      ISECS = isecsFor(); ibgW = '';   /* v393: 面の組を決めてから図を組む */
+      ibgBuild();
+      /* スマホ（iPhone の Safari）：案内は文書のスクロールで進める。指で文書を送ると Safari の帯（タブ・アドレス）が畳まれ、
+         そのあと遊びの間は overflow を止めるので畳まれたまま——盤面に画面の高さがそのまま渡る（幕の後ろの紙面は見えない） */
+      docMode = document.documentElement.classList.contains('phone');
+      var isp = introEl.querySelector('.gm-ispace'); if(isp) isp.style.height = ISECS.length < 3 ? (docMode ? '170%' : '130%') : '';   /* v393: 二面なら一度の送りで着く送り幅に */
+      if(docMode){
+        scroll0 = window.scrollY; document.documentElement.classList.add('gmdoc');
+        var R = introRange(), maxB = Math.max(0, document.documentElement.scrollHeight - window.innerHeight - R - 24);
+        docBase = Math.max(0, Math.min(scroll0, maxB)); window.scrollTo(0, docBase);
+        window.addEventListener('scroll', introScroll, {passive:true});
+      }
+      var secs = introEl.querySelector('.gm-isecs'), dots = introEl.querySelector('.gm-idots'); secs.innerHTML = ''; dots.innerHTML = '';
+      if(!introEl.__swipe){ introEl.__swipe = true; var sy = null;   /* v396: iPhone は指で送ったら次の面へ寄せる */
+        introEl.addEventListener('touchstart', function(e){ sy = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true});
+        introEl.addEventListener('touchend', function(e){ if(sy === null || !docMode || !introOn) return; var ey = e.changedTouches[0] ? e.changedTouches[0].clientY : sy, dy = ey - sy; sy = null; if(e.target.closest && e.target.closest('button, a')) return; if(dy < -50) introTo(introAt() + 1); else if(dy > 50) introTo(introAt() - 1); }, {passive:true});
+      }
+      if(!introEl.__tap){ introEl.__tap = true; var tp = null;   /* v392（Sol 第 16・Q2）：面を触ると図がもう一度動く。ボタンと送りの操作は邪魔しない */
+        introEl.addEventListener('pointerdown', function(e){ tp = e.target.closest('button, a, .gm-idots') ? null : [e.clientX, e.clientY]; }, {passive:true});
+        introEl.addEventListener('pointerup', function(e){ if(!tp) return; var dx = e.clientX - tp[0], dy = e.clientY - tp[1]; tp = null; if(dx * dx + dy * dy > 64 || !introOn) return; var cur = introAt(); ibgRuns[cur] = 0; introBg(); }, {passive:true});
+      }
+      ISECS.forEach(function(s, i){
+        var d = el('div', 'gm-isec' + (s.title ? ' gm-ititle' : (s.choice ? ' gm-iinfo' : ''))); d.innerHTML = isecHTML(s); secs.appendChild(d); bindChoice(d);
+        dots.appendChild(el('i', i === 0 ? 'on' : ''));
+      });
+      introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip');
+      introEl.querySelector('.gm-igo').textContent = L('次へ', 'Next');
+      var one = ISECS.length < 2; [dots, introEl.querySelector('.gm-igo'), introEl.querySelector('.gm-iskip')].forEach(function(x){ if(x) x.style.display = one ? 'none' : ''; });
+      ibgRuns = ISECS.map(function(){ return 0; }); introEl.classList.remove('end', 'moved', 's0', 's1', 's2', 's3', 's4'); iscroll.scrollTop = 0; introTgt = -1; introScroll(); introBg();
+      setTimeout(function(){ if(introOn) iscroll.focus({preventScroll:true}); }, 60);
+    }
+    function introP(){ var m = introRange(); if(m <= 0) return 1; return docMode ? Math.max(0, Math.min(1, (window.scrollY - docBase) / m)) : iscroll.scrollTop / m; }
+    function introCur(){ var p = introP(), cur = 0; ISECS.forEach(function(s, i){ if(i > 0 && p >= (s.at + ISECS[i - 1].at) / 2) cur = i; }); return cur; }
+    function introScroll(){
+      if(!introOn) return;
+      var p = introP(), secs = introEl.querySelectorAll('.gm-isec'), dots = introEl.querySelectorAll('.gm-idots i'), cur = 0;
+      if(introTgt >= 0 && introCur() === introTgt && performance.now() - introTgtAt > 250) introTgt = -1;   /* 行き先に着いたら解く */
+      cur = introCur();   /* v396: 隣の面との中点で切り替える（二面の案内で、一度の送りで着くように） */
+      secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur); });
+      if(!introEl.classList.contains('s' + cur)) introBg();   /* 画面が変わったら背景の図を最初から */
+      dots.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('done', i < cur); });
+      var go = introEl.querySelector('.gm-igo'); go.innerHTML = cur === ISECS.length - 1 ? '<b>' + L('はじめる', 'Start') + '</b>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'; go.setAttribute('aria-label', cur === ISECS.length - 1 ? L('はじめる', 'Start') : L('次へ', 'Next')); go.classList.toggle('last', cur === ISECS.length - 1);
+      if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
+      introEl.classList.toggle('moved', p > .04); introEl.classList.toggle('end', cur === ISECS.length - 1); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
+    }
+    var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0;
+    function introRange(){ return iscroll.scrollHeight - iscroll.clientHeight; }
+    function introTo(i){ i = Math.max(0, Math.min(ISECS.length - 1, i)); introTgt = i; introTgtAt = performance.now(); var m = introRange(), top = Math.round(m * Math.min(1, ISECS[i].at + (i >= ISECS.length - 1 ? .2 : .02))); if(docMode) window.scrollTo({top: docBase + top, behavior: rm ? 'auto' : 'smooth'}); else iscroll.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }
+    function introAt(){ return (introTgt >= 0 && performance.now() - introTgtAt < 2500) ? introTgt : introCur(); }   /* なめらかに送っている最中（文書スクロールでは 1 秒を超える）は行き先の画面を基準に。着いたら scroll 側で解く */   /* ボタン連打：なめらかに送っている最中は行き先の画面を基準に */
+    function introKey(e){
+      if(!introOn) return; var k = e.key, cur = introAt(), p = introP();
+      if(e.target && e.target.tagName === 'BUTTON' && (k === ' ' || k === 'Enter')) return;   /* v410: 選択ボタンの上では Space/Enter をボタンに（想定外係 #4） */
+      if(k === 'Enter'){ if(cur === ISECS.length - 1){ var cb = introEl.querySelector('.gm-isec.on .gm-ichoice button'); if(cb && document.activeElement !== cb) cb.focus(); else return; } else introTo(cur + 1); e.preventDefault(); }
+      else if(k === ' ' || k === 'ArrowDown' || k === 'ArrowRight' || k === 'PageDown'){ introTo(cur + 1); e.preventDefault(); }
+      else if(k === 'ArrowUp' || k === 'ArrowLeft' || k === 'PageUp'){ introTo(cur - 1); e.preventDefault(); }
+    }
+    /* v391: iPhone では案内のあとも文書を「動かせる」ままにしておく（gmdoc を残す）。文書が動かせなくなると Safari の帯が戻ってくる（実機で確認）。
+       指のスクロールは gm の touchmove で止め、右の列など中で動く箇所だけ通す */
+    function docOff(){ if(!docMode) return; window.removeEventListener('scroll', introScroll); }
+    /* v389: 遊びの間は紙面（文書）を固定する。iOS の Safari は overflow:hidden だけでは指のスクロールを止めきれないので body を fixed に */
+    var lockY = 0, locked = false, openY = 0;
+    function lockDoc(){ if(locked) return; locked = true; lockY = window.scrollY; document.body.style.top = -lockY + 'px'; document.documentElement.classList.add('gmlock'); }
+    function unlockDoc(){ if(!locked) return; locked = false; document.documentElement.classList.remove('gmlock'); document.body.style.top = ''; jumpTo(lockY); }
+    function jumpTo(y){ try{ window.scrollTo({top:y, behavior:'instant'}); }catch(e){ window.scrollTo(0, y); } }   /* v420: 戻す送りは即時（html{scroll-behavior:smooth} のせいで章を飛び回り、iPad では 08 への送りが捨てられていた＝本編係） */
+    function introEnd(skipped){
+      if(!introOn) return; introOn = false; introSeen = true; docOff(); clearTimeout(ibgT); cringOff(true); document.documentElement.classList.remove('gms0', 'gms1', 'gms2', 'gms3', 'gms4');
+      introEl.classList.add('bye'); setTimeout(function(){ introEl.hidden = true; introEl.classList.remove('bye'); }, rm ? 0 : 720);   /* 文字と選択肢が先に消え（140ms）、線を残した地がゆっくり薄れる */
+      start(); startedAt = performance.now();   /* 案内の操作を一手目へ持ち越さない：直後 400ms の押下は無視 */
+      morphIn();
+      var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); }); }); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1100); }   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
+    }
+    /* v392（Sol 第 16・Q4）：五面目で選んだ骨格の枠が、そのまま盤面の位置と大きさへ 700ms で育ち、四本を残したまま中に絵が現れる。拭きと拡縮は重ねない */
+    function morphIn(){
+      if(rm) return;
+      var src = introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on'); if(!src) return;   /* v406: 図をやめたので、選択の行から盤面へ育てる（総点検係の指摘） */
+      var r0 = src.getBoundingClientRect(); if(!r0.width) return;
+      var g = el('div', 'gm-morph'); g.style.cssText = 'left:' + r0.left + 'px;top:' + r0.top + 'px;width:' + r0.width + 'px;height:' + r0.height + 'px';
+      src.querySelectorAll('i.h, i.v').forEach(function(l){ var c = el('i', l.classList.contains('v') ? 'v' : 'h'); var st = l.getAttribute('style') || ''; var m = /(left|top):\s*([\d.]+%)/.exec(st); if(m) c.style[m[1]] = m[2]; g.appendChild(c); });
+      document.body.appendChild(g);
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        var r1 = stage.getBoundingClientRect(); if(!r1.width){ g.remove(); return; }
+        g.classList.add('go'); g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px';
+        setTimeout(function(){ g.classList.add('bye'); }, 760); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1300);
+      }); });
+    }
+    function btn(label, fn, cls){ var b = el('button', 'gm-b' + (cls ? ' ' + cls : '')); b.type = 'button'; b.textContent = label; b.addEventListener('click', fn); goEl.appendChild(b); return b; }
+    function focusBtn(){ if(ptype === 'touch') return; setTimeout(function(){ var b = goEl.querySelector('button:not(:disabled)'); if(b) b.focus({preventScroll:true}); }, 220); }
+    function forced(){
+      /* 面接用：#play=id,id,id で三枚を指名。検証用の window.__gmForce も */
+      var m = /play=([^&#]+)/.exec(location.hash || ''), ids = m ? decodeURIComponent(m[1]).split(',') : (window.__gmForce || []);
+      var f = ids.map(function(id){ return BOARDS.filter(function(b){ return b.id === id; })[0]; }).filter(Boolean);
+      return f.length === 3 ? f : null;
+    }
+    function pick3(){
+      function sh(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+      var f = forced(); if(f) return f;
+      var jp = sh(BOARDS.filter(function(b){ return b.jp; })), we = sh(BOARDS.filter(function(b){ return !b.jp; }));
+      if(cat === 'jp' && jp.length >= 3) return jp.slice(0, 3);
+      if(cat === 'we' && we.length >= 3) return we.slice(0, 3);
+      return sh(Math.random() < .5 ? [jp[0], jp[1], we[0]] : [jp[0], we[0], we[1]]);
+    }
+    function hdFit(){
+      var hd = document.querySelector('.hd'), bg = hd && hd.querySelector('.burger'), xb = gm.querySelector('.gm-x');
+      gm.style.setProperty('--hdh', (hd ? Math.max(48, hd.offsetHeight) : 60) + 'px');
+      /* 遊びの中身の右端は、本編のハンバーガーの線の右端にそろえる（小坂さんの指定：情報の終点をひとつに） */
+      gm.style.setProperty('--sidepad', '0px');
+      if(bg && bg.offsetWidth){ var bodyEl = gm.querySelector('.gm-body'), bir = (bg.firstElementChild || bg).getBoundingClientRect().right, bodyR = bodyEl ? bodyEl.getBoundingClientRect().right : 0; if(bodyR > bir) gm.style.setProperty('--sidepad', Math.round(bodyR - bir) + 'px'); }
+      /* 本編のハンバーガーが遊びの × に重なるとき（スマホ）だけ、× と右上の札をその左へ寄せる。PC は × のほうが右にあるので重ならない */
+      gm.style.setProperty('--navw', '0px');
+      if(xb && hd){   /* × はナビ（JA/EN・ハンバーガー）のすぐ左に並べ、ハンバーガーの中心の高さにそろえる */
+        var xr = xb.getBoundingClientRect(), left = Infinity, g = gm.getBoundingClientRect();
+        [hd.querySelector('.lang'), bg].forEach(function(el){ if(!el || !el.offsetWidth) return; left = Math.min(left, el.getBoundingClientRect().left); });
+        /* i・×・JA/EN・ハンバーガーを等間隔に：本編の JA/EN とハンバーガーの間隔 G を測り、× と i もその間隔で並べる（× は 4px、ハンバーガーは 8px の内側余白ぶんを補正） */
+        var lg = hd.querySelector('.lang'), V = 28;   /* V＝JA/EN の箱の右端からハンバーガーの線の左端まで（見た目の間隔） */
+        if(lg && lg.offsetWidth && bg && bg.offsetWidth){ var lr = lg.getBoundingClientRect(), bi = (bg.firstElementChild || bg).getBoundingClientRect(); if(bi.left > lr.right) V = Math.round(bi.left - lr.right); }
+        var cg = parseFloat(getComputedStyle(gm.querySelector('.gm-hd')).columnGap) || 12;
+        gm.style.setProperty('--hgap', Math.max(0, V - 4 - cg) + 'px');   /* i の余白：見た目の間隔 V から、× の内側余白 4 と grid の gap を引く */
+        if(isFinite(left)) gm.style.setProperty('--navw', Math.max(0, Math.round(xr.right - (left - V + 4))) + 'px');
+        if(isFinite(left)) gm.style.setProperty('--gmnavl', Math.max(0, Math.round(g.right - left)) + 'px');   /* v409: 骨格画面の一列を本編ナビの左に収める（細部係 #1） */
+        gm.style.setProperty('--vgap', V + 'px'); if(isFinite(left)) gm.style.setProperty('--ihdr', Math.round(g.right - left + V) + 'px');   /* 案内のスキップと × も同じ列・同じ間隔で JA/EN の左に */   /* × の字の右端（箱の右端 − 4）が JA/EN の左端から V 離れる */
+        if(bg && bg.offsetWidth){ var br = bg.getBoundingClientRect(); gm.style.setProperty('--hdc', Math.round(br.top + br.height / 2 - g.top) + 'px'); }
+      }
+    }
+    var openedAt = 0;
+    function open(){
+      build();
+      if(!gm.hidden){ if(typeof setMenu === 'function') setMenu(false); return; }   /* 開いている最中にメニューの札を押したら、メニューを閉じるだけ */
+      lastFocus = document.activeElement; clearTimeout(offT); openedAt = performance.now(); openY = window.scrollY;
+      gm.querySelector('.gm-ttl').innerHTML = mix('絵を、測る。', 'Measure the composition.', '測る');
+      gm.querySelector('.gm-sub').textContent = '';
+      axlText();
+      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');   /* v400: 右の列の ? と見分けがつくよう文字で */
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('研究の骨格', 'research grid');
+      gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
+      if(!forced()) intro(); else start();   /* 案内は開くたびに（スキップがある）。#play のときだけ省く */
+      if(!docMode) lockDoc();
+      if(window.__retint) window.__retint();   /* iOS の帯の色を、幕の紙色で採り直させる */
+    }
+    function close(){
+      if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
+      if(docMode){ docOff(); document.documentElement.classList.remove('gmdoc'); docMode = false; } unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
+      gm.classList.remove('on', 'sheeton'); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
+      offT = setTimeout(function(){ gm.hidden = true; if(window.__retint) window.__retint(); }, 520);
+      if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
+    }
+    /* 細長い絵（掛軸・横長の巻物）は画面に収めると小さくなる。紙を回して置き直すように −90° に回し、外郭の枠も横長に組み替える（小坂さんの指示）。
+       線の役割と％は絵の座標のまま（上から・左から）。回した絵では、絵の上端が画面の左、絵の左端が画面の下に来る。目盛りと札の数字は正立させる */
+    var rot = false, turnEl = null, tbEl = null, turnT = 0;
+    function unturn(){ if(!rot) return; rot = false; axlText(); stage.classList.remove('rot'); if(tbEl) tbEl.setAttribute('aria-pressed', 'false'); tbLabel(); }
+    /* v388: 目盛りの向きの語。回した絵では「左から」が左の目盛りに沿って上へ、「上から」が下の目盛りに沿って右へ */
+    function axlText(){ var axh = gm.querySelector('.gm-axl.h'), axv = gm.querySelector('.gm-axl.v'); if(axh) axh.textContent = rot ? L('左から ↑', 'from left ↑') : L('左から →', 'from left →'); if(axv) axv.textContent = rot ? L('上から →', 'from top →') : L('上から ↓', 'from top ↓'); }
+    function tbLabel(){ if(!tbEl) return; var t = rot ? L('絵を縦に戻す', 'Turn the picture back') : L('絵を横にして、大きく', 'Turn the picture sideways'); tbEl.setAttribute('aria-label', t); tbEl.title = t; var sp = tbEl.querySelector('span'); if(sp) sp.textContent = rot ? L('縦に戻す', 'Back') : L('横にする', 'Turn'); }
+    function turnAllowed(){
+      var b = picks[bi]; if(!b || !turnEl || state === 'avg' || state === 'idle' || gm.hidden) return false;
+      var sw = gm.querySelector('.gm-sw'), W = Math.max(60, sw.clientWidth - 30), H = Math.max(stage.offsetHeight, sw.clientHeight - 40);
+      if(rot) return true;
+      var ar = b.ar, w0 = Math.min(W, H * ar), a0 = w0 * w0 / ar, w1 = Math.min(W, H / ar), a1 = w1 * w1 * ar;
+      return a1 > a0 * 1.2;   /* 回すと二割以上大きく見えるときだけ */
+    }
+    function tbFit(){ if(tbEl) tbEl.hidden = !turnAllowed(); }
+    function turnPic(on){
+      var b = picks[bi]; if(!b || on === rot || !turnEl) return;
+      if(demoEl){ demoDone = true; demoOff(); }   /* v405: 回したら手本は消す（位置が合わなくなる） */
+      var s0 = stage.getBoundingClientRect(), t0w = turnEl.offsetWidth, t0h = turnEl.offsetHeight;
+      hideLive(); if(state === 'trace' && live < 0) tipEl.classList.remove('off');   /* 手番の札は消さない */
+      rot = on; axlText(); stage.classList.toggle('rot', on); tbEl.setAttribute('aria-pressed', on ? 'true' : 'false'); tbLabel();
+      clearTimeout(turnT); stage.style.transition = 'none'; turnEl.style.transition = 'none';
+      stage.style.width = ''; stage.style.height = ''; turnEl.style.width = ''; turnEl.style.height = ''; turnEl.style.transform = '';
+      stage.style.setProperty('--par', b.ar); stage.style.setProperty('--ar', on ? (1 / b.ar).toFixed(4) : b.ar); fit();
+      var s1 = stage.getBoundingClientRect(), t1w = turnEl.offsetWidth, t1h = turnEl.offsetHeight;
+      if(rm){ stage.style.transition = ''; turnEl.style.transition = ''; return; }
+      stage.style.width = s0.width + 'px'; stage.style.height = s0.height + 'px'; turnEl.style.width = t0w + 'px'; turnEl.style.height = t0h + 'px';
+      turnEl.style.transform = 'translate(-50%,-50%) rotate(' + (on ? 0 : -90) + 'deg)';
+      void stage.offsetWidth;
+      stage.style.transition = 'width .55s var(--ease), height .55s var(--ease)'; turnEl.style.transition = 'width .55s var(--ease), height .55s var(--ease), transform .55s var(--ease)';
+      stage.style.width = s1.width + 'px'; stage.style.height = s1.height + 'px'; turnEl.style.width = t1w + 'px'; turnEl.style.height = t1h + 'px'; turnEl.style.transform = '';
+      turnT = setTimeout(function(){ stage.style.transition = ''; stage.style.width = ''; stage.style.height = ''; turnEl.style.transition = ''; turnEl.style.width = ''; turnEl.style.height = ''; }, 600);
+    }
+    var swapT = 0;
+    function showBoard(b){
+      sealOff(true); stage.classList.remove('twelve'); clearDim(); linesEl.innerHTML = '';
+      var had = picEl.firstChild;
+      function put(){ unturn(); stage.style.setProperty('--ar', b.ar); stage.style.setProperty('--par', b.ar); stage.classList.remove('blank'); picEl.innerHTML = ''; picEl.appendChild(picOf(b)); picEl.classList.remove('swap'); tbFit(); }
+      /* 作品の切替は三段：前の絵が薄れる → 外郭（枠）が次の絵の縦横に整う → 次の絵が現れる。枠を先に整えるので「別の作品に移った」ことが目で分かる（Astra の手本から採用） */
+      if(had && !rm){
+        clearTimeout(swapT); stage.classList.add('swapping'); picEl.classList.add('swap'); var oc = gm.querySelector('.gm-cring'); if(oc) oc.classList.add('bye');   /* 前の場面の輪が残っていれば消す */
+        swapT = setTimeout(function(){
+          /* 枠の変形は前後の実寸を測って width/height を同時に送る（縦横比だけ替えると、途中で枠が画面からはみ出す） */
+          var r0 = stage.getBoundingClientRect();
+          stage.style.transition = 'none';   /* CSS の width の遷移を止めてから測る（遷移中だと新しい寸法が読めない） */
+          unturn(); stage.style.setProperty('--ar', b.ar); stage.style.setProperty('--par', b.ar); stage.classList.remove('blank'); picEl.innerHTML = '';
+          var r1 = stage.getBoundingClientRect();
+          if(Math.abs(r0.width - r1.width) > 1 || Math.abs(r0.height - r1.height) > 1){
+            stage.style.width = r0.width + 'px'; stage.style.height = r0.height + 'px'; void stage.offsetWidth;
+            stage.style.transition = 'width .32s var(--ease), height .32s var(--ease)'; stage.style.width = r1.width + 'px'; stage.style.height = r1.height + 'px';
+          } else stage.style.transition = '';
+          swapT = setTimeout(function(){ stage.style.transition = ''; stage.style.width = ''; stage.style.height = ''; picEl.appendChild(picOf(b)); picEl.classList.remove('swap'); tbFit(); swapT = setTimeout(function(){ stage.classList.remove('swapping'); }, 300); }, 340); }, 220);
+      } else put();
+    }
+    function swapRes(fn){ if(rm){ fn(); return; } resEl.classList.add('sw'); setTimeout(function(){ fn(); resEl.classList.remove('sw'); }, 150); }
+    function hideLive(){ var lc = liveEl.querySelector('.gm-lcap'); if(lc) lc.parentNode.removeChild(lc); var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld); liveEl.className = 'gm-live'; readEl.className = 'gm-read'; tipEl.classList.add('off'); drv.style.width = '0'; drh.style.height = '0'; drv.className = 'gm-dimr v'; drh.className = 'gm-dimr h';
+      if(state === 'trace'){ listState(); mode(L('なぞる', 'trace')); tipEl.classList.remove('off'); }   /* 決めずに離した（絵を押して次へ進んだ直後など）：一覧の仮の値と「押している」を戻し、札も戻す */
+    }
+    function clearDim(){ dimEl.className = 'gm-dim'; dimEl.innerHTML = ''; }
+    /* 導入は一手目に統合：開いた瞬間から一枚目が触れる */
+    function start(){
+      res = []; bi = 0; ti = 0; live = -1; first = true;
+      picks = pick3(); preload(picks); cardEl.hidden = true; trayReset();
+      boardStart(0);
+    }
+    var boardAt = 0;
+    function boardStart(i){
+      bi = i; ti = 0; res[i] = {}; boardAt = performance.now(); var b = picks[i]; goEl.classList.remove('hold', 'on');
+      showBoard(b);
+      cardRender(i);
+      cardEl.hidden = false; listBuild();
+      turn();
+    }
+    function cardRender(i){ var b = picks[i];
+      cardEl.innerHTML = '<b>' + 'ABC'[i] + '</b><strong>' + ttl(b) + '</strong><em>' + L('分析カテゴリ · ', 'Category · ') + esc(L(b.cat, b.cate)) + '<button type="button" class="gm-q gm-catq2" aria-label="' + L('分析カテゴリとは', 'What is a category') + '" title="' + L('分析カテゴリとは：研究で作品全体の構成を七つの観点で整理したもの。押すと説明が開きます。', 'The category: one of seven viewpoints from my research. Press to open the explanation.') + '">?</button></em><small>' + esc(L(b.src, b.srce)) + '</small>';
+      cardEl.querySelector('.gm-catq2').addEventListener('click', function(){ infoWantCat = true; info(); });   /* 「分析カテゴリって何？」に、その場で答える */
+    }
+    function obj(b){ return L(b.obj || '塊', b.obje || 'mass'); }
+    /* v390: 一枚目の一本目だけ、絵の上で「押したまま下へ、離す」を指の影で見せる。触れたら消える */
+    var demoEl = null, demoDone = false;
+    function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i><b>' + L('絵を押して、そのまま下へ動かしてください。<br>離したところに線が引かれます。', 'Drag downward on the picture,<br>then release to place a line.') + '</b>'; stage.appendChild(demoEl);
+      /* v399: 問いの札が絵の中にあるとき（iPhone）は、その下に 8px 空けて同じ幅で置く */
+      requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(tr.height && tr.top >= sr.top - 1){ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
+    function demoOff(){ if(demoEl && demoEl.parentNode) demoEl.parentNode.removeChild(demoEl); demoEl = null; }
+    function turn(){
+      setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
+      if(bi === 0 && ti === 0 && !demoDone) demoOn(); else demoOff();
+      var t = LINES[ti], b = picks[bi];
+      state = 'trace'; live = -1; down = false;
+      stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      resEl.innerHTML =
+        (first ? '<p class="gm-ask gm-lead"><b>' + mix('絵から、ものさしを取り出す。', 'Turn a picture into a ruler.', 'ものさし') + '</b>' + L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Draw four lines on each picture; the three are then averaged.') + '</p>' : '') +
+        (first ? '<p class="gm-note">' + L('絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 'Drag on the picture,<br>then release to place a line.') + '</p>' : '');   /* 線の名前は右の一覧が示す（帯・一覧・見出しの三重を避ける） */
+      goEl.innerHTML = '';
+      if(bi === 0) help(t, false); else helpOff();
+      hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
+      tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(L(t.q, t.qe).replace('%s', obj(b))) + '</span>'; tipEl.classList.remove('off');
+      if(ptype !== 'touch') setTimeout(function(){ if(state === 'trace') stage.focus({preventScroll:true}); }, 30);
+      tbFit();
+    }
+    function move(e){
+      if(state !== 'trace') return;
+      var t = LINES[ti], r = stage.getBoundingClientRect(), px, py;
+      if(rot){ px = 100 - (e.clientY - r.top) / r.height * 100; py = (e.clientX - r.left) / r.width * 100; }   /* 絵を −90° に回して置いたとき：絵の上端は画面の左、絵の左端は画面の下 */
+      else { px = (e.clientX - r.left) / r.width * 100; py = (e.clientY - r.top) / r.height * 100; }
+      var p = t.ax === 'v' ? px : py;
+      setLive(Math.max(0, Math.min(100, p)));
+    }
+    /* なぞる：線は補間なしで追従。数値は指に隠れない位置——たての線は上端、よこの線は右端——に。目盛りには 0 からここまでの寸法 */
+    function setLive(p){
+      var t = LINES[ti]; live = p; var s = p.toFixed(2) + '%'; listLive(p); mode(down ? L('押している', 'holding') : L('なぞる', 'trace'));
+      liveEl.className = 'gm-live ' + t.ax + ' on' + (down ? ' press' : '') + (p > 88 ? ' low' : '') + (p < 12 ? ' high' : '');   /* v418: 端では一言と札の置き場を変える（細部係） */
+      if(down && p < 14) tipEl.classList.add('off'); readEl.className = 'gm-read ' + t.ax + ' on';
+      if(t.ax === 'v'){ liveEl.style.left = s; liveEl.style.top = ''; readEl.style.left = rot ? 'clamp(46px, ' + s + ', calc(100% - 46px))' : 'min(' + s + ', calc(100% - 46px))'; readEl.style.top = ''; drv.style.width = s; drv.className = 'gm-dimr v on'; }
+      else { liveEl.style.top = s; liveEl.style.left = ''; readEl.style.top = rot ? 'clamp(46px, ' + s + ', calc(100% - 46px))' : 'max(31px, ' + s + ')'; readEl.style.left = ''; drh.style.height = s; drh.className = 'gm-dimr h on'; }
+      readEl.textContent = Math.round(p) + '%';
+      if(down && moved > 5) tipEl.classList.add('off');   /* 押したまま 5px 動いたらキャプションを引く（なぞるだけ・押しただけでは残す） */
+    }
+    /* 離して確定：その位置で保存。端点を短く強める。すぐにわたしの線を破線で重ね、二本のあいだに寸法。次の押下まで残す */
+    function confirm(){
+      if(state !== 'trace' || live < 0) return;
+      var t = LINES[ti], b = picks[bi], p = Math.round(live), a = b.a[t.k], d = p - a;
+      state = 'compare'; fixedAt = performance.now(); res[bi][t.k] = p; hideLive(); helpOff(); listState(); mode(L('比べる', 'compare'));
+      if(bi === 2 && ti === LINES.length - 1 && !rm){ stage.classList.remove('twelve'); void stage.offsetWidth; stage.classList.add('twelve'); }   /* 十二本目：外郭が一拍応える */
+      var ln = mkLine(linesEl, t.ax, p, 'you now', p + '%');
+      if(!rm) setTimeout(function(){ ln.classList.remove('now'); }, 420);
+      mkLine(linesEl, t.ax, a, 'mine', a + '%');
+      dim(t.ax, p, a, d);
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      cmpRender(t, b, p, a, d);
+      first = false; setTimeout(reveal, 80);
+    }
+    function cmpRender(t, b, p, a, d){
+      resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir + 'の線', t.dire) + '</small></b></p>' +
+        '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('ずれ', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
+        '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
+        (first ? '<p class="gm-note">' + L('絵の幅と高さを 100 として読みます。', 'Read the picture\'s width and height as 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('もう一度押すと、次の線。', 'Click again for the next line.')) + '</p>' : '');
+      goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
+    }
+    /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
+    function moreMark(){ var sc = gm && gm.querySelector('.gm-side'); if(!sc) return; sc.classList.toggle('more', sc.scrollHeight - sc.clientHeight - sc.scrollTop > 6); }
+    function revealRes(){   /* v414: 平均の見出しを列の頭に合わせる（ボタンは iPhone では sticky、pc はホイール／iPad は指で） */
+      var sc = gm.querySelector('.gm-side'); if(!sc || !resEl || sc.scrollHeight <= sc.clientHeight + 2) return;
+      var top = sc.scrollTop + (resEl.getBoundingClientRect().top - sc.getBoundingClientRect().top) - 6;
+      try{ sc.scrollTo({top: Math.max(0, top), behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = Math.max(0, top); }
+    }
+    function reveal(){
+      if(!goEl.firstChild) return;
+      var sc = goEl.parentNode;
+      while(sc && sc !== gm){ var o = getComputedStyle(sc).overflowY; if((o === 'auto' || o === 'scroll') && sc.scrollHeight > sc.clientHeight + 2) break; sc = sc.parentNode; }
+      if(!sc || sc === gm) return;
+      var sr = sc.getBoundingClientRect(), d = goEl.getBoundingClientRect().bottom - sr.bottom + 10;
+      if(d <= 0) return;
+      /* v413: 目標は一覧の頭（列の座標で。offsetTop は列の外の親が基準になり 72px 送りすぎていた＝細部係）。それでもボタンが隠れるなら、落ち着いてからボタンまで */
+      var tgt = listEl && listEl.offsetParent ? Math.max(0, sc.scrollTop + (listEl.getBoundingClientRect().top - sr.top) - 8) : sc.scrollTop + d;
+      if(tgt < sc.scrollTop) tgt = sc.scrollTop;
+      try{ sc.scrollTo({top:tgt, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = tgt; }
+      setTimeout(function(){ if(!goEl.firstChild) return; var d2 = goEl.getBoundingClientRect().bottom - sc.getBoundingClientRect().bottom + 10; if(d2 > 0){ try{ sc.scrollTo({top: sc.scrollTop + d2, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop += d2; } } }, rm ? 0 : 560);
+    }
+    function dim(ax, p, a, d){
+      var lo = Math.min(p, a), hi = Math.max(p, a);
+      dimEl.className = 'gm-dim ' + ax + ' on' + (d === 0 ? ' same' : '');
+      if(ax === 'h'){ dimEl.style.top = lo + '%'; dimEl.style.height = (hi - lo) + '%'; dimEl.style.left = ''; dimEl.style.width = ''; }
+      else { dimEl.style.left = lo + '%'; dimEl.style.width = (hi - lo) + '%'; dimEl.style.top = ''; dimEl.style.height = ''; }
+      dimEl.innerHTML = '<b>' + (d === 0 ? '=' : sg(d)) + '</b>';
+    }
+    function redo(){
+      if(state !== 'compare') return;
+      linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); });
+      var ys = linesEl.querySelectorAll('.you:not(.past)'); if(ys.length) ys[ys.length - 1].parentNode.removeChild(ys[ys.length - 1]);
+      clearDim(); delete res[bi][LINES[ti].k]; turn();
+    }
+    function nextTurn(){
+      if(state !== 'compare') return;
+      linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); });
+      linesEl.querySelectorAll('.you').forEach(function(x){ x.classList.add('past'); });
+      clearDim();
+      ti++; if(ti < LINES.length) turn(); else boardDone();
+    }
+    function tally(i){
+      var r = res[i] || {}, out = '';
+      LINES.forEach(function(t){ if(r[t.k] != null) out += '<div><dt>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire[0].toUpperCase())) + '</dt><dd>' + r[t.k] + PC + '</dd></div>'; });
+      return out ? '<dl class="gm-num">' + out + '</dl>' : '';
+    }
+    function table(i){
+      var b = picks[i], r = res[i];
+      return '<table class="gm-tb"><thead><tr><th>' + L('線', 'line') + '</th><th>' + L('あなた', 'you') + '</th><th>' + L('私', 'me') + '</th><th>' + L('ずれ', 'gap') + '</th></tr></thead><tbody>' +
+        LINES.map(function(t){ return '<tr><td>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</td><td>' + r[t.k] + PC + '</td><td>' + b.a[t.k] + PC + '</td><td>' + sg(r[t.k] - b.a[t.k]) + PC + '</td></tr>'; }).join('') +
+        '</tbody></table>';
+    }
+    function boardDone(){
+      state = 'done'; fixedAt = performance.now(); trayFill(bi);
+      var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); }
+      doneFn = bi < 2 ? function(){ doneFn = null; boardStart(bi + 1); } : function(){ doneFn = null; average(); };
+      stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; listState(); mode(L('測り終わり', 'measured'));
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      doneRender();
+      focusBtn(); setTimeout(reveal, 80); setTimeout(reveal, 460);   /* v419: iPad の一枚目は列の伸びが遅れて 5px 欠けたので、もう一度（細部係） */   /* v414: 表が出て列が伸びたあとにボタンまで（細部係） */
+      if(document.documentElement.classList.contains('phone')) seal('MEASURED', '採寸', stage, 'tr'); else seal('MEASURED', '採寸', resEl, 'sheet');   /* v397: iPhone は絵の右上に押す（右の列の下は目に入らない） */
+      cring(L(ORD[bi] + '、測り終わり \u00b7 MEASURED \u00b7 ', 'THE ' + ORDE[bi].toUpperCase() + ', MEASURED \u00b7 '));
+    }
+    function doneRender(){
+      resEl.innerHTML = '<p class="gm-ask"><b>' + mix(ORD[bi] + '、測り終わり。', 'The ' + ORDE[bi] + ', measured.', ORD[bi]) + '</b></p>' + table(bi) +
+        '<p class="gm-note">' + (bi === 2 ? L('同じ役割の線を、三枚で平均します。', 'Lines of the same role are averaged across the three.') + '<br>' : '') + (ptype === 'touch' ? (bi < 2 ? L('絵を押すと、次の絵へ。', 'Tap the picture for the next one.') : L('絵を押すと、平均へ。', 'Tap the picture for the average.')) : (bi < 2 ? L('絵を押すと、次の絵へ。', 'Tap the picture for the next one.') : L('絵を押すと、平均へ。', 'Tap the picture for the average.'))) + '</p>';
+      goEl.innerHTML = '';
+      if(bi < 2) btn(L(ORD[bi + 1] + 'へ', 'To the ' + ORDE[bi + 1]), doneFn, 'go');
+      else btn(L('三枚の平均をとる', 'Average the three'), doneFn, 'go');
+    }
+    /* 一行の観察：四本の差（三枚の平均）でいちばん大きい一本を選び、向きで言う。作品ごとの差も一つ添える。点数は出さない */
+    function observe(diff, per){
+      /* Δ＝線別の三枚平均差（あなた−わたし。右・下が＋）、M＝max|Δ|、E＝12 値の max|d|。同率は手番順→作品順。判定は丸め前、表示は整数 */
+      var k = null, M = 0; LINES.forEach(function(t){ if(Math.abs(diff[t.k]) > M + 1e-9){ M = Math.abs(diff[t.k]); k = t.k; } });
+      var w = null; per.forEach(function(x){ if(!w || Math.abs(x.d) > Math.abs(w.d) + 1e-9) w = x; });
+      var E = w ? Math.abs(w.d) : 0, out = '';
+      function nm(t){ return L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')'); }
+      function dir(t, d){ return t.ax === 'h' ? (d > 0 ? L('下', 'below') : L('上', 'above')) : (d > 0 ? L('右', 'to the right of') : L('左', 'to the left of')); }
+      function dsz(t, d){ var a = Math.abs(Math.round(d)), w = t.ax === 'h' ? (d > 0 ? L('下に', 'below') : L('上に', 'above')) : (d > 0 ? L('右に', 'right') : L('左に', 'left')); return d === 0 ? L('同じ', 'same') : L(w + ' ' + a + PC, a + PC + ' ' + w); }   /* 「+14%」でなく「下に 14%」 */
+      if(E < 4) out = '<p class="gm-obs">' + L('三枚とも、私と近い位置に四本の線を引きました。', 'On all three pictures, your four lines were close to mine.', '近い') + '</p>';
+      else if(M >= 4){
+        var t = LINES.filter(function(x){ return x.k === k; })[0], d = diff[k];
+        out = '<p class="gm-obs">' + L('平均すると、主塊の' + (t.k === 'y1' || t.k === 'x1' ? '始まり' : '重心') + 'を私より' + dir(t, d) + 'に見ています。', 'On average, you placed the mass’s ' + (t.k === 'y1' || t.k === 'x1' ? 'start' : 'centre of weight') + ' ' + dir(t, d) + ' mine.', dir(t, d)) + '<small>' + dsz(t, d) + '</small></p>';
+        out += '<p class="gm-obs2">' + L('いちばん読みが分かれたのは、' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '・', 'Where our readings split most: ' + nm(w.t) + ' on ' + 'ABC'[w.i] + ' (') + '<span>' + dsz(w.t, w.d) + '</span>' + L('）。', ').') + '</p>';
+      } else {
+        out = '<p class="gm-obs">' + L('平均は近く、いちばん読みが分かれたのは ' + 'ABC'[w.i] + ' の' + w.t.n + '（' + w.t.dir + '）でした。', 'The averages are close; our readings split most on ' + nm(w.t) + ' of ' + 'ABC'[w.i] + '.', '近く') + '<small>' + dsz(w.t, w.d) + '</small></p>';
+      }
+      return out;
+    }
+    /* 三枚の平均：同じ役割の三つの目盛りが一本の平均線へ集まり、そのあと研究の三本を薄く補う（あなたの4本＋研究の3本） */
+    function average(){
+      var avg = {}, kav = {}, diff = {}, per = [];
+      LINES.forEach(function(t){ var s = 0, m = 0; res.forEach(function(r, k){ s += r[t.k]; m += picks[k].a[t.k]; per.push({i:k, t:t, d:r[t.k] - picks[k].a[t.k]}); }); avg[t.k] = Math.round(s / 3); kav[t.k] = Math.round(m / 3); diff[t.k] = (s - m) / 3; });
+      state = 'avg'; cardEl.hidden = true; hideLive(); clearDim(); helpOff(); sealOff(true); unturn(); tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
+      picEl.classList.add('swap'); linesEl.innerHTML = ''; stage.classList.remove('narrow');
+      setTimeout(function(){ stage.style.transition = 'none'; stage.style.setProperty('--ar', (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3)); stage.classList.add('blank'); picEl.innerHTML = ''; picEl.classList.remove('swap'); void stage.offsetWidth; requestAnimationFrame(function(){ stage.style.transition = ''; }); }, rm ? 0 : 220);   /* v408: 幅だけ遷移して小箱が出る一瞬を無くす（細部係） */   /* 絵が薄れてから、白い盤面に目盛りが並ぶ */
+      /* 目盛り→平均線。動きは left/top の transition（線は細く、集まったら平均線だけ濃く） */
+      var ticks = [];
+      LINES.forEach(function(t, n){
+        res.forEach(function(r, k){ ticks.push({el: mkLine(linesEl, t.ax, r[t.k], 'tick', 'ABC'[k]), to: avg[t.k]}); });
+        var av = mkLine(linesEl, t.ax, avg[t.k], 'you avg', avg[t.k] + '%'); av.style.transitionDelay = (n * .95 + 1.15) + 's';
+      });
+      void linesEl.offsetWidth;
+      /* v389: 役割ごとに三本→一本を順に見せる（Astra の手本：保持 300ms、集約 780ms）。いま何を集めているかを一語で */
+      LINES.forEach(function(t, n){ setTimeout(function(){ if(state === 'avg') mode(L(t.n + '（' + t.dir + '）を一本に', t.ne + ' (' + t.dire + ') into one')); }, rm ? 0 : 300 + n * 950); });
+      setTimeout(function(){ if(state === 'avg') mode(L('平均', 'average')); }, rm ? 0 : 4300);
+      var step = rm ? 0 : 1;
+      setTimeout(function(){ ticks.forEach(function(x, i){ x.el.style.transitionDelay = (.35 + Math.floor(i / 3) * .95) + 's'; x.el.style[x.el.classList.contains('v') ? 'left' : 'top'] = x.to + '%'; }); linesEl.classList.add('gathered'); }, 120 * step);
+      setTimeout(function(){ FIXED.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'fixed', v + '%'); }); linesEl.classList.add('fixed'); }, rm ? 60 : 4300);
+      setTimeout(function(){ var n = resEl.querySelector('.gm-seven'); if(n) n.classList.add('on'); if(state === 'avg'){ seal('YOUR GRID', '平均', stage, 'center'); cring(L('あなたの平均グリッド \u00b7 YOUR GRID \u00b7 ', 'YOUR AVERAGE GRID \u00b7 YOUR GRID \u00b7 ')); var th = resEl.querySelector('.gm-thanks'); if(th) th.classList.add('on'); trayEl.classList.add('pulse'); setTimeout(function(){ trayEl.classList.remove('pulse'); }, 500); } }, rm ? 100 : 4900);
+      setTimeout(function(){ goEl.classList.add('on'); focusBtn(); revealRes(); }, rm ? 150 : 5400);
+      lastAvg = {avg:avg, kav:kav, diff:diff, per:per}; avgRender(avg, kav, diff, per);
+    }
+    function avgRender(avg, kav, diff, per){
+      stepEl.textContent = L('三枚の平均をとる', 'Averaging the three');
+      resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
+        '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
+        '<ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' +
+        observe(diff, per) +
+        '<p class="gm-legend gm-seven"><i class="you"></i>' + L('朱の四本：あなた', 'red four: you') + '<i class="mine"></i>' + L('薄い破線の三本：研究', 'faint dashed three: research') + '</p>' +
+        '<div class="gm-jw"><p class="gm-cmph">' + L('日本の絵と海外の絵で、骨格はこれだけ違います。', 'Japanese and Western pictures differ this much.') + '</p><p class="gm-note">' + L('私の読みを、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、海外 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と海外を重ねる', 'Overlay Japan and the West') + '</button></div>' +
+        '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
+          '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
+      var jwb = resEl.querySelector('.gm-jwb'); if(jwb) jwb.addEventListener('click', jwOverlay);
+      resEl.querySelectorAll('.gm-media button').forEach(function(b){ b.addEventListener('click', function(){
+        resEl.querySelectorAll('.gm-media button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        var v = b.getAttribute('data-ar'); stage.style.setProperty('--ar', v === 'screen' ? (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3) : v);
+      }); });
+      goEl.innerHTML = ''; goEl.classList.add('hold');
+      btn(L('画面いっぱいに表示', 'Show full screen'), function(){ sheet(avg); }, 'go');
+      btn(L('研究と重ねる', 'Compare with the research grid'), overlay);
+      btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
+      btn(L('別の三枚を測る', 'Measure three more'), start);
+      btn(L('研究の手順 08 へ', 'To research step 08'), function(){ close(); setTimeout(function(){ if(window.__goStep) window.__goStep(8); else if(typeof skipTo === 'function') skipTo('#ch6'); }, 420); });   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
+    }
+    /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
+    function overlay(){
+      var on = linesEl.querySelector('.mine');
+      if(on){ linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); }); var n0 = resEl.querySelector('.gm-avnote'); if(n0) n0.parentNode.removeChild(n0); return; }
+      GRID.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'mine', v + '%'); });
+      resEl.insertAdjacentHTML('beforeend', '<p class="gm-note gm-avnote">' + L('破線は、研究から作ったこのサイトのグリッドです。', 'Dashed lines show the research grid used by this site.') + '</p>');
+    }
+    /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
+    /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
+    var infoEl = null, infoWantCat = false;
+    function sec(t){ return '<button type="button" class="gm-catq gm-secq" aria-expanded="false"><span>' + t + '</span><i></i></button>'; }   /* v394: i の札の節は畳んで、押すと開く（分析カテゴリと同じ作法） */
+    function info(){
+      if(!infoEl){
+        infoEl = el('div', 'gm-info'); infoEl.setAttribute('role', 'dialog'); infoEl.setAttribute('aria-label', L('この絵と線について', 'About this picture and the lines'));
+        infoEl.innerHTML = '<div class="gm-info-in"><div class="gm-info-b"></div><div class="gm-take-b"><button type="button" class="gm-b go"></button></div></div>';
+        infoEl.querySelector('.gm-take-b button').addEventListener('click', infoOff); infoEl.addEventListener('click', function(e){ if(e.target === infoEl) infoOff(); });
+        gm.appendChild(infoEl);
+      }
+      var b = picks[bi], body = '';
+      if(introOn){
+        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。研究では、その始まりと重心の位置を、絵の端からの百分率で読みます。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
+          sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
+          sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合う所。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>' +
+          sec(L('研究の目的', 'Why this research')) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + L('日本と海外の絵を同じものさし（七本の機能線）で測り、主塊と余白の置き方の違いを百分率で比べる研究です。この遊びは、その手順を三枚でなぞります。', 'The research measures Japanese and Western pictures with the same ruler, seven functional lines, and compares in percent how the main mass and the empty space are placed. This game traces that procedure on three pictures.') + '</p></div>';
+      } else if(b && state !== 'avg' && state !== 'idle'){
+        body += '<p class="gm-info-k">' + L('いま測っている絵', 'The picture you are measuring') + '</p><h3>' + ttl(b) + '</h3>' +
+          '<p class="gm-info-s">' + esc(L(b.src, b.srce)) + '</p>' + (b.note ? '<p class="gm-info-t gm-info-n">' + esc(L(b.note, b.notee)) + '</p>' : '') +
+          '<p class="gm-info-s">' + L('分析カテゴリ：', 'Category: ') + esc(L(b.cat, b.cate)) + '　／　' + L('主塊：', 'Main mass: ') + esc(obj(b)) + '</p>' +
+          '<button type="button" class="gm-catq" aria-expanded="false"><span>' + L('分析カテゴリとは', 'What the category means') + '</span><i></i></button>' +
+          '<div class="gm-catx" hidden><p class="gm-info-t">' + L('研究では、作品全体の構成を七つの観点で整理しています。ひとつの絵に複数が当てはまることもあります。この絵は、主に「', 'My research sorts the composition of a whole picture into seven viewpoints; more than one can apply. I read this picture mainly as “') + esc(L(b.cat, b.cate)) + L('」に当てはまります。', '”. ') + (catDef(b.cat) ? esc(L(catDef(b.cat)[2], catDef(b.cat)[3])) : '') + '</p><ul class="gm-cats">' +
+            CATS.map(function(c){ return '<li' + (c[0] === b.cat ? ' class="on"' : '') + '><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul></div>';   /* 絵の時代背景と特徴、分析カテゴリの説明（押すと開く） */
+      }
+      if(!introOn) body += sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' +
+        LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
+        sec(L('測らない三本', 'The three lines you do not draw')) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + L('研究の骨格は七本です。この遊びでは上の四本を測り、残る三本は研究の平均値で補います。三本は主塊ではなく、描き込みの密度が変わる所や脇の要素の境で決まり、絵ごとの差が小さいからです。平均の画面では薄い破線で重なります。', 'The research grid has seven lines. In this game you draw the four above; the other three are supplied from the research averages. They depend on where the drawing thins out or where side elements end, not on the main mass, and they vary little between pictures. On the average screen they appear as faint dashed lines.') + '</p>' +
+        '<ul class="gm-info-l gm-three"><li><b>X2</b><span>' + L('密度転換線　左から 28％', 'density shift · 28% from the left') + '</span></li><li><b>Y3</b><span>' + L('密度転換線　上から 71％', 'density shift · 71% from the top') + '</span></li><li><b>X4</b><span>' + L('副次要素境界線　左から 83％', 'secondary boundary · 83% from the left') + '</span></li></ul>' +
+        '</div>' + sec(L('遊び方', 'How to play')) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + L('絵を押して、そのまま動かします。離したところに線が引かれます。一本ごとに、私が同じ絵に引いた線を破線で重ね、二本の差を％で示します。三枚を測ると、四本の線を平均したあなたのグリッドができます。', 'Drag on the picture, then release to place a line. After each line, mine appears dashed with the difference in %. After three pictures, your four lines are averaged into your grid.') + '</p></div>';
+      infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
+      var iin = infoEl.querySelector('.gm-info-in');
+      infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
+        q.addEventListener('click', function(){ var on = x.hidden; x.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false'); if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: Math.min(top, q.offsetTop + x.offsetHeight - iin.clientHeight + 24 > top ? top : top), behavior:'smooth'}); }, 40); }); });
+      var cq = infoEl.querySelector('.gm-catq:not(.gm-secq)'), cx = cq && cq.nextElementSibling;
+      if(infoWantCat && cq && cx){ cx.hidden = false; cq.setAttribute('aria-expanded', 'true'); setTimeout(function(){ iin.scrollTo({top: Math.max(0, cq.offsetTop - 12), behavior: rm ? 'auto' : 'smooth'}); }, 260); }
+      void infoEl.offsetWidth; infoEl.classList.add('on'); gm.querySelector('.gm-i').setAttribute('aria-expanded', 'true');   /* 作った直後でも出現の動き（薄→濃、下から 8px）が付くように一度描かせる */ var wc = infoWantCat; infoWantCat = false; setTimeout(function(){ if(!wc) infoEl.querySelector('.gm-take-b button').focus({preventScroll:true}); }, 240);
+    }
+    function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } }
+    var takeEl = null, takeUrl = null;
+    var takeFile = null;
+    function takeaway(avg){
+      var cs = getComputedStyle(document.documentElement), FM = (cs.getPropertyValue('--mincho') || 'serif').trim(), FS = (cs.getPropertyValue('--sans') || 'sans-serif').trim(), FO = (cs.getPropertyValue('--mono') || 'monospace').trim();
+      var W = 1200, H = 675, cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2; var c = cv.getContext('2d'); c.scale(2, 2);
+      function rr(x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+      c.fillStyle = '#F2F1EC'; c.fillRect(0, 0, W, H);
+      c.fillStyle = '#1C1B19'; c.font = '900 40px ' + FM; c.textBaseline = 'alphabetic'; c.fillText(L('あなたの、ものさし', 'Your ruler'), 60, 92);
+      c.fillStyle = '#E84518'; c.font = '500 12px ' + FO; c.fillText(L('絵を、測る。  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO', 'MEASURE THE PICTURE  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO'), 60, 120);
+      /* 左：三枚の札とあなたの四本 */
+      var x = 60, y = 170, hh = 150;
+      picks.forEach(function(b, i){
+        var im = trayEl.children[i] && trayEl.children[i].querySelector('img'), ar = +b.ar || 1, w = Math.min(hh * ar, 260), h = w / ar; if(h > hh){ h = hh; w = h * ar; }
+        c.save(); rr(x, y, w, h, 4); c.clip();
+        if(im && im.complete && im.naturalWidth){ try{ c.drawImage(im, x, y, w, h); }catch(e){} } else { c.fillStyle = '#ECE8DF'; c.fillRect(x, y, w, h); }
+        var r = res[i] || {}; c.strokeStyle = '#E84518'; c.lineWidth = 1.5;
+        LINES.forEach(function(t){ var v = r[t.k]; if(v == null) return; c.beginPath(); if(t.ax === 'v'){ c.moveTo(x + w * v / 100, y); c.lineTo(x + w * v / 100, y + h); } else { c.moveTo(x, y + h * v / 100); c.lineTo(x + w, y + h * v / 100); } c.stroke(); });
+        c.restore(); c.strokeStyle = 'rgba(30,28,26,.35)'; c.lineWidth = 1; rr(x + .5, y + .5, w - 1, h - 1, 4); c.stroke();
+        c.fillStyle = '#E84518'; c.font = '500 11px ' + FO; c.fillText('ABC'[i], x, y - 8);
+        c.fillStyle = '#5A5955'; c.font = '11px ' + FS; var lb = L(b.t, b.te); while(lb.length > 2 && c.measureText(lb).width > w - 14) lb = lb.slice(0, -1); c.fillText(lb === L(b.t, b.te) ? lb : lb.replace(/.$/, '…'), x + 16, y - 8);   /* 題は札の幅に収める */
+        x += w + 26; if(x > 560){ x = 60; y += hh + 40; }
+      });
+      /* v386: 左の空きに、三枚の読みと一言。値だけでなく言葉が残る一枚に */
+      var ty = y + hh + 44, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b'; if(!enT) obs = obs.replace(/私/g, '研究');   /* 保存画像は単体で読まれるので「私」は「研究」に（Sol 第 15） */
+      c.fillStyle = '#5A5955'; c.font = '11px ' + FS;
+      c.fillText(picks.map(function(b, i){ return 'ABC'[i] + '  ' + (enT ? (b.cate || b.cat || '') : (b.cat || '')); }).join(enT ? '   /   ' : '   ／   '), 60, ty);
+      (function(){ var tl = picks.map(function(b, i){ return 'ABC'[i] + '  ' + L(b.t, b.te); }), sep2 = enT ? '   /   ' : '   ／   ', one = tl.join(sep2); c.fillStyle = '#8E8B84'; c.font = '10.5px ' + FS; if(c.measureText(one).width <= 560) c.fillText(one, 60, ty + 16); else { tl.forEach(function(t2, i2){ c.fillText(t2, 60, ty + 16 + i2 * 14); }); ty += (tl.length - 1) * 14; } })();   /* v418: 題は切らずに一行で（細部係：B・C が「…」で切れていた） */
+      if(obs){
+        c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FM; var toks = enT ? obs.split(' ') : obs.split(''), line = '', ly = ty + 30, n = 0, maxL = ty > 420 ? 2 : 4, sep = enT ? ' ' : '';
+        for(var ci = 0; ci < toks.length && n < maxL; ci++){ var tk = toks[ci], cand = line ? line + sep + tk : tk; if(c.measureText(cand).width > 520 && line){ c.fillText(line, 60, ly); line = tk; ly += 26; n++; } else line = cand; }
+        if(line && n < maxL) c.fillText(line, 60, ly);
+      }
+      /* 右：平均グリッド（あなたの 4 本＋研究の 3 本） */
+      var gx = 640, gy = 170, gw = 480, gh = 300;
+      c.fillStyle = '#FBFAF6'; rr(gx, gy, gw, gh, 6); c.fill(); c.strokeStyle = '#E1BD2B'; c.lineWidth = 1.5; rr(gx, gy, gw, gh, 6); c.stroke();
+      c.save(); rr(gx, gy, gw, gh, 6); c.clip();
+      c.setLineDash([4, 4]); c.strokeStyle = 'rgba(46,44,41,.5)'; c.lineWidth = 1;
+      FIXED.v.forEach(function(v){ c.beginPath(); c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); });
+      FIXED.h.forEach(function(v){ c.beginPath(); c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); });
+      c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = 2; c.fillStyle = '#E84518'; c.font = '500 11px ' + FO;
+      LINES.forEach(function(t){ var v = avg[t.k]; c.beginPath(); if(t.ax === 'v'){ c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); c.fillText(v + '%', gx + gw * v / 100 + 4, gy + 14); } else { c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); c.fillText(v + '%', gx + 4, gy + gh * v / 100 - 5); } });
+      c.restore();
+      c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FS; c.fillText(L('あなた', 'you') + '　X ' + avg.x1 + ' · 28 · ' + avg.x3 + ' · 83%　／　Y ' + avg.y1 + ' · ' + avg.y2 + ' · 71%', gx, gy + gh + 34);
+      c.fillStyle = '#5A5955'; c.font = '13px ' + FS; c.fillText(L('研究', 'research') + '　X 12 · 28 · 58 · 83%　／　Y 14 · 32 · 71%　（' + L('破線', 'dashed') + '）', gx, gy + gh + 58);
+      c.fillStyle = '#8E8B84'; c.font = '11px ' + FO; var d = new Date(); c.fillText(d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) + '  ·  ' + L('絵の幅と高さを 100 とした％', 'percent of the outline as 100'), gx, gy + gh + 82);
+      /* 判（静止） */
+      var sx = 1040, sy = 560, ss = 72; c.save(); c.translate(sx + ss / 2, sy + ss / 2); c.rotate(-9 * Math.PI / 180); c.translate(-ss / 2, -ss / 2);
+      c.strokeStyle = '#E84518'; c.lineWidth = 2.2; c.strokeRect(0, 0, ss, ss); c.lineWidth = .8; c.strokeRect(6, 6, ss - 12, ss - 12);
+      c.fillStyle = '#E84518'; c.font = '500 6px ' + FO; c.textAlign = 'center'; c.fillText('YOUR GRID', ss / 2, 20); c.font = '700 20px ' + FS; c.fillText('平均', ss / 2, 46); c.font = '4px ' + FO; c.fillText('KOSAKA · PORTFOLIO', ss / 2, 60); c.restore(); c.textAlign = 'start';
+      if(!takeEl){
+        takeEl = el('div', 'gm-take'); takeEl.setAttribute('role', 'dialog'); takeEl.setAttribute('aria-label', L('あなたのものさし', 'Your ruler'));
+        takeEl.innerHTML = '<div class="gm-take-in"><div class="gm-take-h"><b></b><em></em></div><img alt=""><p></p><div class="gm-take-b"><a class="gm-b go" download="monosashi.png"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 12.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></a><button type="button" class="gm-b gm-share" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 7.5v6h9v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="gm-b gm-take-x"></button></div></div>';
+        takeEl.querySelector('.gm-take-x').addEventListener('click', takeOff); takeEl.querySelector('.gm-share').addEventListener('click', function(){ if(!takeFile || !navigator.share) return; navigator.share({files:[takeFile], title:L('あなたの、ものさし', 'Your ruler')}).catch(function(){}); });   /* v386: 共有（AirDrop・LINE など。共有できる環境でだけ出る） */ takeEl.addEventListener('click', function(e){ if(e.target === takeEl) takeOff(); });
+        gm.appendChild(takeEl);
+      }
+      var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
+      takeEl.querySelector('p').textContent = L('三枚の読みと平均のグリッド、それに一言を、一枚の画像にしました。保存して、手元のものさしに。', 'Your three readings, the average grid and a note, on one image. Save it and keep the ruler with you.');
+      var ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+      a.querySelector('span').textContent = L('画像を保存', 'Save image'); a.download = 'monosashi-' + ymd + '.png';
+      var sb0 = takeEl.querySelector('.gm-share'); sb0.setAttribute('aria-label', L('共有', 'Share')); sb0.title = L('共有（AirDrop・LINE など）', 'Share (AirDrop, LINE and more)'); takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
+      takeEl.querySelector('.gm-take-h b').textContent = L('あなたの、ものさし。', 'Your ruler.'); takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
+      function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.onload = function(){ im.onload = null; takeFly(); }; im.src = url; a.href = url; takeEl.classList.add('on'); }
+      function share(bl){ var sb = takeEl.querySelector('.gm-share'); takeFile = null; try{ if(bl && window.File && navigator.canShare){ var f = new File([bl], 'monosashi-' + ymd + '.png', {type:'image/png'}); if(navigator.canShare({files:[f]})) takeFile = f; } }catch(e){} sb.hidden = !takeFile;
+        if(takeFile) takeEl.querySelector('p').textContent += L(' 丸いボタンから、AirDrop などでも送れます。', ' The round button shares it, by AirDrop and more.'); }
+      /* v387: 平均のグリッドが保存画像の中へ縮んで収まってから、プリントが下から出る（Sol 第 15：平均→保存がいちばん唐突になり得る） */
+      function takeFly(){
+        if(rm || !stage || !window.Animation) return;
+        var sr = stage.getBoundingClientRect(), tr = takeEl.getBoundingClientRect(); if(!sr.width || !im.offsetWidth) return;
+        var ir = {left: tr.left + im.offsetLeft, top: tr.top + im.offsetTop, width: im.offsetWidth, height: im.offsetHeight};   /* 札はまだ動いている最中なので、変形の影響を受けない offset で最終位置を出す */
+        var tx = ir.left + ir.width * .533, ty = ir.top + ir.height * .252, tw = ir.width * .4, th = ir.height * .444;
+        var g = el('div', 'gm-fly'); g.style.cssText = 'left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px';
+        LINES.forEach(function(t){ var v = avg[t.k]; if(v == null) return; var i = el('i', t.ax); i.style[t.ax === 'v' ? 'left' : 'top'] = v + '%'; g.appendChild(i); });
+        document.body.appendChild(g);
+        try{ var an = g.animate([{transform:'none', opacity:1}, {transform:'translate(' + (tx - sr.left).toFixed(1) + 'px,' + (ty - sr.top).toFixed(1) + 'px) scale(' + (tw / sr.width).toFixed(4) + ',' + (th / sr.height).toFixed(4) + ')', opacity:.2}], {duration:560, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards'}); an.onfinish = function(){ if(g.parentNode) g.remove(); }; }catch(e){ g.remove(); }
+        setTimeout(function(){ if(g.parentNode) g.remove(); }, 1000);
+      }
+      if(cv.toBlob) cv.toBlob(function(bl){ share(bl); put(bl ? URL.createObjectURL(bl) : cv.toDataURL('image/png')); }, 'image/png'); else { share(null); put(cv.toDataURL('image/png')); }
+      setTimeout(function(){ var b = takeEl.querySelector('a'); if(b) b.focus({preventScroll:true}); }, 260);
+    }
+    function takeOff(){ if(takeEl) takeEl.classList.remove('on'); }
+    var sheetAvg = null;
+    function sheet(avg){
+      sheetAvg = avg;
+      var sgd = sheetEl.querySelector('.gm-sgrid'); sgd.innerHTML = '';
+      GRID.v.forEach(function(v){ mkLine(sgd, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(sgd, 'h', v, 'mine', v + '%'); });
+      LINES.forEach(function(t){ mkLine(sgd, t.ax, avg[t.k], 'you big', avg[t.k] + '%'); });
+      FIXED.v.forEach(function(v){ mkLine(sgd, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(sgd, 'h', v, 'fixed', v + '%'); });
+      sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the composition.', '測る');
+      sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
+      var wx = [avg.x1, 28 - avg.x1, avg.x3 - 28, 83 - avg.x3, 17], wy = [avg.y1, avg.y2 - avg.y1, 71 - avg.y2, 29];
+      sheetEl.style.setProperty('--sx1', avg.x1 + '%');   /* v394: 注記は X1（あなたの主塊開始線）から、Y3（71％）の下の帯に置く */
+      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなた', 'you') + '</em> X ' + avg.x1 + ' · 28 · ' + avg.x3 + ' · 83　Y ' + avg.y1 + ' · ' + avg.y2 + ' · 71<br><em>' + L('研究', 'research') + '</em> X 12 · 28 · 58 · 83　Y 14 · 32 · 71';
+      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が研究の三本。見出しは開始線の交点に置きます。本文は重心線から始め、図版は二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between. Switch, and the same content sits on another grid.');
+      sheetGrid('you');
+      var mock = sheetEl.querySelector('.gm-mock'); mock.classList.remove('land'); void mock.offsetWidth;
+      gm.classList.add('sheeton'); sheetEl.setAttribute('aria-hidden', 'false'); try{ sheetEl.inert = false; }catch(x){}
+      setTimeout(function(){ mock.classList.add('land'); }, rm ? 0 : 360);   /* 見出し→図版→本文が線へ着地する（合計 500ms） */
+      setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('画面いっぱいに表示 \u00b7 APPLIED \u00b7 ', 'VIEW GRID FULL SCREEN \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
+      setTimeout(function(){ sheetEl.querySelector('.gm-sx').focus({preventScroll:true}); }, 240);
+    }
+    /* 紙面の内容（見出し・図版・本文）を、あなたの骨格か研究の骨格に載せる。位置は CSS 変数で渡し、切り替えは transition */
+    function sheetGrid(which){
+      var g = which === 'mine' ? {y1:14, x1:12, y2:32, x3:58} : sheetAvg; if(!g) return;
+      var m = sheetEl.querySelector('.gm-mock');
+      m.style.setProperty('--gx1', g.x1 + '%'); m.style.setProperty('--gy1', g.y1 + '%'); m.style.setProperty('--gx3', g.x3 + '%'); m.style.setProperty('--gy2', g.y2 + '%');
+      m.classList.toggle('nofig', g.x3 - g.x1 < 8 || 71 - g.y2 < 6); m.classList.toggle('notxt', 83 - g.x3 < 8);
+      sheetEl.querySelectorAll('.gm-swk button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-g') === which ? 'true' : 'false'); });
+      sheetEl.classList.toggle('mineg', which === 'mine');
+    }
+    function sheetOff(){ sealOff(true); gm.classList.remove('sheeton'); takeOff(); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} }
+    /* JA/EN が切り替わったら、見えている文を組み直す（案内・題・手番の欄） */
+    function relang(){
+      if(!gm || gm.hidden) return;
+      gm.querySelector('.gm-ttl').innerHTML = mix('絵を、測る。', 'Measure the composition.', '測る');
+      gm.querySelector('.gm-sub').textContent = '';
+      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');   /* v400: 右の列の ? と見分けがつくよう文字で */
+      axlText(); tbLabel();   /* 目盛りの向きの語と回すボタンの名も言語に合わせる */
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('研究の骨格', 'research grid');
+      if(introOn){
+        introEl.querySelectorAll('.gm-isec').forEach(function(d, i){ d.innerHTML = isecHTML(ISECS[i]); bindChoice(d); });
+        introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introScroll(); ibgW = ''; ibgBuild(); introBg();
+      } else if(state === 'trace'){ turn(); }
+      if(!introOn && state !== 'avg' && state !== 'idle' && !cardEl.hidden){ cardRender(bi); listBuild(); listState(); }   /* v409: 札と一覧も言語に合わせる（想定外係 #2） */
+      if(state === 'trace' || state === 'compare') stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>';
+      if(state === 'compare'){ var t2 = LINES[ti], b2 = picks[bi], p2 = res[bi][t2.k], a2 = b2.a[t2.k]; cmpRender(t2, b2, p2, a2, p2 - a2); mode(L('比べる', 'compare')); }
+      else if(state === 'done'){ stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; doneRender(); mode(L('測り終わり', 'measured')); }
+      else if(state === 'avg' && lastAvg && goEl.classList.contains('on')){ avgRender(lastAvg.avg, lastAvg.kav, lastAvg.diff, lastAvg.per); var sv = resEl.querySelector('.gm-seven'); if(sv) sv.classList.add('on'); mode(L('平均', 'average')); }
+    }
+    if(window.MutationObserver) new MutationObserver(relang).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+    window.__gmOpen = open;
+    /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
+    (function(){
+      var sp = document.getElementById('seqplay'); if(!sp || typeof kakuSvg !== 'function') return;
+      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '遊ぶ', 77));
+      sp.addEventListener('click', function(){ open(); });
+    })();
+    /* #play=… で開いたときは、そのまま遊びを開く（面接用の入口） */
+    if(/play=|^#game$/.test(location.hash || '')) setTimeout(function(){   /* オープニングが終わるのを待ってから開く（実機では開幕の演出が走っている） */
+      var n = 0, t = setInterval(function(){ if(document.body.classList.contains('opening') && ++n < 200) return; clearInterval(t); if(n < 200) open(); }, 250);
+    }, 1200);
+  })();
 })();
 
 /* dist: the works frames' photos load after the page is up (their <image> hrefs wait in data-lzhref).
