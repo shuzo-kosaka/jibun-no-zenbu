@@ -3993,17 +3993,6 @@
     .gm-intro .gm-isecs{top:54%}
     .gm-ihow{font-size:11px; padding:4px 9px}
   }
-  /* v467 Safari の帯が出た手の端末（高さ 428px）では、メニューの下の四つ（連絡・測る）が画面の外にあった（スマホ係の実測）。
-     低い画面のときだけ、上下の余白と判の大きさを詰めて一画面に収める */
-  @media (max-height:480px){
-    html.pcview.phone .menu-in,.menu .menu-in{padding-top:96px; padding-bottom:12px}
-    html.pcview.phone .menu .mmsg,.menu .mmsg{gap:8px}
-    html.pcview.phone .menu .mseals,.menu .mseals{padding-top:6px}
-    html.pcview.phone .menu-in,.menu .menu-in{zoom:.73}
-    html.pcview.phone .menu .mseals li .t,.menu .mseals li .t{font-size:12px; line-height:1.4}
-    html.pcview.phone .menu .mlinks,.menu .mlinks{padding-top:10px; gap:6px 25.6px}
-    html.pcview.phone .menu .mlinks a,.menu .mlinks a{padding-top:4px; padding-bottom:4px}
-  }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
