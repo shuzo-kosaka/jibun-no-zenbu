@@ -2942,7 +2942,7 @@
   .gm-ask b,.gm-card strong,.gm-obs,.gm-lead b,.gm-scap b{text-wrap:balance}
   /* スマホの案内：文書のスクロールで進める（Safari の帯を畳ませる）。案内の箱そのものは動かさない */
   html.gmdoc,html.gmdoc body{overflow:visible !important}
-  html.gmdoc .gm-iscroll{overflow:hidden}
+  /* v429: 案内は枠の中で送るので、文書を動かせる状態でも中は動く */
   /* 判：本編の感謝の印と同じ押し方（yayPress）。盤面の右下（落款）か中央、紙面の右下。退場は紙から離れるように */
   .gm-seal{position:absolute; z-index:7; pointer-events:none; width:min(32vh, 220px); height:min(32vh, 220px)}
   .gm-seal.corner{right:3.5%; bottom:4%}
@@ -3671,6 +3671,25 @@
   /* v428 帯が出ている間は、見出し行と下のボタンを見えている枠の内側へ */
   .gm-in{padding-top:calc(2.6vh + var(--vvt, 0px)); padding-bottom:calc(2.4vh + var(--vvb, 0px)); padding-left:calc(max(3.4vw, env(safe-area-inset-left, 0px)) + var(--vvl, 0px)); padding-right:calc(max(3.4vw, env(safe-area-inset-right, 0px)) + var(--vvr, 0px))}
   .gm-ihd,.gm-iskip,.gm-ix{margin-top:var(--vvt, 0px)}
+  /* v429 背景の帯：層を小さく保つ（will-change をやめ、描画を段の中に閉じる） */
+  .gm-imos .strip{will-change:auto}
+  .gm-imos .row{contain:paint}
+  html.gmdoc .gm-ispace{height:290%}
+  /* v429 遊びの間のカーソル演出の色は、後ろの章の色に引きずられない（本人：赤い章で白くなり見えなかった） */
+  html.gmopen .cur .cv,html.gmopen .cur .chh{background:#1C1B19}
+  html.gmopen .cur .cd{background:#E84518}
+  html.gmopen .cur .cc,html.gmopen .cur b{color:#1C1B19}
+  /* v429 畳んだ節の山形は、四十五度に回した四角ぶん見た目が下がるので少し上へ（本人） */
+  .gm-catq i{position:relative; top:-2px}
+  /* v429 トレイの三枚は、灰の下地の中で少し上へ（本人） */
+  .gm-tray{padding-bottom:5px; margin-bottom:7px}
+  @media (max-height:640px){ .gm-tray{padding-bottom:4px; margin-bottom:4px} }
+  /* v429 iPhone：遊び方と × は、ハンバーガー・言語切替と同じくらいの大きさに（本人） */
+  @media (max-height:640px){
+    .gm-i{height:38px; line-height:36px; font-size:12.5px; padding:0 13px}
+    .gm-x{font-size:30px; line-height:1}
+    .gm-hd{align-items:center}
+  }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

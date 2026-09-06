@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4363,17 +4363,17 @@
       var title = {k:4, at:0, title:true, big:'測る', ja:['絵を、測る。', ''], en:['Measure the picture.', '']};
       var IK = ['<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6" height="12"/><rect x="9" y="6" width="6" height="12"/><rect x="16" y="6" width="6" height="12"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 12h18"/><circle class="d" cx="12" cy="12" r="2.6"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 10h18"/><path class="m" d="M3 15h18"/><path class="a" d="M17.5 10.4v4.2M16.2 11.4l1.3-1.3 1.3 1.3M16.2 13.6l1.3 1.3 1.3-1.3"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M8 4v16M15 4v16M3 9h18M3 15h18"/></svg>'];
       function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
-      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 1) + il('一本引くたびに、私の線が現れ、ずれが％で出ます。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>研究の骨格と重ねて見比べられます。', 3) + '</ul>';
-      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>then release to place a line.', 1) + il('Each time you draw a line, mine appears on the same picture and the gap is shown in percent.', 2) + il('After twelve lines your average grid is ready. Lay it over the research grid and compare.', 3) + '</ul>';
+      var LJ = '<ul class="gm-ilist">' + il('全部で十二本、二分ほどです。', 0) + il('絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 1) + '</ul>';
+      var LE = '<ul class="gm-ilist">' + il('Twelve lines in all, about two minutes.', 0) + il('Drag on the picture,<br>then release to place a line.', 1) + '</ul>';
       var info = {k:4, at:.5, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
-      var PJ = '<p class="gm-ipur">' + body('同じものさしで日本の絵と海外の絵を測ると、比率の置きどころに偏りが出ます。') + '</p>' +
-        '<p class="gm-ipur">' + body('研究では、その偏りを日本の絵の特徴として取り出しました。あなたの十二本も、その一つの読みになります。') + '</p>' +
-        '<p class="gm-ick">測る絵を選ぶ　　くわしくは右上の「遊び方」から</p>';
-      var PE = '<p class="gm-ipur">Measured with one ruler, Japanese and Western pictures put their ratios in different places.</p>' +
-        '<p class="gm-ipur">The research draws that leaning out as a trait of the Japanese ones. Your twelve lines become one more reading of it.</p>' +
+      var PJ = '<p class="gm-ipur">' + body('日本の絵と海外の絵を同じやり方で測り、私が引いた線との差を％で見比べます。') + '</p>' +
+        '<p class="gm-ipur">' + body('十二本を引き終えると、あなたの平均グリッドができ、研究の骨格と重ねられます。') + '</p>' +
+        '<p class="gm-ick">測る絵を選んでください　　くわしくは右上の「遊び方」から</p>';
+      var PE = '<p class="gm-ipur">Japanese and Western pictures are measured the same way, and your lines are compared with mine in percent.</p>' +
+        '<p class="gm-ipur">After twelve lines your average grid is ready, to lay over the research grid.</p>' +
         '<p class="gm-ick">Choose the pictures　　details under How to play, top right</p>';
-      var choice = {k:4, at:1, html:true, choice:true, big:'比べる', ja:['日本と海外を、比べる。', PJ], en:['Compare Japan and the West.', PE]};
+      var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
       return [title, info, choice];
     }
     var cat = 'both';   /* 日本／海外／両方（小坂さんの指示）。最後に二つの骨格の違いも見せる */
@@ -4454,8 +4454,8 @@
         for(var mr = 0; mr < 3; mr++){
           var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
           for(var cp = 0; cp < 2; cp++){
-            for(var mi = 0; mi < BOARDS.length; mi++){
-              var mb = BOARDS[(mi + mr * 7) % BOARDS.length];
+            for(var mi = 0; mi < 6; mi++){   /* v429: 一巡は六枚。長すぎる帯は端末が描くのをやめてしまう（固まる・消える） */
+              var mb = BOARDS[(mi + mr * 6) % BOARDS.length];
               var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false; mim.src = mb.img; strip.appendChild(mim);
             }
           }
@@ -4480,9 +4480,9 @@
       ibgBuild();
       /* スマホ（iPhone の Safari）：案内は文書のスクロールで進める。指で文書を送ると Safari の帯（タブ・アドレス）が畳まれ、
          そのあと遊びの間は overflow を止めるので畳まれたまま——盤面に画面の高さがそのまま渡る（幕の後ろの紙面は見えない） */
-      docMode = document.documentElement.classList.contains('phone');
+      docMode = false; phoneFree = document.documentElement.classList.contains('phone');   /* v429: 案内も枠の中で送る（文書を動かすと Safari の帯が戻り、後ろの本編も動く：本人）。iPhone では文書を動かせるままにして帯を畳んだまま保つ */
       var isp = introEl.querySelector('.gm-ispace'); if(isp) isp.style.height = ISECS.length < 3 ? (docMode ? '170%' : '130%') : '';   /* v393: 二面なら一度の送りで着く送り幅に */
-      if(docMode){
+      if(phoneFree){
         scroll0 = window.scrollY; document.documentElement.classList.add('gmdoc');
         var R = introRange(), maxB = Math.max(0, document.documentElement.scrollHeight - window.innerHeight - R - 24);
         docBase = Math.max(0, Math.min(scroll0, maxB)); window.scrollTo(0, docBase);
@@ -4521,7 +4521,7 @@
       if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
       introEl.classList.toggle('moved', p > .04); introEl.classList.toggle('end', cur === ISECS.length - 1); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
     }
-    var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0;
+    var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0, phoneFree = false;
     function introRange(){ return iscroll.scrollHeight - iscroll.clientHeight; }
     function introTo(i){ i = Math.max(0, Math.min(ISECS.length - 1, i)); introTgt = i; introTgtAt = performance.now(); var m = introRange(), top = Math.round(m * Math.min(1, ISECS[i].at + (i >= ISECS.length - 1 ? .2 : .02))); if(docMode) window.scrollTo({top: docBase + top, behavior: rm ? 'auto' : 'smooth'}); else iscroll.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }
     function introAt(){ return (introTgt >= 0 && performance.now() - introTgtAt < 2500) ? introTgt : introCur(); }   /* なめらかに送っている最中（文書スクロールでは 1 秒を超える）は行き先の画面を基準に。着いたら scroll 側で解く */   /* ボタン連打：なめらかに送っている最中は行き先の画面を基準に */
@@ -4534,7 +4534,7 @@
     }
     /* v391: iPhone では案内のあとも文書を「動かせる」ままにしておく（gmdoc を残す）。文書が動かせなくなると Safari の帯が戻ってくる（実機で確認）。
        指のスクロールは gm の touchmove で止め、右の列など中で動く箇所だけ通す */
-    function docOff(){ if(!docMode) return; window.removeEventListener('scroll', introScroll); }
+    function docOff(){ window.removeEventListener('scroll', introScroll); }
     /* v389: 遊びの間は紙面（文書）を固定する。iOS の Safari は overflow:hidden だけでは指のスクロールを止めきれないので body を fixed に */
     var lockY = 0, locked = false, openY = 0;
     function lockDoc(){ if(locked) return; locked = true; lockY = window.scrollY; document.body.style.top = -lockY + 'px'; document.documentElement.classList.add('gmlock'); }
@@ -4614,12 +4614,12 @@
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('研究の骨格', 'research grid');
       gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
       if(!forced()) intro(); else start();   /* 案内は開くたびに（スキップがある）。#play のときだけ省く */
-      if(!docMode) lockDoc();
+      if(!phoneFree) lockDoc();
       if(window.__retint) window.__retint();   /* iOS の帯の色を、幕の紙色で採り直させる */
     }
     function close(){
       if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
-      if(docMode){ docOff(); document.documentElement.classList.remove('gmdoc'); docMode = false; } unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
+      if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
       gm.classList.remove('on', 'sheeton'); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
       offT = setTimeout(function(){ gm.hidden = true; if(window.__retint) window.__retint(); }, 520);
       if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
@@ -4707,10 +4707,17 @@
     function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i><b>' + L('絵を押して、そのまま下へ動かしてください。<br>離したところに線が引かれます。', 'Drag downward on the picture,<br>then release to place a line.') + '</b>'; stage.appendChild(demoEl);
       /* v399: 問いの札が絵の中にあるとき（iPhone）は、その下に 8px 空けて同じ幅で置く */
       requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(tr.height && tr.top >= sr.top - 1){ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
+    function demoFit(){   /* v429: 手本の文は、問いの札と同じ中心に（iPhone で 35px ずれていた：本人） */
+      if(!demoEl || !tipEl) return; var bEl = demoEl.querySelector('b'); if(!bEl) return;
+      var tb = tipEl.getBoundingClientRect(); if(!tb.width) return;
+      bEl.style.marginLeft = '0px';
+      var bb = bEl.getBoundingClientRect(); if(!bb.width) return;
+      bEl.style.marginLeft = Math.round((tb.left + tb.width / 2) - (bb.left + bb.width / 2)) + 'px';
+    }
     function demoOff(){ if(demoEl && demoEl.parentNode) demoEl.parentNode.removeChild(demoEl); demoEl = null; }
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
-      if(bi === 0 && ti === 0 && !demoDone) demoOn(); else demoOff();
+      if(bi === 0 && ti === 0 && !demoDone){ demoOn(); setTimeout(demoFit, 40); setTimeout(demoFit, 560); } else demoOff();
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false;
       stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
