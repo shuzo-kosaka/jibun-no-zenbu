@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4189,7 +4189,7 @@
       ringT = setTimeout(function(){ r.classList.add('bye'); setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); if(ringCur === r) ringCur = null; }, 450); }, 1500);
       return r;
     }
-    var SEALT = {sheet:[380, 550, 280], center:[560, 1000, 360], corner:[420, 1000, 300], tr:[420, 2400, 300]};   /* 押印・滞在・退場（ms） */
+    var SEALT = {sheet:[380, 550, 280], center:[1100, 1000, 460], corner:[900, 1000, 380], tr:[1000, 2200, 420]};   /* v476: 判はゆっくり、ぼやっと浮かび上がる（本人） */   /* 押印・滞在・退場（ms） */
     function seal(en, jp, host, pos){
       sealOff(true);
       var sp = el('span', 'gm-seal ' + (pos || 'corner')), tm = SEALT[pos] || SEALT.corner; sp.setAttribute('aria-hidden', 'true');
@@ -4243,7 +4243,7 @@
               '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
               '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' +
             '</div></div>' +
-            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-qa"></div><div class="gm-btns"></div></div>' +
+            '<div class="gm-side"><div class="gm-lead2" hidden></div><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-qa"></div><div class="gm-btns"></div></div>' +
           '</div>' +
         '</div>' +
         '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-iskip" type="button"></button><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
@@ -4798,6 +4798,9 @@
     function demoOff(){ if(demoEl && demoEl.parentNode) demoEl.parentNode.removeChild(demoEl); demoEl = null; }
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
+      var lead2 = gm.querySelector('.gm-lead2');
+      if(lead2){ if(bi === 0 && ti === 0){ lead2.hidden = false; lead2.innerHTML = '<b>' + L('絵から、ものさしを取り出す。', 'Taking a ruler out of a picture.') + '</b><span>' + body_(L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Four lines on each of three pictures; then their average.')) + '</span>'; }
+        else if(!lead2.hidden){ lead2.classList.add('bye'); setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); } }   /* v477: 何をする遊びかを、いちばん先に目につく所へ（本人） */
       if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false;
