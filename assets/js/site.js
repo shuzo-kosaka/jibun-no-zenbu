@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4367,7 +4367,7 @@
       function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
       var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 1) + il('一本引くたびに、私の線が現れ、解釈の違いが％で出ます。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>研究の骨格と重ねて見比べられます。', 3) + '</ul>';
       var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>then release to place a line.', 1) + il('Each time you draw a line, mine appears and the difference is shown in percent.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over the research grid and compare.', 3) + '</ul>';
-      var info = {k:4, at:.5, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
+      var info = {k:4, at:.36, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、私が引いた線との差を％で見比べます。') + '</p>' +
         '<p class="gm-ipur">' + body('十二本を引き終えると、あなたの平均グリッドができ、研究の骨格と重ねられます。') + '</p>' +
@@ -4375,8 +4375,13 @@
       var PE = '<p class="gm-ipur">Japanese and Western pictures are measured the same way, and your lines are compared with mine in percent.</p>' +
         '<p class="gm-ipur">After twelve lines your average grid is ready, to lay over the research grid.</p>' +
         '<p class="gm-ick">Choose the pictures　　details under How to play, top right</p>';
+      var RJ = '<p class="gm-ipur">' + body('私の研究では、形や余白の置かれ方を測り、日本画と西洋画の傾向を比べています。') + '</p>' +
+        '<p class="gm-ipur">' + body('ここで行うのは、主な形が始まる位置と見た目の中心だけを、三枚の絵で測る簡易版です。') + '</p>';
+      var RE = '<p class="gm-ipur">In my research, I measure how forms and empty spaces are placed, then compare the tendencies of Japanese and Western pictures.</p>' +
+        '<p class="gm-ipur">What you do here is a simplified version: three pictures, and only where the main form begins and where its visual centre falls.</p>';
+      var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
       var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
-      return [title, info, choice];
+      return [title, info, brief, choice];
     }
     var cat = 'both';   /* 日本／西洋／両方（小坂さんの指示）。最後に二つの骨格の違いも見せる */
     /* 分析カテゴリ：研究で「作品全体をどんな構図として捉えるか」を七つに分けたもの。遊びでは各絵に一つ */
@@ -4534,7 +4539,13 @@
       secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur); });
       if(!introEl.classList.contains('s' + cur)) introBg();   /* 画面が変わったら背景の図を最初から */
       dots.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('done', i < cur); });
-      var go = introEl.querySelector('.gm-igo'); go.innerHTML = cur === ISECS.length - 1 ? '<b>' + L('はじめる', 'Start') + '</b>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'; go.setAttribute('aria-label', cur === ISECS.length - 1 ? L('はじめる', 'Start') : L('次へ', 'Next')); go.classList.toggle('last', cur === ISECS.length - 1);
+      /* v436: 送るたびにボタンの中身を書き換えていて、iPhone でカクつき、赤い丸が出たり消えたりしていた（本人）。変わったときだけ書き換える */
+      var go = introEl.querySelector('.gm-igo'), isLast = cur === ISECS.length - 1, key = (isLast ? 'L' : 'N') + document.documentElement.lang;
+      if(go.__k !== key){
+        go.__k = key;
+        go.innerHTML = isLast ? '<b>' + L('はじめる', 'Start') + '</b>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        go.setAttribute('aria-label', isLast ? L('はじめる', 'Start') : L('次へ', 'Next')); go.classList.toggle('last', isLast);
+      }
       if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
       introEl.classList.toggle('moved', p > .04); introEl.classList.toggle('end', cur === ISECS.length - 1); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
     }
