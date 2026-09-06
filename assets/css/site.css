@@ -6,8 +6,8 @@
     --l-yellow:#E1BD2B; --l-red:#D9251C; --l-green:#2F8F5B; --l-blue:#2C6FB7; --field:rgba(225,189,43,.28);
     --x1:12%; --x2:28%; --x3:58%; --x4:83%; --y1:14vh; --y2:32vh; --y3:71vh;
     --mincho:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
-    --sans:"IBM Plex Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-    --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,sans-serif;
+    --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,"Hiragino Sans","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,monospace;
     --optima:"Optima","Optima Nova","Marcellus","Zen Old Mincho",serif;
     --ease:cubic-bezier(.2,.7,.2,1);
   }
