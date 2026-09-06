@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4488,7 +4488,7 @@
       clearTimeout(ibgT); ibgT = setTimeout(introBg, rm ? 60000 : 7600);   /* 一巡 7.6 秒でもう一度 */
     }
     function intro(){
-      introOn = true; introEl.hidden = false; introEl.classList.remove('ready'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ introEl.classList.add('ready'); }); });   /* v431: 開いたあと静かに現れる（本人） */
+      introOn = true; introEl.hidden = false; introEl.classList.remove('ready', 'end', 'moved'); introEl.__end = false; clearTimeout(introEl.__endT);   /* v443: 二度目に開いたとき前の状態が残り、スキップが消えていた（実機係） */ requestAnimationFrame(function(){ requestAnimationFrame(function(){ introEl.classList.add('ready'); }); });   /* v431: 開いたあと静かに現れる（本人） */
       ISECS = isecsFor(); ibgW = '';   /* v393: 面の組を決めてから図を組む */
       ibgBuild();
       /* スマホ（iPhone の Safari）：案内は文書のスクロールで進める。指で文書を送ると Safari の帯（タブ・アドレス）が畳まれ、
@@ -4741,6 +4741,7 @@
       showBoard(b);
       cardRender(i);
       cardEl.hidden = false; listBuild();
+      (function(){ var sc = gm.querySelector('.gm-side'); if(sc) sc.scrollTop = 0; })();   /* v443: 絵が替わったら列を頭へ（実機係） */
       turn();
     }
     function cardRender(i){ var b = picks[i];
@@ -5063,12 +5064,12 @@
         x += w + 26; if(x > 560){ x = 60; y += hh + 40; }
       });
       /* v386: 左の空きに、三枚の読みと一言。値だけでなく言葉が残る一枚に */
-      var ty = y + hh + 44, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b'; if(!enT) obs = obs.replace(/私/g, '研究');   /* 保存画像は単体で読まれるので「私」は「研究」に（Sol 第 15） */
+      var ty = y + hh + 52, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b'; if(!enT) obs = obs.replace(/私/g, '研究');   /* 保存画像は単体で読まれるので「私」は「研究」に（Sol 第 15） */
       c.fillStyle = '#5A5955'; c.font = '11px ' + FS;
       c.fillText(picks.map(function(b, i){ return 'ABC'[i] + '  ' + (enT ? (b.cate || b.cat || '') : (b.cat || '')); }).join(enT ? '   /   ' : '   ／   '), 60, ty);
       (function(){ var tl = picks.map(function(b, i){ return 'ABC'[i] + '  ' + L(b.t, b.te); }), sep2 = enT ? '   /   ' : '   ／   ', one = tl.join(sep2); c.fillStyle = '#8E8B84'; c.font = '10.5px ' + FS; if(c.measureText(one).width <= 560) c.fillText(one, 60, ty + 16); else { tl.forEach(function(t2, i2){ c.fillText(t2, 60, ty + 16 + i2 * 14); }); ty += (tl.length - 1) * 14; } })();   /* v418: 題は切らずに一行で（細部係：B・C が「…」で切れていた） */
       if(obs){
-        c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FM; var toks = enT ? obs.split(' ') : obs.split(''), line = '', ly = ty + 30, n = 0, maxL = ty > 420 ? 2 : 4, sep = enT ? ' ' : '';
+        c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FM; var toks = enT ? obs.split(' ') : obs.split(''), line = '', ly = ty + 52, n = 0, maxL = ty > 420 ? 2 : 4, sep = enT ? ' ' : '';
         for(var ci = 0; ci < toks.length && n < maxL; ci++){ var tk = toks[ci], cand = line ? line + sep + tk : tk; if(c.measureText(cand).width > 520 && line){ c.fillText(line, 60, ly); line = tk; ly += 26; n++; } else line = cand; }
         if(line && n < maxL) c.fillText(line, 60, ly);
       }

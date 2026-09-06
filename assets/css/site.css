@@ -3834,6 +3834,28 @@
   .gm-qa .gm-qaa{margin:2px 0 10px; font-size:11.5px; line-height:1.85; opacity:.82}
   .gm-qa .gm-qq:focus-visible{outline:2px solid var(--acc); outline-offset:3px}
   @media (max-height:640px){ .gm-qa .gm-qq{font-size:11.5px} .gm-qa .gm-qaa{font-size:11px} }
+  /* v443 英語では均等割りをやめる（iPhone の Safari で単語の空白が消えていた：実機係） */
+  html[lang="en"] .gm-isec > span,html[lang="en"] .gm-isec > span *{text-align:left; text-justify:auto; word-spacing:normal}
+  html[lang="en"] .gm-ipur{text-align:left}
+  /* v443 案内の見出しが右上のボタンに掛からない幅に（iPhone：実機係） */
+  .gm-isec > b{max-width:min(100%, calc(100vw - 300px)); margin-left:auto; margin-right:auto}
+  @media (max-height:640px){ .gm-isec > b{max-width:calc(100vw - 320px)} }
+  /* v443 遊び方の札は、帯が出ていても閉じるまで届く高さに（実機係） */
+  .gm-info-in{max-height:calc(100% - 24px - var(--vvb, 0px))}
+  @media (max-height:640px){ .gm-info-in{max-height:calc(100% - 16px - var(--vvb, 0px))} }
+  /* v443 骨格の画面：右端と上端の札が画面の外／島に隠れないよう内側へ（実機係） */
+  .gm-sgrid .gm-ln.mine.h b,.gm-sgrid .gm-ln.fixed.h b{right:max(10px, calc(env(safe-area-inset-right, 0px) + 6px))}
+  .gm-sgrid .gm-ln.you.h b{left:max(10px, calc(env(safe-area-inset-left, 0px) + 6px))}
+  .gm-sgrid .gm-ln.v b{top:max(10px, calc(env(safe-area-inset-top, 0px) + 6px))}
+  .gm-sgrid .gm-ln.mine.v b,.gm-sgrid .gm-ln.fixed.v b{top:auto; bottom:max(10px, calc(env(safe-area-inset-bottom, 0px) + 6px))}
+  /* v443 英語の縦軸の見出しが一文字ずつ縦積みになるのを避ける（実機係） */
+  html[lang="en"] .gm-axl{writing-mode:horizontal-tb; text-orientation:mixed}
+  /* v443 iPhone：帯が出ていると平均の列がほとんど読めなくなるので、留まるボタンの帯を薄く小さく（実機係） */
+  @media (max-height:640px){
+    .gm-btns.hold{padding-top:8px; gap:6px}
+    .gm-btns.hold .gm-b{min-height:38px; padding:7px 6px; font-size:11.5px}
+    .gm-btns.hold .gm-b.go{min-height:42px; padding:9px 10px; font-size:12.5px}
+  }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
