@@ -3394,7 +3394,7 @@
     var BOARDS = /*BOARDS*/[
           {
                 "id": "massaki",
-                "img": "{{BOARD_01}}",
+                "img": "assets/img/BOARD_01.webp",
                 "jp": true,
                 "ar": 0.667,
                 "t": "広重『隅田川水神の森真崎』",
@@ -3428,7 +3428,7 @@
           },
           {
                 "id": "fuji",
-                "img": "{{BOARD_02}}",
+                "img": "assets/img/BOARD_02.webp",
                 "jp": true,
                 "ar": 1.5,
                 "t": "北斎『凱風快晴』",
@@ -3462,7 +3462,7 @@
           },
           {
                 "id": "milkmaid",
-                "img": "{{BOARD_05}}",
+                "img": "assets/img/BOARD_05.webp",
                 "jp": false,
                 "ar": 0.875,
                 "t": "フェルメール『牛乳を注ぐ女』",
@@ -3496,7 +3496,7 @@
           },
           {
                 "id": "wanderer",
-                "img": "{{BOARD_06}}",
+                "img": "assets/img/BOARD_06.webp",
                 "jp": false,
                 "ar": 0.75,
                 "t": "フリードリヒ『雲海の上の旅人』",
@@ -3530,7 +3530,7 @@
           },
           {
                 "id": "gleaners",
-                "img": "{{BOARD_07}}",
+                "img": "assets/img/BOARD_07.webp",
                 "jp": false,
                 "ar": 1.333,
                 "t": "ミレー『落穂拾い』",
@@ -3564,7 +3564,7 @@
           },
           {
                 "id": "barrel",
-                "img": "{{BOARD_08}}",
+                "img": "assets/img/BOARD_08.webp",
                 "jp": true,
                 "ar": 1.5,
                 "t": "北斎『尾州不二見原』",
@@ -3598,7 +3598,7 @@
           },
           {
                 "id": "kiss",
-                "img": "{{BOARD_11}}",
+                "img": "assets/img/BOARD_11.webp",
                 "jp": false,
                 "ar": 1.0,
                 "t": "クリムト『接吻』",
@@ -3632,7 +3632,7 @@
           },
           {
                 "id": "wave",
-                "img": "{{BOARD_13}}",
+                "img": "assets/img/BOARD_13.webp",
                 "jp": true,
                 "ar": 1.5,
                 "t": "北斎『神奈川沖浪裏』",
@@ -3666,7 +3666,7 @@
           },
           {
                 "id": "ohashi",
-                "img": "{{BOARD_14}}",
+                "img": "assets/img/BOARD_14.webp",
                 "jp": true,
                 "ar": 0.667,
                 "t": "広重『大はしあたけの夕立』",
@@ -3700,7 +3700,7 @@
           },
           {
                 "id": "kameido",
-                "img": "{{BOARD_15}}",
+                "img": "assets/img/BOARD_15.webp",
                 "jp": true,
                 "ar": 0.667,
                 "t": "広重『亀戸梅屋舗』",
@@ -3734,7 +3734,7 @@
           },
           {
                 "id": "pines",
-                "img": "{{BOARD_17}}",
+                "img": "assets/img/BOARD_17.webp",
                 "jp": true,
                 "ar": 2.344,
                 "t": "等伯『松林図屏風』",
@@ -3768,7 +3768,7 @@
           },
           {
                 "id": "sesshu",
-                "img": "{{BOARD_18}}",
+                "img": "assets/img/BOARD_18.webp",
                 "jp": true,
                 "ar": 0.5,
                 "t": "雪舟『秋冬山水図（冬）』",
@@ -3802,7 +3802,7 @@
           },
           {
                 "id": "kambara",
-                "img": "{{BOARD_03}}",
+                "img": "assets/img/BOARD_03.webp",
                 "jp": true,
                 "ar": 1.5,
                 "t": "広重『蒲原 夜之雪』",
@@ -3836,7 +3836,7 @@
           },
           {
                 "id": "poppin",
-                "img": "{{BOARD_04}}",
+                "img": "assets/img/BOARD_04.webp",
                 "jp": true,
                 "ar": 0.667,
                 "t": "歌麿『ビードロを吹く娘』",
@@ -3870,7 +3870,7 @@
           },
           {
                 "id": "whistler",
-                "img": "{{BOARD_09}}",
+                "img": "assets/img/BOARD_09.webp",
                 "jp": false,
                 "ar": 1.126,
                 "t": "ホイッスラー『母の肖像』",
@@ -3904,7 +3904,7 @@
           },
           {
                 "id": "scream",
-                "img": "{{BOARD_10}}",
+                "img": "assets/img/BOARD_10.webp",
                 "jp": false,
                 "ar": 0.8,
                 "t": "ムンク『叫び』",
@@ -3938,7 +3938,7 @@
           },
           {
                 "id": "fujinraijin",
-                "img": "{{BOARD_12}}",
+                "img": "assets/img/BOARD_12.webp",
                 "jp": true,
                 "ar": 2.381,
                 "t": "宗達『風神雷神図屏風』",
@@ -3972,7 +3972,7 @@
           },
           {
                 "id": "irises",
-                "img": "{{BOARD_16}}",
+                "img": "assets/img/BOARD_16.webp",
                 "jp": true,
                 "ar": 2.532,
                 "t": "光琳『燕子花図屏風』",
@@ -4006,7 +4006,7 @@
           },
           {
                 "id": "mondrian",
-                "img": "{{BOARD_19}}",
+                "img": "assets/img/BOARD_19.webp",
                 "jp": false,
                 "ar": 1.0,
                 "t": "モンドリアン『赤・青・黄のコンポジション』",
