@@ -3996,6 +3996,10 @@
   .gm-lines.gathered .gm-ln.tick b{opacity:0; transition:opacity .3s var(--ease)}
   /* v469 カーソルの座標札が、暗い絵の上で 1.09:1 まで落ちる（PC 係）。紙の光を一段まとわせる */
   html.gmopen .cur .cc{text-shadow:0 0 6px var(--paper, #F2F1EC), 0 0 3px var(--paper, #F2F1EC), 0 0 1px var(--paper, #F2F1EC)}
+  /* v470 引き終えた線の％が読めない件の直し漏れ（台帳係）。親の opacity:.5 が紙の地ごと薄めていた。
+     線だけを薄く見せ、札は不透明のままにする（最悪 2.1:1 → 紙の地の上での値へ） */
+  .gm-ln.you.past{opacity:1; border-color:rgba(232,69,24,.5)}
+  .gm-ln.you.past::before{opacity:.5}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
