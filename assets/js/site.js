@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -3513,7 +3513,7 @@
                 },
                 "why": [
                       "頭のいちばん上。",
-                      "人物と足元の岩をひとつの塊と読む。岩は左の縁近くから。",
+                      "人物と足元の岩をひとつの塊と解釈する。岩は左の縁近くから。",
                       "岩の重さで、重心は下へ。",
                       "ほぼ中央。人物の軸そのもの。"
                 ],
@@ -3615,7 +3615,7 @@
                 },
                 "why": [
                       "頭のいちばん上。",
-                      "抱き合う二人をひとつの塊と読む。その左端。",
+                      "抱き合う二人をひとつの塊と解釈する。その左端。",
                       "上から下まで、ほぼ一様な柱。重心は中央。",
                       "中央の柱。重心も中央。"
                 ],
@@ -4255,7 +4255,7 @@
       gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* v431: スキップを戻す（本人）。遊び方はその隣 */   /* v425: スキップをやめ、案内の右上は「遊び方」に（本人） */   /* スキップは「絵を選ぶ」の画面へ */
       gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1); });
       gm.querySelector('.gm-ix').addEventListener('click', close);
-      gm.querySelector('.gm-idots').addEventListener('click', function(e){ var i = Array.prototype.indexOf.call(e.currentTarget.children, e.target); if(i >= 0) introTo(i); });
+      gm.querySelector('.gm-idots').addEventListener('click', function(e){ var t = e.target.closest('button, i'); if(!t) return; var i = Array.prototype.indexOf.call(e.currentTarget.children, t); if(i >= 0) introTo(i); });
       iscroll.addEventListener('keydown', introKey);
       ruler(gm.querySelector('.gm-rt'), 'v'); ruler(gm.querySelector('.gm-rl'), 'h');
       gm.querySelector('.gm-x').addEventListener('click', close);
@@ -4507,7 +4507,7 @@
       }
       ISECS.forEach(function(s, i){
         var d = el('div', 'gm-isec' + (s.title ? ' gm-ititle' : (s.choice ? ' gm-ipick' : (s.info ? ' gm-iinfo' : '')))); d.innerHTML = isecHTML(s); secs.appendChild(d); bindChoice(d);
-        dots.appendChild(el('i', i === 0 ? 'on' : ''));
+        var dbt = el('button', i === 0 ? 'on' : ''); dbt.type = 'button'; dbt.setAttribute('aria-label', L((i + 1) + ' 枚目の案内へ', 'Go to slide ' + (i + 1))); dots.appendChild(dbt);   /* v439: ボタンにして、本編と同じくカーソルの輪が反応するように（本人） */
       });
       introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('遊び方', 'How to play');
       introEl.querySelector('.gm-igo').textContent = L('次へ', 'Next');
@@ -4592,7 +4592,8 @@
         if(still < 4 && performance.now() - t0 < 1500){ requestAnimationFrame(wait); return; }
         if(!r1.width){ g.remove(); return; }
         g.classList.add('go'); g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px';
-        setTimeout(function(){ g.classList.add('bye'); }, 760); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1300);
+        /* v439: 育ち切ってから薄れる。待ちが入ったぶん、消し始めを育ちの終わりに合わせる（本人） */
+        setTimeout(function(){ g.classList.add('bye'); }, 820); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1400);
       })();
     }
     function btn(label, fn, cls){ var b = el('button', 'gm-b' + (cls ? ' ' + cls : '')); b.type = 'button'; b.textContent = label; b.addEventListener('click', fn); goEl.appendChild(b); return b; }

@@ -3782,6 +3782,32 @@
   .gm-isec > span{font-size:clamp(15px, 1.25vw, 18px)}
   /* v438 最後の面ではスキップを隠す（送るたびに付く end に任せる：確認係） */
   .gm-intro.end .gm-iskip{visibility:hidden; pointer-events:none}
+  /* v439 カーソル演出は本編と同じ作り：触れると中が抜けた輪になる（塗りつぶしになっていた：本人） */
+  html.gmopen .cur:not(.hov) .cd{background:#E84518}
+  html.gmopen .cur.hov .cd{background:transparent; border-color:#E84518}
+  /* v439 案内の丸はボタン。本編の .bgdot と同じ手ざわりに */
+  .gm-intro .gm-idots button{-webkit-appearance:none; appearance:none; padding:0; width:7px; height:7px; border-radius:50%; border:1px solid rgba(30,28,26,.45); background:none; cursor:pointer; position:relative; transition:background .3s, border-color .3s, transform .3s, opacity .3s; opacity:.75}
+  .gm-intro .gm-idots button::after{content:""; position:absolute; inset:-9px}
+  .gm-intro .gm-idots button.on{background:var(--acc); border-color:var(--acc); opacity:1; transform:scale(1.35)}
+  .gm-intro .gm-idots button.done{background:rgba(30,28,26,.4); border-color:transparent; opacity:1}
+  @media (hover:hover){ .gm-intro .gm-idots button:hover{border-color:var(--acc); transform:scale(1.5); opacity:1} }
+  .gm-intro .gm-idots button:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
+  /* v439 縦の線の札が切れる（線を引く動きの clip が残っていた：確認係） */
+  @keyframes gmdrawh{from{clip-path:inset(-24px 100% -24px 0)} to{clip-path:none}}
+  @keyframes gmdrawv{from{clip-path:inset(0 -24px 100% -24px)} to{clip-path:none}}
+  /* v439 節の見出しは押しても横にずれない（指の媒体で中心から縮んでいた：確認係） */
+  .gm-catq.gm-pressed,.gm-secq.gm-pressed{animation:none !important}
+  .gm-catq,.gm-secq{transform-origin:left center}
+  /* v439 平均の主ボタンの帯は後ろを隠す（文字が透けていた：確認係） */
+  .gm-btns.hold{background:var(--bg, #F2F1EC); padding-top:12px; box-shadow:0 -10px 14px -8px rgba(30,28,26,.18)}
+  .gm-btns.hold .gm-b{background:var(--bg, #F2F1EC)}
+  .gm-btns.hold .gm-b.go{background:var(--acc)}
+  /* v439 iPhone：列の末尾の余白は、留まるボタンの下では要らない（200px 浮いていた：確認係） */
+  @media (max-height:640px){ .gm-side::after{height:24px} }
+  /* v439 マウスの無い媒体では、カーソル演出の切替は出さない／盤面の十字も出さない（確認係） */
+  html.gmopen body:not(.hasmouse) .hd #curbtn{display:none !important}
+  .gm-stage{cursor:default}
+  html.gmopen body.hasmouse.nocur .gm-stage{cursor:crosshair}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
