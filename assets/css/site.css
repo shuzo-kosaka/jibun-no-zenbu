@@ -3877,6 +3877,15 @@
   html[lang="en"] .gm-card strong,html[lang="en"] .gm-card em,html[lang="en"] .gm-info-s,html[lang="en"] .gm-why,html[lang="en"] .gm-info-t,html[lang="en"] .gm-ilist span{font-family:"Hiragino Sans", "Noto Sans JP", var(--sans), sans-serif}
   /* v445 朱の帯の上ではカーソルの輪が同色で消える（確認係）。帯の上では紙色の輪に */
   html.gmopen .gm-band ~ * .cur,html.gmopen .cur.onband .cd{border-color:#FBF7F2}
+  /* v446 面の丸は元の左側へ（下の中央だと横に送ると誤解される：本人）。iPhone の島を避けて少し上に置く */
+  .gm-intro .gm-idots{left:max(4vw, calc(env(safe-area-inset-left, 0px) + 12px)) !important; right:auto !important; top:34% !important; bottom:auto !important; transform:none !important; flex-direction:column !important; gap:10px !important}
+  @media (max-height:640px){ .gm-intro .gm-idots{top:30% !important; gap:9px !important} }
+  /* v446 二面目以降の文は、画面の中心より少し下へ（上に寄って見える：本人） */
+  .gm-isecs{top:50%}
+  @media (max-height:640px){ .gm-isecs{top:50%} }
+  .gm-isec.gm-ititle{transform:translateY(2vh)}
+  /* v446 iPhone：遊びの題が小さすぎる（本人）。本編の名前と釣り合う大きさに */
+  @media (max-height:640px){ .gm-hd .gm-ttl{font-size:22px} }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

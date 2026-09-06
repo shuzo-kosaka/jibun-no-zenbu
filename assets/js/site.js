@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4085,7 +4085,9 @@
     function picOf(b){
       var im = document.createElement('img'); im.className = 'gm-img'; im.alt = ''; im.draggable = false; im.decoding = 'async';
       im.addEventListener('load', function(){ if(im.naturalWidth && im.naturalHeight && picEl.contains(im)) stage.style.setProperty('--ar', (im.naturalWidth / im.naturalHeight).toFixed(3)); });
-      im.src = b.img; return im;
+      im.src = b.img;
+      if(im.decode) im.decode().catch(function(){});   /* v446: 先に絵を用意してから見せる（育つ枠の最中にガタついていた：本人） */
+      return im;
     }
     function preload(list){ list.forEach(function(b){ var im = new Image(); im.src = b.img; if(im.decode) im.decode().catch(function(){}); }); }   /* 始める前に読み込み・デコードしておく */
     /* 線は HTML の要素で引く（SVG を縦横比なしに伸ばすと文字まで伸びる） */
@@ -4468,9 +4470,10 @@
         var mos = el('div', 'gm-ibg gm-imos'); mos.setAttribute('aria-hidden', 'true');
         for(var mr = 0; mr < 3; mr++){
           var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
+          var need = Math.max(6, Math.ceil(window.innerWidth / 220) + 2);   /* v446: 一巡が画面幅を超えるまで並べる（切れ目が出ていた：本人） */
           for(var cp = 0; cp < 2; cp++){
-            for(var mi = 0; mi < 6; mi++){   /* v429: 一巡は六枚。長すぎる帯は端末が描くのをやめてしまう（固まる・消える） */
-              var mb = BOARDS[(mi + mr * 6) % BOARDS.length];
+            for(var mi = 0; mi < need; mi++){
+              var mb = BOARDS[(mi + mr * 5) % BOARDS.length];
               var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false; mim.src = mb.img; strip.appendChild(mim);
             }
           }
@@ -4561,7 +4564,8 @@
       if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
       introEl.classList.toggle('moved', p > .04);
       /* v441: 面の境目で判定が揺れて次へのボタンが点滅していた（本人）。最後の面かどうかは少し余裕を持って決める */
-      (function(){ var isEnd = cur === ISECS.length - 1; if(introEl.__end !== isEnd){ clearTimeout(introEl.__endT); introEl.__endT = setTimeout(function(){ introEl.__end = isEnd; introEl.classList.toggle('end', isEnd); }, isEnd ? 0 : 180); } })(); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
+      (function(){ var isEnd = (introAt() === ISECS.length - 1) || cur === ISECS.length - 1;   /* v446: 行き先が最後の面なら、着く前から最後の見せ方に（切り替わる瞬間だけ出ていた：本人） */
+        if(introEl.__end !== isEnd){ clearTimeout(introEl.__endT); introEl.__endT = setTimeout(function(){ introEl.__end = isEnd; introEl.classList.toggle('end', isEnd); }, isEnd ? 0 : 220); } })(); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
     }
     var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0, phoneFree = false;
     function introRange(){ return iscroll.scrollHeight - iscroll.clientHeight; }
@@ -4724,7 +4728,7 @@
     function showBoard(b){
       sealOff(true); stage.classList.remove('twelve'); clearDim(); linesEl.innerHTML = '';
       var had = picEl.firstChild;
-      function put(){ unturn(); stage.style.setProperty('--ar', b.ar); stage.style.setProperty('--par', b.ar); stage.classList.remove('blank'); picEl.innerHTML = ''; picEl.appendChild(picOf(b)); picEl.classList.remove('swap'); tbFit(); }
+      function put(){ unturn(); stage.style.setProperty('--ar', b.ar); stage.style.setProperty('--par', b.ar); stage.classList.remove('blank'); picEl.innerHTML = ''; picEl.appendChild(picOf(b)); picEl.classList.remove('swap'); tbFit(); setTimeout(fit, 60); setTimeout(fit, 420);   /* v446: 一枚目が小さいまま出ることがあった（本人）。形が決まってから組み直す */ }
       /* 作品の切替は三段：前の絵が薄れる → 外郭（枠）が次の絵の縦横に整う → 次の絵が現れる。枠を先に整えるので「別の作品に移った」ことが目で分かる（Astra の手本から採用） */
       if(had && !rm){
         clearTimeout(swapT); stage.classList.add('swapping'); picEl.classList.add('swap'); var oc = gm.querySelector('.gm-cring'); if(oc) oc.classList.add('bye');   /* 前の場面の輪が残っていれば消す */
@@ -4900,7 +4904,7 @@
     }
     function doneRender(){
       resEl.innerHTML = '<p class="gm-ask"><b>' + mix(ORD[bi] + '、測り終わり。', 'The ' + ORDE[bi] + ', measured.', ORD[bi]) + '</b></p>' + table(bi) +
-        '<p class="gm-note">' + (bi === 2 ? L('同じ役割の線を、三枚で平均します。', 'Lines of the same role are averaged across the three.') + '<br>' : '') + (ptype === 'touch' ? (bi < 2 ? L('絵を押すと、次の絵へ。', 'Tap the picture for the next one.') : L('絵を押すと、平均へ。', 'Tap the picture for the average.')) : (bi < 2 ? L('絵を押すと、次の絵へ。', 'Tap the picture for the next one.') : L('絵を押すと、平均へ。', 'Tap the picture for the average.'))) + '</p>';
+        '<p class="gm-note">' + (bi === 2 ? L('同じ役割の線を、三枚で平均します。', 'Lines of the same role are averaged across the three.') + '<br>' : '') + '</p>';
       goEl.innerHTML = '';
       if(bi < 2) btn(L(ORD[bi + 1] + 'へ', 'To the ' + ORDE[bi + 1]), doneFn, 'go');
       else btn(L('三枚の平均をとる', 'Average the three'), doneFn, 'go');
