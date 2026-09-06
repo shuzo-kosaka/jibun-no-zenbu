@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5005,6 +5005,12 @@
     /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
     var infoEl = null, infoWantCat = false, infoWantHow = false;
     var QA = [
+      ['この％は、何と比べた数字ですか？', 'What is this percentage comparing?',
+       'あなたの線と、私が同じ絵に引いた線の位置の差です。よこの線は絵の高さ、たての線は絵の幅をそれぞれ 100 として、その差を示します。数字が大きいほど、二本の位置が離れています。',
+       'It is the gap between your line and the one I drew on the same picture. For horizontal lines the height of the picture is 100, for vertical lines the width. A larger number means the two lines sit farther apart.'],
+      ['保存した一枚は、何に使えますか？', 'What can I do with the saved image?',
+       'あなたが引いた四本の平均と、三点から起こした骨格が重ねてあります。紙面を組むときの当たりとして使えますし、私との解釈の違いをそのまま持ち帰る一枚にもなります。',
+       'It carries the average of your four lines with the grid taken from the three pictures laid over it. You can use it as a guide when laying out a page, or simply keep it as a record of where our readings differed.'],
       ['二本の線が違うと、どちらかが間違いですか？', 'If the two lines differ, is one of them wrong?',
        'これは正解を当てるものではありません。あなたと私が、主な形の始まりや重心をどこに見たかを比べ、同じ絵から生まれる解釈の違いを数で見ています。',
        'There is no correct line to guess. The numbers compare where you and I see the main form begin and where its visual centre falls: two readings of one picture.'],
