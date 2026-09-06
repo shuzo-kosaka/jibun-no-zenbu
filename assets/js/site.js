@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4237,7 +4237,7 @@
               '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
               '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' +
             '</div></div>' +
-            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-btns"></div></div>' +
+            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-btns"></div><div class="gm-qa"></div></div>' +
           '</div>' +
         '</div>' +
         '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-iskip" type="button"></button><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
@@ -4249,7 +4249,7 @@
       liveEl = gm.querySelector('.gm-live'); readEl = gm.querySelector('.gm-read'); bandEl = gm.querySelector('.gm-band'); tipEl = gm.querySelector('.gm-tip'); dimEl = gm.querySelector('.gm-dim');
       drv = gm.querySelector('.gm-dimr.v'); drh = gm.querySelector('.gm-dimr.h');
       stepEl = gm.querySelector('.gm-step'); resEl = gm.querySelector('.gm-res'); goEl = gm.querySelector('.gm-btns'); listEl = gm.querySelector('.gm-list'); modeEl = gm.querySelector('.gm-mode');
-      cardEl = gm.querySelector('.gm-card'); try{ gm.querySelector('.gm-sheet').inert = true; }catch(x){} trayEl = gm.querySelector('.gm-tray'); sheetEl = gm.querySelector('.gm-sheet'); introEl = gm.querySelector('.gm-intro'); iscroll = gm.querySelector('.gm-iscroll');
+      cardEl = gm.querySelector('.gm-card'); setTimeout(qaBuild, 0); try{ gm.querySelector('.gm-sheet').inert = true; }catch(x){} trayEl = gm.querySelector('.gm-tray'); sheetEl = gm.querySelector('.gm-sheet'); introEl = gm.querySelector('.gm-intro'); iscroll = gm.querySelector('.gm-iscroll');
       iscroll.addEventListener('scroll', introScroll, {passive:true});
       gm.querySelector('.gm-ihow').addEventListener('click', function(){ infoWantHow = true; info(); });
       gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* v431: スキップを戻す（本人）。遊び方はその隣 */   /* v425: スキップをやめ、案内の右上は「遊び方」に（本人） */   /* スキップは「絵を選ぶ」の画面へ */
@@ -4937,7 +4937,7 @@
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><i class="you"></i>' + L('朱の四本：あなた', 'red four: you') + '<i class="mine"></i>' + L('薄い破線の三本：研究', 'faint dashed three: research') + '</p>' +
-        '<div class="gm-jw"><p class="gm-cmph">' + L('日本の絵と西洋の絵で、骨格はこれだけ違います。', 'Japanese and Western pictures differ this much.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と西洋を重ねる', 'Overlay Japan and the West') + '</button></div>' + '</div>' +
+        '<div class="gm-jw"><p class="gm-cmph">' + L('選んだ十九点では、骨格の置きどころにこれだけ違いが出ました。', 'Across the nineteen chosen works, the skeletons sit this differently.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と西洋を重ねる', 'Overlay Japan and the West') + '</button></div>' + '</div>' +
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);
@@ -4963,6 +4963,38 @@
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
     /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
     var infoEl = null, infoWantCat = false, infoWantHow = false;
+    var QA = [
+      ['二本の線が違うと、どちらかが間違いですか。', 'If the two lines differ, is one of them wrong?',
+       'これは正解を当てるものではありません。あなたと私が、主な形の始まりや重心をどこに見たかを比べ、同じ絵から生まれる解釈の違いを数で見ています。',
+       'There is no correct line to guess. The numbers compare where you and I see the main form begin and where its visual centre falls: two readings of one picture.'],
+      ['七本のうち、なぜ四本だけを使うのですか。', 'Why does this use only four of the seven lines?',
+       '研究では、各作品を七つの観点と七本の線で見ています。ここでは二分ほどで骨格に触れられるよう、主塊の始まりと重心を示すよこ・たての四本に絞りました。',
+       'The study looks at each work through seven viewpoints and seven lines. This two-minute version keeps four: the horizontal and vertical lines for the main mass start and its visual centre.'],
+      ['基準線も、結局は主観ではありませんか。', 'Are the reference lines subjective after all?',
+       '線を引く判断は私がしています。主観を消すのではなく、七つの観点と線の置き方を全作品で同じ手順にそろえ、同じものさしで取った座標どうしを比べています。',
+       'I place the lines myself. The aim is not to erase judgement but to keep the viewpoints and the method the same across every work, and to compare coordinates taken with one measure.'],
+      ['作品の選び方に、偏りはありませんか。', 'Is there a bias in how the works were chosen?',
+       '私が選ぶ以上、選び方そのものが研究の条件になります。そこで、主な形と余白を同じ手順で記録できることを共通の条件にし、十九点すべてと選んだ理由を示しています。',
+       'Since I choose them, the selection is itself a condition of the study. The shared rule is that the main form and the empty space can be recorded by the same method; all nineteen works and the reasons are shown.'],
+      ['この比率は、どこで使われていますか。', 'Where are these ratios actually used?',
+       'このサイトで使っています。画面を均等に割るのではなく、絵から取り出した線に合わせて、文字と絵と余白の位置や間隔を決めています。',
+       'On this site. Instead of dividing the screen evenly, the text, pictures and empty space follow the lines drawn from the paintings.']
+    ];
+    function qaBuild(){
+      var host = gm.querySelector('.gm-qa'); if(!host) return;
+      host.innerHTML = sec(L('Q&A', 'Q&A')) + '<div class="gm-catx gm-secx gm-qal" hidden>' +
+        QA.map(function(q){ return '<button type="button" class="gm-qq" aria-expanded="false"><span>' + esc(L(q[0], q[1])) + '</span><i></i></button><p class="gm-qaa" hidden>' + body(L(q[2], q[3])) + '</p>'; }).join('') + '</div>';
+      bindSecs(host);
+      host.querySelectorAll('.gm-qq').forEach(function(q){
+        var a = q.nextElementSibling;
+        q.addEventListener('click', function(){
+          var on = a.hidden;
+          host.querySelectorAll('.gm-qaa').forEach(function(x){ x.hidden = true; });
+          host.querySelectorAll('.gm-qq').forEach(function(x){ x.setAttribute('aria-expanded', 'false'); });
+          a.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false');
+        });
+      });
+    }
     function bindSecs(root){   /* v433: 右の列でも節を畳めるように（本人：平均の画面の情報量が多い） */
       if(!root) return;
       root.querySelectorAll('.gm-secq').forEach(function(q){
