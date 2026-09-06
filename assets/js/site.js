@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4255,13 +4255,19 @@
       gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* v431: スキップを戻す（本人）。遊び方はその隣 */   /* v425: スキップをやめ、案内の右上は「遊び方」に（本人） */   /* スキップは「絵を選ぶ」の画面へ */
       gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1); });
       gm.querySelector('.gm-ix').addEventListener('click', close);
+      (function(){ var tl = gm.querySelector('.gm-ttl'); if(!tl) return;   /* v441: 左上の題を押したら、遊びを閉じて本編の先頭へ（本人） */
+        tl.setAttribute('role', 'button'); tl.setAttribute('tabindex', '0'); tl.setAttribute('title', L('本編の先頭へ戻る', 'Back to the top of the page'));
+        function top(){ close(); setTimeout(function(){ jumpTo(0); }, 60); }
+        tl.addEventListener('click', top);
+        tl.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); top(); } });
+      })();
       gm.querySelector('.gm-idots').addEventListener('click', function(e){ var t = e.target.closest('button, i'); if(!t) return; var i = Array.prototype.indexOf.call(e.currentTarget.children, t); if(i >= 0) introTo(i); });
       iscroll.addEventListener('keydown', introKey);
       ruler(gm.querySelector('.gm-rt'), 'v'); ruler(gm.querySelector('.gm-rl'), 'h');
       gm.querySelector('.gm-x').addEventListener('click', close);
       gm.querySelector('.gm-i').addEventListener('click', function(){ if(infoEl && infoEl.classList.contains('on')) infoOff(); else info(); });
       /* 押したときの応答：どのボタンも一瞬わずかに沈んで戻る（0.18 秒）。動きを控える設定では出さない */
-      gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots i') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
+      gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots > *') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
       turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb');
       tbEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path class="r2" d="M10 14H23V21H10"/><path class="r1" d="M10 14V8H3V21H10"/><path class="rm" d="M10 14V21"/><path class="a" d="M7 4.6A12 12 0 0 1 19 10.9M15.6 9.9 19 10.9 20 7.5"/><path class="a2" d="M19 10.9A12 12 0 0 0 7 4.6M9.6 2.2 7 4.6 9.4 7.2"/></svg><span></span>';   /* v390: Astra の C 案「角をそろえる」（縦 7×13 と横 13×7 が角を共有、Material の rotate_90_degrees_cw の弧）。押した後は横が濃くなり、矢印が戻る向きに */   /* v388: 縦の絵（濃）が横（淡）になる、時計回りの矢印。写真アプリの「回転」と SF の rectangle.portrait.rotate の折衷。文字も添える */
       tbEl.addEventListener('click', function(){ turnPic(!rot); }); tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
@@ -4532,7 +4538,7 @@
     }
     function introScroll(){
       if(!introOn) return;
-      var p = introP(), secs = introEl.querySelectorAll('.gm-isec'), dots = introEl.querySelectorAll('.gm-idots i'), cur = 0;
+      var p = introP(), secs = introEl.querySelectorAll('.gm-isec'), dots = introEl.querySelectorAll('.gm-idots > *'), cur = 0;
       if(introTgt >= 0 && introCur() === introTgt && performance.now() - introTgtAt > 250) introTgt = -1;   /* 行き先に着いたら解く */
       cur = introCur();   /* v396: 隣の面との中点で切り替える（二面の案内で、一度の送りで着くように） */
       secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur); });
@@ -4546,7 +4552,9 @@
         go.setAttribute('aria-label', isLast ? L('はじめる', 'Start') : L('次へ', 'Next')); go.classList.toggle('last', isLast);
       }
       if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
-      introEl.classList.toggle('moved', p > .04); introEl.classList.toggle('end', cur === ISECS.length - 1); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
+      introEl.classList.toggle('moved', p > .04);
+      /* v441: 面の境目で判定が揺れて次へのボタンが点滅していた（本人）。最後の面かどうかは少し余裕を持って決める */
+      (function(){ var isEnd = cur === ISECS.length - 1; if(introEl.__end !== isEnd){ clearTimeout(introEl.__endT); introEl.__endT = setTimeout(function(){ introEl.__end = isEnd; introEl.classList.toggle('end', isEnd); }, isEnd ? 0 : 180); } })(); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
     }
     var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0, phoneFree = false;
     function introRange(){ return iscroll.scrollHeight - iscroll.clientHeight; }

@@ -3810,6 +3810,20 @@
   html.gmopen body.hasmouse.nocur .gm-stage{cursor:crosshair}
   /* v440 遊びの遊び方と × を、本編のハンバーガーの中心にきっちり合わせる */
   .gm-hd .gm-i,.gm-hd .gm-x{top:auto; align-self:center}
+  /* v441 次へのボタンは、面の切り替わりで点滅しないよう静かに出入りする */
+  .gm-igo{transition:opacity .28s var(--ease), background .2s, color .2s, border-color .2s}
+  /* v441 左上の題は押せる（本編の先頭へ） */
+  .gm-ttl{cursor:pointer}
+  @media (hover:hover){ .gm-ttl:hover{color:var(--acc)} }
+  .gm-ttl:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
+  /* v441 言語切替の帯は、遊びの上でも見えるように（遊びの層より上へ：本人） */
+  html.gmopen .lgsw{z-index:101}
+  /* v441 遊び方・スキップの色の変わり方をなめらかに（唐突に黒くなって目が疲れる：本人） */
+  .gm-iskip,.gm-ihow{transition:background-color .28s var(--ease), color .28s var(--ease), border-color .28s var(--ease), transform .12s var(--ease)}
+  .gm-igo{transition:opacity .28s var(--ease), background-color .28s var(--ease), color .28s var(--ease), border-color .28s var(--ease)}
+  .gm-ichoice button{transition:background-color .28s var(--ease), color .28s var(--ease), border-color .28s var(--ease), transform .12s var(--ease)}
+  .gm-b,.gm-sx,.gm-swk button,.gm-media button{transition:background-color .24s var(--ease), color .24s var(--ease), border-color .24s var(--ease), transform .12s var(--ease)}
+  .gm-i{transition:background-color .28s var(--ease), color .28s var(--ease), border-color .28s var(--ease), transform .12s var(--ease)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
