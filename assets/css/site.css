@@ -3970,9 +3970,9 @@
   html.rm .gm.out,html.rm .gm.out .gm-stage,html.rm .gm.out .gm-side,html.rm .gm.out .gm-hd{transition:none}
   /* v463 案内から盤面へは、もう少しゆっくり浮かび上がる（本人：ふわっとした感じに）。枠が育つ演出はそのまま */
   .gm-in.enter .gm-stage{transform:scale(.992)}
-  .gm-in.enter.on .gm-stage{transform:none; transition:opacity .6s var(--ease) .5s, transform .7s var(--ease) .5s}
+  .gm-in.enter.on .gm-stage{transform:none; transition:opacity .52s var(--ease) .78s, transform .6s var(--ease) .78s}   /* v480: 育つ枠が着いてから絵が現れる。枠が小さいうちに絵が原寸で出ていたので、二つが食い違って見えていた（本人：広がり方が合っていない） */
   .gm-in.enter .gm-side{transform:translateY(8px)}
-  .gm-in.enter.on .gm-side{transform:none; transition:opacity .5s var(--ease) .62s, transform .6s var(--ease) .62s}
+  .gm-in.enter.on .gm-side{transform:none; transition:opacity .5s var(--ease) .9s, transform .6s var(--ease) .9s}
   html.rm .gm-in.enter .gm-stage,html.rm .gm-in.enter .gm-side{transform:none; transition:none}
   /* v465 引いている間も手番の問いを残す（本人：線を引き始めると消えていた）。薄めるだけにして、線の邪魔はしない */
   .gm-tip.off{opacity:.5; transform:translate(-50%,0); pointer-events:none}

@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4601,7 +4601,7 @@
       introEl.classList.add('bye'); setTimeout(function(){ introEl.hidden = true; introEl.classList.remove('bye'); }, rm ? 0 : 720);   /* 文字と選択肢が先に消え（140ms）、線を残した地がゆっくり薄れる */
       start(); startedAt = performance.now();   /* 案内の操作を一手目へ持ち越さない：直後 400ms の押下は無視 */
       morphIn(msrc, mr0);
-      var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1400); }); }); }   /* v462: 外す時刻を on から数える（動き係：盤面の出現の最後が切られていた） */   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
+      var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1600); }); }); }   /* v462: 外す時刻を on から数える（動き係：盤面の出現の最後が切られていた） */   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
     }
     /* v392（Sol 第 16・Q4）：五面目で選んだ骨格の枠が、そのまま盤面の位置と大きさへ 700ms で育ち、四本を残したまま中に絵が現れる。拭きと拡縮は重ねない */
     function morphIn(src0, rect0){
