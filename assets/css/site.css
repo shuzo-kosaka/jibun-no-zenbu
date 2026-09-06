@@ -3863,6 +3863,20 @@
   /* v444 見出しが右上のボタンに掛からない幅（丈の低い窓で英語が重なっていた：確認係） */
   .gm-isec > b{max-width:min(100%, calc(100vw - 340px))}
   @media (max-height:640px){ .gm-isec > b{max-width:calc(100vw - 340px)} }
+  /* v445 帯の説明が「遊び方」の下に潜る（英語：確認係） */
+  .gm-band{padding-right:var(--bandpr, 150px); justify-content:flex-start}
+  .gm-band span{max-width:100%; min-width:0}
+  @media (max-height:640px){ .gm-band{padding-right:var(--bandpr, 130px)} }
+  /* v445 回した盤面：たての線の札が枠を 2.4px はみ出す（確認係） */
+  .gm-stage.rot .gm-ln.v b{left:11px}
+  .gm-stage.rot .gm-ln.mine.v b{bottom:11px; top:auto}
+  .gm-stage.rot .gm-ln.h b{top:11px}
+  .gm-stage.rot .gm-ln.mine.h b{right:11px; left:auto}
+  .gm-stage.rot .gm-ln.you.h b{left:11px; right:auto}
+  /* v445 英語のマクロン（ū・ō）が字間に浮く（Blink：確認係）。マクロンを持つ書体を先に置く */
+  html[lang="en"] .gm-card strong,html[lang="en"] .gm-card em,html[lang="en"] .gm-info-s,html[lang="en"] .gm-why,html[lang="en"] .gm-info-t,html[lang="en"] .gm-ilist span{font-family:"Hiragino Sans", "Noto Sans JP", var(--sans), sans-serif}
+  /* v445 朱の帯の上ではカーソルの輪が同色で消える（確認係）。帯の上では紙色の輪に */
+  html.gmopen .gm-band ~ * .cur,html.gmopen .cur.onband .cd{border-color:#FBF7F2}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

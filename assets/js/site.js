@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4077,7 +4077,9 @@
     function body(t){ if(document.documentElement.lang === 'en') return esc(t); return phrases(t).map(function(ph){ return '<span class="ph">' + esc(ph) + '</span>'; }).join(''); }
     /* 作品名：作者と『題』のあいだでだけ折る */
     function ttl(b){
-      var t = L(b.t, b.te); if(document.documentElement.lang === 'en') return esc(t);
+      var t = L(b.t, b.te);
+      if(document.documentElement.lang === 'en'){ var ci = t.indexOf(', ');   /* v445: 英語も作者と題を書き分ける（確認係） */
+        return ci > 0 ? '<span class="ph gm-aut">' + esc(t.slice(0, ci + 1)) + '</span><span class="ph gm-ttlm">' + esc(t.slice(ci + 1)) + '</span>' : esc(t); }
       var i = t.indexOf('『'); return i > 0 ? '<span class="ph gm-aut">' + esc(t.slice(0, i)) + '</span><span class="ph gm-ttlm">' + esc(t.slice(i)) + '</span>' : esc(t);   /* v434: 作者は小さく、題は大きく（本人） */
     }
     function picOf(b){
@@ -4237,7 +4239,7 @@
               '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
               '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' +
             '</div></div>' +
-            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-btns"></div><div class="gm-qa"></div></div>' +
+            '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-qa"></div><div class="gm-btns"></div></div>' +
           '</div>' +
         '</div>' +
         '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-iskip" type="button"></button><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
@@ -4628,6 +4630,13 @@
     function hdFit(){
       var hd = document.querySelector('.hd'), bg = hd && hd.querySelector('.burger'), xb = gm.querySelector('.gm-x');
       gm.style.setProperty('--hdh', (hd ? Math.max(48, hd.offsetHeight) : 60) + 'px');
+      /* v445: 帯の文が「遊び方」の下に潜らないよう、右の余白を実測で決める（確認係） */
+      (function(){ var ib = gm.querySelector('.gm-i'), bd = gm.querySelector('.gm-band');
+        if(!ib || !bd || !ib.offsetWidth) return;
+        var br = bd.getBoundingClientRect(), ir = ib.getBoundingClientRect();
+        var pr = Math.max(96, Math.round(br.right - ir.left + 16));
+        if(pr < br.width - 200) gm.style.setProperty('--bandpr', pr + 'px');
+      })();
       /* v432: 見出し行の帯は本編と同じ。ハンバーガーの中心をそのまま遊びの行の中心にする（本人：本編の法則に合わせる） */
       if(bg && bg.offsetWidth){
         var br0 = bg.getBoundingClientRect(), gr0 = gm.getBoundingClientRect();
