@@ -3186,7 +3186,7 @@
   html.gmopen.gms1 .hd{--fg:#F2F2EE; --fg2:#BDBBB3; --fg3:#7E7C76; --acc:#E84518; --bg:#15151A}
   html.gmopen.gms2 .hd{--fg:#F2F2EE; --fg2:#B9C0CB; --fg3:#7F8895; --acc:#F0603E; --bg:#0E1826}
   html.gmopen.gms0 body.menuopen .hd,html.gmopen.gms1 body.menuopen .hd,html.gmopen.gms2 body.menuopen .hd{--fg:#1C1B19; --fg2:#5A5955; --fg3:#8E8B84; --acc:#E84518; --bg:#F2F1EC}
-  html.gmopen.pcview.phone .hd{padding:10px 2.6vw 8px} html.gmopen.pcview.phone .burger{width:52px; height:46px} html.gmopen.pcview.phone .burger i{left:8px; right:8px}
+  /* v434: 遊びを開いても本編の見出し行（ハンバーガー・言語切替）の大きさと位置は変えない（本人） */
   .gm-in{padding-top:0} .gm-hd{box-sizing:border-box; height:var(--hdh, 70px); padding-bottom:0; align-items:center; padding-right:var(--navw, 0px)}
   .gm-hd .gm-ttl{line-height:1} .gm-x{margin-top:0}
   .gm-ihd{right:calc(max(3.4vw, env(safe-area-inset-right, 0px) + 8px) + var(--navw, 0px)); top:calc(var(--hdh, 60px) / 2); transform:translateY(-50%)}
@@ -3731,6 +3731,25 @@
   /* v433 見出し行の遊び方と × を、ハンバーガー・言語切替に近い大きさに */
   .gm-i{height:32px; line-height:30px}
   .gm-x{font-size:28px}
+  /* v434 トレイ：灰の下地を下へ伸ばす（中の配置はそのまま。下の情報はその分だけ下がる：本人） */
+  .gm-tray{align-items:flex-start; padding-top:6px; padding-bottom:26px}
+  @media (max-height:640px){ .gm-tray{padding-bottom:16px} }
+  /* v434 作品の表記：作者は小さく、題は大きく（本人） */
+  .gm-card strong .gm-aut{font-size:.72em; opacity:.75; margin-right:.25em; font-weight:600}
+  .gm-card strong .gm-ttlm{font-size:1.06em}
+  /* v434 節の見出しは、触れると少しだけ大きく（押して横にずれる動きをやめる：本人） */
+  .gm-catq,.gm-secq,.gm-side .gm-secq{transition:transform .18s var(--ease), color .18s}
+  .gm-catq:active,.gm-secq:active,.gm-side .gm-secq:active{transform:none}
+  @media (hover:hover){ .gm-catq:hover,.gm-secq:hover,.gm-side .gm-secq:hover{transform:scale(1.02); transform-origin:left center} }
+  .gm-catq:focus-visible,.gm-secq:focus-visible{outline:2px solid var(--acc); outline-offset:3px}
+  /* v434 遊び方の札：閉じるを下げ、下の余白を取り直す（本人） */
+  .gm-info-in .gm-take-b{margin-top:22px}
+  .gm-info-in{padding-bottom:22px}
+  @media (max-height:640px){ .gm-info-in .gm-take-b{margin-top:16px} .gm-info-in{padding-bottom:16px} }
+  /* v434 平均の主ボタンは、どの媒体でも列の下に留める（本人） */
+  .gm-btns.hold{position:sticky; bottom:0; background:linear-gradient(to bottom, rgba(242,241,236,0), rgba(242,241,236,.97) 22%); padding-top:14px; z-index:4}
+  /* v435 白いぼかしは、見出しと本文の中心へ */
+  .gm-isec::before{transform:translate(calc(-50% + var(--blurdx, 0px)), -50%) !important}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
