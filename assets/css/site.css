@@ -3878,14 +3878,22 @@
   /* v445 朱の帯の上ではカーソルの輪が同色で消える（確認係）。帯の上では紙色の輪に */
   html.gmopen .gm-band ~ * .cur,html.gmopen .cur.onband .cd{border-color:#FBF7F2}
   /* v446 面の丸は元の左側へ（下の中央だと横に送ると誤解される：本人）。iPhone の島を避けて少し上に置く */
-  .gm-intro .gm-idots{left:max(4vw, calc(env(safe-area-inset-left, 0px) + 12px)) !important; right:auto !important; top:34% !important; bottom:auto !important; transform:none !important; flex-direction:column !important; gap:10px !important}
-  @media (max-height:640px){ .gm-intro .gm-idots{top:30% !important; gap:9px !important} }
+  .gm-intro .gm-idots{left:max(4vw, calc(env(safe-area-inset-left, 0px) + 12px)) !important; right:auto !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; flex-direction:column !important; gap:10px !important}
+  @media (max-height:640px){ .gm-intro .gm-idots{top:calc(50% - 7vh) !important; gap:9px !important} }   /* iPhone は島を避けて少しだけ上 */
   /* v446 二面目以降の文は、画面の中心より少し下へ（上に寄って見える：本人） */
   .gm-isecs{top:50%}
   @media (max-height:640px){ .gm-isecs{top:50%} }
   .gm-isec.gm-ititle{transform:translateY(2vh)}
   /* v446 iPhone：遊びの題が小さすぎる（本人）。本編の名前と釣り合う大きさに */
   @media (max-height:640px){ .gm-hd .gm-ttl{font-size:22px} }
+  /* v447 背景に絵が流れるようになり、細い輪郭のボタンが絵に埋もれて見えなくなっていた（本人）。紙の地を敷く */
+  .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{background:var(--ibg, #F2F1EC); border-color:rgba(30,28,25,.42); box-shadow:0 1px 10px rgba(30,28,26,.10)}
+  .gm-intro .gm-ix{background:var(--ibg, #F2F1EC); border-radius:6px; padding:2px 8px; box-shadow:0 1px 10px rgba(30,28,26,.10)}
+  .gm-intro .gm-idots button{box-shadow:0 0 0 3px var(--ibg, #F2F1EC), 0 1px 6px rgba(30,28,26,.12)}
+  @media (hover:hover){ .gm-intro .gm-iskip:hover,.gm-intro .gm-ihow:hover{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19} }
+  /* v447 iPhone：段が二つのときは丈を半分に */
+  .gm-imos .row:nth-child(1):nth-last-child(2),.gm-imos .row:nth-child(2):nth-last-child(1){height:50%}
+  .gm-imos .row:nth-child(2):nth-last-child(1){top:50%}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

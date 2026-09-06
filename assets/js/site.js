@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4468,9 +4468,10 @@
       /* v428: 背景は、遊びで使う絵を角と角で継いで並べ、横へ流す（本人）。文字は紙の縁取りで浮かせる */
       if(BOARDS.length && !rm){
         var mos = el('div', 'gm-ibg gm-imos'); mos.setAttribute('aria-hidden', 'true');
-        for(var mr = 0; mr < 3; mr++){
+        var rows = (window.innerHeight <= 640 || /iPhone|Android/.test(navigator.userAgent)) ? 2 : 3;   /* v447: 手の端末は段を減らす（上下が止まる・途切れる：本人） */
+        for(var mr = 0; mr < rows; mr++){
           var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
-          var need = Math.max(6, Math.ceil(window.innerWidth / 220) + 2);   /* v446: 一巡が画面幅を超えるまで並べる（切れ目が出ていた：本人） */
+          var need = Math.max(6, Math.ceil(window.innerWidth / (rows > 2 ? 220 : 260)) + 2);   /* v446: 一巡が画面幅を超えるまで並べる（切れ目が出ていた：本人） */
           for(var cp = 0; cp < 2; cp++){
             for(var mi = 0; mi < need; mi++){
               var mb = BOARDS[(mi + mr * 5) % BOARDS.length];
