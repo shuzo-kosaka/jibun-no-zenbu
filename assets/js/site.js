@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4240,7 +4240,7 @@
             '<div class="gm-side"><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-btns"></div></div>' +
           '</div>' +
         '</div>' +
-        '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-iskip" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
+        '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-iskip" type="button"></button><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -4512,7 +4512,6 @@
       introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('遊び方', 'How to play');
       introEl.querySelector('.gm-igo').textContent = L('次へ', 'Next');
       var one = ISECS.length < 2; [dots, introEl.querySelector('.gm-igo'), introEl.querySelector('.gm-iskip')].forEach(function(x){ if(x) x.style.display = one ? 'none' : ''; });
-      var isk = introEl.querySelector('.gm-iskip'); if(isk) isk.style.visibility = (introCur() >= ISECS.length - 1) ? 'hidden' : '';
       ibgRuns = ISECS.map(function(){ return 0; }); introEl.classList.remove('end', 'moved', 's0', 's1', 's2', 's3', 's4'); iscroll.scrollTop = 0; introTgt = -1; introScroll(); introBg();
       setTimeout(function(){ if(introOn) iscroll.focus({preventScroll:true}); }, 60);
     }
@@ -4522,7 +4521,7 @@
       if(!introEl) return;
       introEl.querySelectorAll('.gm-isec').forEach(function(sc){
         var sr = sc.getBoundingClientRect(); if(!sr.width) return;
-        var b = sc.querySelector('b'), sp = sc.querySelector('span');
+        var b = sc.querySelector(':scope > b'), sp = sc.querySelector(':scope > span');   /* v438: 見出しの中の span を拾っていた（確認係） */
         var cs = [], r;
         if(b){ r = b.getBoundingClientRect(); if(r.width) cs.push(r.left + r.width / 2); }
         if(sp){ r = sp.getBoundingClientRect(); if(r.width) cs.push(r.left + r.width / 2); }
@@ -4587,9 +4586,10 @@
       var last = null, still = 0, t0 = performance.now();
       (function wait(){
         var r1 = stage.getBoundingClientRect();
-        if(r1.width && last && Math.abs(r1.width - last.w) < 1 && Math.abs(r1.height - last.h) < 1) still++; else still = 0;
+        var im = picEl && picEl.querySelector('img'), ready = !im || (im.complete && im.naturalWidth > 0);   /* v438: 絵が読み込まれてからでないと盤面の形が決まらない（確認係） */
+        if(r1.width && ready && last && Math.abs(r1.width - last.w) < 1 && Math.abs(r1.height - last.h) < 1) still++; else still = 0;
         last = {w:r1.width, h:r1.height};
-        if(still < 2 && performance.now() - t0 < 700){ requestAnimationFrame(wait); return; }
+        if(still < 4 && performance.now() - t0 < 1500){ requestAnimationFrame(wait); return; }
         if(!r1.width){ g.remove(); return; }
         g.classList.add('go'); g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px';
         setTimeout(function(){ g.classList.add('bye'); }, 760); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1300);
@@ -4995,9 +4995,10 @@
         q.addEventListener('click', function(){ var on = x.hidden; x.hidden = !on; q.setAttribute('aria-expanded', on ? 'true' : 'false'); if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: Math.min(top, q.offsetTop + x.offsetHeight - iin.clientHeight + 24 > top ? top : top), behavior:'smooth'}); }, 40); }); });
       var cq = infoEl.querySelector('.gm-catq:not(.gm-secq)'), cx = cq && cq.nextElementSibling;
       if(infoWantCat && cq && cx){ cx.hidden = false; cq.setAttribute('aria-expanded', 'true'); setTimeout(function(){ iin.scrollTo({top: Math.max(0, cq.offsetTop - 12), behavior: rm ? 'auto' : 'smooth'}); }, 260); }
+      document.documentElement.classList.add('gminfo');   /* v438: 札を開いている間は幕を見出し行の上まで（本編の帯だけ明るいままだった：本人） */
       void infoEl.offsetWidth; infoEl.classList.add('on'); gm.querySelector('.gm-i').setAttribute('aria-expanded', 'true');   /* 作った直後でも出現の動き（薄→濃、下から 8px）が付くように一度描かせる */ var wc = infoWantCat; infoWantCat = false; setTimeout(function(){ if(!wc) infoEl.querySelector('.gm-take-b button').focus({preventScroll:true}); }, 240);
     }
-    function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } }
+    function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } } document.documentElement.classList.remove('gminfo');
     var takeEl = null, takeUrl = null;
     var takeFile = null;
     function takeaway(avg){
@@ -5140,6 +5141,20 @@
     }, 1200);
   })();
 })();
+  /* v437: 08 の「ゲームで、理解を深める」は、右の段階の並びの下（CLICK の注記の下）へ移す（本人）。押すと判と同じく遊びが開く */
+  (function(){
+    function move(){
+    var sp = document.getElementById('seqplay'); if(!sp) return;
+    var cap = sp.querySelector('.cap'); if(!cap) return;
+    var host = sp.parentElement, tip = host && host.querySelector('.tip'); if(!tip) return;
+    cap.classList.remove('cap'); cap.classList.add('seqcap');
+    tip.parentNode.insertBefore(cap, tip.nextSibling);
+    cap.setAttribute('role', 'button'); cap.setAttribute('tabindex', '0');
+    cap.addEventListener('click', function(){ sp.click(); });
+    cap.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); sp.click(); } });
+    }
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', move); else move();
+  })();
 
 /* dist: the works frames' photos load after the page is up (their <image> hrefs wait in data-lzhref).
    WebKit does not rebuild a <use> when the element it points at changes, so every frame stayed empty on

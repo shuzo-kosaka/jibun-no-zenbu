@@ -3750,6 +3750,38 @@
   .gm-btns.hold{position:sticky; bottom:0; background:linear-gradient(to bottom, rgba(242,241,236,0), rgba(242,241,236,.97) 22%); padding-top:14px; z-index:4}
   /* v435 白いぼかしは、見出しと本文の中心へ */
   .gm-isec::before{transform:translate(calc(-50% + var(--blurdx, 0px)), -50%) !important}
+  /* v437 案内の操作の並べ方を、世の中の作法に合わせ直した（本人の指示で調べた上で）
+     ・× と 遊び方 … 右上（本編のハンバーガー・言語切替と同じ列。窓を閉じる印は右上が通例）
+     ・スキップ … 左下（Material の onboarding は「飛ばす」を左下、「次へ」を右下に置く）
+     ・面の数を示す丸 … 下の中央（本編の .bgdot と同じ置き方。iPhone のダイナミックアイランドを避ける） */
+  .gm-intro .gm-idots{left:50% !important; right:auto !important; top:auto !important; bottom:calc(5.5vh + var(--vvb, 0px)) !important; transform:translateX(-50%) !important; flex-direction:row !important; gap:11px !important}
+  .gm-intro .gm-idot{display:none !important}
+  .gm-intro .gm-iskip{position:absolute !important; left:max(4vw, calc(env(safe-area-inset-left, 0px) + 12px)) !important; bottom:calc(5vh + var(--vvb, 0px)) !important; top:auto !important; right:auto !important; margin:0 !important; z-index:3}
+  @media (max-height:640px){ .gm-intro .gm-idots{bottom:calc(4.5vh + var(--vvb, 0px)) !important; gap:9px !important} .gm-intro .gm-iskip{bottom:calc(4vh + var(--vvb, 0px)) !important} }
+  /* v437 案内の操作の並べ方（本人の指示で作法を調べた上で）
+     ・× と 遊び方 … 右上（本編のハンバーガー・言語切替と同じ列）
+     ・スキップ … 左下（Material の onboarding は「飛ばす」を左下、「次へ」を右下に置く）
+     ・面の数を示す丸 … 下の中央（本編の .bgdot と同じ置き方。iPhone のダイナミックアイランドを避ける） */
+  .gm-intro .gm-idots{left:50% !important; right:auto !important; top:auto !important; bottom:calc(5.5vh + var(--vvb, 0px)) !important; transform:translateX(-50%) !important; flex-direction:row !important; gap:11px !important}
+  .gm-intro .gm-idot{display:none !important}
+  .gm-intro .gm-iskip{position:absolute !important; left:max(4vw, calc(env(safe-area-inset-left, 0px) + 12px)) !important; bottom:calc(5vh + var(--vvb, 0px)) !important; top:auto !important; right:auto !important; margin:0 !important; z-index:3}
+  @media (max-height:640px){ .gm-intro .gm-idots{bottom:calc(4.5vh + var(--vvb, 0px)) !important; gap:9px !important} .gm-intro .gm-iskip{bottom:calc(4vh + var(--vvb, 0px)) !important} }
+  /* v437 08 の「遊ぶ」の判：WebKit（iPhone・iPad の Safari）でも紙目を出す（Blink のにじみ filter は効かないため） */
+  html.is-webkit .seqplay .st svg{-webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
+  /* v437 判の左端を X1（主塊開始線）にそろえる。画面の端に寄せない（本人） */
+  .seqplay{left:var(--x1, 12%) !important; right:auto !important}
+  @media (max-width:1024px){ .seqplay{left:var(--x1, 12%) !important; right:auto !important; bottom:calc(4vh + env(safe-area-inset-bottom, 0px)) !important; width:min(22vw, 108px) !important} }
+  /* v437 「ゲームで、理解を深める」は、右の段階の並びの下（CLICK の注記の下）へ */
+  .steps .seqcap{display:block; margin-top:10px; font-family:var(--mono); font-size:11px; letter-spacing:.14em; line-height:1.7; color:var(--fg2); opacity:.85; cursor:pointer; text-align:left}
+  .steps .seqcap:hover{color:var(--acc)}
+  /* v438 遊び方の札：幕は画面の全部を覆う（見出し行だけ明るいままだった：本人） */
+  html.gminfo #gm{z-index:100}
+  .gm-info{top:0}
+  /* v438 案内の本文は本編の本文と同じ大きさに（小さすぎた：本人）。注記や小さな添えはそのまま */
+  @media (max-height:640px){ .gm-isec > span{font-size:15px; line-height:1.95} }
+  .gm-isec > span{font-size:clamp(15px, 1.25vw, 18px)}
+  /* v438 最後の面ではスキップを隠す（送るたびに付く end に任せる：確認係） */
+  .gm-intro.end .gm-iskip{visibility:hidden; pointer-events:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
