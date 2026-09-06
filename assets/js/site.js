@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4179,8 +4179,8 @@
       var old = gm.querySelector('.gm-cring'); if(old && old.parentNode) old.parentNode.removeChild(old); clearTimeout(ringT);
       var r = el('i', 'gm-cring'), id = 'gmcr' + (Date.now() % 100000); ringCur = r;
       var t0 = txt; while(txt.length < 40) txt += t0;   /* 輪を一周ぶん埋める（短い文は繰り返す） */
-      r.innerHTML = '<svg viewBox="0 0 140 140" aria-hidden="true"><defs><path id="' + id + '" d="M70,70 m-54,0 a54,54 0 1,1 108,0 a54,54 0 1,1 -108,0"/></defs>' +
-        '<circle cx="70" cy="70" r="66" fill="none" stroke="var(--acc)" stroke-width="2.6"/><circle cx="70" cy="70" r="40" fill="none" stroke="var(--acc)" stroke-width="1" opacity=".5"/>' +
+      r.innerHTML = '<svg viewBox="0 0 140 140" aria-hidden="true" style="overflow:visible"><defs><path id="' + id + '" d="M70,70 m-64,0 a64,64 0 1,1 128,0 a64,64 0 1,1 -128,0"/></defs>' +
+        '<circle cx="70" cy="70" r="50" fill="none" stroke="var(--acc)" stroke-width="2.6"/><circle cx="70" cy="70" r="36" fill="none" stroke="var(--acc)" stroke-width="1" opacity=".5"/>' +   /* v450: 文字は輪の外側を回す（本編と同じ作り：本人） */
         '<text font-family="var(--mono)" font-size="9.5" letter-spacing="2.2" fill="var(--acc)"><textPath href="#' + id + '" startOffset="0">' + esc(txt) + '</textPath></text></svg>';
       r.style.left = lastX + 'px'; r.style.top = lastY + 'px';
       (introOn ? introEl : gm).appendChild(r); void r.offsetWidth; r.classList.add('on');   /* 案内の上では案内の色（地に合わせた --acc）で */
@@ -4257,7 +4257,8 @@
       iscroll.addEventListener('scroll', introScroll, {passive:true});
       gm.querySelector('.gm-ihow').addEventListener('click', function(){ infoWantHow = true; info(); });
       gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* v431: スキップを戻す（本人）。遊び方はその隣 */   /* v425: スキップをやめ、案内の右上は「遊び方」に（本人） */   /* スキップは「絵を選ぶ」の画面へ */
-      gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1); });
+      gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1);
+        setTimeout(function(){ var g = gm.querySelector('.gm-igo'); if(g && g.matches(':hover') && introAt() < ISECS.length - 1) cringHold(L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 ')); }, 420); });   /* v450: 押したあと輪が消えたままだった（本人） */
       gm.querySelector('.gm-ix').addEventListener('click', close);
       (function(){ var tl = gm.querySelector('.gm-ttl'); if(!tl) return;   /* v441: 左上の題を押したら、遊びを閉じて本編の先頭へ（本人） */
         tl.setAttribute('role', 'button'); tl.setAttribute('tabindex', '0'); tl.setAttribute('title', L('本編の先頭へ戻る', 'Back to the top of the page'));
@@ -4324,7 +4325,8 @@
       var tmY = null; gm.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true});
       gm.addEventListener('touchmove', function(e){ if(!phoneFree) return;   /* v431: 案内中も遊び中も、後ろの本編は動かさない（本人） */ var sc = e.target && e.target.closest ? e.target.closest('.gm-side, .gm-iscroll, .gm-info-in, .gm-take-in, .gm-sheet') : null;
         if(sc){ var y = e.touches[0] ? e.touches[0].clientY : tmY, dy = (tmY === null || y === null) ? 0 : y - tmY; tmY = y;   /* v398: 列の端で引いても紙面へ伝えない（帯が戻り、本編が見える） */
-          if(sc.classList.contains('gm-side') || sc.classList.contains('gm-info-in')){ var atTop = sc.scrollTop <= 0, atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1; if((atTop && dy > 0) || (atEnd && dy < 0) || sc.scrollHeight <= sc.clientHeight + 1) e.preventDefault(); }
+          { var atTop = sc.scrollTop <= 0, atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1;   /* v452: 案内の枠でも端で止める（端まで送ると後ろの本編が動いていた：本人） */
+            if((atTop && dy > 0) || (atEnd && dy < 0) || sc.scrollHeight <= sc.clientHeight + 1) e.preventDefault(); }
           return; }
         e.preventDefault(); }, {passive:false});   /* v391: 盤面の間、指で紙面が動かないように */
       stage.addEventListener('pointercancel', function(e){ up(e, false); if(state === 'trace') tipEl.classList.remove('off'); });

@@ -3887,9 +3887,10 @@
   /* v446 iPhone：遊びの題が小さすぎる（本人）。本編の名前と釣り合う大きさに */
   @media (max-height:640px){ .gm-hd .gm-ttl{font-size:22px} }
   /* v447 背景に絵が流れるようになり、細い輪郭のボタンが絵に埋もれて見えなくなっていた（本人）。紙の地を敷く */
-  .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{background:var(--ibg, #F2F1EC); border-color:rgba(30,28,25,.42); box-shadow:0 1px 10px rgba(30,28,26,.10)}
-  .gm-intro .gm-ix{background:var(--ibg, #F2F1EC); border-radius:6px; padding:2px 8px; box-shadow:0 1px 10px rgba(30,28,26,.10)}
-  .gm-intro .gm-idots button{box-shadow:0 0 0 3px var(--ibg, #F2F1EC), 0 1px 6px rgba(30,28,26,.12)}
+  /* v450 白い板はやめ（違和感があるとのこと）、輪郭を濃くし、紙の光で絵から浮かせる */
+  .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{background:transparent; border-color:rgba(30,28,25,.62); box-shadow:0 0 12px 6px var(--ibg, #F2F1EC); text-shadow:0 0 8px var(--ibg, #F2F1EC), 0 0 4px var(--ibg, #F2F1EC)}
+  .gm-intro .gm-ix{background:transparent; box-shadow:0 0 12px 8px var(--ibg, #F2F1EC); text-shadow:0 0 8px var(--ibg, #F2F1EC)}
+  .gm-intro .gm-idots button{box-shadow:0 0 0 3px var(--ibg, #F2F1EC)}
   @media (hover:hover){ .gm-intro .gm-iskip:hover,.gm-intro .gm-ihow:hover{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19} }
   /* v447 iPhone：段が二つのときは丈を半分に */
   .gm-imos .row:nth-child(1):nth-last-child(2),.gm-imos .row:nth-child(2):nth-last-child(1){height:50%}
@@ -3915,6 +3916,14 @@
   .gm-once{margin:0 0 1em; padding:9px 11px; border-left:2px solid var(--acc); background:rgba(232,69,24,.06); font-size:12px; line-height:1.75; transition:opacity .8s var(--ease)}
   .gm-once.bye{opacity:0}
   @media (max-height:640px){ .gm-once{font-size:11.5px; padding:7px 9px} }
+  /* v450 次へのボタンも、触れると色が変わる（本人） */
+  @media (hover:hover){ .gm-intro .gm-igo:hover{background:var(--acc); border-color:var(--acc); color:#FBF7F2; box-shadow:0 0 12px 6px var(--ibg, #F2F1EC)} .gm-intro .gm-igo:hover svg{stroke:#FBF7F2} }
+  .gm-intro .gm-igo:active{transform:translateY(1px)}
+  /* v451 縦持ちの案内は、遊びの最中は章の色に左右されない（本人）。朱と紙で固定する */
+  html.gmopen .rotv{background:#E84518 !important; color:#FBF7F2 !important}
+  html.gmopen .rotv .rtl .ch,html.gmopen .rotv p,html.gmopen .rotv small{color:#FBF7F2 !important}
+  html.gmopen .rotv svg [stroke]{stroke:#FBF7F2 !important}
+  html.gmopen .rotv svg [fill]:not([fill="none"]){fill:#FBF7F2 !important}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
