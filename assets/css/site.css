@@ -3440,7 +3440,7 @@
   .gm .gm-pressed{animation:gmBtnPress .18s cubic-bezier(.2,.8,.2,1) 1}
   .gm-igo.gm-pressed{animation:gmBtnPress .18s cubic-bezier(.2,.8,.2,1) 1}
   .gm-band b small{position:relative; top:-1px}   /* 向きの小字は 2px 下がって見えたので 1px 上げる */
-  .gm-hd .gm-i,.gm-hd .gm-x{top:-1px}   /* i と × は JA/EN・ハンバーガーより 1px 低く見えたので */
+  /* v440: 遊びの見出し行はハンバーガーの中心に合わせて組むので、1px の持ち上げは不要（1.5px 上にずれていた：確認係） */
   .gm-step .gm-cnt{position:relative; top:-1px}
   .gm-i.gm-pressed{animation:gmBtnPress .18s cubic-bezier(.2,.8,.2,1) 1}
 
@@ -3808,6 +3808,8 @@
   html.gmopen body:not(.hasmouse) .hd #curbtn{display:none !important}
   .gm-stage{cursor:default}
   html.gmopen body.hasmouse.nocur .gm-stage{cursor:crosshair}
+  /* v440 遊びの遊び方と × を、本編のハンバーガーの中心にきっちり合わせる */
+  .gm-hd .gm-i,.gm-hd .gm-x{top:auto; align-self:center}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
