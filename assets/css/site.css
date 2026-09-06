@@ -3648,6 +3648,29 @@
   /* v425 カーソル演出の切替は、遊びの最中はメニューを開いたときだけ（見出し行の遊び方・× と重ならないように） */
   html.gmopen .hd #curbtn{display:none !important}
   html.gmopen body.menuopen .hd #curbtn{display:grid !important}
+  /* v426 カーソル演出が出ている間は、盤面の十字カーソルを重ねない（本人） */
+  html.gmopen body.hasmouse:not(.nocur) .gm-stage,html.gmopen body.hasmouse:not(.nocur) .gm-stage *{cursor:none}
+  /* v426 数字の札は、字がはみ出さない幅で（縦の線で私の％が切れて見えた） */
+  .gm-ln b{padding:0 5px; min-width:max-content; box-sizing:content-box}
+  /* v426 遊び方の札：分析カテゴリの節もほかと同じ高さ・同じ字で */
+  .gm-info-in .gm-catq.gm-secq{font-family:var(--mincho); font-weight:900; font-size:14px; letter-spacing:.04em}
+  .gm-info-in .gm-catq.gm-secq span{font:inherit; letter-spacing:inherit}
+  /* v427 帯の向こうに本編が透けないよう、遊びの間は文書の地も紙に（連絡ページの cphid と同じ手：本人） */
+  html.gmopen{background-color:var(--paper, #F2F1EC) !important}
+  html.gmopen body{background-color:var(--paper, #F2F1EC)}
+  /* v428 案内の背景：遊びで使う絵を角と角で継いで並べ、横へ流す（本人） */
+  .gm-imos{position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; opacity:.17; display:block !important}
+  .gm-imos .row{position:absolute; left:0; right:0; height:calc(100% / 3); overflow:hidden}
+  .gm-imos .row:nth-child(1){top:0} .gm-imos .row:nth-child(2){top:calc(100% / 3)} .gm-imos .row:nth-child(3){top:calc(200% / 3)}
+  .gm-imos .strip{position:absolute; top:0; bottom:0; left:0; display:flex; align-items:stretch; width:max-content; animation:gmMos 110s linear infinite; will-change:transform}
+  .gm-imos .row.rev .strip{animation-duration:140s; animation-direction:reverse}
+  .gm-imos img{height:100%; width:auto; display:block; flex:none}
+  @keyframes gmMos{from{transform:translate3d(0,0,0)} to{transform:translate3d(-50%,0,0)}}
+  html.rm .gm-imos .strip{animation:none}
+  .gm-intro .gm-ibg.gm-imos{display:block !important}
+  /* v428 帯が出ている間は、見出し行と下のボタンを見えている枠の内側へ */
+  .gm-in{padding-top:calc(2.6vh + var(--vvt, 0px)); padding-bottom:calc(2.4vh + var(--vvb, 0px)); padding-left:calc(max(3.4vw, env(safe-area-inset-left, 0px)) + var(--vvl, 0px)); padding-right:calc(max(3.4vw, env(safe-area-inset-right, 0px)) + var(--vvr, 0px))}
+  .gm-ihd,.gm-iskip,.gm-ix{margin-top:var(--vvt, 0px)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

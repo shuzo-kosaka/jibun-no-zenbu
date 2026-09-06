@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4095,9 +4095,28 @@
     }
     function ruler(host, n){ for(var i = 0; i <= 10; i++){ var t = el('i', i % 5 ? '' : 'big'); t.style[n === 'v' ? 'left' : 'top'] = (i * 10) + '%'; host.appendChild(t); } }
     /* 盤面の高さの上限は、欄（.gm-sw）の実寸から。vh／svh は iOS の帯ぶん小さく評価され、盤面が画面の四割ほどにしかならなかった */
+    function vvFit(){   /* v428: ブラウザの帯が出ている間も、見出し行とボタンが指の届く所に残るよう、見えている枠の内側へ寄せる（本人） */
+      var v = window.visualViewport; if(!v || !gm) return;
+      var de = document.documentElement;
+      var t = Math.max(0, Math.round(v.offsetTop)), l = Math.max(0, Math.round(v.offsetLeft));
+      var bm = Math.max(0, Math.round(de.clientHeight - v.height - v.offsetTop));
+      var r = Math.max(0, Math.round(de.clientWidth - v.width - v.offsetLeft));
+      if(bm > 160) bm = 160; if(t > 160) t = 160; if(l > 160) l = 160; if(r > 160) r = 160;   /* 想定外の値で崩さない */
+      gm.style.setProperty('--vvt', t + 'px'); gm.style.setProperty('--vvb', bm + 'px');
+      gm.style.setProperty('--vvl', l + 'px'); gm.style.setProperty('--vvr', r + 'px');
+    }
+    function tipFit(){   /* v426: 盤面が高いと札が見出し行に潜るので、帯の下に留める（本人） */
+      if(!tipEl || document.documentElement.classList.contains('phone')) return;
+      tipEl.style.top = '';
+      var st = stage.getBoundingClientRect().top, hd = document.querySelector('.hd');
+      var floor = (hd ? hd.getBoundingClientRect().bottom : 60) + 10;
+      var now = parseFloat(getComputedStyle(tipEl).top) || 0;
+      if(st + now < floor) tipEl.style.top = Math.round(floor - st) + 'px';
+    }
     function fit(){
       if(!gm || gm.hidden) return; var sw = gm.querySelector('.gm-sw'), r = sw.getBoundingClientRect(), rs = gm.querySelector('.gm-side').getBoundingClientRect();
       hdFit(); tbFit();
+      setTimeout(tipFit, 60); vvFit();
       if(r.height > 0 && rs.left >= r.left + r.width - 2) stage.style.setProperty('--sh', Math.max(120, Math.round(r.height - 22 - (rot ? 26 : 0))) + 'px');   /* 回した絵では下に目盛りが来るぶん低く */   /* 右欄が横に並ぶ二列のときだけ。一列（タブレット縦）では欄の高さが盤面から決まるので CSS の上限に任せる */
       else stage.style.removeProperty('--sh');
     }
@@ -4178,6 +4197,16 @@
       return sp;
     }
     /* v389: 平均の判は消さず、盤面の右下へ小さく寄せて残す（小坂さん：判が見えない・消えている） */
+    function centerSeal(host){   /* v426: 壱弐参の字が判の中心からずれていた（本人）。描いたあとに実寸で寄せる */
+      requestAnimationFrame(function(){ try{
+        var sv = host.querySelector('svg'); if(!sv) return;
+        var best = null, area = 0;
+        [].slice.call(sv.querySelectorAll('text')).forEach(function(t){ var bb = t.getBBox(); var a = bb.width * bb.height; if(a > area){ area = a; best = t; } });
+        if(!best || !area) return;
+        var bb = best.getBBox(), dx = 78 - (bb.x + bb.width / 2), dy = 78 - (bb.y + bb.height / 2);
+        best.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
+      }catch(e){} });
+    }
     function sealPark(sp){
       if(!sp || !sp.parentNode || !stage) return;
       var r = stage.getBoundingClientRect(), w = sp.offsetWidth, h = sp.offsetHeight, k = .5;
@@ -4300,8 +4329,15 @@
         else if(t && ((t.ax === 'v' && (k === 'ArrowUp' || k === 'ArrowDown')) || (t.ax === 'h' && (k === 'ArrowLeft' || k === 'ArrowRight')))) e.preventDefault();
       });
       window.addEventListener('resize', function(){ setTimeout(function(){ if(stage) stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 0); });
-      window.addEventListener('resize', fit); window.addEventListener('resize', function(){ setTimeout(moreMark, 80); }); (function(){ var sc = gm.querySelector('.gm-side'); if(sc){ sc.addEventListener('scroll', moreMark, {passive:true}); if(window.MutationObserver) new MutationObserver(function(){ setTimeout(moreMark, 60); setTimeout(moreMark, 700); }).observe(sc, {childList:true, subtree:true}); } })();   /* v420: 列の下端に続きの印 */ window.addEventListener('resize', function(){ if(introOn){ ibgBuild(); introBg(); } else if(state === 'compare' || state === 'done'){ setTimeout(reveal, 60); } });   /* v409: 帯の出入りで高さが変わってもボタンを見せる（想定外係 #3） */ window.addEventListener('orientationchange', function(){ setTimeout(fit, 80); setTimeout(fit, 400); });
-      if(window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+      var lastW = window.innerWidth, lastVW = window.visualViewport ? Math.round(window.visualViewport.width) : lastW;
+      function fitW(){   /* v427: 帯（ブラウザの上下の棒）が出入りしただけでは組み直さない。幅が変わったときだけ（本人） */
+        var w = window.innerWidth, vw = window.visualViewport ? Math.round(window.visualViewport.width) : w;
+        if(document.documentElement.classList.contains('phone') && w === lastW && vw === lastVW) return;
+        lastW = w; lastVW = vw; fit();
+      }
+      window.addEventListener('resize', fitW); window.addEventListener('resize', function(){ setTimeout(moreMark, 80); }); (function(){ var sc = gm.querySelector('.gm-side'); if(sc){ sc.addEventListener('scroll', moreMark, {passive:true}); if(window.MutationObserver) new MutationObserver(function(){ setTimeout(moreMark, 60); setTimeout(moreMark, 700); }).observe(sc, {childList:true, subtree:true}); } })();   /* v420: 列の下端に続きの印 */ window.addEventListener('resize', function(){ if(introOn){ ibgBuild(); introBg(); } else if(state === 'compare' || state === 'done'){ setTimeout(reveal, 60); } });   /* v409: 帯の出入りで高さが変わってもボタンを見せる（想定外係 #3） */ window.addEventListener('orientationchange', function(){ setTimeout(fit, 80); setTimeout(fit, 400); });
+      if(window.visualViewport){ window.visualViewport.addEventListener('resize', fitW); window.visualViewport.addEventListener('resize', vvFit); window.visualViewport.addEventListener('scroll', vvFit); }
+      window.addEventListener('resize', vvFit); vvFit();
       document.addEventListener('click', function(e){   /* 遊びの最中にメニューの判（章・制作・プロフィール・連絡）を押したら、遊びを閉じてそこへ */
         if(!gm || gm.hidden) return; var a = e.target && e.target.closest ? e.target.closest('.menu a[href]') : null;
         if(a && !a.classList.contains('mgame')) close();
@@ -4412,6 +4448,21 @@
     function ibgBuild(){
       var pin = introEl.querySelector('.gm-ipin'), key = document.documentElement.lang; if(ibgW === key) return; ibgW = key;   /* 位置は CSS の％なので組み直しは言語が変わったときだけ */
       pin.querySelectorAll('.gm-ibg').forEach(function(x){ x.parentNode.removeChild(x); });
+      /* v428: 背景は、遊びで使う絵を角と角で継いで並べ、横へ流す（本人）。文字は紙の縁取りで浮かせる */
+      if(BOARDS.length && !rm){
+        var mos = el('div', 'gm-ibg gm-imos'); mos.setAttribute('aria-hidden', 'true');
+        for(var mr = 0; mr < 3; mr++){
+          var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
+          for(var cp = 0; cp < 2; cp++){
+            for(var mi = 0; mi < BOARDS.length; mi++){
+              var mb = BOARDS[(mi + mr * 7) % BOARDS.length];
+              var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false; mim.src = mb.img; strip.appendChild(mim);
+            }
+          }
+          row.appendChild(strip); mos.appendChild(row);
+        }
+        pin.appendChild(mos);
+      }
       /* v396: 案内の背景の図はやめる（小坂さん：安っぽく見える）。図の要素を作らず、地色だけ */
       ibgRuns = ISECS.map(function(){ return 0; });   /* 組み直した図は新しい要素なので、巡回の数も最初から（言語切替で二度呼ばれると図が動かないままになっていた） */
     }
@@ -4504,9 +4555,12 @@
       var g = el('div', 'gm-morph'); g.style.cssText = 'left:' + r0.left + 'px;top:' + r0.top + 'px;width:' + r0.width + 'px;height:' + r0.height + 'px';
       src.querySelectorAll('i.h, i.v').forEach(function(l){ var c = el('i', l.classList.contains('v') ? 'v' : 'h'); var st = l.getAttribute('style') || ''; var m = /(left|top):\s*([\d.]+%)/.exec(st); if(m) c.style[m[1]] = m[2]; g.appendChild(c); });
       document.body.appendChild(g);
+      function syncTo(){ var r1 = stage.getBoundingClientRect(); if(!r1.width) return false; g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px'; return true; }
       requestAnimationFrame(function(){ requestAnimationFrame(function(){
-        var r1 = stage.getBoundingClientRect(); if(!r1.width){ g.remove(); return; }
-        g.classList.add('go'); g.style.left = r1.left + 'px'; g.style.top = r1.top + 'px'; g.style.width = r1.width + 'px'; g.style.height = r1.height + 'px';
+        g.classList.add('go');
+        if(!syncTo()){ g.remove(); return; }
+        /* v426: 盤面は絵の縦横比が決まるまで形が変わる。育つ枠を途中で合わせ直し、着地の寸法を実物にそろえる（本人） */
+        [140, 300, 460, 620].forEach(function(ms){ setTimeout(syncTo, ms); });
         setTimeout(function(){ g.classList.add('bye'); }, 760); setTimeout(function(){ if(g.parentNode) g.remove(); }, 1300);
       }); });
     }
@@ -4669,6 +4723,7 @@
       hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
       tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(L(t.q, t.qe).replace('%s', obj(b))) + '</span>'; tipEl.classList.remove('off');
       if(ptype !== 'touch') setTimeout(function(){ if(state === 'trace') stage.focus({preventScroll:true}); }, 30);
+      setTimeout(tipFit, 40); setTimeout(tipFit, 520);
       tbFit();
     }
     function move(e){
@@ -4763,13 +4818,13 @@
     }
     function boardDone(){
       state = 'done'; fixedAt = performance.now(); trayFill(bi);
-      var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); }
+      var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); centerSeal(ms); }
       doneFn = bi < 2 ? function(){ doneFn = null; boardStart(bi + 1); } : function(){ doneFn = null; average(); };
       stepEl.innerHTML = '<span>' + esc('ABC'[bi] + ' · ' + L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; listState(); mode(L('測り終わり', 'measured'));
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
       doneRender();
       focusBtn(); setTimeout(reveal, 80); setTimeout(reveal, 460);   /* v419: iPad の一枚目は列の伸びが遅れて 5px 欠けたので、もう一度（細部係） */   /* v414: 表が出て列が伸びたあとにボタンまで（細部係） */
-      if(document.documentElement.classList.contains('phone')) seal('MEASURED', '採寸', stage, 'tr'); else seal('MEASURED', '採寸', resEl, 'sheet');   /* v397: iPhone は絵の右上に押す（右の列の下は目に入らない） */
+      seal('MEASURED', '採寸', stage, 'tr');   /* v426: 記録用紙の横ではなく絵の右上に（本人） */   /* v397: iPhone は絵の右上に押す（右の列の下は目に入らない） */
       cring(L(ORD[bi] + '、測り終わり \u00b7 MEASURED \u00b7 ', 'THE ' + ORDE[bi].toUpperCase() + ', MEASURED \u00b7 '));
     }
     function doneRender(){
@@ -4872,7 +4927,7 @@
         body += '<p class="gm-info-k">' + L('いま測っている絵', 'The picture you are measuring') + '</p><h3>' + ttl(b) + '</h3>' +
           '<p class="gm-info-s">' + esc(L(b.src, b.srce)) + '</p>' + (b.note ? '<p class="gm-info-t gm-info-n">' + esc(L(b.note, b.notee)) + '</p>' : '') +
           '<p class="gm-info-s">' + L('分析カテゴリ：', 'Category: ') + esc(L(b.cat, b.cate)) + '　／　' + L('主塊：', 'Main mass: ') + esc(obj(b)) + '</p>' +
-          '<button type="button" class="gm-catq" aria-expanded="false"><span>' + L('分析カテゴリとは', 'What the category means') + '</span><i></i></button>' +
+          '<button type="button" class="gm-catq gm-secq" aria-expanded="false"><span>' + L('分析カテゴリとは', 'What the category means') + '</span><i></i></button>' +
           '<div class="gm-catx" hidden><p class="gm-info-t">' + L('研究では、作品全体の構成を七つの観点で整理しています。ひとつの絵に複数が当てはまることもあります。この絵は、主に「', 'My research sorts the composition of a whole picture into seven viewpoints; more than one can apply. I read this picture mainly as “') + esc(L(b.cat, b.cate)) + L('」に当てはまります。', '”. ') + (catDef(b.cat) ? esc(L(catDef(b.cat)[2], catDef(b.cat)[3])) : '') + '</p><ul class="gm-cats">' +
             CATS.map(function(c){ return '<li' + (c[0] === b.cat ? ' class="on"' : '') + '><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul></div>';   /* 絵の時代背景と特徴、分析カテゴリの説明（押すと開く） */
       }
