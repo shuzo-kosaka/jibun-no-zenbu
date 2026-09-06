@@ -3944,6 +3944,8 @@
   html:has(.lgsw.run) .cur .cd{background:#FBF7F2}
   html:has(.lgsw.run) .cur.hov .cd{background:transparent; border-color:#FBF7F2}
   html:has(.lgsw.run) .cur .cc{color:#FBF7F2}
+  /* v458 × の字は em の中心より上に出るので、一 px 下げて枠の中心に合わせる（目視と墨の重心の実測から） */
+  .gm-hd .gm-x{top:1px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
