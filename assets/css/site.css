@@ -4017,10 +4017,8 @@
   html.rm .gm-i,html.rm .gm-x,html.rm .gm-ix,html.rm .gm-q{transition:none}
   /* v477 一枚目の一本目だけ、右の列のいちばん上に「何をする遊びか」を置く（本人） */
   .gm-lead2{margin:0 0 14px; padding:0 0 12px; border-bottom:1px solid rgba(30,28,26,.14); transition:opacity .38s var(--ease), transform .38s var(--ease)}
-  .gm-lead2 b{display:block; font-family:var(--mincho); font-weight:900; font-size:17px; line-height:1.35; letter-spacing:.01em; margin:0 0 .35em}
-  .gm-lead2 span{display:block; font-size:12.5px; line-height:1.75; color:var(--fg2, #5A5853)}
   .gm-lead2.bye{opacity:0; transform:translateY(-6px)}
-  @media (max-height:640px){ .gm-lead2{margin-bottom:10px; padding-bottom:9px} .gm-lead2 b{font-size:15px} .gm-lead2 span{font-size:11.5px; line-height:1.65} }
+  @media (max-height:640px){ .gm-lead2{margin-bottom:10px; padding-bottom:9px} }
   html.rm .gm-lead2{transition:none}
   /* v481 案内二面の図をもっと大きく、順に現れるように（本人） */
   .gm-ilist{padding-left:0; max-width:32em}
@@ -4063,6 +4061,10 @@
   /* v488b 二つの選択は、地も枠も字も同じにする（片方だけ枠が濃かった） */
   .gm-ichoice button,.gm-ichoice button:last-child{background:var(--ibg, #F2F1EC); border:1px solid rgba(30,28,25,.62); color:var(--ifg, #1C1B19)}
   @media (hover:hover){ .gm-ichoice button:hover,.gm-ichoice button:last-child:hover{background:var(--ifg, #1C1B19); border-color:var(--ifg, #1C1B19); color:var(--ibg, #F2F1EC)} }
+  /* v489 上へ移した案内。下にあったときと同じ組みにする */
+  .gm-lead2 .gm-ask.gm-lead{margin:0}
+  .gm-lead2 .gm-leadhow{margin:.55em 0 0; font-size:12.5px; line-height:1.75; color:var(--fg2, #5A5853)}
+  .gm-lead2.gm-res{border-bottom:1px solid rgba(30,28,26,.14); padding-bottom:12px; margin-bottom:14px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
