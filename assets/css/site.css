@@ -3894,6 +3894,17 @@
   /* v447 iPhone：段が二つのときは丈を半分に */
   .gm-imos .row:nth-child(1):nth-last-child(2),.gm-imos .row:nth-child(2):nth-last-child(1){height:50%}
   .gm-imos .row:nth-child(2):nth-last-child(1){top:50%}
+  /* v448 触れたときに行ごと大きくするのをやめる（右端の記号が列の外へ出ていた：本人。実測 内側 2px → 外へ 4px） */
+  .gm-catq,.gm-secq,.gm-side .gm-secq,.gm-qa .gm-qq{transform:none !important}
+  @media (hover:hover){
+    .gm-catq:hover,.gm-secq:hover,.gm-side .gm-secq:hover,.gm-qa .gm-qq:hover{color:var(--acc); transform:none !important}
+    .gm-catq:hover i,.gm-secq:hover i,.gm-side .gm-secq:hover i,.gm-qa .gm-qq:hover i{border-color:var(--acc)}
+  }
+  /* v448 右の列の送りの筋は見せない（文字に被って読みにくい：本人） */
+  .gm-side{scrollbar-width:none; -ms-overflow-style:none}
+  .gm-side::-webkit-scrollbar{width:0; height:0; display:none}
+  .gm-info-in{scrollbar-width:none; -ms-overflow-style:none}
+  .gm-info-in::-webkit-scrollbar{width:0; height:0; display:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
