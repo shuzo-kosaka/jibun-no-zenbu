@@ -3856,6 +3856,13 @@
     .gm-btns.hold .gm-b{min-height:38px; padding:7px 6px; font-size:11.5px}
     .gm-btns.hold .gm-b.go{min-height:42px; padding:9px 10px; font-size:12.5px}
   }
+  /* v444 短い窓の本文の大きさ（後の clamp に負けていた：確認係） */
+  @media (max-height:640px){ .gm-isec > span{font-size:15px !important; line-height:1.95} }
+  /* v444 白いぼかしは見出しと本文の中心へ（縦も）。題の面は箱の丈が 0 なので最低の高さを与える */
+  .gm-isec::before{transform:translate(calc(-50% + var(--blurdx, 0px)), calc(-50% + var(--blurdy, 0px))) !important; height:max(120%, 300px)}
+  /* v444 見出しが右上のボタンに掛からない幅（丈の低い窓で英語が重なっていた：確認係） */
+  .gm-isec > b{max-width:min(100%, calc(100vw - 340px))}
+  @media (max-height:640px){ .gm-isec > b{max-width:calc(100vw - 340px)} }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

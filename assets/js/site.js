@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4534,6 +4534,11 @@
         if(!cs.length) return;
         var mid = cs.reduce(function(a, c){ return a + c; }, 0) / cs.length;
         sc.style.setProperty('--blurdx', Math.round(mid - (sr.left + sr.width / 2)) + 'px');
+        var cy = [], r2;
+        if(b){ r2 = b.getBoundingClientRect(); if(r2.height) cy.push(r2.top + r2.height / 2); }
+        if(sp){ r2 = sp.getBoundingClientRect(); if(r2.height) cy.push(r2.top + r2.height / 2); }
+        if(cy.length){ var midY = cy.reduce(function(a, c){ return a + c; }, 0) / cy.length;
+          sc.style.setProperty('--blurdy', Math.round(midY - (sr.top + sr.height / 2)) + 'px'); }   /* v444: 選ぶ面はボタンのぶん中心が下がっていた（確認係） */
       });
     }
     function introScroll(){
@@ -4656,7 +4661,9 @@
       gm.querySelector('.gm-ttl').innerHTML = mix('絵を、測る。', 'Measure the composition.', '測る');
       gm.querySelector('.gm-sub').textContent = '';
       axlText();
-      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');   /* v400: 右の列の ? と見分けがつくよう文字で */
+      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');
+      ['.gm-ix', '.gm-x'].forEach(function(sel){ var e = gm.querySelector(sel); if(e) e.setAttribute('aria-label', L('閉じる', 'Close')); });
+      if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('研究の骨格', 'research grid');
       gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
       if(!forced()) intro(); else start();   /* 案内は開くたびに（スキップがある）。#play のときだけ省く */
@@ -4666,7 +4673,8 @@
     function close(){
       if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
-      gm.classList.remove('on', 'sheeton'); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
+      gm.classList.remove('on', 'sheeton'); document.documentElement.classList.remove('gminfo', 'gms0', 'gms1', 'gms2', 'gms3', 'gms4');   /* v444: 閉じたあとに印が残っていた（確認係） */
+      sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
       offT = setTimeout(function(){ gm.hidden = true; if(window.__retint) window.__retint(); }, 520);
       if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
     }
@@ -5156,7 +5164,9 @@
       if(!gm || gm.hidden) return;
       gm.querySelector('.gm-ttl').innerHTML = mix('絵を、測る。', 'Measure the composition.', '測る');
       gm.querySelector('.gm-sub').textContent = '';
-      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');   /* v400: 右の列の ? と見分けがつくよう文字で */
+      gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('遊び方', 'How to play');
+      ['.gm-ix', '.gm-x'].forEach(function(sel){ var e = gm.querySelector(sel); if(e) e.setAttribute('aria-label', L('閉じる', 'Close')); });
+      if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       axlText(); tbLabel();   /* 目盛りの向きの語と回すボタンの名も言語に合わせる */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('研究の骨格', 'research grid');
       if(introOn){
