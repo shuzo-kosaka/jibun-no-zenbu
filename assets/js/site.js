@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4413,7 +4413,7 @@
     function isecHTML(sx){
       var hj = sx.ja[0].split('|'), he = sx.en[0].split('|');
       return '<b>' + hj.map(function(t, k){ return '<u>' + mix(t, he[k] || (k === 0 ? sx.en[0] : ''), sx.big) + '</u>'; }).join('') + '</b><span>' + (sx.html ? L(sx.ja[1], sx.en[1]) : body(L(sx.ja[1], sx.en[1]))) + '</span>' +
-        (sx.choice ? '<div class="gm-ichoice"><button type="button" data-c="jp">' + L('日本の絵', 'Japanese') + '</button><button type="button" data-c="we">' + L('西洋の絵', 'Western') + '</button><button type="button" data-c="both">' + L('両方', 'Both') + '</button></div>' : '');
+        (sx.choice ? '<div class="gm-ichoice"><button type="button" data-c="jp">' + L('日本の絵', 'Japanese') + '</button><button type="button" data-c="we">' + L('西洋の絵', 'Western') + '</button></div>' : '');
     }
     function bindChoice(d){ d.querySelectorAll('.gm-ichoice button').forEach(function(bt){ bt.addEventListener('click', function(){ cat = bt.getAttribute('data-c'); var fs = introEl.querySelectorAll('.gm-ibg.b4 .jf'); fs.forEach(function(f){ if(cat === 'both' || (cat === 'jp' && f.classList.contains('l')) || (cat === 'we' && f.classList.contains('r'))) f.classList.add('pick'); }); if(rm) introEnd(false); else setTimeout(function(){ introEnd(false); }, 110); }); }); }   /* 選んだ側の枠が一瞬濃くなってから去る（応答） */
     function jwMeans(){ var g = {jp:{}, we:{}}; ['jp', 'we'].forEach(function(k){ var bs = BOARDS.filter(function(b){ return k === 'jp' ? !!b.jp : !b.jp; }); LINES.forEach(function(t){ var sum = 0; bs.forEach(function(b){ sum += b.a[t.k]; }); g[k][t.k] = bs.length ? Math.round(sum / bs.length) : 0; }); }); return g; }
@@ -4421,7 +4421,8 @@
     function jwOverlay(){
       var b = resEl.querySelector('.gm-jwb'); if(!b) return; var on = b.getAttribute('aria-pressed') === 'true'; b.setAttribute('aria-pressed', on ? 'false' : 'true');
       linesEl.querySelectorAll('.jw').forEach(function(x){ x.parentNode.removeChild(x); }); linesEl.classList.toggle('jwon', !on); if(on) return;
-      var g = jwMeans(); LINES.forEach(function(t){ mkLine(linesEl, t.ax, g.jp[t.k], 'jw jp', L('日本 ', 'JP ') + g.jp[t.k] + '%'); mkLine(linesEl, t.ax, g.we[t.k], 'jw we', L('西洋 ', 'West ') + g.we[t.k] + '%'); });
+      var g = jwMeans(), opp = (cat === 'jp') ? 'we' : 'jp';   /* v479: 測らなかった側の平均と重ねる（本人） */
+      LINES.forEach(function(t){ mkLine(linesEl, t.ax, g[opp][t.k], 'jw ' + opp, (opp === 'jp' ? L('日本 ', 'JP ') : L('西洋 ', 'West ')) + g[opp][t.k] + '%'); });
     }
     /* 案内の背景の図：①主塊に四本 ②外郭に目盛り ③同じ％を絵・紙・画面に ④三枚→平均グリッド→紙面。薄い線で、文の後ろで一巡ずつ動く */
     /* 案内の背景：本編の「グリッド表示」（.lines）と同じ言葉——画面いっぱいの 1px の線、外周 10px の黄枠、中心軸、線を抜く小さな札。枠の中に閉じない（小坂さんの指摘） */
@@ -4594,16 +4595,19 @@
     function jumpTo(y){ try{ window.scrollTo({top:y, behavior:'instant'}); }catch(e){ window.scrollTo(0, y); } }   /* v420: 戻す送りは即時（html{scroll-behavior:smooth} のせいで章を飛び回り、iPad では 08 への送りが捨てられていた＝本編係） */
     function introEnd(skipped){
       if(!introOn) return; introOn = false; introSeen = true; docOff(); clearTimeout(ibgT); cringOff(true); document.documentElement.classList.remove('gms0', 'gms1', 'gms2', 'gms3', 'gms4');
+      /* v478: 育つ枠は、案内が去る前に元の位置を採っておく（start() のあとでは選択の行が見つからず、演出そのものが動いていなかった） */
+      var msrc = introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on');
+      var mr0 = msrc ? msrc.getBoundingClientRect() : null;
       introEl.classList.add('bye'); setTimeout(function(){ introEl.hidden = true; introEl.classList.remove('bye'); }, rm ? 0 : 720);   /* 文字と選択肢が先に消え（140ms）、線を残した地がゆっくり薄れる */
       start(); startedAt = performance.now();   /* 案内の操作を一手目へ持ち越さない：直後 400ms の押下は無視 */
-      morphIn();
+      morphIn(msrc, mr0);
       var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1400); }); }); }   /* v462: 外す時刻を on から数える（動き係：盤面の出現の最後が切られていた） */   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
     }
     /* v392（Sol 第 16・Q4）：五面目で選んだ骨格の枠が、そのまま盤面の位置と大きさへ 700ms で育ち、四本を残したまま中に絵が現れる。拭きと拡縮は重ねない */
-    function morphIn(){
+    function morphIn(src0, rect0){
       if(rm) return;
-      var src = introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on'); if(!src) return;   /* v406: 図をやめたので、選択の行から盤面へ育てる（総点検係の指摘） */
-      var r0 = src.getBoundingClientRect(); if(!r0.width) return;
+      var src = src0 || introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on'); if(!src) return;   /* v406: 図をやめたので、選択の行から盤面へ育てる（総点検係の指摘） */
+      var r0 = rect0 && rect0.width ? rect0 : src.getBoundingClientRect(); if(!r0.width) return;
       var g = el('div', 'gm-morph'); g.style.cssText = 'left:' + r0.left + 'px;top:' + r0.top + 'px;width:' + r0.width + 'px;height:' + r0.height + 'px';
       src.querySelectorAll('i.h, i.v').forEach(function(l){ var c = el('i', l.classList.contains('v') ? 'v' : 'h'); var st = l.getAttribute('style') || ''; var m = /(left|top):\s*([\d.]+%)/.exec(st); if(m) c.style[m[1]] = m[2]; g.appendChild(c); });
       document.body.appendChild(g);
@@ -4978,7 +4982,7 @@
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '<i class="mine"></i>' + L('薄い破線の七本：三点の骨格', 'seven faint dashed: the three-work grid') + '</p>' +
-        '<div class="gm-jw"><p class="gm-cmph">' + L('選んだ十九点では、骨格の置きどころにこれだけ違いが出ました。', 'Across the nineteen chosen works, the skeletons sit this differently.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L('日本と西洋を重ねる', 'Overlay Japan and the West') + '</button></div>' + '</div>' +
+        '<div class="gm-jw"><p class="gm-cmph">' + L('選んだ十九点では、骨格の置きどころにこれだけ違いが出ました。', 'Across the nineteen chosen works, the skeletons sit this differently.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button></div>' + '</div>' +
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);
