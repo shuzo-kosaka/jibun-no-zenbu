@@ -3989,6 +3989,13 @@
   html.phone .gm-idots i::after{inset:-16px -20px}
   /* v468 測り終えた画面に、前の手番の問いが薄く残っていた（細部係） */
   .gm-tip.hid{opacity:0 !important; pointer-events:none}
+  /* v469 一本引くと列が送られ、手番（A・一枚目 01 / 12）が画面から消えていた（細部係・スマホ係・PC 係）。
+     手番の行だけは列の頭に貼り付けて、どの絵の何本目かを見失わないようにする */
+  .gm-side .gm-step{position:sticky; top:0; z-index:5; background:var(--bg, #F2F1EC); padding-top:2px; padding-bottom:4px}
+  /* v469 平均で三枚の目盛りが一点に寄り切ると、A・B・C の札が重なって読めない塊になる（細部係） */
+  .gm-lines.gathered .gm-ln.tick b{opacity:0; transition:opacity .3s var(--ease)}
+  /* v469 カーソルの座標札が、暗い絵の上で 1.09:1 まで落ちる（PC 係）。紙の光を一段まとわせる */
+  html.gmopen .cur .cc{text-shadow:0 0 6px var(--paper, #F2F1EC), 0 0 3px var(--paper, #F2F1EC), 0 0 1px var(--paper, #F2F1EC)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
