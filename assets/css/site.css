@@ -4065,6 +4065,13 @@
   .gm-lead2 .gm-ask.gm-lead{margin:0}
   .gm-lead2 .gm-leadhow{margin:.55em 0 0; font-size:12.5px; line-height:1.75; color:var(--fg2, #5A5853)}
   .gm-lead2.gm-res{border-bottom:1px solid rgba(30,28,26,.14); padding-bottom:12px; margin-bottom:14px}
+  /* v490 スマホでは案内の本文が小さくて読みづらい（本人）。手の端末だけ級数を上げる */
+  html.phone .gm-ilist{font-size:15px; line-height:1.85}
+  html.phone .gm-ilist li{margin-bottom:.7em}
+  html.phone .gm-ipur{font-size:17px; line-height:1.9}
+  html.phone .gm-ick{font-size:13px}
+  html.phone .gm-ilist .ik{width:40px; height:40px}
+  html.phone .gm-ilist li{grid-template-columns:40px 1fr; column-gap:14px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
