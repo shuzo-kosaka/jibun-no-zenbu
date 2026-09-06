@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4999,6 +4999,9 @@
       ['作品の選び方に、偏りはありませんか。', 'Is there a bias in how the works were chosen?',
        '私が選ぶ以上、選び方そのものが研究の条件になります。そこで、主な形と余白を同じ手順で記録できることを共通の条件にし、十九点すべてと選んだ理由を示しています。',
        'Since I choose them, the selection is itself a condition of the study. The shared rule is that the main form and the empty space can be recorded by the same method; all nineteen works and the reasons are shown.'],
+      ['絵は実物ではなく、描き起こしたものですね。', 'The pictures are redrawn, not reproductions. Why?',
+       '複製の写真は、撮り方によって色も切り取りも違います。同じ手順で描き起こすことで、測る条件をそろえました。色や筆致を落として形と余白だけを残しているのも、比率を見るためです。',
+       'Reproductions differ in colour and cropping from one photograph to the next. Redrawing them by one method keeps the conditions of measurement the same. Colour and brushwork are dropped so that only form and empty space remain, which is what the ratios are about.'],
       ['この比率は、どこで使われていますか。', 'Where are these ratios actually used?',
        'このサイトで使っています。画面を均等に割るのではなく、絵から取り出した線に合わせて、文字と絵と余白の位置や間隔を決めています。',
        'On this site. Instead of dividing the screen evenly, the text, pictures and empty space follow the lines drawn from the paintings.']
