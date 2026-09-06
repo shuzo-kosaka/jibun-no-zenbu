@@ -4019,6 +4019,21 @@
   .gm-lead2.bye{opacity:0; transform:translateY(-6px)}
   @media (max-height:640px){ .gm-lead2{margin-bottom:10px; padding-bottom:9px} .gm-lead2 b{font-size:15px} .gm-lead2 span{font-size:11.5px; line-height:1.65} }
   html.rm .gm-lead2{transition:none}
+  /* v481 案内二面の図をもっと大きく、順に現れるように（本人） */
+  .gm-ilist{padding-left:0; max-width:32em}
+  .gm-ilist li{display:grid; grid-template-columns:46px 1fr; column-gap:16px; align-items:start; margin:0 0 .8em; padding-left:0}
+  .gm-ilist .ik{width:46px; height:46px; margin-top:.15em}
+  .gm-ilist .ik svg{stroke-width:1.15}
+  @keyframes gmIlIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  .gm-isec .gm-ilist li{opacity:0}
+  .gm-isec.on .gm-ilist li{animation:gmIlIn .52s var(--ease) both}
+  .gm-isec.on .gm-ilist li:nth-child(1){animation-delay:.26s}
+  .gm-isec.on .gm-ilist li:nth-child(2){animation-delay:.46s}
+  .gm-isec.on .gm-ilist li:nth-child(3){animation-delay:.66s}
+  .gm-isec.on .gm-ilist li:nth-child(4){animation-delay:.86s}
+  .gm-isec.on .gm-ilist li:nth-child(5){animation-delay:1.06s}
+  html.rm .gm-isec .gm-ilist li,html.rm .gm-isec.on .gm-ilist li{opacity:1; animation:none}
+  @media (max-height:640px){ .gm-ilist li{grid-template-columns:34px 1fr; column-gap:12px; margin-bottom:.5em} .gm-ilist .ik{width:34px; height:34px} }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
