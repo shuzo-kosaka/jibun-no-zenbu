@@ -3985,7 +3985,10 @@
   /* v467 手の端末では 44pt（≒65px）が要る。見た目は変えず、当たりだけ広げる（スマホ係の実測：× 24pt、? 11pt、面の丸 5pt） */
   html.phone .gm-x::before,html.phone .gm-ix::before{inset:-20px}
   html.phone .gm-q::before,html.phone .gm-catq2::before{inset:-24px}
-  html.phone .gm-idots i::after{inset:-16px -20px}
+  /* v482 案内の丸：当たりを広げると隣と食い合う（丸の中心の間隔は 17px／スマホ 16px。44px にすると 27px 重なる）。
+     縦は自分の帯ぶんだけに閉じ、横に広げて押しやすくする（Astra の指摘と、細部係の実測から） */
+  .gm-idots i::after{inset:-5px -22px}
+  html.phone .gm-idots i::after{inset:-4px -24px}
   /* v468 測り終えた画面に、前の手番の問いが薄く残っていた（細部係） */
   .gm-tip.hid{opacity:0 !important; pointer-events:none}
   /* v469 一本引くと列が送られ、手番（A・一枚目 01 / 12）が画面から消えていた（細部係・スマホ係・PC 係）。
