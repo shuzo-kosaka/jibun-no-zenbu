@@ -3370,7 +3370,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4322,13 +4322,13 @@
         fresh = false; move(e); confirm();   /* 画像の外で離しても、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
       }
       stage.addEventListener('pointerup', function(e){ up(e, true); });
-      var tmY = null; gm.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true});
-      gm.addEventListener('touchmove', function(e){ if(!phoneFree) return;   /* v431: 案内中も遊び中も、後ろの本編は動かさない（本人） */ var sc = e.target && e.target.closest ? e.target.closest('.gm-side, .gm-iscroll, .gm-info-in, .gm-take-in, .gm-sheet') : null;
+      var tmY = null; document.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true, capture:true});   /* v453: 遊びの外（見出しの帯など）に指を置いても数えるため、文書で受ける */
+      document.addEventListener('touchmove', function(e){ if(!phoneFree || !document.documentElement.classList.contains('gmopen')) return;   /* v431/v453: 案内中も遊び中も、後ろの本編は動かさない。遊びの外に触れても効くよう、文書で捕まえる（本人） */ var sc = e.target && e.target.closest ? e.target.closest('.gm-side, .gm-iscroll, .gm-info-in, .gm-take-in, .gm-sheet, .menu') : null;
         if(sc){ var y = e.touches[0] ? e.touches[0].clientY : tmY, dy = (tmY === null || y === null) ? 0 : y - tmY; tmY = y;   /* v398: 列の端で引いても紙面へ伝えない（帯が戻り、本編が見える） */
           { var atTop = sc.scrollTop <= 0, atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1;   /* v452: 案内の枠でも端で止める（端まで送ると後ろの本編が動いていた：本人） */
             if((atTop && dy > 0) || (atEnd && dy < 0) || sc.scrollHeight <= sc.clientHeight + 1) e.preventDefault(); }
           return; }
-        e.preventDefault(); }, {passive:false});   /* v391: 盤面の間、指で紙面が動かないように */
+        e.preventDefault(); }, {passive:false, capture:true});   /* v391: 盤面の間、指で紙面が動かないように */
       stage.addEventListener('pointercancel', function(e){ up(e, false); if(state === 'trace') tipEl.classList.remove('off'); });
       stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } });
       stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); });   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
