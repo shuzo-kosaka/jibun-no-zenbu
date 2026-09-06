@@ -343,12 +343,13 @@
       setTimeout(function(){ typeIn(function(){ typed = true; }); }, 1000);                        /* ...and the phrase is typed */
       var lifted = false;
       function lift(){ if(lifted) return; lifted = true; ld.classList.add('lift'); heroIn(); setTimeout(function(){ ld.remove(); }, 1400); }
-      liftNow = lift;
+      liftNow = lift; if(wantLift){ lift(); return; }
       (function waitTyped(){ if(typed) setTimeout(lift, 900); else setTimeout(waitTyped, 60); })();
       setTimeout(lift, 7600);   /* never later than this */
     }
-    var liftNow = null;
-    ld.addEventListener('click', function(){ if(phase === 'run'){ phase = 'stop'; stopT = performance.now(); } else if(liftNow){ liftNow(); } });
+    var liftNow = null, wantLift = false;
+    if(window.__ldTap){ wantLift = true; phase = 'stop'; stopT = performance.now() - 900; }   /* v464: loader が動く前の押下を拾う（幕は静的 HTML で先に出ていた） */
+    ld.addEventListener('click', function(){ if(liftNow){ liftNow(); return; } wantLift = true; phase = 'stop'; stopT = performance.now() - 900; });   /* v464: 「CLICK TO SKIP」は一度で本編へ */
     window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && phase === 'run'){ phase = 'stop'; stopT = performance.now(); } });
     (function frame(now){
       var t = now - t0, dt = Math.min(50, now - last) / 1000; last = now;
@@ -358,7 +359,7 @@
       disp = Math.min(bound, disp + ((ready ? 100 : 92) - disp) * .12);
       if(ready && t >= MIN) disp = 100;
       if(phase === 'run' && disp >= 100){ phase = 'stop'; stopT = now; ld.classList.add('hund'); }
-      var n = Math.floor(disp); ldn.textContent = (n < 10 ? '0' : '') + n;
+      var n = Math.max(0, Math.floor(disp)); ldn.textContent = (n < 10 ? '0' : '') + n;   /* v464: 幕が明けた直後、rAF の時刻が t0 より前になり 0-27 のような負の値が出ていた（動き係） */
       /* lanes: ease in over .5s, run, then brake to a halt over .8s */
       if(phase === 'run'){ speed = Math.min(1, t / 500); speed = speed * speed * (3 - 2 * speed); }
       else { var k = Math.min(1, (now - stopT) / 620); speed = (1 - k) * (1 - k) * (1 - k);
