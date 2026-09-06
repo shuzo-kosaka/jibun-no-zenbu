@@ -3669,7 +3669,8 @@
   html.rm .gm-imos .strip{animation:none}
   .gm-intro .gm-ibg.gm-imos{display:block !important}
   /* v428 帯が出ている間は、見出し行と下のボタンを見えている枠の内側へ */
-  .gm-in{padding-top:calc(2.6vh + var(--vvt, 0px)); padding-bottom:calc(2.4vh + var(--vvb, 0px)); padding-left:calc(max(3.4vw, env(safe-area-inset-left, 0px)) + var(--vvl, 0px)); padding-right:calc(max(3.4vw, env(safe-area-inset-right, 0px)) + var(--vvr, 0px))}
+  .gm-in{padding-bottom:calc(2.4vh + var(--vvb, 0px)); padding-left:calc(max(3.4vw, env(safe-area-inset-left, 0px)) + var(--vvl, 0px)); padding-right:calc(max(3.4vw, env(safe-area-inset-right, 0px)) + var(--vvr, 0px))}
+  .gm-hd{margin-top:var(--vvt, 0px)}   /* v432: 帯が出たぶんだけ見出し行を下げる（本編の帯の位置はそのまま） */
   .gm-ihd,.gm-iskip,.gm-ix{margin-top:var(--vvt, 0px)}
   /* v429 背景の帯：層を小さく保つ（will-change をやめ、描画を段の中に閉じる） */
   .gm-imos .strip{will-change:auto}
@@ -3690,6 +3691,25 @@
     .gm-x{font-size:30px; line-height:1}
     .gm-hd{align-items:center}
   }
+  /* v431 案内の右上：遊び方とスキップを並べる */
+  .gm-ihow{position:static; font:inherit; font-size:12.5px; letter-spacing:.1em; padding:8px 14px; border:1px solid var(--iline, rgba(30,28,26,.3)); background:transparent; color:var(--ifg, inherit); cursor:pointer; border-radius:5px; -webkit-appearance:none; appearance:none; min-height:40px; margin-top:var(--vvt, 0px)}
+  .gm-ihow:focus-visible{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19}
+  @media (hover:hover){ .gm-ihow:hover{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19} }
+  .gm-ihow:active{transform:translateY(1px)}
+  @media (max-height:640px){ .gm-ihow{font-size:11.5px; padding:7px 11px; min-height:36px} .gm-iskip{font-size:11.5px; padding:7px 11px; min-height:36px} }
+  /* v431 案内は静かに現れる（絵の読み込みを待たせない） */
+  .gm-imos{opacity:0; transition:opacity 1.5s var(--ease)}
+  .gm-intro.ready .gm-imos{opacity:.17}
+  .gm-isecs{transition:opacity .9s var(--ease), transform .9s var(--ease)}
+  .gm-intro:not(.ready) .gm-isecs{opacity:0; transform:translateY(10px)}
+  html.rm .gm-imos,html.rm .gm-isecs{transition:none}
+  html.rm .gm-intro:not(.ready) .gm-isecs{opacity:1; transform:none}
+  /* v431 表の最後の列は「違い」が入る幅に */
+  .gm-tb td:last-child,.gm-tb th:last-child{width:48px}
+  /* v432 採寸の判：下地の白も判と同じ傾きに、退場も判と同じ間で（本人） */
+  .gm-stage .gm-seal.tr::before{transform:rotate(-9deg); transition:opacity .25s var(--ease)}
+  .gm-stage .gm-seal.tr.on.bye::before{opacity:0; transition-duration:var(--sb, .3s)}
+  html.rm .gm-stage .gm-seal.tr::before{transition:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
