@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4694,14 +4694,24 @@
       ['.gm-ix', '.gm-x'].forEach(function(sel){ var e = gm.querySelector(sel); if(e) e.setAttribute('aria-label', L('閉じる', 'Close')); });
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'research grid');
+      siteInert(true);   /* v484: 遊びの最中は後ろの本編へ Tab で抜けない（流れ係） */
       gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
       if(!forced()) intro(); else start();   /* 案内は開くたびに（スキップがある）。#play のときだけ省く */
       if(!phoneFree) lockDoc();
       if(window.__retint) window.__retint();   /* iOS の帯の色を、幕の紙色で採り直させる */
     }
+    function siteInert(on){
+      var keep = ['hd', 'menu', 'cur', 'lgsw', 'jcur', 'rotv'];
+      Array.prototype.forEach.call(document.body.children, function(el){
+        if(el === gm || el.id === 'ld') return;
+        for(var i = 0; i < keep.length; i++){ if(el.classList && el.classList.contains(keep[i])) return; }
+        try{ el.inert = on; }catch(e){}
+      });
+    }
     function close(){
       if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
+      siteInert(false);
       gm.classList.add('out');   /* v463: 本編へ戻るときの引き際（本人：戻る演出がなかった）。盤面 → 右の列 → 見出しの順に引いて、紙ごと持ち上がる */
       gm.classList.remove('on', 'sheeton'); document.documentElement.classList.remove('gminfo', 'gms0', 'gms1', 'gms2', 'gms3', 'gms4');   /* v444: 閉じたあとに印が残っていた（確認係） */
       sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
@@ -4775,7 +4785,7 @@
     }
     var boardAt = 0;
     function boardStart(i){
-      bi = i; ti = 0; res[i] = {}; boardAt = performance.now(); var b = picks[i]; goEl.classList.remove('hold', 'on');
+      bi = i; ti = 0; res[i] = {}; boardAt = performance.now(); var b = picks[i]; goEl.classList.remove('hold', 'on'); try{ goEl.inert = false; }catch(x){}
       showBoard(b);
       cardRender(i);
       cardEl.hidden = false; listBuild();
@@ -4972,7 +4982,7 @@
       setTimeout(function(){ ticks.forEach(function(x, i){ x.el.style.transitionDelay = (.35 + Math.floor(i / 3) * .95) + 's'; x.el.style[x.el.classList.contains('v') ? 'left' : 'top'] = x.to + '%'; }); linesEl.classList.add('gathered'); }, 120 * step);
       setTimeout(function(){ FIXED.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'fixed', v + '%'); }); linesEl.classList.add('fixed'); }, rm ? 60 : 4300);
       setTimeout(function(){ var n = resEl.querySelector('.gm-seven'); if(n) n.classList.add('on'); if(state === 'avg'){ seal('YOUR GRID', '平均', stage, 'center'); cring(L('あなたの平均グリッド \u00b7 YOUR GRID \u00b7 ', 'YOUR AVERAGE GRID \u00b7 YOUR GRID \u00b7 ')); var th = resEl.querySelector('.gm-thanks'); if(th) th.classList.add('on'); trayEl.classList.add('pulse'); setTimeout(function(){ trayEl.classList.remove('pulse'); }, 500); } }, rm ? 100 : 4900);
-      setTimeout(function(){ goEl.classList.add('on'); focusBtn(); revealRes(); }, rm ? 150 : 5400);
+      setTimeout(function(){ goEl.classList.add('on'); try{ goEl.inert = false; }catch(x){} focusBtn(); revealRes(); }, rm ? 150 : 5400);
       lastAvg = {avg:avg, kav:kav, diff:diff, per:per}; avgRender(avg, kav, diff, per);
     }
     function avgRender(avg, kav, diff, per){
@@ -4993,7 +5003,7 @@
         resEl.querySelectorAll('.gm-media button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
         var v = b.getAttribute('data-ar'); stage.style.setProperty('--ar', v === 'screen' ? (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3) : v);
       }); });
-      goEl.innerHTML = ''; goEl.classList.add('hold');
+      goEl.innerHTML = ''; goEl.classList.add('hold'); try{ goEl.inert = true; }catch(x){}   /* v484: 伏せている間はキーボードでも触れない（流れ係） */
       btn(L('画面いっぱいに表示', 'Show full screen'), function(){ sheet(avg); }, 'go');
       btn(L('三点の骨格と重ねる', 'Compare with the research grid'), overlay);
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
