@@ -4053,6 +4053,16 @@
   .gm-catx.anim,.gm-secx.anim{overflow:hidden; transition:height .24s var(--ease)}
   html.rm .gm-catx.anim,html.rm .gm-secx.anim{transition:none}
   .gm-lead2 span.how{margin-top:.5em; color:var(--fg, #1C1B19)}
+  /* v488 「両方」を外したことで、最後の一つ（西洋の絵）だけが朱地で目立っていた（本人：どちらも同じ見え方に） */
+  .gm-ichoice button:last-child{background:transparent; border-color:var(--iline, rgba(30,28,25,.62)); color:var(--ifg, #1C1B19)}
+  @media (hover:hover){ .gm-ichoice button:last-child:hover{background:var(--ifg, #1C1B19); border-color:var(--ifg, #1C1B19); color:var(--ibg, #F2F1EC)} }
+  .gm-intro.s0 .gm-ichoice button:last-child{color:var(--ifg, #1C1B19)}
+  .gm-intro.s0 .gm-ichoice button:last-child:hover{background:var(--ifg, #1C1B19); color:var(--ibg, #F2F1EC)}
+  /* v488 スマホでは、背景の絵をもっとゆっくり浮かび上がらせる（本人：間に合っていない） */
+  html.phone .gm-imos{transition:opacity 2.8s var(--ease) .45s}
+  /* v488b 二つの選択は、地も枠も字も同じにする（片方だけ枠が濃かった） */
+  .gm-ichoice button,.gm-ichoice button:last-child{background:var(--ibg, #F2F1EC); border:1px solid rgba(30,28,25,.62); color:var(--ifg, #1C1B19)}
+  @media (hover:hover){ .gm-ichoice button:hover,.gm-ichoice button:last-child:hover{background:var(--ifg, #1C1B19); border-color:var(--ifg, #1C1B19); color:var(--ibg, #F2F1EC)} }
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
