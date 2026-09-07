@@ -424,7 +424,7 @@
       var c = window.__landCols;   /* 横持ちで読んでいた章の色 */
       if(c && c.bg){ H.style.setProperty('--rvbg', c.bg); H.style.setProperty('--rvfg', c.fg || '#1C1B19'); }
       var sv = rv.querySelector('svg'); if(sv){ sv.style.display = 'none'; void sv.offsetWidth; sv.style.display = ''; }   /* v281: 端末の絵の動きを頭から。止まったまま出ると縦横の絵が重なって見える */
-      rv.classList.remove('gone'); H.classList.add('rotvup'); if(window.__setTheme) window.__setTheme((c && c.bg) || '#E84518');
+      rv.classList.remove('gone'); H.classList.add('rotvup'); angUp = devAng();   /* v530 この幕を出したときの角度 */ if(window.__setTheme) window.__setTheme((c && c.bg) || '#E84518');
       if(window.__retint) window.__retint();   /* v296: 帯の色を採り直させる（iOS は画面の端の固定要素＝#tint から採る） */
     }
     H.classList.add('rotvup', 'rotvup0');   /* 最初の案内が出ているあいだも（切れ目＝ホームバー帯は html の色で塗られる） */
@@ -536,7 +536,11 @@
       setTimeout(rvPut, 140); setTimeout(rvPut, 380); setTimeout(rvPut, 760); setTimeout(rvPut, 1200); setTimeout(rvPut, 1800); setTimeout(rvPut, 2500);
       clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800);
     }
-    var visAt = 0;   /* v528 別のタブ（アプリ）から戻ってきた時刻。戻ってきただけのときに、回したときの判を出さないため（本人） */
+    var visAt = 0, angUp = null;   /* v528 別のタブ（アプリ）から戻ってきた時刻。戻ってきただけのときに、回したときの判を出さないため（本人） */
+    function devAng(){   /* v530 端末の角度。これが変わっていなければ「回した」ではない（回転の判 係の検証より） */
+      try{ if(window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number') return window.screen.orientation.angle; }catch(e){}
+      return (typeof window.orientation === 'number') ? window.orientation : null;
+    }
     document.addEventListener('visibilitychange', function(){ if(!document.hidden) visAt = performance.now(); }, true);
     function onOrient(e){
       var m = e.matches;
@@ -548,7 +552,9 @@
       /* v291: 案内が出ていたかは「横になった時点」で見る。430ms 待つあいだに別の経路（章の切り替えなど）が
          案内を引っ込めることがあり、その場合に花の判が出ないままだった */
       var wasUp = started && !rv.classList.contains('gone');
-      var backFromTab = document.hidden || (visAt && performance.now() - visAt < 1600);   /* v528: 向きは変わっていないのに、戻ってきた拍子に change が届くことがある */
+      var ang = devAng();
+      var notTurned = (ang !== null && angUp !== null && ang === angUp);   /* v530 端末は回っていない（iPad で窓の幅だけ変わった場合など） */
+      var backFromTab = document.hidden || notTurned || (visAt && performance.now() - visAt < 2600);   /* v528/v530: 向きは変わっていないのに、戻ってきた拍子に change が届くことがある。実測の最大は 0.77 秒 */
       onOrient.t = setTimeout(function(){
         muted = false; hide(); startOpening(); if(wasUp && !backFromTab) setTimeout(rotOk, 520);
       }, 430);
