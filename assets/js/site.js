@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4528,7 +4528,7 @@
         var dbt = el('button', i === 0 ? 'on' : ''); dbt.type = 'button'; dbt.setAttribute('aria-label', L((i + 1) + ' 枚目の案内へ', 'Go to slide ' + (i + 1))); dots.appendChild(dbt);   /* v439: ボタンにして、本編と同じくカーソルの輪が反応するように（本人） */
       });
       introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('測り方とQ&A', 'How to measure & Q&A');
-      introEl.querySelector('.gm-igo').textContent = L('次へ', 'Next');
+      introEl.querySelector('.gm-igo').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';   /* v491: 案内の送りはいつも同じ形（本人） */
       var one = ISECS.length < 2; [dots, introEl.querySelector('.gm-igo'), introEl.querySelector('.gm-iskip')].forEach(function(x){ if(x) x.style.display = one ? 'none' : ''; });
       ibgRuns = ISECS.map(function(){ return 0; }); introEl.classList.remove('end', 'moved', 's0', 's1', 's2', 's3', 's4'); iscroll.scrollTop = 0; introTgt = -1; introScroll(); introBg();
       setTimeout(function(){ if(introOn) iscroll.focus({preventScroll:true}); }, 60);
@@ -4565,18 +4565,24 @@
       var go = introEl.querySelector('.gm-igo'), isLast = cur === ISECS.length - 1, key = (isLast ? 'L' : 'N') + document.documentElement.lang;
       if(go.__k !== key){
         go.__k = key;
-        go.innerHTML = isLast ? '<b>' + L('はじめる', 'Start') + '</b>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        go.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';   /* v491: 最後の面でも形は変えない。文字の出し分けをやめる（本人：一瞬「はじめる」が出る件も消える） */
         go.setAttribute('aria-label', isLast ? L('はじめる', 'Start') : L('次へ', 'Next')); go.classList.toggle('last', isLast);
       }
       if(ringHold) ringText(cur === ISECS.length - 1 ? L('はじめる \u00b7 START \u00b7 ', 'START \u00b7 はじめる \u00b7 ') : L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 '));
       introEl.classList.toggle('moved', p > .04);
       /* v441: 面の境目で判定が揺れて次へのボタンが点滅していた（本人）。最後の面かどうかは少し余裕を持って決める */
-      (function(){ var isEnd = (introAt() === ISECS.length - 1) || cur === ISECS.length - 1;   /* v446: 行き先が最後の面なら、着く前から最後の見せ方に（切り替わる瞬間だけ出ていた：本人） */
-        if(introEl.__end !== isEnd){ clearTimeout(introEl.__endT); introEl.__endT = setTimeout(function(){ introEl.__end = isEnd; introEl.classList.toggle('end', isEnd); }, isEnd ? 0 : 220); } })(); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
+      (function(){ var moving = introTgt >= 0 && (performance.now() - introTgtAt) < 1200;
+        /* v492: 行き先が決まっているあいだは行き先で判定する。最後の面から戻したとき、
+           送りの位置が着くまで「最後の見せ方」が残り、スキップと送りが遅れて出ていた（本人） */
+        var isEnd = moving ? (introTgt === ISECS.length - 1) : ((introAt() === ISECS.length - 1) || cur === ISECS.length - 1);
+        if(introEl.__end !== isEnd){ clearTimeout(introEl.__endT); introEl.__endT = setTimeout(function(){ introEl.__end = isEnd; introEl.classList.toggle('end', isEnd); }, isEnd ? 0 : 40); } })(); if(cur === ISECS.length - 1 && ringHold) cringOff(false);   /* 最後の画面では矢印が消えるので、輪も消す */   /* 最後の画面に来たら「はじめる」を出す（端まで送らなくても） */
     }
     var introTgt = -1, introTgtAt = 0, docMode = false, docBase = 0, scroll0 = 0, phoneFree = false;
     function introRange(){ return iscroll.scrollHeight - iscroll.clientHeight; }
-    function introTo(i){ i = Math.max(0, Math.min(ISECS.length - 1, i)); introTgt = i; introTgtAt = performance.now(); var m = introRange(), top = Math.round(m * Math.min(1, ISECS[i].at + (i >= ISECS.length - 1 ? .2 : .02))); if(docMode) window.scrollTo({top: docBase + top, behavior: rm ? 'auto' : 'smooth'}); else iscroll.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }
+    function introTo(i){ i = Math.max(0, Math.min(ISECS.length - 1, i)); introTgt = i; introTgtAt = performance.now();
+      /* v493: 行き先が決まった時点で、最後の見せ方を解く。送りが着くのを待たない（本人：戻ったときにボタンが遅れて出る） */
+      if(i < ISECS.length - 1 && introEl.__end){ clearTimeout(introEl.__endT); introEl.__end = false; introEl.classList.remove('end'); }
+ var m = introRange(), top = Math.round(m * Math.min(1, ISECS[i].at + (i >= ISECS.length - 1 ? .2 : .02))); if(docMode) window.scrollTo({top: docBase + top, behavior: rm ? 'auto' : 'smooth'}); else iscroll.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }
     function introAt(){ return (introTgt >= 0 && performance.now() - introTgtAt < 2500) ? introTgt : introCur(); }   /* なめらかに送っている最中（文書スクロールでは 1 秒を超える）は行き先の画面を基準に。着いたら scroll 側で解く */   /* ボタン連打：なめらかに送っている最中は行き先の画面を基準に */
     function introKey(e){
       if(!introOn) return; var k = e.key, cur = introAt(), p = introP();
