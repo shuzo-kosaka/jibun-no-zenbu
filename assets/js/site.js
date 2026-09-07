@@ -3380,7 +3380,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4885,7 +4885,7 @@
        ・二度目からは出さない（localStorage 'gm-tut'）*/
     var tutEl = null, tutOn = false, tutAt = 0, tutPend = null, tutT = 0, tutAtT = 0;
     var TUTS = [
-      {k:['stage', 'rt', 'rl'], ja:'この絵に、《四本の線》を引きます。',
+      {k:['stage'], ja:'この絵に、《四本の線》を引きます。',
                                 en:'You will draw 《four lines》 on this picture.'},
       {k:['step'],              ja:'%sの帯に、《いま何本目か》が出ます。',
                                 en:'The band %s shows 《which line you are on》.'},
@@ -4904,7 +4904,7 @@
       if(r[0] + r[2] <= x0 + 8) return [L('左', 'left'), 'on the left'];
       return [L('下', 'below'), 'below'];
     }
-    function tutSeen(){ try{ return localStorage.getItem('gm-tut') === '1'; }catch(e){ return false; } }
+    function tutSeen(){ return false; }   /* v531 一枚目の手引きは毎回出す（本人）。飛ばすには「手引きをとばす」か Esc */
     function tutBox(k){
       var e = k === 'stage' ? stage : k === 'step' ? stepEl : k === 'tip' ? tipEl
             : gm.querySelector('.gm-' + k);   /* rt・rl は目盛り */
@@ -4939,6 +4939,7 @@
       tutEl.setAttribute('aria-hidden', 'true');   /* 読み上げは本編の文が担う */
       tutEl.innerHTML =
         '<i class="gmt-p t"></i><i class="gmt-p b"></i><i class="gmt-p l"></i><i class="gmt-p r"></i>' +
+        '<i class="gmt-c tl"></i><i class="gmt-c tr"></i><i class="gmt-c bl"></i><i class="gmt-c br"></i>' +
         '<p class="gmt-say"><b></b><span class="gmt-t"></span><i class="gmt-nx"></i></p>' +
         '<button class="gmt-skip" type="button"></button>';
       tutEl.querySelector('.gmt-skip').textContent = L('手引きをとばす', 'Skip this');
@@ -4950,8 +4951,14 @@
         if(tutAt < TUTS.length - 1) tutStep(tutAt + 1); else tutEnd();
       }, {passive:false});
       window.addEventListener('resize', tutFit);
+      document.addEventListener('keydown', tutKey, true);
       tutStep(0);
       requestAnimationFrame(function(){ if(tutEl) tutEl.classList.add('on'); });
+    }
+    function tutKey(e){   /* v531 Esc で手引きを飛ばす。Enter・Space は次へ */
+      if(!tutOn) return;
+      if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); tutEnd(); return; }
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.stopPropagation(); if(tutAt < TUTS.length - 1) tutStep(tutAt + 1); else tutEnd(); }
     }
     function tutStep(i){
       if(!tutEl) return;
@@ -4973,13 +4980,19 @@
       var open = null;
       TUTS[tutAt].k.forEach(function(k){ open = tutUni(open, tutBox(k)); });
       if(!open){ tutEnd(); return; }
-      open = [open[0] - 8, open[1] - 8, open[2] + 16, open[3] + 16];
+      open = [open[0] - 10, open[1] - 10, open[2] + 20, open[3] + 20];
       var W = window.innerWidth, H = window.innerHeight;
       var x = open[0], y = open[1], r = open[0] + open[2], b = open[1] + open[3];
       tutSet(tutEl.querySelector('.gmt-p.t'), [0, 0, W, y]);
       tutSet(tutEl.querySelector('.gmt-p.b'), [0, b, W, H - b]);
       tutSet(tutEl.querySelector('.gmt-p.l'), [0, y, x, open[3]]);
       tutSet(tutEl.querySelector('.gmt-p.r'), [r, y, W - r, open[3]]);
+      var cr = Math.max(6, Math.min(18, Math.round(Math.min(open[2], open[3]) * .06)));   /* v531 穴の角の丸み。絵の枠と同じ気配に */
+      tutEl.style.setProperty('--gmt-r', cr + 'px');
+      tutSet(tutEl.querySelector('.gmt-c.tl'), [x, y, cr, cr]);
+      tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y, cr, cr]);
+      tutSet(tutEl.querySelector('.gmt-c.bl'), [x, b - cr, cr, cr]);
+      tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr, cr]);
       var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null, h;
       if(f){   /* 一の手：見出し行の空き（三段とも同じ場所） */
         say.classList.add('row'); say.style.width = Math.min(f[2], 640) + 'px';
@@ -5012,6 +5025,7 @@
       tutOn = false; clearTimeout(tutT);
       try{ localStorage.setItem('gm-tut', '1'); }catch(e){}
       window.removeEventListener('resize', tutFit);
+      document.removeEventListener('keydown', tutKey, true);
       var e = tutEl; tutEl = null;
       if(e){
         e.style.pointerEvents = 'none';   /* 消えかけの幕が押下を飲まないように */

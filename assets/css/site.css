@@ -4297,6 +4297,16 @@
   @media (max-height:640px){ .gmt-t{font-size:14.5px} .gmt-say{gap:9px} }
   html.rm .gmt, html.rm .gmt-p, html.rm .gmt-say, html.rm .gmt-nx{transition:none}
 
+  /* v531 手引きの穴の角を丸く（本人：角が丸くなっていない）。四隅の小片で丸みを作る（box-shadow や clip-path は iOS で重く、描き落ちがある） */
+  .gmt-c{position:absolute; pointer-events:none; background:var(--gmt-dim);
+    transition:left .42s var(--ease, cubic-bezier(.22,.61,.36,1)), top .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+               width .42s var(--ease, cubic-bezier(.22,.61,.36,1)), height .42s var(--ease, cubic-bezier(.22,.61,.36,1))}
+  .gmt-c.tl{background:radial-gradient(circle at 100% 100%, transparent var(--gmt-r, 14px), var(--gmt-dim) 0)}
+  .gmt-c.tr{background:radial-gradient(circle at 0 100%,    transparent var(--gmt-r, 14px), var(--gmt-dim) 0)}
+  .gmt-c.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-r, 14px), var(--gmt-dim) 0)}
+  .gmt-c.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-r, 14px), var(--gmt-dim) 0)}
+  html.rm .gmt-c{transition:none}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
