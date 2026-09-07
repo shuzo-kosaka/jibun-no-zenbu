@@ -4459,6 +4459,12 @@
   @keyframes cpDone{from{opacity:0; transform:translateY(8px)}}
   /* v552 判の置き場：列 1 の左端に寄せていたものを、X1 と X2 の真ん中（20%）へ。
      文字の案内は判の中に入れたので、外の .cap／.seqcap は出さない（v437 の移設ごと取り消し） */
-  .seqplay{left:20% !important; transform:translateX(-50%); width:min(13vw, 168px); bottom:calc(29vh + env(safe-area-inset-bottom, 0px)) !important}   /* v553 もう少し上へ（本人）。Y3（71vh）のすぐ上に載せ、大きな一文と同じ帯に置く */
+  /* v554 「このページは、その平均グリッドで組まれています。」の一文に、判を食い込ませる（本人）。
+     判は multiply で刷るので、下の文字は透けて読める。押すと少しだけ大きくなる（メニューの判と同じ作法） */
+  .seqplay{left:53.5% !important; transform:translateX(-50%); width:min(13vw, 168px); bottom:34vh !important;   /* 文の終わりに少しだけ食い込む位置。字を塗り潰さない */
+    transition:opacity .35s, transform .18s var(--ease)}
+  .seqplay .st{transition:transform .18s var(--ease)}
+  @media (hover:hover){ .seqplay:hover .st{transform:translate(2px,-2px) rotate(var(--rot)) scale(1.06)} }
+  .seqplay:active .st{transform:translate(2px,-2px) rotate(var(--rot)) scale(.98)}
   .seqplay .cap,.seqcap{display:none !important}
   html.pcview.phone .seqplay,html.pcview.tablet .seqplay{left:20% !important; transform:translateX(-50%)}

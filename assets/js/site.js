@@ -1929,7 +1929,7 @@
       '<g filter="url(#' + id + ')" fill="none" stroke="var(--acc)">' +
       '<rect x="9" y="9" width="138" height="138" rx="12" stroke-width="4.2"/><rect x="21" y="21" width="114" height="114" rx="6" stroke-width="1.5"/>' +
       '<text x="78" y="46" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="500" letter-spacing="2.6" fill="var(--acc)" stroke="none">' + en + '</text>' +
-      '<text x="78" y="' + (jp.length > 3 ? 92 : 94) + '" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (jp.length > 3 ? 20 : 26) + '" fill="var(--acc)" stroke="none">' + jp + '</text>' +
+      (jp.indexOf('\n') > 0 ? (function(){ var ln = jp.split('\n'), fs = Math.min(20, Math.round(112 / Math.max(ln[0].length, ln[1].length))); return '<text x="78" y="82" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + fs + '" fill="var(--acc)" stroke="none">' + '<tspan x="78">' + ln[0] + '</tspan><tspan x="78" dy="' + (fs + 5) + '">' + ln[1] + '</tspan></text>'; })() : '<text x="78" y="' + (jp.length > 3 ? 92 : 94) + '" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="' + (jp.length > 3 ? 20 : 26) + '" fill="var(--acc)" stroke="none">' + jp + '</text>') +   /* v554 改行を渡したら二段に組む（判の中に用件を入れるため） */
       '<text x="78" y="124" text-anchor="middle" font-family="var(--mono)" font-size="6.5" letter-spacing="1.6" fill="var(--acc)" stroke="none">KOSAKA \u00b7 PORTFOLIO</text></g>';
     return sv;
   }
@@ -5789,7 +5789,7 @@
     /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
     (function(){
       var sp = document.getElementById('seqplay'); if(!sp || typeof kakuSvg !== 'function') return;
-      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '測ってみる', 77));   /* v552 外の案内文をやめ、用件を判の中に（本人） */
+      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '測って\n遊んでみる', 77));   /* v554 二行で（本人） */
       sp.addEventListener('click', function(){ open(); });
     })();
     /* #play=… で開いたときは、そのまま遊びを開く（面接用の入口） */
