@@ -4416,6 +4416,27 @@
   .gm-legend i.jw.we{border-top:1px dashed #3B6FB6}
   .gm-legend i.jw.jp{border-top:1px dashed #2F8F5B}
 
+  /* ================= v551 案内に残っていた白を、全部やめる（本人：まだ直り切っていない） =================
+     v543 で見出しの影と、ボタンの字の影は外した。それでも白いのは、白い覆いが四つ残っていたから。
+       ① .gm-isec::before … 見出しと本文の後ろに敷いた紙色の楕円（760×506px、opacity .92）。
+          画面の 17〜20％ を最大 Δ34 明るくしていた。帯が流れて後ろの絵が暗くなる瞬間だけ、
+          楕円が白い影絵のように浮かび上がる（止まった一枚では出ない）。これが「白いもや」の正体。
+       ② .gm-iskip / .gm-ihow / .gm-igo の box-shadow … 紙色の光輪（0 0 12px 6px）。
+       ③ .gm-idots button の box-shadow … 丸のまわりの紙の輪（0 0 0 3px）。
+       ④ .gm-ix の text-shadow … v543 で外し忘れていた四枚（.gm-iskip 等と同じ紙色）。
+     どれも要らない。理由は帯の作りにある：.gm-imos は紙（#F2F1EC）の上に opacity .17 で載るので、
+     後ろの絵がどれだけ暗くても、地の明るさは 0.17×0 + 0.83×242 = 200 より下がらない。
+     実測でも 24 秒追って最も暗い所が (205,203,199)。字（#1C1B19）との比は 10.6:1 で、
+     本文の AAA（7:1）を常に上回る。紙を敷く必要が、そもそも無かった。
+     v447「絵に埋もれる細い輪郭」は、白い光ではなく輪郭そのものを濃くして果たす。 */
+  .gm-isec::before{display:none}
+  .gm-isec > b,.gm-isec > span{text-shadow:none}
+  .gm-intro .gm-ix{text-shadow:none}
+  .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{box-shadow:none; border-color:rgba(30,28,25,.82)}
+  @media (hover:hover){ .gm-intro .gm-igo:hover{box-shadow:none} }   /* v450 の hover にも光輪が残っていた */
+  .gm-intro .gm-idots button{box-shadow:none; border-color:rgba(30,28,26,.72)}
+  .gm-intro .gm-idots button.done{background:rgba(30,28,26,.6); border-color:transparent}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
