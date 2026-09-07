@@ -4162,6 +4162,17 @@
   html.rm .gm mark{transition:none !important; background-size:100% 2px !important}
   .gm .gm-secq mark,.gm .gm-catq mark{background-image:none}   /* 見出しには掛けない */
 
+
+  /* ================= v509 平均の画面：重ねているあいだは補った三本を隠す ================= */
+  .gm-lines.ovl .gm-ln.fixed{display:none}   /* 七本の中に同じ三本があり、線も％の札も二枚ずつ重なっていた（文言係） */
+  .gm-legend b{font-weight:inherit}
+
+  /* v509 凡例が「あな／た」「残／り」で折れていた（文言係）。項目の途中では折らず、行ごと折り返す */
+  .gm-legend{flex-wrap:wrap; row-gap:3px; column-gap:14px}
+  .gm-legend b{display:inline-flex; align-items:center; gap:6px; white-space:nowrap; font-weight:inherit}
+  .gm-legend b[hidden]{display:none}
+  .gm-legend i.mine{margin-left:0}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
