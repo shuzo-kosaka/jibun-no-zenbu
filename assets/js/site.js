@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4530,7 +4530,7 @@
       clearTimeout(ibgT); ibgT = setTimeout(introBg, rm ? 60000 : 7600);   /* 一巡 7.6 秒でもう一度 */
     }
     function intro(){
-      introOn = true; introEl.hidden = false; introEl.classList.remove('ready', 'end', 'moved'); introEl.__end = false; clearTimeout(introEl.__endT);   /* v443: 二度目に開いたとき前の状態が残り、スキップが消えていた（実機係） */ requestAnimationFrame(function(){ requestAnimationFrame(function(){ introEl.classList.add('ready'); }); });   /* v431: 開いたあと静かに現れる（本人） */
+      introOn = true; introEl.hidden = false; try{ gm.querySelector('.gm-in').inert = true; }catch(x){}   /* v520 案内の裏の盤面へ Tab が入っていた（見張り番） */ introEl.classList.remove('ready', 'end', 'moved'); introEl.__end = false; clearTimeout(introEl.__endT);   /* v443: 二度目に開いたとき前の状態が残り、スキップが消えていた（実機係） */ requestAnimationFrame(function(){ requestAnimationFrame(function(){ introEl.classList.add('ready'); }); });   /* v431: 開いたあと静かに現れる（本人） */
       ISECS = isecsFor(); ibgW = '';   /* v393: 面の組を決めてから図を組む */
       ibgBuild();
       /* スマホ（iPhone の Safari）：案内は文書のスクロールで進める。指で文書を送ると Safari の帯（タブ・アドレス）が畳まれ、
@@ -4631,7 +4631,7 @@
     function unlockDoc(){ if(!locked) return; locked = false; document.documentElement.classList.remove('gmlock'); document.body.style.top = ''; jumpTo(lockY); }
     function jumpTo(y){ try{ window.scrollTo({top:y, behavior:'instant'}); }catch(e){ window.scrollTo(0, y); } }   /* v420: 戻す送りは即時（html{scroll-behavior:smooth} のせいで章を飛び回り、iPad では 08 への送りが捨てられていた＝本編係） */
     function introEnd(skipped){
-      if(!introOn) return; introOn = false; introSeen = true; docOff(); clearTimeout(ibgT); cringOff(true); document.documentElement.classList.remove('gms0', 'gms1', 'gms2', 'gms3', 'gms4');
+      if(!introOn) return; introOn = false; introSeen = true; try{ gm.querySelector('.gm-in').inert = false; }catch(x){} docOff(); clearTimeout(ibgT); cringOff(true); document.documentElement.classList.remove('gms0', 'gms1', 'gms2', 'gms3', 'gms4');
       /* v478: 育つ枠は、案内が去る前に元の位置を採っておく（start() のあとでは選択の行が見つからず、演出そのものが動いていなかった） */
       var msrc = introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on');
       var mr0 = msrc ? msrc.getBoundingClientRect() : null;
@@ -4989,6 +4989,7 @@
       if(rm || !elm) return;
       var h0 = elm.getBoundingClientRect().height, gh = null;
       if(ghost && h0 > 0 && elm.innerHTML.trim()){ gh = document.createElement('div'); gh.className = 'gm-resghost'; gh.innerHTML = elm.innerHTML; }
+      if(h0 > 0){ elm.style.height = h0 + 'px'; elm.style.overflow = 'hidden'; }   /* v520 ここで留めないと、次のコマまでのあいだに素の高さが一コマ描かれて跳ねる（見張り番：最大 129px） */
       if(elm.__raf) cancelAnimationFrame(elm.__raf);
       elm.__raf = requestAnimationFrame(function(){
         elm.__raf = 0;
