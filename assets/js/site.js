@@ -2788,8 +2788,10 @@
   window.addEventListener('resize', function(){ if(surLayer) surStop(true); });
   /* the contact page: a sheet of paper over the site; sending composes a mail to him in the visitor's own mail app */
   var cpage = document.getElementById('cpage'), cpform = document.getElementById('cpform'), cpLast = null, cpT = 0, cpPushed = false; var surHintT = 0;
+  var cpY = 0;   /* v533 開いたときの居場所。閉じたあと、頭に飛んでから戻ってくるのを止める（本人） */
   function cpOpen(){
     if(!cpage || !cpage.hidden) return; clearTimeout(cpT);
+    cpY = window.scrollY;
     cpLast = document.activeElement; var hdEl = document.querySelector('.hd'); if(hdEl) cpage.style.setProperty('--hdh', hdEl.offsetHeight + 'px');   /* the sheet begins under the site's header, which stays usable */
     /* one bar only: the page's CONTACT label and × move into the header (the logo's and the hamburger's places) while it is open */
     var cpx0 = document.getElementById('cpx'), cpl0 = cpage.querySelector('.cp-lab'), nav0 = hdEl && hdEl.querySelector('.nav');
@@ -2940,10 +2942,33 @@
     if(mkbtn && mkbtn.__t !== undefined) mkbtn.title = mkbtn.__t; togFit();
     if(cpPushed && !fromPop){ cpPushed = false; try{ history.back(); }catch(e){} }
     cpPushed = false;
-    if(cpLast && cpLast.focus) try{ cpLast.focus(); }catch(e){}
+    if(cpLast && cpLast.focus) try{ cpLast.focus({preventScroll:true}); }catch(e){ try{ cpLast.focus(); }catch(e2){} }   /* v533 焦点で紙面が動かないように */
+    (function(){   /* v533 履歴を戻すとブラウザが位置を戻し、html の scroll-behavior:smooth で頭から滑って見えていた（本人）。
+                      戻ったあと数コマのあいだ、開いたときの居場所に静かに置き直す */
+      if(!(cpY > 0)) return;
+      var put = function(){ if(Math.abs(window.scrollY - cpY) > 2) window.scrollTo({top: cpY, behavior: 'instant'}); };
+      requestAnimationFrame(function(){ requestAnimationFrame(put); });
+      setTimeout(put, 60); setTimeout(put, 160); setTimeout(put, 320); setTimeout(put, 620);
+    })();
   }
   window.addEventListener('popstate', function(){ if(cpage && !cpage.hidden) cpClose(true); });
   document.querySelectorAll('#ftcta').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); cpOpen(); }); });
+  /* v534 フッターの共有ボタン。端末に共有の仕組みがあればそれを呼び、無ければリンクを写して一言返す（QR の代わり：本人） */
+  (function(){
+    var sb = document.getElementById('ftshare'); if(!sb) return;
+    var msg = document.querySelector('.ft-sharemsg'), msgT = 0;
+    function say(t){ if(!msg) return; msg.textContent = t; msg.classList.add('on'); clearTimeout(msgT); msgT = setTimeout(function(){ msg.classList.remove('on'); }, 2600); }
+    sb.addEventListener('click', function(){
+      var url = location.href.split('#')[0];
+      var en = document.documentElement.lang === 'en';
+      var d = {title: en ? 'Shuzo Kosaka — Everything of mine.' : '小坂脩蔵 — ジブンのゼンブを。', url: url};
+      if(navigator.share){ navigator.share(d).catch(function(){}); return; }
+      var done = function(){ say(en ? 'LINK COPIED' : 'リンクを写しました'); };
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done, function(){ say(url); }); return; }
+      try{ var ta = document.createElement('textarea'); ta.value = url; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); done(); }catch(e){ say(url); }
+    });
+  })();
   ['cpx', 'cpback'].forEach(function(id){ var el = document.getElementById(id); if(el) el.addEventListener('click', function(e){ e.preventDefault(); cpClose(); }); });
   document.addEventListener('keydown', function(e){
     if(!cpage || cpage.hidden) return;
