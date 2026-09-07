@@ -4103,6 +4103,22 @@
   .gm-side .gm-step span{color:#FBF7F2; font-family:var(--sans); font-size:12.5px; letter-spacing:.02em}
   .gm-side .gm-step .gm-cnt{color:#FBF7F2; opacity:.92; font-family:var(--mono); font-size:11.5px; top:0}
   html.phone .gm-side .gm-step span{font-size:13.5px} html.phone .gm-side .gm-step .gm-cnt{font-size:12.5px}
+  /* v500 スマホでは札の字が小さく、開いた中身との差も目立った（本人）。初めから大きく、同じ調子で組む */
+  html.phone .gm-info-in .gm-secq span{font-size:15px}
+  html.phone .gm-info-in .gm-info-k{font-size:12px; letter-spacing:.1em}
+  html.phone .gm-info-in .gm-info-t,html.phone .gm-info-in .gm-catx p{font-size:14px; line-height:1.85}
+  html.phone .gm-info-in .gm-info-s{font-size:12.5px; line-height:1.7}
+  html.phone .gm-info-in .gm-info-l li b{font-size:14px}
+  html.phone .gm-info-in .gm-info-l li span{font-size:13.5px; line-height:1.75}
+  html.phone .gm-info-in .gm-cats li{font-size:12.5px; line-height:1.65}
+  html.phone .gm-info-in h3{font-size:20px}
+  /* v500 線の説明の帯（?を押すと出る）も、スマホでは小さすぎた（本人）。× や「測り方とQ&A」と釣り合う大きさに */
+  html.phone .gm-band b{font-size:15px}
+  html.phone .gm-band span{font-size:13.5px}
+  html.phone .gm-band b small{font-size:11.5px}
+  html.phone .gm-band{min-height:52px}
+  /* v500 Q&A は問いも少し大きく（答えとの差を詰める） */
+  .gm-info-in .gm-secq span{font-size:14.5px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
