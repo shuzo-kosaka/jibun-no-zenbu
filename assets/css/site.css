@@ -4225,16 +4225,16 @@
     background:rgba(242,241,236,.94); color:#1C1B19; cursor:pointer; z-index:9; display:flex; align-items:center; justify-content:center; gap:6px;
     box-shadow:0 1px 6px rgba(30,28,26,.14); transition:opacity .2s var(--ease), color .16s var(--ease), border-color .16s var(--ease)}
   .gm-lensb svg{width:19px; height:19px; flex:none}
-  .gm-lensb span{display:none}
   .gm-lensb[aria-pressed="false"]{color:#8E8B84; border-color:rgba(30,28,26,.18)}
   .gm-lensb[aria-pressed="false"] svg{opacity:.55}
   .gm-lensb:hover{color:#E84518; border-color:rgba(232,69,24,.5)}
   .gm-stage.swapping .gm-lensb,.gm-stage.blank .gm-lensb{opacity:0; pointer-events:none}
   .gm-lensb[hidden]{display:none}
-  .gm-pcview .gm-lensb,.gm-lensb.wide{width:auto; min-width:34px; padding:0 12px 0 9px; border-radius:17px}
-  @media (min-width:900px){ .gm-lensb{width:auto; min-width:34px; padding:0 12px 0 9px; border-radius:17px}
-    .gm-lensb span{display:inline; font-family:var(--sans); font-weight:600; font-size:12px; line-height:1; letter-spacing:.04em; white-space:nowrap} }
+  /* v521 文字は添えず、丸いアイコンだけ（本人） */
   @media (max-height:640px){ .gm-lensb{height:32px} .gm-lensb svg{width:17px; height:17px} }
+
+  /* v522 保存の札：見出しを置かないので、空の b は畳む */
+  .gm-take-h b:empty{display:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

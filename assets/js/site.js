@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4257,7 +4257,7 @@
               '<div class="gm-rt"><span>0</span><span>50</span><span>100</span></div><div class="gm-rl"><span>0</span><span>50</span><span>100</span></div><i class="gm-axl h"></i><i class="gm-axl v"></i>' +
               '<i class="gm-dimr v"></i><i class="gm-dimr h"></i>' +
               '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
-              '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' + '<button class="gm-lensb" type="button" aria-pressed="true" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12.9 12.9 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span></span></button>' +
+              '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' + '<button class="gm-lensb" type="button" aria-pressed="true" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12.9 12.9 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>' +
             '</div></div>' +
             '<div class="gm-side"><div class="gm-lead2" hidden></div><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-qa"></div><div class="gm-btns"></div></div>' +
           '</div>' +
@@ -4309,7 +4309,7 @@
         if(demoEl){ demoDone = true; demoOff(); }
         if(e.button != null && e.button !== 0) return;
         if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } return; }   /* v416: 二本目の指は線にしない（ピンチ） */
-        if(e.target && e.target.closest && e.target.closest('.gm-turnb')) return;   /* 回すボタンの押下は線にしない */
+        if(e.target && e.target.closest && e.target.closest('.gm-turnb, .gm-lensb')) return;   /* 回す・虫眼鏡のボタンの押下は線にしない（v521: 盤面が指を捕まえて、二度目が届いていなかった） */
         if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
         if(stage.classList.contains('swapping')){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v512 切替中の押下も、そのまま動かせば線にする（流れ係：0.86 秒が捨てられていた） */
         if(performance.now() - boardAt < 700){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v462: 盤面が出た直後でも、実際に動かせば線にする（動き係：一本目の 0.85 秒が捨てられていた） */
@@ -4786,7 +4786,6 @@
     function lbLabel(){
       if(!lbEl) return;
       lbEl.setAttribute('aria-pressed', lensPref ? 'true' : 'false');
-      var sp = lbEl.querySelector('span'); if(sp) sp.textContent = L('虫眼鏡', 'Lens');
       var t = lensPref ? L('虫眼鏡をしまう', 'Turn the lens off') : L('虫眼鏡を出す', 'Turn the lens on');
       lbEl.setAttribute('aria-label', t); lbEl.title = t;
     }
@@ -5273,19 +5272,17 @@
        他の方の絵を保存できるようにするのは筋が通らない／レイアウトも要らない／枠と形式を選べるように） */
     var takeAR = 'screen', takeFmt = 'png';
     var FRAMES = [
-      {k:'screen', ja:'この画面',   en:'This screen'},
-      {k:'phone',  ja:'スマホ（縦）', en:'Phone', ar:9 / 19.5},
-      {k:'phoneL', ja:'スマホ（横）', en:'Phone (landscape)', ar:19.5 / 9},
-      {k:'tab',    ja:'タブレット',  en:'Tablet', ar:3 / 4},
-      {k:'a4',     ja:'A4（縦）',    en:'A4 portrait',  ar:1 / 1.4142},
-      {k:'a4l',    ja:'A4（横）',    en:'A4 landscape', ar:1.4142},
-      {k:'sq',     ja:'正方形',      en:'Square', ar:1},
-      {k:'wide',   ja:'16 : 9',      en:'16 : 9', ar:16 / 9}
+      {k:'screen', ja:'画面と同じ',   en:'Same as screen'},
+      {k:'phone',  ja:'スマホ（縦）', en:'Phone portrait', ar:9 / 19.5},
+      {k:'a4',     ja:'A4（縦）',     en:'A4 portrait',    ar:1 / 1.4142},
+      {k:'a4l',    ja:'A4（横）',     en:'A4 landscape',   ar:1.4142},
+      {k:'sq',     ja:'正方形',       en:'Square', ar:1},
+      {k:'wide',   ja:'16 : 9',       en:'16 : 9', ar:16 / 9}
     ];
     var FMTS = [
       {k:'png',   ja:'PNG',          en:'PNG',   mime:'image/png',  ext:'png'},
       {k:'jpg',   ja:'JPEG',         en:'JPEG',  mime:'image/jpeg', ext:'jpg'},
-      {k:'alpha', ja:'PNG（背景透過）', en:'PNG (transparent)', mime:'image/png', ext:'png'}
+      {k:'alpha', ja:'PNG（背景なし）', en:'PNG (no background)', mime:'image/png', ext:'png'}
     ];
     function frameAR(){
       if(takeAR === 'screen') return window.innerWidth / Math.max(1, window.innerHeight);
@@ -5324,11 +5321,11 @@
         gm.appendChild(takeEl);
       }
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
-      takeEl.querySelector('.gm-take-h b').textContent = L('保存する一枚', 'The sheet you keep');
+      takeEl.querySelector('.gm-take-h b').textContent = '';   /* v522 見出しは置かない（本人＋ChatGPT）。右肩の欧文が題として働く */
       takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
-      takeEl.querySelector('p').textContent = L('あなたの四本と三点の骨格を、選んだ枠に引いた一枚です。', 'Your four lines and the three-work grid, drawn in the frame you choose.');
-      takeEl.querySelector('.gm-optl').textContent = L('枠', 'Frame');
-      takeEl.querySelector('.gm-optl2').textContent = L('形式', 'Format');
+      takeEl.querySelector('p').textContent = L('絵は入りません。あなたが引いた四本（朱の実線）と三点の骨格（七本の薄い破線）だけを保存します。', 'No picture is included. Only your four lines (solid red) and the three-work grid (seven faint dashed lines) are saved.');
+      takeEl.querySelector('.gm-optl').textContent = L('画像の形', 'Image shape');   /* 「枠」は盤面の育つ枠と衝突するので使わない */
+      takeEl.querySelector('.gm-optl2').textContent = L('ファイルの種類', 'File type');
       takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
       a.querySelector('span').textContent = L('画像を保存', 'Save image');
       var sb0 = takeEl.querySelector('.gm-share'); sb0.setAttribute('aria-label', L('共有', 'Share')); sb0.title = L('共有（AirDrop・LINE など）', 'Share (AirDrop, LINE and more)');
