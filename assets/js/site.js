@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4559,28 +4559,51 @@
       return o + '</div>';
     }
     var ibgW = 0;
+    function ibgRows(h){ return Math.max(2, Math.min(8, Math.round(h / 330))); }   /* v521: 段の丈を 330px 前後に保つ。横持ちの段数は従来どおり（iPhone 590→2 段・iPad 889→3 段）。縦持ちだけ段が増える（朱の「横に持ち替えて」の裏側なので見た目に影響しない） */
+    function ibgKey(){   /* v521: 組み直しの鍵は「面の幅と段数」。丈が少し変わっても帯の幅は変わらない作りにしたので、Safari の帯の出入りでは組み直さない */
+      var pin = introEl.querySelector('.gm-ipin'); if(!pin) return '';
+      var r = pin.getBoundingClientRect();
+      return Math.round(r.width) + ':' + ibgRows(r.height);
+    }
     function ibgBuild(){
-      var pin = introEl.querySelector('.gm-ipin'), key = document.documentElement.lang; if(ibgW === key) return; ibgW = key;   /* 位置は CSS の％なので組み直しは言語が変わったときだけ */
+      var pin = introEl.querySelector('.gm-ipin'); if(!pin) return;
+      ibgRuns = ISECS.map(function(){ return 0; });
+      var key = ibgKey(); if(ibgW === key) return; ibgW = key;   /* v521: 言語では組み直さない（絵は日英で変わらない。切り替えのたびに流れが頭へ戻っていた） */
+      var pr = pin.getBoundingClientRect(), PW = pr.width, PH = pr.height; if(!PW || !PH) return;
       pin.querySelectorAll('.gm-ibg').forEach(function(x){ x.parentNode.removeChild(x); });
       /* v428: 背景は、遊びで使う絵を角と角で継いで並べ、横へ流す（本人）。文字は紙の縁取りで浮かせる */
       if(BOARDS.length && !rm){
         var mos = el('div', 'gm-ibg gm-imos'); mos.setAttribute('aria-hidden', 'true');
-        var rows = (window.innerHeight <= 640 || /iPhone|Android/.test(navigator.userAgent)) ? 2 : 3;   /* v447: 手の端末は段を減らす（上下が止まる・途切れる：本人） */
+        var rows = ibgRows(PH), rowH = PH / rows;
         for(var mr = 0; mr < rows; mr++){
           var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
-          var need = Math.max(6, Math.ceil(window.innerWidth / (rows > 2 ? 220 : 260)) + 2);   /* v446: 一巡が画面幅を超えるまで並べる（切れ目が出ていた：本人） */
+          row.style.height = (100 / rows) + '%'; row.style.top = (mr * 100 / rows) + '%';
+          /* v521: 一巡がちょうど面幅になる枚数を選ぶ。丈なりに並べていたので帯が青天井に伸び、
+             iPhone 縦持ちで 20,901 実ピクセル・196.9MB に達して iOS が描き切れず、
+             空白と停止が出ていた（→ 2,358px・23.0MB） */
+          var s = 0, best = Infinity, need = 1;
+          for(var t = 1; t <= 24; t++){
+            s += (BOARDS[(t - 1 + mr * 5) % BOARDS.length].ar || 1);
+            var dd = Math.abs(s * rowH - PW);
+            if(dd < best){ best = dd; need = t; }
+          }
+          strip.style.width = (2 * PW) + 'px';   /* 二枚組。渡る距離＝面幅ちょうどなので、向きが変わっても速さが変わらない */
           for(var cp = 0; cp < 2; cp++){
+            var grp = el('div', 'grp'); grp.style.width = PW + 'px';
             for(var mi = 0; mi < need; mi++){
               var mb = BOARDS[(mi + mr * 5) % BOARDS.length];
-              var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false; mim.src = mb.img; strip.appendChild(mim);
+              var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false;
+              mim.style.setProperty('--ar', mb.ar || 1);
+              mim.width = Math.round((mb.ar || 1) * 1000); mim.height = 1000;   /* v521: 読み込む前から幅が決まる */
+              mim.src = mb.img; grp.appendChild(mim);
             }
+            strip.appendChild(grp);
           }
           row.appendChild(strip); mos.appendChild(row);
         }
         pin.appendChild(mos);
       }
       /* v396: 案内の背景の図はやめる（小坂さん：安っぽく見える）。図の要素を作らず、地色だけ */
-      ibgRuns = ISECS.map(function(){ return 0; });   /* 組み直した図は新しい要素なので、巡回の数も最初から（言語切替で二度呼ばれると図が動かないままになっていた） */
     }
     var ibgT = 0, ibgRuns = [0, 0, 0, 0, 0];
     function introBg(){
@@ -4593,7 +4616,7 @@
     }
     function intro(){
       introOn = true; introEl.hidden = false; try{ gm.querySelector('.gm-in').inert = true; }catch(x){}   /* v520 案内の裏の盤面へ Tab が入っていた（見張り番） */ introEl.classList.remove('ready', 'end', 'moved'); introEl.__end = false; clearTimeout(introEl.__endT);   /* v443: 二度目に開いたとき前の状態が残り、スキップが消えていた（実機係） */ requestAnimationFrame(function(){ requestAnimationFrame(function(){ introEl.classList.add('ready'); }); });   /* v431: 開いたあと静かに現れる（本人） */
-      ISECS = isecsFor(); ibgW = '';   /* v393: 面の組を決めてから図を組む */
+      ISECS = isecsFor();   /* v393: 面の組を決めてから図を組む */   /* v537: ibgW は消さない。開き直すたびに 28 枚を作り直して 2.5 秒止まっていた（背景係） */
       ibgBuild();
       /* スマホ（iPhone の Safari）：案内は文書のスクロールで進める。指で文書を送ると Safari の帯（タブ・アドレス）が畳まれ、
          そのあと遊びの間は overflow を止めるので畳まれたまま——盤面に画面の高さがそのまま渡る（幕の後ろの紙面は見えない） */
@@ -5652,7 +5675,7 @@
       if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
       if(introOn){
         introEl.querySelectorAll('.gm-isec').forEach(function(d, i){ d.innerHTML = isecHTML(ISECS[i]); bindChoice(d); });
-        introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('測り方とQ&A', 'How to measure & Q&A'); introScroll(); ibgW = ''; ibgBuild(); introBg();
+        introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('測り方とQ&A', 'How to measure & Q&A'); introScroll(); ibgBuild(); introBg();
       } else if(state === 'trace'){ turn(); }
       if(!introOn && state !== 'avg' && state !== 'idle' && !cardEl.hidden){ cardRender(bi); listBuild(); listState(); }   /* v409: 札と一覧も言語に合わせる（想定外係 #2） */
       if(state === 'trace' || state === 'compare') stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>';

@@ -3662,11 +3662,11 @@
   html.gmopen body{background-color:var(--paper, #F2F1EC)}
   /* v428 案内の背景：遊びで使う絵を角と角で継いで並べ、横へ流す（本人） */
   .gm-imos{position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; opacity:.17; display:block !important}
-  .gm-imos .row{position:absolute; left:0; right:0; height:calc(100% / 3); overflow:hidden}
-  .gm-imos .row:nth-child(1){top:0} .gm-imos .row:nth-child(2){top:calc(100% / 3)} .gm-imos .row:nth-child(3){top:calc(200% / 3)}
-  .gm-imos .strip{position:absolute; top:0; bottom:0; left:0; display:flex; align-items:stretch; width:max-content; animation:gmMos 110s linear infinite; will-change:transform}
-  .gm-imos .row.rev .strip{animation-duration:140s; animation-direction:reverse}
-  .gm-imos img{height:100%; width:auto; display:block; flex:none}
+  .gm-imos .row{position:absolute; left:0; right:0; overflow:hidden}   /* v521 丈と位置は段数から JS が入れる */
+  .gm-imos .strip{position:absolute; top:0; bottom:0; left:0; display:flex; align-items:stretch; animation:gmMos 63s linear infinite; will-change:transform}
+  .gm-imos .row.rev .strip{animation-duration:80s; animation-direction:reverse}
+  .gm-imos .grp{display:flex; align-items:stretch; flex:none; overflow:hidden}   /* v521 一巡ぶん。幅は面幅ちょうど（JS が px で入れる） */
+  .gm-imos img{height:100%; width:auto; min-width:0; flex:var(--ar, 1) 1 0; object-fit:cover; display:block}
   @keyframes gmMos{from{transform:translate3d(0,0,0)} to{transform:translate3d(-50%,0,0)}}
   html.rm .gm-imos .strip{animation:none}
   .gm-intro .gm-ibg.gm-imos{display:block !important}
@@ -3896,8 +3896,6 @@
   .gm-intro .gm-idots button{box-shadow:0 0 0 3px var(--ibg, #F2F1EC)}
   @media (hover:hover){ .gm-intro .gm-iskip:hover,.gm-intro .gm-ihow:hover{background:#1C1B19; color:#FBF7F2; border-color:#1C1B19} }
   /* v447 iPhone：段が二つのときは丈を半分に */
-  .gm-imos .row:nth-child(1):nth-last-child(2),.gm-imos .row:nth-child(2):nth-last-child(1){height:50%}
-  .gm-imos .row:nth-child(2):nth-last-child(1){top:50%}
   /* v448 触れたときに行ごと大きくするのをやめる（右端の記号が列の外へ出ていた：本人。実測 内側 2px → 外へ 4px） */
   .gm-catq,.gm-secq,.gm-side .gm-secq,.gm-qa .gm-qq{transform:none !important}
   @media (hover:hover){
