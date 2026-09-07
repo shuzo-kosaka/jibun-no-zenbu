@@ -2970,6 +2970,10 @@
     });
   })();
   ['cpx', 'cpback'].forEach(function(id){ var el = document.getElementById(id); if(el) el.addEventListener('click', function(e){ e.preventDefault(); cpClose(); }); });
+  (function(){   /* v535 幕（#cpback）は紙（.cp-sheet）に覆われていて押せなかった。紙の余白（中身の外）を押したら閉じる（挙動係） */
+    var sh = document.getElementById('cpsheet'); if(!sh) return;
+    sh.addEventListener('click', function(e){ if(e.target === sh){ e.preventDefault(); cpClose(); } });
+  })();
   document.addEventListener('keydown', function(e){
     if(!cpage || cpage.hidden) return;
     if(e.key === 'Escape'){ e.preventDefault(); cpClose(); return; }
@@ -3405,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5355,7 +5359,7 @@
       var ovb = btn(L('三点の骨格と重ねる', 'Compare with the three-work grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
-      btn(L('研究の手順へ', 'To the research steps'), function(){ close(); setTimeout(function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }, 420); })   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
+      btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */
@@ -5481,7 +5485,7 @@
       document.documentElement.classList.add('gminfo');   /* v438: 札を開いている間は幕を見出し行の上まで（本編の帯だけ明るいままだった：本人） */
       void infoEl.offsetWidth; infoEl.classList.add('on'); lite(infoEl.querySelector('.gm-info-t'));   /* v507 いちばん上の一文だけ先に引く。節は開いたときに引く */ gm.querySelector('.gm-i').setAttribute('aria-expanded', 'true');   /* 作った直後でも出現の動き（薄→濃、下から 8px）が付くように一度描かせる */ var wc = infoWantCat; infoWantCat = false; setTimeout(function(){ if(!wc) infoEl.querySelector('.gm-take-b button').focus({preventScroll:true}); }, 240);
     }
-    function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } } document.documentElement.classList.remove('gminfo');
+    function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } document.documentElement.classList.remove('gminfo'); }   /* v535 閉じ括弧の外にあり、閉じても印が残っていた（挙動係） */
     var takeEl = null, takeUrl = null;
     var takeFile = null;
     /* C：持ち帰れる「あなたのものさし」——絵は入れず、選んだ枠にグリッドだけを描いて保存する（v517 本人：

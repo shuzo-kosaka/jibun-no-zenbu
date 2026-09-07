@@ -3049,7 +3049,7 @@
   .gm-iskip{min-height:40px}
   .gm-x{position:relative; z-index:9} .gm-x::before,.gm-ix::before,.gm-q::before{content:""; position:absolute; inset:-12px}   /* 押下領域 44px（見た目は変えない） */
   .gm-ix{position:relative}
-  .gm-idots i{position:relative} .gm-idots i::before{content:""; position:absolute; inset:-12px -18px}
+  .gm-idots i{position:relative} .gm-idots i::before{content:""; position:absolute; inset:-5px -18px}   /* v535 上下の当たりが隣の丸と重なり、一つ上の丸が押せなかった（挙動係：当たり 31px に対し間隔 17px）。上下は丸の間隔に収める */
   .gm-tb td,.gm-avg li span,.gm-avg li em,.gm-avg li small,.gm-cmp dd,.gm-num dd{font-variant-numeric:tabular-nums}
   .gm-tb th:first-child,.gm-tb td:first-child{text-align:left}
   .gm-sx,.gm-swk{right:max(4vw, calc(env(safe-area-inset-right, 0px) + 12px))}
