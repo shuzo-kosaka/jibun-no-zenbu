@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4723,15 +4723,16 @@
         try{ el.inert = on; }catch(e){}
       });
     }
+    var closing = false;
     function close(){
-      if(!gm || gm.hidden) return; state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
+      if(!gm || gm.hidden || closing) return; closing = true;   /* v498: 二重に走ると退場の演出が飛ぶ（本人：× を押しても演出がない） */ state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
       siteInert(false);
-      if(histPushed){ histPushed = false; try{ history.back(); }catch(e){} }   /* v485: 自分で閉じたときは、積んだ履歴も戻す */
+      if(histPushed){ histPushed = false; setTimeout(function(){ try{ history.back(); }catch(e){} }, 640); }   /* v498: 履歴の戻しは退場のあとで（先に戻すと popstate が閉じ直して演出が飛ぶ） */
       gm.classList.add('out');   /* v463: 本編へ戻るときの引き際（本人：戻る演出がなかった）。盤面 → 右の列 → 見出しの順に引いて、紙ごと持ち上がる */
       gm.classList.remove('on', 'sheeton'); document.documentElement.classList.remove('gminfo', 'gms0', 'gms1', 'gms2', 'gms3', 'gms4');   /* v444: 閉じたあとに印が残っていた（確認係） */
       sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
-      offT = setTimeout(function(){ gm.hidden = true; gm.classList.remove('out'); if(window.__retint) window.__retint(); }, 560);
+      offT = setTimeout(function(){ gm.hidden = true; gm.classList.remove('out'); closing = false; if(window.__retint) window.__retint(); }, 620);
       if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
     }
     /* 細長い絵（掛軸・横長の巻物）は画面に収めると小さくなる。紙を回して置き直すように −90° に回し、外郭の枠も横長に組み替える（小坂さんの指示）。
