@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5304,6 +5304,20 @@
       c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = Math.max(1.5, 2.6 * u);
       LINES.forEach(function(t){ var v = avg[t.k]; if(v == null) return; c.beginPath();
         if(t.ax === 'v'){ c.moveTo(W * v / 100, 0); c.lineTo(W * v / 100, H); } else { c.moveTo(0, H * v / 100); c.lineTo(W, H * v / 100); } c.stroke(); });
+      /* 判（v524 本人：保存する一枚にも「平均」の判を。角は他の判と同じく丸く） */
+      var cs2 = getComputedStyle(document.documentElement);
+      var FS2 = (cs2.getPropertyValue('--sans') || 'sans-serif').trim(), FO2 = (cs2.getPropertyValue('--mono') || 'monospace').trim();
+      var ss = Math.max(96, Math.min(300, Math.round(Math.min(W, H) * 0.145))), mg = Math.round(Math.min(W, H) * 0.055);
+      function rrect(x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+      c.save();
+      c.translate(W - mg - ss / 2, H - mg - ss / 2); c.rotate(-9 * Math.PI / 180); c.translate(-ss / 2, -ss / 2);
+      c.strokeStyle = '#E84518'; c.fillStyle = '#E84518'; c.textAlign = 'center';
+      c.lineWidth = ss * .031; rrect(c.lineWidth / 2, c.lineWidth / 2, ss - c.lineWidth, ss - c.lineWidth, ss * .085); c.stroke();
+      var pd = ss * .083; c.lineWidth = ss * .011; rrect(pd, pd, ss - pd * 2, ss - pd * 2, ss * .062); c.stroke();
+      c.font = '500 ' + (ss * .083).toFixed(1) + 'px ' + FO2; c.fillText('YOUR GRID', ss / 2, ss * .278);
+      c.font = '700 ' + (ss * .278).toFixed(1) + 'px ' + FS2; c.fillText('平均', ss / 2, ss * .639);   /* 画面の判（YOUR GRID ＋ 平均）と同じ組み。英語でも判は和字のまま */
+      c.font = (ss * .056).toFixed(1) + 'px ' + FO2; c.fillText('KOSAKA · PORTFOLIO', ss / 2, ss * .833);
+      c.restore(); c.textAlign = 'start';
       return cv;
     }
     function takeaway(avg){
