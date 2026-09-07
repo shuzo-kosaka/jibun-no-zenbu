@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4332,10 +4332,11 @@
       gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots > *') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
       turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb'); lbEl = gm.querySelector('.gm-lensb');
       if(lbEl && !lbEl.__b){ lbEl.__b = true;
-        var lbDown = false;
+        var lbDown = false, lbX = 0, lbY = 0;
         var lbTog = function(){ lensPref = !lensPref; try{ localStorage.setItem('gm-lens', lensPref ? '1' : '0'); }catch(e){} if(!lensPref) lensOff(); lbLabel(); };
-        lbEl.addEventListener('pointerdown', function(e){ lbDown = true; if(e.pointerType !== 'touch'){ try{ lbEl.setPointerCapture(e.pointerId); }catch(x){} } });   /* v524 指は必ず少し滑る。滑ると click は出ないので、押下と離しで受ける（指は暗黙に捕まえているので捕まえ直さない） */
+        lbEl.addEventListener('pointerdown', function(e){ lbDown = true; lbX = e.clientX; lbY = e.clientY; });   /* v540: 捕まえない。捕まえると以後の押下も離しもボタンに向き、盤面が線を引けなくなる */   /* v524 指は必ず少し滑る。滑ると click は出ないので、押下と離しで受ける（指は暗黙に捕まえているので捕まえ直さない） */
         lbEl.addEventListener('pointerup', function(e){ if(!lbDown) return; lbDown = false;
+          var mdx = e.clientX - lbX, mdy = e.clientY - lbY; if(mdx * mdx + mdy * mdy > 64) return;   /* v540: 動かして離したのは線を引く手。ボタンは切り替えない（絵の左下から引き始めると虫眼鏡が勝手に切れ、次から出なくなっていた） */
           var r = lbEl.getBoundingClientRect(), m = 32;
           if(e.clientX < r.left - m || e.clientX > r.right + m || e.clientY < r.top - m || e.clientY > r.bottom + m) return;   /* 大きく外へ滑らせて離したときだけ取り消し */
           lbTog(); });
@@ -4345,9 +4346,10 @@
       tbEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path class="r2" d="M10 14H23V21H10"/><path class="r1" d="M10 14V8H3V21H10"/><path class="rm" d="M10 14V21"/><path class="a" d="M7 4.6A12 12 0 0 1 19 10.9M15.6 9.9 19 10.9 20 7.5"/><path class="a2" d="M19 10.9A12 12 0 0 0 7 4.6M9.6 2.2 7 4.6 9.4 7.2"/></svg><span></span>';   /* v390: Astra の C 案「角をそろえる」（縦 7×13 と横 13×7 が角を共有、Material の rotate_90_degrees_cw の弧）。押した後は横が濃くなり、矢印が戻る向きに */   /* v388: 縦の絵（濃）が横（淡）になる、時計回りの矢印。写真アプリの「回転」と SF の rectangle.portrait.rotate の折衷。文字も添える */
       /* v532 回すボタンも、指が滑ると click が出ない（虫眼鏡と同じ筋。入切係の実測）。押下と離しで受ける */
       (function(){
-        var tbDown = false;
-        tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); tbDown = true; if(e.pointerType !== 'touch'){ try{ tbEl.setPointerCapture(e.pointerId); }catch(x){} } });
+        var tbDown = false, tbX = 0, tbY = 0;
+        tbEl.addEventListener('pointerdown', function(e){ tbDown = true; tbX = e.clientX; tbY = e.clientY; });   /* v540: 捕まえない。伝播も止めない（盤面まで届かせないと pend に載らず、回すボタンの当たりから線が引けない） */
         tbEl.addEventListener('pointerup', function(e){ if(!tbDown) return; tbDown = false;
+          var mdx = e.clientX - tbX, mdy = e.clientY - tbY; if(mdx * mdx + mdy * mdy > 64) return;   /* v540: 同上 */
           var r = tbEl.getBoundingClientRect(), m = 32;
           if(e.clientX < r.left - m || e.clientX > r.right + m || e.clientY < r.top - m || e.clientY > r.bottom + m) return;
           turnPic(!rot); });
@@ -4368,7 +4370,7 @@
         if(demoEl){ demoDone = true; demoOff(); }
         if(e.button != null && e.button !== 0) return;
         if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } lensOff(); return; }   /* v416: 二本目の指は線にしない（ピンチ） */
-        if(e.target && e.target.closest && e.target.closest('.gm-turnb, .gm-lensb')) return;   /* 回す・虫眼鏡のボタンの押下は線にしない（v521: 盤面が指を捕まえて、二度目が届いていなかった） */
+        if(e.target && e.target.closest && e.target.closest('.gm-turnb, .gm-lensb')){ if(state === 'trace') pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v540: ボタンの当たり（::before）は絵の中にはみ出している。叩けばボタン、そのまま動かせば線（v417 と同じ作法） */   /* 回す・虫眼鏡のボタンの押下は線にしない（v521: 盤面が指を捕まえて、二度目が届いていなかった） */
         if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
         if(stage.classList.contains('swapping')){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v512 切替中の押下も、そのまま動かせば線にする（流れ係：0.86 秒が捨てられていた） */
         if(performance.now() - boardAt < 700){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v462: 盤面が出た直後でも、実際に動かせば線にする（動き係：一本目の 0.85 秒が捨てられていた） */
@@ -4423,7 +4425,8 @@
           return; }
         e.preventDefault(); }, {passive:false, capture:true});   /* v391: 盤面の間、指で紙面が動かないように */
       stage.addEventListener('pointercancel', function(e){ up(e, false); if(state === 'trace') tipEl.classList.remove('off'); });
-      stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } lensOff(); });   /* v536 ここで虫眼鏡を閉じていなかった。押していないのに丸が残り、線も引けなくなっていた（本人） */
+      stage.addEventListener('lostpointercapture', function(e){ if(e.target !== stage){ lensOff(); return; }   /* v540: この記録役は盤面に付いているが、中の誰かが手放した分も bubble してきて、なぞりを殺す道があった */
+        if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } lensOff(); });   /* v536 ここで虫眼鏡を閉じていなかった。押していないのに丸が残り、線も引けなくなっていた（本人） */
       stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); lensOff(); if(state === 'trace') hideLive(); });   /* v536 同上 */   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
       stage.addEventListener('keydown', function(e){
         if(e.target && e.target.closest && e.target.closest('button')) return;   /* v524 盤面の keydown が、盤面の中のボタン（虫眼鏡・回す）の Enter/Space まで preventDefault していた */
@@ -5039,6 +5042,7 @@
         '<i class="gmt-p t"></i><i class="gmt-p b"></i><i class="gmt-p l"></i><i class="gmt-p r"></i>' +
         '<i class="gmt-p wt"></i><i class="gmt-p wl"></i><i class="gmt-p wr"></i>' +   /* 案内の窓のまわり。t はこのとき窓の下だけを受け持つ */
         '<i class="gmt-c tl"></i><i class="gmt-c tr"></i><i class="gmt-c bl"></i><i class="gmt-c br"></i>' +
+        '<i class="gmt-c w tl"></i><i class="gmt-c w tr"></i><i class="gmt-c w bl"></i><i class="gmt-c w br"></i>' +   /* v541 案内の窓の角も丸く（本人） */
         '<p class="gmt-say"><b></b><span class="gmt-t"></span><i class="gmt-nx"></i></p>' +
         '<button class="gmt-skip" type="button"></button>';
       tutEl.querySelector('.gmt-skip').textContent = L('手引きをとばす', 'Skip this');
@@ -5088,7 +5092,7 @@
       tutSet(tutEl.querySelector('.gmt-p.b'), [0, b, W, H - b]);
       tutSet(tutEl.querySelector('.gmt-p.l'), [0, y, x, open[3]]);
       tutSet(tutEl.querySelector('.gmt-p.r'), [r, y, W - r, open[3]]);
-      var cr = Math.max(6, Math.min(18, Math.round(Math.min(open[2], open[3]) * .06)));   /* v531 穴の角の丸み。絵の枠と同じ気配に */
+      var cr = Math.max(4, Math.min(9, Math.round(Math.min(open[2], open[3]) * .02)));   /* v541 丸めすぎだったので緩やかに（本人）。18px → 9px 上限 */
       tutEl.style.setProperty('--gmt-r', cr + 'px');
       tutSet(tutEl.querySelector('.gmt-c.tl'), [x, y, cr, cr]);
       tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y, cr, cr]);
@@ -5118,10 +5122,17 @@
           tutSet(wl, [0, wy, wx, wh]);
           tutSet(wr, [wx + ww, wy, W - wx - ww, wh]);
           tutSet(tutEl.querySelector('.gmt-p.t'), [0, wy + wh, W, y - wy - wh]);   /* 元の板は窓の下だけ受け持つ */
+          var wr2 = Math.max(3, Math.min(7, Math.round(Math.min(ww, wh) * .05)));   /* v541 窓の角の丸み。絵の穴と同じ気配で、少し控えめに */
+          tutEl.style.setProperty('--gmt-wr', wr2 + 'px');
+          tutSet(tutEl.querySelector('.gmt-c.w.tl'), [wx, wy, wr2, wr2]);
+          tutSet(tutEl.querySelector('.gmt-c.w.tr'), [wx + ww - wr2, wy, wr2, wr2]);
+          tutSet(tutEl.querySelector('.gmt-c.w.bl'), [wx, wy + wh - wr2, wr2, wr2]);
+          tutSet(tutEl.querySelector('.gmt-c.w.br'), [wx + ww - wr2, wy + wh - wr2, wr2, wr2]);
         }
       }
       if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
         tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
+        tutEl.querySelectorAll('.gmt-c.w').forEach(function(cw){ tutSet(cw, [0, 0, 0, 0]); });
         say.classList.add('dim'); say.classList.add('ts2');
         var bw = Math.max(300, Math.min(560, open[2]));
         say.style.width = bw + 'px';

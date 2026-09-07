@@ -4353,6 +4353,12 @@
   .gmt-c.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-r, 14px), var(--gmt-dim) 0)}
   html.rm .gmt-c{transition:none}
 
+  /* v541 案内の窓の角も丸く（本人）。絵の穴と同じ作りで、半径だけ控えめに */
+  .gmt-c.w.tl{background:radial-gradient(circle at 100% 100%, transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
+  .gmt-c.w.tr{background:radial-gradient(circle at 0 100%,    transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
+  .gmt-c.w.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
+  .gmt-c.w.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
