@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5039,10 +5039,12 @@
       tutEl = el('div', 'gmt');
       tutEl.setAttribute('aria-hidden', 'true');   /* 読み上げは本編の文が担う */
       tutEl.innerHTML =
+        '<i class="gmt-veil">' +   /* v544 板と角はこの袋の中。薄さは袋に掛ける——板どうしが重なっても濃くならず、動いている最中に継ぎ目（黒い点・白い筋）が出ない（本人） */
         '<i class="gmt-p t"></i><i class="gmt-p b"></i><i class="gmt-p l"></i><i class="gmt-p r"></i>' +
         '<i class="gmt-p wt"></i><i class="gmt-p wl"></i><i class="gmt-p wr"></i>' +   /* 案内の窓のまわり。t はこのとき窓の下だけを受け持つ */
         '<i class="gmt-c tl"></i><i class="gmt-c tr"></i><i class="gmt-c bl"></i><i class="gmt-c br"></i>' +
         '<i class="gmt-c w tl"></i><i class="gmt-c w tr"></i><i class="gmt-c w bl"></i><i class="gmt-c w br"></i>' +   /* v541 案内の窓の角も丸く（本人） */
+        '</i>' +
         '<p class="gmt-say"><b></b><span class="gmt-t"></span><i class="gmt-nx"></i></p>' +
         '<button class="gmt-skip" type="button"></button>';
       tutEl.querySelector('.gmt-skip').textContent = L('手引きをとばす', 'Skip this');
@@ -5090,14 +5092,14 @@
       var x = open[0], y = open[1], r = open[0] + open[2], b = open[1] + open[3];
       tutSet(tutEl.querySelector('.gmt-p.t'), [0, 0, W, y]);
       tutSet(tutEl.querySelector('.gmt-p.b'), [0, b, W, H - b]);
-      tutSet(tutEl.querySelector('.gmt-p.l'), [0, y, x, open[3]]);
-      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y, W - r, open[3]]);
+      tutSet(tutEl.querySelector('.gmt-p.l'), [0, y - 1, x, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
+      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r, open[3] + 2]);
       var cr = Math.max(4, Math.min(9, Math.round(Math.min(open[2], open[3]) * .02)));   /* v541 丸めすぎだったので緩やかに（本人）。18px → 9px 上限 */
       tutEl.style.setProperty('--gmt-r', cr + 'px');
-      tutSet(tutEl.querySelector('.gmt-c.tl'), [x, y, cr, cr]);
-      tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y, cr, cr]);
-      tutSet(tutEl.querySelector('.gmt-c.bl'), [x, b - cr, cr, cr]);
-      tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr, cr]);
+      tutSet(tutEl.querySelector('.gmt-c.tl'), [x - 1, y - 1, cr + 1, cr + 1]);   /* v544 角も外へ 1px。丸の中心は動かないので、丸みはそのまま */
+      tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y - 1, cr + 1, cr + 1]);
+      tutSet(tutEl.querySelector('.gmt-c.bl'), [x - 1, b - cr, cr + 1, cr + 1]);
+      tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr + 1, cr + 1]);
       /* 案内文の置き場。見出し行の空きに三段とも固定し、そこの幕を開けて（窓を切って）、
          文は本物の紙の上に置く。窓は三段とも左端と高さを同じにし、幅だけ文に合わせる */
       var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null;
@@ -5119,15 +5121,15 @@
         if(wy + wh <= y - 4){          /* 窓が絵の穴に掛からないときだけ、窓を切る */
           put = [f[0], wy + Math.round((wh - say.offsetHeight) / 2)];
           tutSet(wt, [0, 0, W, wy]);
-          tutSet(wl, [0, wy, wx, wh]);
-          tutSet(wr, [wx + ww, wy, W - wx - ww, wh]);
+          tutSet(wl, [0, wy - 1, wx, wh + 2]);
+          tutSet(wr, [wx + ww, wy - 1, W - wx - ww, wh + 2]);
           tutSet(tutEl.querySelector('.gmt-p.t'), [0, wy + wh, W, y - wy - wh]);   /* 元の板は窓の下だけ受け持つ */
           var wr2 = Math.max(3, Math.min(7, Math.round(Math.min(ww, wh) * .05)));   /* v541 窓の角の丸み。絵の穴と同じ気配で、少し控えめに */
           tutEl.style.setProperty('--gmt-wr', wr2 + 'px');
-          tutSet(tutEl.querySelector('.gmt-c.w.tl'), [wx, wy, wr2, wr2]);
-          tutSet(tutEl.querySelector('.gmt-c.w.tr'), [wx + ww - wr2, wy, wr2, wr2]);
-          tutSet(tutEl.querySelector('.gmt-c.w.bl'), [wx, wy + wh - wr2, wr2, wr2]);
-          tutSet(tutEl.querySelector('.gmt-c.w.br'), [wx + ww - wr2, wy + wh - wr2, wr2, wr2]);
+          tutSet(tutEl.querySelector('.gmt-c.w.tl'), [wx - 1, wy - 1, wr2 + 1, wr2 + 1]);
+          tutSet(tutEl.querySelector('.gmt-c.w.tr'), [wx + ww - wr2, wy - 1, wr2 + 1, wr2 + 1]);
+          tutSet(tutEl.querySelector('.gmt-c.w.bl'), [wx - 1, wy + wh - wr2, wr2 + 1, wr2 + 1]);
+          tutSet(tutEl.querySelector('.gmt-c.w.br'), [wx + ww - wr2, wy + wh - wr2, wr2 + 1, wr2 + 1]);
         }
       }
       if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
@@ -5243,7 +5245,7 @@
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この一本について', 'ABOUT THIS LINE') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》.'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
+        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この一本について', 'ABOUT THIS LINE') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむ遊びです。', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game.'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
         lite(once);
         /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
            盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */

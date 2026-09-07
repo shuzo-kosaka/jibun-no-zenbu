@@ -4387,6 +4387,22 @@
   .gm-isec > span{text-shadow:0 0 10px var(--ibg, #F2F1EC)}
   .gm-isec::before{opacity:.92}
 
+  /* ================= v544 幕の継ぎ目を消す（本人：角に黒い点、動くと白い筋） =================
+     板を一枚ずつ半透明にしていたので、重なった所は濃く（黒い点）、離れた所は素通し（白い筋）になっていた。
+     とくに動いている最中は、板ごとに別々に補間されるので、必ずどちらかが出る。
+     板そのものは不透明にして、薄さは袋（.gmt-veil）に一度だけ掛ける。こうすると重なっても濃くならないので、
+     継ぎ目は 1px ずつ重ねてよく、隙間も出ない。 */
+  .gmt-veil{position:absolute; inset:0; opacity:.55; pointer-events:none}
+  .gmt-p{background:#1C1B19}
+  .gmt-c.tl{background:radial-gradient(circle at 100% 100%, transparent var(--gmt-r, 9px), #1C1B19 0)}
+  .gmt-c.tr{background:radial-gradient(circle at 0 100%,    transparent var(--gmt-r, 9px), #1C1B19 0)}
+  .gmt-c.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-r, 9px), #1C1B19 0)}
+  .gmt-c.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-r, 9px), #1C1B19 0)}
+  .gmt-c.w.tl{background:radial-gradient(circle at 100% 100%, transparent var(--gmt-wr, 6px), #1C1B19 0)}
+  .gmt-c.w.tr{background:radial-gradient(circle at 0 100%,    transparent var(--gmt-wr, 6px), #1C1B19 0)}
+  .gmt-c.w.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-wr, 6px), #1C1B19 0)}
+  .gmt-c.w.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-wr, 6px), #1C1B19 0)}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
