@@ -605,7 +605,7 @@
     var parallaxEls = null;
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY; cur.classList.add('on');
-      var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null;
+      var t = e.target, hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang, .gm-ttl, .gm-idots > *') : null;
       cur.classList.toggle('hov', !!hov);
       cur.classList.toggle('onmedia', !!(t && t.closest && t.closest('.vid, .wkf, .marg figure, .hw, #ch5pin .bgph, .wk-mid')));   /* v100: ink-on-ink is invisible over a photo or a video thumbnail */
       suckHold(t);
@@ -623,7 +623,7 @@
     (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); window.__peek = pk; pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
     var c5 = document.getElementById('ch5pin');
     window.addEventListener('mousemove', function(e){ if(c5){ c5.style.setProperty('--sx', (e.clientX / window.innerWidth * 100).toFixed(1) + '%'); c5.style.setProperty('--sy', (e.clientY / vh() * 100).toFixed(1) + '%'); } }, {passive:true});
-    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang') : null; cur.classList.toggle('hov', !!hov); suckHold(t); }, {passive:true});
+    window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang, .gm-ttl, .gm-idots > *') : null; cur.classList.toggle('hov', !!hov); suckHold(t); }, {passive:true});
     document.documentElement.addEventListener('mouseleave', function(){ cur.classList.remove('on'); });
     document.documentElement.addEventListener('mouseenter', function(){ cur.classList.add('on'); });
     (function loop(){
@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5243,7 +5243,8 @@
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = body(L('この差が示すのは、正解・不正解ではなく、私との解釈の違いです。', 'This difference is not about right or wrong. It shows how your interpretation differs from mine.'));
+        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この一本について', 'ABOUT THIS LINE') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》.'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
+        lite(once);
         /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
            盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */
         once.classList.add('gm-onceb');

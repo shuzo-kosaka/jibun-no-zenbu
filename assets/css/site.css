@@ -3816,7 +3816,7 @@
   /* v441 次へのボタンは、面の切り替わりで点滅しないよう静かに出入りする */
   .gm-igo{transition:opacity .28s var(--ease), background .2s, color .2s, border-color .2s}
   /* v441 左上の題は押せる（本編の先頭へ） */
-  .gm-ttl{cursor:pointer}
+  .gm-ttl{cursor:pointer; transition:color .26s var(--ease)}   /* v542 突然色が変わっていた（本人）。ゆっくり移す */
   @media (hover:hover){ .gm-ttl:hover{color:var(--acc)} }
   .gm-ttl:focus-visible{outline:2px solid var(--acc); outline-offset:4px}
   /* v441 言語切替の帯は、遊びの上でも見えるように（遊びの層より上へ：本人） */
@@ -4134,9 +4134,14 @@
   .gm-ilist li{align-items:center}
   /* v506 一度だけの一言は、列の段落から出して盤面の上に浮かせる（本人：出入りで前後が歪に動く） */
   .gm-sw{position:relative}
-  .gm-once.gm-onceb{position:absolute; z-index:9; transform:translate(-50%,-50%) translateY(6px); margin:0; max-width:min(300px, 62%);
-    background:rgba(242,241,236,.95); border-left:2px solid var(--acc); padding:9px 12px; font-size:12.5px; line-height:1.7;
+  /* v542 一度だけの一言。板を貼った囲みではなく、本編と同じ「紙に引いた一本の罫と、その下の文」に（本人：見直してほしい） */
+  .gm-once.gm-onceb{position:absolute; z-index:9; transform:translate(-50%,-50%) translateY(6px); margin:0; max-width:min(320px, 64%);
+    background:rgba(242,241,236,.96); border-left:0; border-radius:3px; padding:13px 15px 14px; font-size:12.5px; line-height:1.8;
+    box-shadow:0 1px 12px rgba(30,28,26,.10);
     opacity:0; pointer-events:none; transition:opacity .42s var(--ease), transform .42s var(--ease)}
+  .gm-once.gm-onceb::before{content:""; position:absolute; left:15px; right:15px; top:0; height:0; border-top:1.5px solid var(--acc)}   /* 朱の罫は上に一本 */
+  .gm-oncek{display:block; margin:0 0 6px; font-family:var(--mono); font-size:9.5px; letter-spacing:.18em; font-style:normal; color:var(--acc); opacity:.9}
+  html.phone .gm-oncek{font-size:9px}
   .gm-once.gm-onceb.on{opacity:1; transform:translate(-50%,-50%)}
   .gm-once.gm-onceb.bye{opacity:0; transform:translate(-50%,-50%) translateY(-6px)}
   .gm-oncetie{position:absolute; z-index:8; background:var(--acc); opacity:0; transition:opacity .32s var(--ease) .1s; pointer-events:none}
