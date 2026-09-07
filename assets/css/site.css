@@ -4403,6 +4403,13 @@
   .gmt-c.w.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-wr, 6px), #1C1B19 0)}
   .gmt-c.w.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-wr, 6px), #1C1B19 0)}
 
+  /* v549 平均の画面の観察文は、見出しと同じ混植で、少し大きく（本人） */
+  .gm-obs{font-family:inherit; font-weight:400; font-size:20px; line-height:1.72; letter-spacing:.01em; margin:0 0 .5em}
+  .gm-obs .mx{display:inline}
+  .gm-obs small{font-size:13px; margin-left:10px}
+  html.phone .gm-obs{font-size:18px; line-height:1.75}
+  @media (max-height:640px){ .gm-obs{font-size:17px} }
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
