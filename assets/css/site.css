@@ -4253,6 +4253,10 @@
   html.phone .gm-take-opt{margin:18px 0 14px}
   @media (max-height:640px){ .gm-take-opt{margin:14px 0 10px} }
 
+  /* v527 スマホの幅では、虫眼鏡のボタンと状態の語（引いている・なぞる…）が同じ場所に重なっていた（本人）。
+     重なっている文字のほうを出さない（実測：ボタン [353,533,34,32] と語 [353,542,68,23] が完全に重なっていた） */
+  html.phone .gm-mode{display:none}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
