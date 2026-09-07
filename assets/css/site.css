@@ -4123,6 +4123,16 @@
   .gm-info-g{margin:1.6em 0 .5em; font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; color:var(--acc, #E84518); border-top:1px solid rgba(30,28,26,.16); padding-top:1.1em}
   .gm-info-g:first-child{margin-top:.6em; border-top:0; padding-top:0}
   html.phone .gm-info-g{font-size:12px}
+  /* v502 背景の絵は、PC とタブレットでも、ゆっくりふわりと浮かび上がるようにする（本人） */
+  .gm-imos{transition:opacity 2.4s var(--ease) .35s}
+  html.phone .gm-imos{transition:opacity 2.8s var(--ease) .45s}
+  /* v502 送りの円が大きすぎた（本人）。媒体ごとに釣り合う大きさへ */
+  .gm-igo{width:72px; height:72px}
+  html.pcview.tablet .gm-igo{width:66px; height:66px}
+  html.phone .gm-igo{width:62px; height:62px}
+  @media (max-height:640px){ .gm-igo{width:58px; height:58px} }
+  .gm-igo svg{width:22px; height:22px}
+  html.phone .gm-igo svg{width:20px; height:20px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
