@@ -3374,7 +3374,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4175,6 +4175,7 @@
     }
     /* 帯（標識）：画面の上端に朱の帯で「この線の役割」を出す。絵やグリッドの上には出さない。一枚目の各手番で自動、? で呼び戻し。押下で消える */
     function help(t, hold){
+      if(tutOn){ tutPend = [t, hold]; return; }   /* 手引きの最中は帯を出さない。終わってから出す */
       clearTimeout(helpT);
       bandEl.innerHTML = pict(t.k) + '<b>' + esc(L(t.n, t.ne)) + '<small>' + esc(L(t.dir, t.dire)) + '</small></b><span>' + esc(L(t.h, t.he)) + '</span>';
       var hd = gm.querySelector('.gm-hd').getBoundingClientRect(), g = gm.getBoundingClientRect(); bandEl.style.minHeight = Math.round(hd.bottom - g.top) + 'px';   /* ヘッダーの帯をちょうど覆う高さ（題字が半分だけ覗かない） */
@@ -4639,7 +4640,9 @@
       var msrc = introEl.querySelector('.gm-isec.on .gm-ichoice') || introEl.querySelector('.gm-isec.on');
       var mr0 = msrc ? msrc.getBoundingClientRect() : null;
       introEl.classList.add('bye'); setTimeout(function(){ introEl.hidden = true; introEl.classList.remove('bye'); }, rm ? 0 : 720);   /* 文字と選択肢が先に消え（140ms）、線を残した地がゆっくり薄れる */
+      tutOn = !tutSeen();   /* 手引きを出すなら、朱の帯と指の手本はここで止まる（help・turn の中で見ている） */
       start(); startedAt = performance.now();   /* 案内の操作を一手目へ持ち越さない：直後 400ms の押下は無視 */
+      if(tutOn) setTimeout(tutStart, rm ? 200 : 1100);   /* 盤面が育ちきってから幕をかける */
       morphIn(msrc, mr0);
       var gin = gm.querySelector('.gm-in'); if(gin && !rm){ gin.classList.add('enter'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ gin.classList.add('on'); setTimeout(function(){ gin.classList.remove('enter', 'on'); }, 1600); }); }); }   /* v462: 外す時刻を on から数える（動き係：盤面の出現の最後が切られていた） */   /* 案内が薄れる間に、盤面と右の列が下からゆっくり現れる */
     }
@@ -4759,7 +4762,7 @@
     }
     var closing = false;
     function close(){
-      if(!gm || gm.hidden || closing) return; closing = true;   /* v498: 二重に走ると退場の演出が飛ぶ（本人：× を押しても演出がない） */ state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
+      if(!gm || gm.hidden || closing) return; closing = true; tutEnd();   /* v498: 二重に走ると退場の演出が飛ぶ（本人：× を押しても演出がない） */ state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
       siteInert(false);
       if(histPushed){ histPushed = false; setTimeout(function(){ try{ history.back(); }catch(e){} }, 640); }   /* v498: 履歴の戻しは退場のあとで（先に戻すと popstate が閉じ直して演出が飛ぶ） */
@@ -4869,12 +4872,156 @@
       bEl.style.marginLeft = Math.round((tb.left + tb.width / 2) - (bb.left + bb.width / 2)) + 'px';
     }
     function demoOff(){ if(demoEl && demoEl.parentNode) demoEl.parentNode.removeChild(demoEl); demoEl = null; }
+    /* ===== 一枚目の手引き。幕で覆い、見せる所だけを開けて、三段階で読み方を教える =====
+       ・段は「絵と目盛り／朱の帯／絵の上の問い」の三つ。押すと次へ、三つ目を押すと消える
+       ・幕は押下を通さない（「次へ」のつもりの押下が一本目の線になるのを防ぐ）
+       ・手引きの間は朱の帯（help）と指の手本（demoOn）を止め、終わってから始める
+       ・二度目からは出さない（localStorage 'gm-tut'）*/
+    var tutEl = null, tutOn = false, tutAt = 0, tutPend = null, tutT = 0, tutAtT = 0;
+    var TUTS = [
+      {k:['stage', 'rt', 'rl'], ja:'この絵に、《四本の線》を引きます。',
+                                en:'You will draw 《four lines》 on this picture.'},
+      {k:['step'],              ja:'%sの帯に、《いま何本目か》が出ます。',
+                                en:'The band %s shows 《which line you are on》.'},
+      {k:['tip'],               ja:'探すところは、《この一行》に書いてあります。',
+                                en:'《This line》 says what to look for.'}
+    ];
+    /* 「右の帯に」の「右」は、案内文から見た朱の帯の向きで決める
+       （狭い縦持ちで列が下に回り込む組みでも、指す向きが狂わないように） */
+    function tutWay(){
+      var r = tutBox('step');
+      if(!r) return [L('右', 'right'), 'on the right'];
+      var s = tutEl && tutEl.querySelector('.gmt-say'), sb = s && s.getBoundingClientRect(), x0, x1;
+      if(sb && sb.width > 4){ x0 = sb.left; x1 = sb.right; }
+      else { var f = tutFree(); if(!f) return [L('右', 'right'), 'on the right']; x0 = f[0]; x1 = f[0] + f[2]; }
+      if(r[0] >= x1 - 8) return [L('右', 'right'), 'on the right'];
+      if(r[0] + r[2] <= x0 + 8) return [L('左', 'left'), 'on the left'];
+      return [L('下', 'below'), 'below'];
+    }
+    function tutSeen(){ try{ return localStorage.getItem('gm-tut') === '1'; }catch(e){ return false; } }
+    function tutBox(k){
+      var e = k === 'stage' ? stage : k === 'step' ? stepEl : k === 'tip' ? tipEl
+            : gm.querySelector('.gm-' + k);   /* rt・rl は目盛り */
+      if(!e) return null;
+      var r = e.getBoundingClientRect();
+      return (r.width > 2 && r.height > 2) ? [r.left, r.top, r.width, r.height] : null;
+    }
+    function tutUni(a, b){
+      if(!a) return b; if(!b) return a;
+      var l = Math.min(a[0], b[0]), t = Math.min(a[1], b[1]);
+      return [l, t, Math.max(a[0] + a[2], b[0] + b[2]) - l, Math.max(a[1] + a[3], b[1] + b[3]) - t];
+    }
+    function tutSet(e, r){
+      e.style.left = Math.round(r[0]) + 'px'; e.style.top = Math.round(r[1]) + 'px';
+      e.style.width = Math.max(0, Math.round(r[2])) + 'px'; e.style.height = Math.max(0, Math.round(r[3])) + 'px';
+    }
+    /* 見出し行の、題字とボタンのあいだの空き。案内文は三段とも同じここに置く
+       （読み手が毎回そこを探さずに済む）。PC で 678×68、iPhone 横持ちで 560×120 空く */
+    function tutFree(){
+      var hd = gm.querySelector('.gm-hd'), a = gm.querySelector('.gm-ttl'),
+          b = gm.querySelector('.gm-i') || gm.querySelector('.gm-x');
+      if(!hd || !a || !b) return null;
+      var h = hd.getBoundingClientRect(), ar = a.getBoundingClientRect(), br = b.getBoundingClientRect();
+      var x = ar.right + 40, w = br.left - 24 - x;
+      return (w >= 330 && h.height > 30) ? [x, h.top, w, h.height] : null;
+    }
+    function tutStart(){
+      if(!tutOn) return;
+      if(!gm || !stage || !stepEl || !tipEl){ tutOn = false; tutFlush(); return; }
+      tutAt = 0;
+      tutEl = el('div', 'gmt');
+      tutEl.setAttribute('aria-hidden', 'true');   /* 読み上げは本編の文が担う */
+      tutEl.innerHTML =
+        '<i class="gmt-p t"></i><i class="gmt-p b"></i><i class="gmt-p l"></i><i class="gmt-p r"></i>' +
+        '<p class="gmt-say"><b></b><span class="gmt-t"></span><i class="gmt-nx"></i></p>' +
+        '<button class="gmt-skip" type="button"></button>';
+      tutEl.querySelector('.gmt-skip').textContent = L('手引きをとばす', 'Skip this');
+      document.body.appendChild(tutEl);   /* .hd（101）より後ろに置く。カーソル演出（102）はその上 */
+      tutEl.addEventListener('pointerdown', function(e){
+        e.preventDefault();   /* 幕の下へ押下を渡さない。iOS の引っぱりも止める */
+        if(performance.now() - tutAtT < 420) return;   /* 段が変わった直後の押下は読まない */
+        if(e.target && e.target.closest && e.target.closest('.gmt-skip')){ tutEnd(); return; }
+        if(tutAt < TUTS.length - 1) tutStep(tutAt + 1); else tutEnd();
+      }, {passive:false});
+      window.addEventListener('resize', tutFit);
+      tutStep(0);
+      requestAnimationFrame(function(){ if(tutEl) tutEl.classList.add('on'); });
+    }
+    function tutStep(i){
+      if(!tutEl) return;
+      tutAt = i; tutAtT = performance.now();
+      var s = TUTS[i], say = tutEl.querySelector('.gmt-say');
+      say.querySelector('b').textContent = (i + 1) + ' / ' + TUTS.length;
+      var w = tutWay();
+      say.querySelector('.gmt-t').innerHTML = body(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1])));
+      var nx = say.querySelector('.gmt-nx');
+      nx.textContent = (i === TUTS.length - 1) ? L('押すと、始まります', 'Press to begin')
+                                               : L('押して、次へ', 'Press for the next');
+      nx.classList.remove('on'); clearTimeout(tutT);
+      tutT = setTimeout(function(){ if(tutEl) nx.classList.add('on'); }, rm ? 0 : 1300);
+      tutFit();
+      setTimeout(tutFit, 60);   /* 組み替えのあとの高さで置き直す */
+    }
+    function tutFit(){
+      if(!tutEl) return;
+      var open = null;
+      TUTS[tutAt].k.forEach(function(k){ open = tutUni(open, tutBox(k)); });
+      if(!open){ tutEnd(); return; }
+      open = [open[0] - 8, open[1] - 8, open[2] + 16, open[3] + 16];
+      var W = window.innerWidth, H = window.innerHeight;
+      var x = open[0], y = open[1], r = open[0] + open[2], b = open[1] + open[3];
+      tutSet(tutEl.querySelector('.gmt-p.t'), [0, 0, W, y]);
+      tutSet(tutEl.querySelector('.gmt-p.b'), [0, b, W, H - b]);
+      tutSet(tutEl.querySelector('.gmt-p.l'), [0, y, x, open[3]]);
+      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y, W - r, open[3]]);
+      var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null, h;
+      if(f){   /* 一の手：見出し行の空き（三段とも同じ場所） */
+        say.classList.add('row'); say.style.width = Math.min(f[2], 640) + 'px';
+        h = say.offsetHeight;
+        var hy = Math.max(5, f[1] + Math.round((f[3] - h) / 2));
+        if(hy + h <= y - 6) put = [f[0], hy];
+      }
+      if(!put){   /* 二の手：穴の下の帯 */
+        var bw = Math.max(400, Math.min(660, open[2]));
+        say.classList.add('row'); say.style.width = bw + 'px'; h = say.offsetHeight;
+        if(H - b >= h + 28) put = [Math.max(24, Math.min(x, W - bw - 24)), b + 18];
+      }
+      if(!put){   /* 三の手：穴の右（または左）に段で組む */
+        var sw = Math.max(200, Math.min(320, Math.max(W - r - 72, x - 72)));
+        say.classList.remove('row'); say.style.width = sw + 'px'; h = say.offsetHeight;
+        var sx = (W - r - 72 >= x - 72) ? Math.min(r + 36, W - sw - 24) : 36;
+        put = [Math.max(16, sx), Math.max(20, Math.round(H / 2 - h / 2))];
+      }
+      say.style.left = Math.round(put[0]) + 'px'; say.style.top = Math.round(put[1]) + 'px';
+    }
+    /* 止めておいた朱の帯と指の手本を、手引きのあとから始める */
+    function tutFlush(){
+      if(tutPend){ var p = tutPend; tutPend = null; help(p[0], p[1]); }
+      if(bi === 0 && ti === 0 && !demoDone){
+        setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, rm ? 0 : 420);
+      }
+    }
+    function tutEnd(){
+      if(!tutOn) return;
+      tutOn = false; clearTimeout(tutT);
+      try{ localStorage.setItem('gm-tut', '1'); }catch(e){}
+      window.removeEventListener('resize', tutFit);
+      var e = tutEl; tutEl = null;
+      if(e){
+        e.style.pointerEvents = 'none';   /* 消えかけの幕が押下を飲まないように */
+        e.classList.remove('on');
+        setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); }, rm ? 0 : 540);
+      }
+      tutFlush();
+    }
+    /* 「手引きをもう一度」を作るときの入口（次に遊びを開いたときに出ます） */
+    window.__gmTutorAgain = function(){ try{ localStorage.removeItem('gm-tut'); }catch(e){} };
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
       var lead2 = gm.querySelector('.gm-lead2');
       if(lead2){ if(bi === 0 && ti === 0){ lead2.hidden = false; lead2.className = 'gm-lead2 gm-res';   /* v489: 下と同じ組みの規則が当たるように */ lead2.innerHTML = '<p class="gm-ask gm-lead"><b>' + mix('絵から、ものさしを取り出す。', 'Turn a picture into a ruler.', 'ものさし') + '</b>' + L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Draw four lines on each picture; the three are then averaged.') + '</p>' + '<p class="gm-leadhow">' + L('絵を押して、そのまま動かします。離したところに線が引かれます。', 'Press the picture and drag; the line is placed where you release.') + '</p>';   /* v489: 下にあった組みのよいほうを、そのまま上へ（本人）。文節で割る処理は通さない */ }
         else if(!lead2.hidden){ lead2.className = 'gm-lead2 gm-res bye'; setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); } }   /* v477: 何をする遊びかを、いちばん先に目につく所へ（本人） */
-      if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
+      if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ if(tutOn) return;   /* 手引きの最中は出さない。tutEnd から始める */ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false;
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));

@@ -4257,6 +4257,46 @@
      重なっている文字のほうを出さない（実測：ボタン [353,533,34,32] と語 [353,542,68,23] が完全に重なっていた） */
   html.phone .gm-mode{display:none}
 
+  /* ===== 一枚目の手引き。半透明の幕で覆い、見せる所だけを開ける ===== */
+  /* 覆いは四枚の矩形。穴はその真ん中に残る空き。
+     巨大な box-shadow や clip-path は使わない（iOS で重く、描き落ちがある） */
+  .gmt{position:fixed; inset:0; z-index:101; pointer-events:auto; cursor:pointer;
+       --gmt-dim:rgba(28,27,25,.55);
+       -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none;
+       opacity:0; transition:opacity .5s var(--ease, cubic-bezier(.22,.61,.36,1))}
+  .gmt.on{opacity:1}
+  .gmt-p{position:absolute; background:var(--gmt-dim); pointer-events:none;
+         transition:left .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+                    top .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+                    width .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+                    height .42s var(--ease, cubic-bezier(.22,.61,.36,1))}
+
+  /* 案内文。白い板は敷かず、文のまわりだけ幕を深くしてにじませる */
+  .gmt-say{position:absolute; margin:0; color:#F2F1EC; pointer-events:none; isolation:isolate;
+           display:flex; flex-direction:column; align-items:flex-start; gap:11px;
+           transition:left .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+                      top .42s var(--ease, cubic-bezier(.22,.61,.36,1)),
+                      width .42s var(--ease, cubic-bezier(.22,.61,.36,1))}
+  .gmt-say::before{content:""; position:absolute; z-index:-1; inset:-30px -120px -30px -30px;
+      background:radial-gradient(56% 170% at 20% 50%,
+                 rgba(18,17,16,.48) 0%, rgba(18,17,16,.28) 44%, rgba(18,17,16,0) 100%)}
+  .gmt-say.row{flex-direction:row; align-items:baseline; gap:20px}
+  .gmt-say b{flex:none; position:relative; top:-1px; font-size:10.5px; letter-spacing:.2em;
+             color:rgba(242,241,236,.5); font-variant-numeric:tabular-nums}
+  .gmt-t{font-size:16px; line-height:1.9; letter-spacing:.03em; text-shadow:0 1px 12px rgba(0,0,0,.5)}
+  .gmt-say .ph{display:inline-block}
+  .gmt-say mark{background:none; color:#FFD5C8; font-weight:600}
+  .gmt-nx{flex:none; font-style:normal; font-size:11px; letter-spacing:.12em; white-space:nowrap;
+          color:rgba(242,241,236,.5); opacity:0;
+          transition:opacity .6s var(--ease, cubic-bezier(.22,.61,.36,1))}
+  .gmt-nx.on{opacity:1}
+  .gmt-skip{position:fixed; right:18px; bottom:16px; z-index:1; pointer-events:auto;
+            font:inherit; font-size:11.5px; letter-spacing:.08em; color:rgba(242,241,236,.5);
+            background:none; border:0; padding:13px 17px; cursor:pointer}   /* 文字は控えめでも、押せる範囲は狭めない */
+  .gmt-skip:hover{color:#F2F1EC}
+  @media (max-height:640px){ .gmt-t{font-size:14.5px} .gmt-say{gap:9px} }
+  html.rm .gmt, html.rm .gmt-p, html.rm .gmt-say, html.rm .gmt-nx{transition:none}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
