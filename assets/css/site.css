@@ -4173,6 +4173,17 @@
   .gm-legend b[hidden]{display:none}
   .gm-legend i.mine{margin-left:0}
 
+  /* v510 右の列の差し替え：消える中身はその場で薄くなり、空いた高さは 0.34 秒かけて畳まれる（本人：情報がガンとぶつかる） */
+  .gm-res{position:relative}
+  .gm-resghost{position:absolute; left:0; right:0; top:0; pointer-events:none; opacity:1; transition:opacity .22s var(--ease)}
+  .gm-resghost.out{opacity:0}
+  html.rm .gm-resghost{display:none}
+
+  /* ================= v511 紙面の説明文が潰れていた（流れ係） =================
+     主塊開始線（たて）の平均が 83% を超えると left+right が 100% を超え、幅 10px の柱になって画面の外まで伸びていた。
+     説明文だけは骨格に連れて動かさず、左は 55% で止めて、最低限の幅を確保する。 */
+  .gm-sheet .gm-scap{left:min(var(--sx1, 12%), 55%); min-width:min(320px, 78vw)}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}

@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4835,7 +4835,7 @@
     var demoEl = null, demoDone = false;
     function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i>';   /* v495: 同じ操作の一文が右の列の頭にもあり、絵の上の板が絵を隠していた（細部係）。指の図だけ残す */; stage.appendChild(demoEl);
       /* v399: 問いの札が絵の中にあるとき（iPhone）は、その下に 8px 空けて同じ幅で置く */
-      requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(tr.height && tr.top >= sr.top - 1){ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
+      requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(b && tr.height && tr.top >= sr.top - 1){   /* v511 b が無い版で毎回 TypeError（流れ係） */ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
     function demoFit(){   /* v429: 手本の文は、問いの札と同じ中心に（iPhone で 35px ずれていた：本人） */
       if(!demoEl || !tipEl) return; var bEl = demoEl.querySelector('b'); if(!bEl) return;
       var tb = tipEl.getBoundingClientRect(); if(!tb.width) return;
@@ -4854,9 +4854,11 @@
       state = 'trace'; live = -1; down = false;
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
+      resPre(true);   /* v510 次の線へ移るとき、上の情報が消えて下がぶつかるのを止める（本人）。薄くなってから畳む */
       resEl.innerHTML =
         '' +
         '';   /* v487: 操作の一文は右の列の頭（.gm-lead2）へ移した（本人） */   /* 線の名前は右の一覧が示す（帯・一覧・見出しの三重を避ける） */
+      hTween(goEl, true);   /* v510 ボタンの段も、消えるときは薄くなってから畳む */
       goEl.innerHTML = '';
       if(bi === 0) help(t, false); else helpOff();
       hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
@@ -4928,13 +4930,33 @@
       first = false; setTimeout(reveal, 80);
     }
     function cmpRender(t, b, p, a, d){
-      resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir, t.dire) + '</small></b></p>' +
+      resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir, t.dire) + '</small></b></p>' +
         '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
         (first ? '<p class="gm-note">' + L('絵の幅と高さをそれぞれ 100 として、線の位置を％で示します。', 'Line positions are shown as percentages, with the picture\'s width and height each set to 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('絵をもう一度押すと、次の線。', 'Click the picture again for the next line.')) + '</p>' : '');
       goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
     }
     /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
+    /* v510 右の列とボタンの段の差し替え：前の高さから新しい高さへ繋ぐ。中身が消えて下の情報が跳ね上がるのを止める（本人） */
+    function hTween(elm, ghost){
+      if(rm || !elm) return;
+      var h0 = elm.getBoundingClientRect().height, gh = null;
+      if(ghost && h0 > 0 && elm.innerHTML.trim()){ gh = document.createElement('div'); gh.className = 'gm-resghost'; gh.innerHTML = elm.innerHTML; }
+      if(elm.__raf) cancelAnimationFrame(elm.__raf);
+      elm.__raf = requestAnimationFrame(function(){
+        elm.__raf = 0;
+        if(gh){ elm.appendChild(gh); requestAnimationFrame(function(){ gh.classList.add('out'); });
+          setTimeout(function(){ if(gh.parentNode) gh.parentNode.removeChild(gh); }, 300); }
+        elm.style.height = ''; elm.style.transition = '';
+        var h1 = elm.getBoundingClientRect().height;
+        if(!(h0 > 0) || Math.abs(h1 - h0) < 4) return;
+        elm.style.height = h0 + 'px'; elm.style.overflow = 'hidden'; void elm.offsetHeight;
+        elm.style.transition = 'height .34s cubic-bezier(.22,.61,.36,1)'; elm.style.height = h1 + 'px';   /* var(--ease) は要素に無いと式ごと無効になる */
+        clearTimeout(elm.__anim);
+        elm.__anim = setTimeout(function(){ elm.style.height = ''; elm.style.overflow = ''; elm.style.transition = ''; }, 380);
+      });
+    }
+    function resPre(ghost){ hTween(resEl, ghost); }
     function moreMark(){ var sc = gm && gm.querySelector('.gm-side'); if(!sc) return; sc.classList.toggle('more', sc.scrollHeight - sc.clientHeight - sc.scrollTop > 6); }
     function revealRes(){   /* v414: 平均の見出しを列の頭に合わせる（ボタンは iPhone では sticky、pc はホイール／iPad は指で） */
       var sc = gm.querySelector('.gm-side'); if(!sc || !resEl || sc.scrollHeight <= sc.clientHeight + 2) return;
@@ -4998,7 +5020,7 @@
       cring(L(ORD[bi] + '、測り終える \u00b7 MEASURED \u00b7 ', 'THE ' + ORDE[bi].toUpperCase() + ', MEASURED \u00b7 '));
     }
     function doneRender(){
-      resEl.innerHTML = '<p class="gm-ask"><b>' + mix(ORD[bi] + '、測り終わり。', 'The ' + ORDE[bi] + ', measured.', ORD[bi]) + '</b></p>' + table(bi) +
+      resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix(ORD[bi] + '、測り終わり。', 'The ' + ORDE[bi] + ', measured.', ORD[bi]) + '</b></p>' + table(bi) +
         '<p class="gm-note">' + (bi === 2 ? L('同じ役割の線を、三枚で平均します。', 'Lines of the same role are averaged across the three.') + '<br>' : '') + '</p>';
       goEl.innerHTML = '';
       if(bi < 2) btn(L(ORD[bi + 1] + 'へ', 'To the ' + ORDE[bi + 1]), doneFn, 'go');
@@ -5049,7 +5071,7 @@
     }
     function avgRender(avg, kav, diff, per){
       stepEl.textContent = L('三枚の平均をとる', 'Averaging the three');
-      resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
+      resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
