@@ -4487,3 +4487,26 @@
     transform:none; width:min(13vw, 168px); transition:opacity .35s, transform .18s var(--ease)}
   @media (hover:hover){ .seqplay:hover{transform:scale(1.06)} }
   .seqplay:active{transform:scale(.98)}
+
+  /* v558 ① 案内の一枚目の題が、画面の中心より 4vh 下にいた（本人）。
+     v407 で「.gm-isecs が 46％ だから」と 4vh 下げたが、v446 で top:50% に直したので、
+     補正だけが残って題が下がっていた（実測：pc +36px／板 +35.6px／携帯 +23.6px＝どれも +4.00vh）。 */
+  .gm-intro .gm-isec.gm-ititle{transform:none}
+  .gm-intro .gm-isec.gm-ititle:not(.on){transform:scale(.94)}
+
+  /* v558 ②④ 「メッセージを送る」（フッター）と「送る」（連絡シート）を、
+     隣の「このサイトを共有」と同じ系統のボタンにそろえる。明朝 → ゴシック、角の丸みも 3px に。
+     ※ 明朝の枠付きボタンはこの二つだけ（他は .gridbtn／.lang／.cp-cancel でどれも等幅）。 */
+  .ft-cta,.cp-send{font-family:var(--sans); font-weight:600; letter-spacing:.06em; border-radius:3px}
+
+  /* v558 ③ 封筒が右上へ逃げる動きをやめ、封を開く動きに。
+     絵は <g class=env> の中の rect（本体）＋ 一本目の path（V 字の弁）＋ 二本目の path（左右の折り目）。
+     弁だけを上辺（y=2.2）で裏返すと、開いた封に見える。はみ出すので overflow は見せる。 */
+  .cp-send:hover .mi{transform:none}
+  .cp-send .mi{overflow:visible}
+  .ft-cta .mi .env > path:nth-of-type(1),
+  .cp-send .mi .env > path:nth-of-type(1){transform-box:view-box; transform-origin:13px 2.2px;
+    transition:transform .42s cubic-bezier(.2,.8,.2,1)}
+  .ft-cta:hover .mi .env > path:nth-of-type(1),
+  .cp-send:hover .mi .env > path:nth-of-type(1){transform:scaleY(-1)}
+  html.rm .ft-cta .mi .env > path:nth-of-type(1),html.rm .cp-send .mi .env > path:nth-of-type(1){transition:none}
