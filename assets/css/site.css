@@ -3959,7 +3959,7 @@
   .gm-lines .gm-ln.mine.v{animation:gmdrawv .30s var(--ease) .12s both}
   .gm-ln.you.now b{animation:gmstamp .22s var(--ease) .30s both}
   .gm-ln.mine b{animation:gmstamp .22s var(--ease) .38s both}
-  .gm-res{transition:opacity .22s var(--ease) .22s}
+  .gm-res{transition:opacity .18s var(--ease), transform .18s var(--ease)}   /* v505: 一括指定で transform の演出を消し、0.22 秒の遅れまで足していた（動き係⑦） */
   html.rm .gm-lines .gm-ln.mine.h,html.rm .gm-lines .gm-ln.mine.v,html.rm .gm-ln.you.now b,html.rm .gm-ln.mine b{animation:none}
   html.rm .gm-res{transition:none}
   /* v463 本編へ戻る引き際。中身を順に引いてから、紙ごと持ち上げる（本人：戻る演出がなかった） */

@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4370,9 +4370,9 @@
                           en:['Find the main mass.',        'I call the largest mass in a picture the main mass. You draw one line across and one down where it begins, and again at its centre of weight.']},
       {at:.44, big:'位置',   ja:['絵の端から、位置を測る。', '線を引くと、私が同じ絵に引いた線が破線で現れます。絵の幅と高さを 100 として、あなたと私の位置と差を百分率で比べます。'],
                           en:['Measure from the edge.',     'When you set a line, mine appears dashed on the same picture. With the width and height as 100, your position, mine, and the difference are read in percent.']},
-      {at:.66, big:'四本',   ja:['十二本を、四本にまとめる。', '三枚を測り終えると、同じ役割の三本が一本にまとまります。できた四本を、この調べで得た骨格と重ねます。'],
+      {at:.66, big:'四本',   ja:['十二本を、四本にまとめる。', '三枚を測り終えると、同じ役割の三本が一本にまとまります。できた四本を、研究で得た骨格と重ねます。'],
                           en:['Twelve lines become four.',  'After the third picture, the three lines of each role merge into one. Your four lines are then laid over the grid from my research.']},
-      {at:.88, big:'絵',     ja:['測る絵を、選ぶ。',         'この調べで測った日本と西洋の絵には、主塊の位置や間の取り方に違いがありました。測る絵を選ぶと三枚が無作為に出て、最後に二つの骨格を比べられます。'],
+      {at:.88, big:'絵',     ja:['測る絵を、選ぶ。',         '研究で測った日本と西洋の絵には、主塊の位置や間の取り方に違いがありました。測る絵を選ぶと三枚が無作為に出て、最後に二つの骨格を比べられます。'],
                           en:['Choose the pictures.',       'In my research, Japanese and Western pictures placed the main mass and the empty space differently. Choose which to measure; three pictures are drawn at random, and the two grids are compared at the end.'], choice:true}
     ];
     var ISECS = [];
@@ -4390,11 +4390,11 @@
       var PE = '<p class="gm-ipur">Japanese and Western pictures are measured the same way, and your lines are compared with mine in percent.</p>' +
         '<p class="gm-ipur">After twelve lines your average grid is ready, to lay over the research grid.</p>' +
         '<p class="gm-ick">Choose the pictures　　details in “How to measure &amp; Q&amp;A”, top right</p>';
-      var RJ = '<p class="gm-ipur">' + body('私のこの調べでは、形と余白の置かれ方を測り、日本の絵と西洋の絵の傾向を比べています。') + '</p>' +
-        '<p class="gm-ipur">' + body('ここでは、この調べで使う七本のうち、主塊（いちばん大きなまとまり）の始まりと重心を示す四本を引きます。') + '</p>';
+      var RJ = '<p class="gm-ipur">' + body('私の研究では、形と余白の置かれ方を測り、日本の絵と西洋の絵の傾向を比べています。') + '</p>' +
+        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、主塊（いちばん大きなまとまり）の始まりと重心を示す四本を引きます。') + '</p>';
       var RE = '<p class="gm-ipur">In my research, I measure how forms and empty spaces are placed, then compare the tendencies of Japanese and Western pictures.</p>' +
         '<p class="gm-ipur">What you do here is a simplified version: three pictures, and only where the main form begins and where its visual centre falls.</p>';
-      var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['調べの方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
+      var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
       var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
       return [title, info, brief, choice];
     }
@@ -4810,7 +4810,7 @@
       turn();
     }
     function cardRender(i){ var b = picks[i];
-      cardEl.innerHTML = '<b>' + 'ABC'[i] + '</b><strong>' + ttl(b) + '</strong><em>' + L('分析カテゴリ · ', 'Category · ') + esc(L(b.cat, b.cate)) + '<button type="button" class="gm-q gm-catq2" aria-label="' + L('分析カテゴリとは', 'What is a category') + '" title="' + L('分析カテゴリとは：この調べで作品全体の構成を七つの観点で整理したもの。押すと説明が開きます。', 'The category: one of seven viewpoints from my research. Press to open the explanation.') + '">?</button></em><small>' + esc(L(b.src, b.srce)) + '</small>';
+      cardEl.innerHTML = '<b>' + 'ABC'[i] + '</b><strong>' + ttl(b) + '</strong><em>' + L('分析カテゴリ · ', 'Category · ') + esc(L(b.cat, b.cate)) + '<button type="button" class="gm-q gm-catq2" aria-label="' + L('分析カテゴリとは', 'What is a category') + '" title="' + L('分析カテゴリとは：研究で作品全体の構成を七つの観点で整理したもの。押すと説明が開きます。', 'The category: one of seven viewpoints from my research. Press to open the explanation.') + '">?</button></em><small>' + esc(L(b.src, b.srce)) + '</small>';
       cardEl.querySelector('.gm-catq2').addEventListener('click', function(){ infoWantCat = true; info(); });   /* 「分析カテゴリって何？」に、その場で答える */
     }
     function obj(b){ return L(b.obj || '塊', b.obje || 'mass'); }
@@ -4836,7 +4836,7 @@
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false;
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       resEl.innerHTML =
         '' +
         '';   /* v487: 操作の一文は右の列の頭（.gm-lead2）へ移した（本人） */   /* 線の名前は右の一覧が示す（帯・一覧・見出しの三重を避ける） */
@@ -4876,7 +4876,7 @@
       if(!rm) setTimeout(function(){ ln.classList.remove('now'); }, 420);
       mkLine(linesEl, t.ax, a, 'mine', a + '%');
       dim(t.ax, p, a, d);
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
         var once = el('p', 'gm-once'); once.innerHTML = body(L('この差が示すのは、正解・不正解ではなく、私との解釈の違いです。', 'This difference is not about right or wrong. It shows how your interpretation differs from mine.'));
@@ -4946,7 +4946,7 @@
       var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); centerSeal(ms); }
       doneFn = bi < 2 ? function(){ doneFn = null; boardStart(bi + 1); } : function(){ doneFn = null; average(); };
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; listState(); mode(L('測り終える', 'measured'));
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 30);
+      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       doneRender();
       focusBtn(); setTimeout(reveal, 80); setTimeout(reveal, 460);   /* v419: iPad の一枚目は列の伸びが遅れて 5px 欠けたので、もう一度（細部係） */   /* v414: 表が出て列が伸びたあとにボタンまで（細部係） */
       seal('MEASURED', '採寸', stage, 'tr');   /* v426: 記録用紙の横ではなく絵の右上に（本人） */   /* v397: iPhone は絵の右上に押す（右の列の下は目に入らない） */
@@ -5054,7 +5054,7 @@
        '線を引く判断は私がしています。主観を消すのではなく、七つの観点と線の置き方を全作品で同じ手順にそろえ、同じものさしで取った座標どうしを比べています。',
        'I place the lines myself. The aim is not to erase judgement but to keep the viewpoints and the method the same across every work, and to compare coordinates taken with one measure.'],
       ['作品の選び方に、偏りはありませんか？', 'Is there a bias in how the works were chosen?',
-       '私が選ぶ以上、選び方そのものが調べの条件になります。そこで、主な形と余白を同じ手順で記録できることを共通の条件にし、十九点すべてと選んだ理由を示しています。',
+       '私が選ぶ以上、選び方そのものが研究の条件になります。そこで、主な形と余白を同じ手順で記録できることを共通の条件にし、十九点すべてと選んだ理由を示しています。',
        'Since I choose them, the selection is itself a condition of the study. The shared rule is that the main form and the empty space can be recorded by the same method; all nineteen works and the reasons are shown.'],
       ['絵は実物ではなく、描き起こしたものですね。', 'The pictures are redrawn, not reproductions. Why?',
        '複製の写真は、撮り方によって色も切り取りも違います。同じ手順で描き起こすことで、測る条件をそろえました。色や筆致を落として形と余白だけを残しているのも、比率を見るためです。',
@@ -5109,9 +5109,9 @@
       var b = picks[bi], body = '', CATSEC = '';
       /* v475: 見せる順を決め直した（本人）。まず何をするか（操作）→ いま測っている絵 → 畳んだ節（目的・分類・線の役割・コツ・Q&A） */
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
-      var PURSEC = sec(L('この調べの目的', 'What I am looking for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('日本の絵に共通する比率を見つけることが、この調べの目的です。ただ、日本の絵だけを測っても、その比率が日本のものだとは言い切れません。そこで西洋の絵も同じものさしで測り、両方を見比べることで、日本の絵の傾向に根拠を持たせています。この遊びでは、その手順を三枚の絵でなぞります。', 'This research looks for the proportions that Japanese pictures share. Measuring only Japanese pictures cannot show that those proportions belong to them, so I measure Western pictures with the same ruler and compare the two. Here you follow that procedure on three pictures.')) + '</p>' + '</div>';
+      var PURSEC = sec(L('研究の目的', 'What I am looking for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('日本の絵に共通する比率を見つけることが、研究の目的です。日本の絵だけを測っても、その比率が日本のものだとは言い切れません。そこで西洋の絵も同じものさしで測り、両方を見比べています。なお、この遊びは確定した研究の工程そのものではありません。皆さまに体験していただきたくて、手順を簡略にした版を作ってみたものです。', 'This research looks for the proportions that Japanese pictures share. Measuring only Japanese pictures cannot show that those proportions belong to them, so I measure Western pictures with the same ruler and compare the two. This game is not the finished research procedure: it is a simplified version I built so that you can try the steps for yourself.')) + '</p>' + '</div>';
       if(introOn){
-        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。この調べでは、その始まりと重心の位置を、絵の端からの百分率で測ります。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
+        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + L('絵の中でいちばん大きなまとまりのことです。研究では、その始まりと重心の位置を、絵の端からの百分率で測ります。', 'The largest mass in a picture. My research reads where it begins and where its weight sits, as percentages from the edges of the picture.') + '</p>' +
           sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
           sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合う所。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>';
       } else if(b && state !== 'avg' && state !== 'idle'){
@@ -5125,7 +5125,7 @@
       /* v501: 問いが一列に並んで雑然としていた（本人）。遊びのことと、調べのことに分けて括る */
       var qsec = function(a, b2){ return QA.slice(a, b2).map(function(q){ return sec(L(q[0], q[1])) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + body_(L(q[2], q[3])) + '</p></div>'; }).join(''); };
       body += '<p class="gm-info-g">' + L('遊びのこと', 'About the game') + '</p>' + qsec(0, 3) +
-        '<p class="gm-info-g">' + L('調べのこと', 'About the study') + '</p>' + PURSEC + CATSEC + qsec(3, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
+        '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + PURSEC + CATSEC + qsec(3, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
       infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
