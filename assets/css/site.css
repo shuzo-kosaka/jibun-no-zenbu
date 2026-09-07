@@ -4129,6 +4129,8 @@
   @media (max-height:640px){ .gm-igo{width:58px; height:58px} }
   .gm-igo svg{width:22px; height:22px}
   html.phone .gm-igo svg{width:20px; height:20px}
+  /* v504 一行の項目だけ、字が図の上に寄っていた（本人）。図と字の中心を合わせる */
+  .gm-ilist li{align-items:center}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
