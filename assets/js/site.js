@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4811,7 +4811,7 @@
     function obj(b){ return L(b.obj || '塊', b.obje || 'mass'); }
     /* v390: 一枚目の一本目だけ、絵の上で「押したまま下へ、離す」を指の影で見せる。触れたら消える */
     var demoEl = null, demoDone = false;
-    function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i><b>' + L('絵を押して、そのまま下へ動かしてください。<br>離したところに線が引かれます。', 'Drag downward on the picture,<br>then release to place a line.') + '</b>'; stage.appendChild(demoEl);
+    function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i>';   /* v495: 同じ操作の一文が右の列の頭にもあり、絵の上の板が絵を隠していた（細部係）。指の図だけ残す */; stage.appendChild(demoEl);
       /* v399: 問いの札が絵の中にあるとき（iPhone）は、その下に 8px 空けて同じ幅で置く */
       requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(tr.height && tr.top >= sr.top - 1){ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
     function demoFit(){   /* v429: 手本の文は、問いの札と同じ中心に（iPhone で 35px ずれていた：本人） */

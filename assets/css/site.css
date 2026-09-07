@@ -4075,6 +4075,16 @@
   /* v494 タブバーが出た状態で、見出し行に指を当てて送ると本編が動く（本人・実機）。
      見出し行から始まる指の動きでは、ブラウザに送りを起こさせない */
   html.gmopen .hd,html.gmopen .hd *{touch-action:none}
+  /* v495 遊びの朱の帯の上で、言語切替だけが紙色の板に見えていた（細部係）。板をやめ、字と枠だけにする */
+  html.gmopen .hd .lang{background-color:transparent}
+  html.gmopen .hd .lang button{background-color:transparent}
+  html.gmopen .hd .lang button[aria-pressed="true"]{background-color:#1C1B19; color:#F2F1EC}
+  /* v495 英語では「trace／compare」が目盛りの見出しと同じ隅に来て重なっていた（細部係：29px）。状態語を盤面の左上へ逃がす */
+  html[lang="en"] .gm-mode{right:auto; left:50%; transform:translateX(-50%)}   /* 目盛りの二つの見出しの間へ */
+  /* v495 送りの円が戻るのに 0.28 秒かかっていた（細部係⑥）。スキップと同じ速さに */
+  .gm-intro .gm-igo{transition:opacity .1s var(--ease), background-color .16s var(--ease), border-color .16s var(--ease), transform .16s var(--ease)}
+  /* v495 列でいちばん小さい字が、いちばん説明の要る段落だった（細部係⑪） */
+  .gm-cmph{font-size:12.5px; color:var(--fg2, #5A5853); opacity:1; letter-spacing:0; font-family:var(--sans)}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
