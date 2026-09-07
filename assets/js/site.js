@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4408,15 +4408,15 @@
       var title = {k:4, at:0, title:true, big:'測る', ja:['絵を、測る。', ''], en:['Measure the picture.', '']};
       var IK = ['<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6" height="12"/><rect x="9" y="6" width="6" height="12"/><rect x="16" y="6" width="6" height="12"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 12h18"/><circle class="d" cx="12" cy="12" r="2.6"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 10h18"/><path class="m" d="M3 15h18"/><path class="a" d="M17.5 10.4v4.2M16.2 11.4l1.3-1.3 1.3 1.3M16.2 13.6l1.3 1.3 1.3-1.3"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M9 4v16M15 4v16M3 9h18M3 15h18"/></svg>'];
       function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
-      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>離したところに線が引かれます。', 1) + il('一本引くたびに、私の線が現れ、解釈の違いが％で出ます。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>三点の骨格と重ねて見比べられます。', 3) + '</ul>';
-      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>then release to place a line.', 1) + il('Each time you draw a line, mine appears and the difference is shown in percent.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over the research grid and compare.', 3) + '</ul>';
+      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>《離したところに線が引かれます》。', 1) + il('一本引くたびに、私の線が現れ、《解釈の違いが％で出ます》。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>三点の骨格と重ねて見比べられます。', 3) + '</ul>';
+      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over the three-work grid and compare.', 3) + '</ul>';
       var info = {k:4, at:.36, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、《私が引いた線との差を％で見比べます》。') + '</p>' +
         '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッドができ》、三点の骨格と重ねられます。') + '</p>' +
         '<p class="gm-ick">測る絵を選んでください　　詳しくは右上の「測り方とQ&A」から</p>';
       var PE = '<p class="gm-ipur">' + body('Japanese and Western pictures are measured the same way, and 《your lines are compared with mine in percent》.') + '</p>' +
-        '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over the research grid.') + '</p>' +
+        '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over the three-work grid.') + '</p>' +
         '<p class="gm-ick">Choose the pictures　　details in “How to measure &amp; Q&amp;A”, top right</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。ここでは見比べる相手として、西洋の絵も同じやり方で測りました。') + '</p>' +
         '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>';
@@ -4733,7 +4733,7 @@
         var st = gm.querySelector('.gm-stage'); if(st) st.setAttribute('aria-label', L('盤面', 'The board'));
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
-      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'research grid');
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
       siteInert(true);   /* v484: 遊びの最中は後ろの本編へ Tab で抜けない（流れ係） */
       if(!histPushed){ try{ history.pushState({gm:1}, ''); histPushed = true; }catch(e){} }   /* v485: 端末の「戻る」で遊びだけを閉じられるように（流れ係） */
       gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
@@ -5105,7 +5105,7 @@
       var ovb = btn(L('三点の骨格と重ねる', 'Compare with the three-work grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
-      btn(L('測り方の手順へ', 'To the research steps'), function(){ close(); setTimeout(function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }, 420); })   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
+      btn(L('研究の手順へ', 'To the research steps'), function(){ close(); setTimeout(function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }, 420); })   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */
@@ -5293,8 +5293,8 @@
       c.fillStyle = '#FBFAF6'; rr(gx, gy, gw, gh, 6); c.fill(); c.strokeStyle = '#E1BD2B'; c.lineWidth = 1.5; rr(gx, gy, gw, gh, 6); c.stroke();
       c.save(); rr(gx, gy, gw, gh, 6); c.clip();
       c.setLineDash([4, 4]); c.strokeStyle = 'rgba(46,44,41,.5)'; c.lineWidth = 1;
-      FIXED.v.forEach(function(v){ c.beginPath(); c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); });
-      FIXED.h.forEach(function(v){ c.beginPath(); c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); });
+      GRID.v.forEach(function(v){ c.beginPath(); c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); });   /* v514 説明は七本を挙げているのに三本しか引いていなかった（見張り番） */
+      GRID.h.forEach(function(v){ c.beginPath(); c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); });
       c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = 2; c.fillStyle = '#E84518'; c.font = '500 11px ' + FO;
       LINES.forEach(function(t){ var v = avg[t.k]; c.beginPath(); if(t.ax === 'v'){ c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); c.fillText(v + '%', gx + gw * v / 100 + 4, gy + 14); } else { c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); c.fillText(v + '%', gx + 4, gy + gh * v / 100 - 5); } });
       c.restore();
@@ -5342,7 +5342,7 @@
       var sgd = sheetEl.querySelector('.gm-sgrid'); sgd.innerHTML = '';
       GRID.v.forEach(function(v){ mkLine(sgd, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(sgd, 'h', v, 'mine', v + '%'); });
       LINES.forEach(function(t){ mkLine(sgd, t.ax, avg[t.k], 'you big', avg[t.k] + '%'); });
-      FIXED.v.forEach(function(v){ mkLine(sgd, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(sgd, 'h', v, 'fixed', v + '%'); });
+      /* v514 ここで FIXED の三本を足すと、上の七本と重なって三本だけ濃くなっていた（見張り番） */
       sheetEl.style.setProperty('--sx1', avg.x1 + '%');   /* v394: 注記は X1（あなたの主塊開始線）から、Y3（71％）の下の帯に置く */
       sheetText();
       sheetGrid('you');
@@ -5357,7 +5357,7 @@
       sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
       sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
       sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなたの四本', 'your four lines') + '</em> X ' + avg.x1 + ' · ' + avg.x3 + '\u3000Y ' + avg.y1 + ' · ' + avg.y2 + '<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83\u3000Y 14 · 32 · 71';
-      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は重心線の二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between those two. Switch, and the same content sits on another grid.');
+      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は重心線の二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'Solid red is your four lines; the faint dashed is the three-work grid. The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between those two. Switch, and the same content sits on another grid.');
     }
     /* 紙面の内容（見出し・図版・本文）を、あなたの骨格か研究の骨格に載せる。位置は CSS 変数で渡し、切り替えは transition */
     function sheetGrid(which){
