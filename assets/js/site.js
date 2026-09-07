@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4310,7 +4310,7 @@
         if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } return; }   /* v416: 二本目の指は線にしない（ピンチ） */
         if(e.target && e.target.closest && e.target.closest('.gm-turnb')) return;   /* 回すボタンの押下は線にしない */
         if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
-        if(stage.classList.contains('swapping')) return;   /* 作品の切替中の押下は線にしない */
+        if(stage.classList.contains('swapping')){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v512 切替中の押下も、そのまま動かせば線にする（流れ係：0.86 秒が捨てられていた） */
         if(performance.now() - boardAt < 700){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v462: 盤面が出た直後でも、実際に動かせば線にする（動き係：一本目の 0.85 秒が捨てられていた） */
         ptype = e.pointerType || 'mouse';
         if(state === 'compare'){ if(performance.now() - fixedAt < 350) return; nextTurn(); fresh = true; startedAt = performance.now() + 100; pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v417: そのまま動いたら次の線にする（pend） */   /* v416: 進めた直後 500ms の押下は線にしない（ダブルタップ） */   /* v403: 進めるための押下はここで終わり。同じ押下で仮の線を出さない（離すまで「押している」が残っていた） */
@@ -4587,7 +4587,8 @@
       var p = introP(), secs = introEl.querySelectorAll('.gm-isec'), dots = introEl.querySelectorAll('.gm-idots > *'), cur = 0;
       if(introTgt >= 0 && introCur() === introTgt && performance.now() - introTgtAt > 250) introTgt = -1;   /* 行き先に着いたら解く */
       cur = introCur();   /* v396: 隣の面との中点で切り替える（二面の案内で、一度の送りで着くように） */
-      secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur); });
+      secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur);
+        try{ d.inert = (i !== cur); }catch(x){} });   /* v512 見えていない面は Tab でも触れない（流れ係：Tab 一回＋Enter で始まっていた） */
       if(!introEl.classList.contains('s' + cur)) introBg();   /* 画面が変わったら背景の図を最初から */
       dots.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('done', i < cur); });
       /* v436: 送るたびにボタンの中身を書き換えていて、iPhone でカクつき、赤い丸が出たり消えたりしていた（本人）。変わったときだけ書き換える */
