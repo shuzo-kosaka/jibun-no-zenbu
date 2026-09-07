@@ -3409,7 +3409,7 @@
   .gm-intro.s1 .gm-ibg .blob{background:rgba(251,247,242,.075); border-color:rgba(251,247,242,.38)}
   .gm-isec > b,.gm-isec > span{text-shadow:0 0 6px var(--ibg), 0 0 12px var(--ibg), 0 0 18px var(--ibg), 0 0 26px var(--ibg), 0 0 34px var(--ibg)}   /* 文字の周りだけ地色で線を弱める（板は敷かない） */
   .gm-ibg .jf.pick{border-color:var(--ifg); transition:border-color .1s} .gm-ibg .jf.pick i{opacity:1; transition:opacity .1s}
-  .gm-lines.jwon .gm-ln.fixed{opacity:.14}   /* 日本と海外の骨格を重ねている間は、研究の破線を弱める */
+  .gm-lines.jwon .gm-ln.fixed{opacity:.14}   /* 日本と西洋の骨格を重ねている間は、研究の破線を弱める */
 
   /* 夜の一回目：測り終わりの表が右の列で一字ずつ折れていた（三媒体とも）。名前は折らず、数の列は詰める */
   .gm-tb{table-layout:auto; border-collapse:collapse} .gm-tb th,.gm-tb td{white-space:nowrap; padding:4px 0 4px 8px} .gm-tb th:first-child,.gm-tb td:first-child{padding-left:0; font-size:12px; letter-spacing:0}
@@ -4409,6 +4409,12 @@
   .gm-obs small{font-size:13px; margin-left:10px}
   html.phone .gm-obs{font-size:18px; line-height:1.75}
   @media (max-height:640px){ .gm-obs{font-size:17px} }
+
+  /* v550 日本と西洋の節：ボタンの直後の但し書きが張り付いていた（文言係） */
+  .gm-jw .gm-jwend{margin-top:.8em}
+  .gm-jw .gm-jwgo{margin-top:.9em}
+  .gm-legend i.jw.we{border-top:1px dashed #3B6FB6}
+  .gm-legend i.jw.jp{border-top:1px dashed #2F8F5B}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

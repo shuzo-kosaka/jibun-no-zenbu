@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4512,9 +4512,20 @@
     function bindChoice(d){ d.querySelectorAll('.gm-ichoice button').forEach(function(bt){ bt.addEventListener('click', function(){ cat = bt.getAttribute('data-c'); var fs = introEl.querySelectorAll('.gm-ibg.b4 .jf'); fs.forEach(function(f){ if(cat === 'both' || (cat === 'jp' && f.classList.contains('l')) || (cat === 'we' && f.classList.contains('r'))) f.classList.add('pick'); }); if(rm) introEnd(false); else setTimeout(function(){ introEnd(false); }, 110); }); }); }   /* 選んだ側の枠が一瞬濃くなってから去る（応答） */
     function jwMeans(){ var g = {jp:{}, we:{}}; ['jp', 'we'].forEach(function(k){ var bs = BOARDS.filter(function(b){ return k === 'jp' ? !!b.jp : !b.jp; }); LINES.forEach(function(t){ var sum = 0; bs.forEach(function(b){ sum += b.a[t.k]; }); g[k][t.k] = bs.length ? Math.round(sum / bs.length) : 0; }); }); return g; }
     function jwTable(){ var g = jwMeans(); return '<table class="gm-tb gm-jwt"><thead><tr><th>' + L('線', 'line') + '</th><th>' + L('日本', 'Japan') + '</th><th>' + L('西洋', 'West') + '</th><th>' + L('差', 'diff') + '</th></tr></thead><tbody>' + LINES.map(function(t){ return '<tr><td>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</td><td>' + g.jp[t.k] + PC + '</td><td>' + g.we[t.k] + PC + '</td><td>' + sg(g.we[t.k] - g.jp[t.k]) + PC + '</td></tr>'; }).join('') + '</tbody></table>'; }
+    function jwLabel(on){   /* v550 重ねているあいだは、凡例に一項目足し、ボタンの札も「外す」に（三点の骨格と同じ作法。文言係） */
+      var lg = resEl && resEl.querySelector('.gm-legend'), b = resEl && resEl.querySelector('.gm-jwb');
+      if(b) b.textContent = on ? L(cat === 'jp' ? '西洋の絵の平均を外す' : '日本の絵の平均を外す', cat === 'jp' ? 'Hide the Western average' : 'Hide the Japanese average')
+                               : L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average');
+      if(!lg) return;
+      var old = lg.querySelector('.gm-lgjw'); if(old) old.parentNode.removeChild(old);
+      if(!on) return;
+      var e = el('b', 'gm-lgjw');
+      e.innerHTML = '<i class="jw ' + (cat === 'jp' ? 'we' : 'jp') + '"></i>' + esc(L(cat === 'jp' ? '青い破線の四本：西洋の絵の平均' : '緑の破線の四本：日本の絵の平均', cat === 'jp' ? 'four blue dashed: the Western average' : 'four green dashed: the Japanese average'));
+      lg.appendChild(e);
+    }
     function jwOverlay(){
       var b = resEl.querySelector('.gm-jwb'); if(!b) return; var on = b.getAttribute('aria-pressed') === 'true'; b.setAttribute('aria-pressed', on ? 'false' : 'true');
-      linesEl.querySelectorAll('.jw').forEach(function(x){ x.parentNode.removeChild(x); }); linesEl.classList.toggle('jwon', !on); if(on) return;
+      linesEl.querySelectorAll('.jw').forEach(function(x){ x.parentNode.removeChild(x); }); linesEl.classList.toggle('jwon', !on); jwLabel(!on); if(on) return;
       var g = jwMeans(), opp = (cat === 'jp') ? 'we' : 'jp';   /* v479: 測らなかった側の平均と重ねる（本人） */
       LINES.forEach(function(t){ mkLine(linesEl, t.ax, g[opp][t.k], 'jw ' + opp, (opp === 'jp' ? L('日本 ', 'JP ') : L('西洋 ', 'West ')) + g[opp][t.k] + '%'); });
     }
@@ -5425,13 +5436,28 @@
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：三点の骨格', 'seven faint dashed: the three-work grid') + '</b></p>' +
-        '<div class="gm-jw"><p class="gm-cmph">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
-          return L('日本の絵 ' + nj + ' 点と、西洋の絵 ' + nw + ' 点。それぞれの平均です。あなたが測ったのは' + (cat === 'jp' ? '日本の絵' : '西洋の絵') + 'なので、' + (cat === 'jp' ? '西洋の絵' : '日本の絵') + 'の平均を重ねられます。',
-            'The averages of ' + nj + ' Japanese and ' + nw + ' Western pictures. You measured ' + (cat === 'jp' ? 'Japanese' : 'Western') + ' ones, so you can lay the ' + (cat === 'jp' ? 'Western' : 'Japanese') + ' average over yours.'); })() + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden><p class="gm-note">' + L('私の解釈を、絵の出どころごとに平均した値です。', 'My readings, averaged by where the pictures come from.') + (function(){ var nj = picks.filter(function(b){ return b.jp; }).length; return cat === 'both' ? L('あなたの三枚は、日本 ' + nj + ' 枚、西洋 ' + (3 - nj) + ' 枚でした。', ' Your three: ' + nj + ' Japanese, ' + (3 - nj) + ' Western.') : ''; })() + '</p>' + jwTable() + '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button></div>' + '</div>' +
+        '<div class="gm-jw"><p class="gm-cmph">' + L('研究で引いた線を、日本の絵と西洋の絵に分けて平均しました。あなたの四本と見比べられます。',
+          'These are the lines from my research, averaged separately for the Japanese and the Western pictures. You can compare them with your four.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden>' +
+          '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
+            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点を、私が研究で測りました。《あなたが引いたのと同じ四本の位置を、一本ずつ平均しています》。あなたが測った三枚も、この中に含まれます。',
+              'I measured ' + nj + ' Japanese and ' + nw + ' Western pictures in my research. 《I averaged the position of each of the same four lines you drew》. The three pictures you measured are among them.')); })() + '</p>' +
+          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が《西洋の絵にもあるのかどうか》を、同じやり方で測って見比べています。',
+            'I use the same method to see whether ratios that recur in Japanese pictures 《also appear in Western ones》.')) + '</p>' +
+          '<p class="gm-note gm-jwgo">' + body(L('盤面のあなたの％と、《表の同じ線の％を見比べてください》。',
+            '《Compare your percentages on the board with the same lines in the table》.')) + '</p>' +
+          jwTable() +
+          '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値です。《あなたと私の解釈の違いとは別です》。',
+            'The “diff” column is the Japanese average subtracted from the Western one. 《It is not the difference between your reading and mine》.')) + '</p>' +
+          '<p class="gm-note">' + body(L(cat === 'jp' ? '西洋の絵の平均を、青い破線で盤面に重ねられます。日本の絵の平均は、表で見比べてください。' : '日本の絵の平均を、緑の破線で盤面に重ねられます。西洋の絵の平均は、表で見比べてください。',
+            cat === 'jp' ? 'You can overlay the Western average on the board as blue dashed lines. For the Japanese average, read the table.' : 'You can overlay the Japanese average on the board as green dashed lines. For the Western average, read the table.')) + '</p>' +
+          '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button>' +
+          '<p class="gm-note gm-jwend">' + body(L('《近さは、正解を示すものではありません》。測る三枚や線の引き方によって、結果は変わります。',
+            '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
+          '</div>' + '</div>' +
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);
-      var jwb = resEl.querySelector('.gm-jwb'); if(jwb) jwb.addEventListener('click', jwOverlay);
+      var jwb = resEl.querySelector('.gm-jwb'); if(jwb){ jwb.__jw = true; jwb.addEventListener('click', jwOverlay); }
       resEl.querySelectorAll('.gm-media button').forEach(function(b){ b.addEventListener('click', function(){
         resEl.querySelectorAll('.gm-media button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
         var v = b.getAttribute('data-ar'); stage.style.setProperty('--ar', v === 'screen' ? (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3) : v);
@@ -5523,7 +5549,7 @@
         if(q.__bound) return; q.__bound = true;
         var x = q.nextElementSibling; if(!x) return;
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
-          if(on) secOnly(root, q);   /* v547 ほかは畳む */
+          if(on){ secOnly(root, q); setTimeout(function(){ var sc = gm.querySelector('.gm-side'); if(!sc) return; var top = sc.scrollTop + (q.getBoundingClientRect().top - sc.getBoundingClientRect().top) - 8; if(top > sc.scrollTop) try{ sc.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = top; } }, 300); }   /* v547 ほかは畳む。v550 開いた節の頭を見えるところへ（中身がボタン群の下に潜っていた） */
           if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
           if(on){   /* 開く：0 から実寸へ。終わったら auto に戻して中身の高さに追従させる */
             x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
