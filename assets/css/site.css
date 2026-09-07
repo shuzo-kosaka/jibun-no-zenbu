@@ -4236,6 +4236,9 @@
   /* v522 保存の札：見出しを置かないので、空の b は畳む */
   .gm-take-h b:empty{display:none}
 
+  /* v523 説明の一文を置かないので、空の p は畳む */
+  .gm-take p:empty{display:none; margin:0}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}

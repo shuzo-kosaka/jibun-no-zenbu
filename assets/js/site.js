@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5323,7 +5323,7 @@
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
       takeEl.querySelector('.gm-take-h b').textContent = '';   /* v522 見出しは置かない（本人＋ChatGPT）。右肩の欧文が題として働く */
       takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
-      takeEl.querySelector('p').textContent = L('絵は入りません。あなたが引いた四本（朱の実線）と三点の骨格（七本の薄い破線）だけを保存します。', 'No picture is included. Only your four lines (solid red) and the three-work grid (seven faint dashed lines) are saved.');
+      takeEl.querySelector('p').textContent = '';   /* v523 説明の一文も置かない（本人）。何が保存されるかは見本を見れば分かる */
       takeEl.querySelector('.gm-optl').textContent = L('画像の形', 'Image shape');   /* 「枠」は盤面の育つ枠と衝突するので使わない */
       takeEl.querySelector('.gm-optl2').textContent = L('ファイルの種類', 'File type');
       takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
