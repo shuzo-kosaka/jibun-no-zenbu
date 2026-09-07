@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5241,24 +5241,48 @@
       c.fillStyle = '#F2F1EC'; c.fillRect(0, 0, W, H);
       c.fillStyle = '#1C1B19'; c.font = '900 40px ' + FM; c.textBaseline = 'alphabetic'; c.fillText(L('あなたの、ものさし', 'Your ruler'), 60, 92);
       c.fillStyle = '#E84518'; c.font = '500 12px ' + FO; c.fillText(L('絵を、測る。  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO', 'MEASURE THE PICTURE  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO'), 60, 120);
-      /* 左：三枚の札とあなたの四本 */
-      var x = 60, y = 170, hh = 150;
-      picks.forEach(function(b, i){
-        var im = trayEl.children[i] && trayEl.children[i].querySelector('img'), ar = +b.ar || 1, w = Math.min(hh * ar, 260), h = w / ar; if(h > hh){ h = hh; w = h * ar; }
-        c.save(); rr(x, y, w, h, 4); c.clip();
-        if(im && im.complete && im.naturalWidth){ try{ c.drawImage(im, x, y, w, h); }catch(e){} } else { c.fillStyle = '#ECE8DF'; c.fillRect(x, y, w, h); }
-        var r = res[i] || {}; c.strokeStyle = '#E84518'; c.lineWidth = 1.5;
-        LINES.forEach(function(t){ var v = r[t.k]; if(v == null) return; c.beginPath(); if(t.ax === 'v'){ c.moveTo(x + w * v / 100, y); c.lineTo(x + w * v / 100, y + h); } else { c.moveTo(x, y + h * v / 100); c.lineTo(x + w, y + h * v / 100); } c.stroke(); });
-        c.restore(); c.strokeStyle = 'rgba(30,28,26,.35)'; c.lineWidth = 1; rr(x + .5, y + .5, w - 1, h - 1, 4); c.stroke();
-        c.fillStyle = '#E84518'; c.font = '500 11px ' + FO; c.fillText('ABC'[i], x, y - 8);
-        c.fillStyle = '#5A5955'; c.font = '11px ' + FS; var lb = L(b.t, b.te); while(lb.length > 2 && c.measureText(lb).width > w - 14) lb = lb.slice(0, -1); c.fillText(lb === L(b.t, b.te) ? lb : lb.replace(/.$/, '…'), x + 16, y - 8);   /* 題は札の幅に収める */
-        x += w + 26; if(x > 560){ x = 60; y += hh + 40; }
-      });
-      /* v386: 左の空きに、三枚の読みと一言。値だけでなく言葉が残る一枚に */
-      var ty = y + hh + 52, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b'; if(!enT) obs = obs.replace(/私/g, '私')   /* v472: 画面と保存の画像で主語が入れ替わっていた（文言係）。どちらも「私」で通す */;   /* 保存画像は単体で読まれるので「私」は「研究」に（Sol 第 15） */
+      /* 左：三枚の札とあなたの四本。いちばん解釈が分かれた一枚を大きく置き、残る二枚を添える（v513 本人：横に三つ並べていて緩急がない） */
+      var ORDJ = ['一枚目', '二枚目', '三枚目'], ORDEN = ['First', 'Second', 'Third'];
+      var bigI = 0, bigD = -1;
+      picks.forEach(function(b, i){ var r = res[i] || {}, m = 0; LINES.forEach(function(t){ if(r[t.k] != null && b.a && b.a[t.k] != null) m = Math.max(m, Math.abs(r[t.k] - b.a[t.k])); }); if(m > bigD){ bigD = m; bigI = i; } });
+      function card(i, cx, cy, maxW, maxH, big){
+        var b = picks[i], im = trayEl.children[i] && trayEl.children[i].querySelector('img'), ar = +b.ar || 1;
+        var w = maxW, h = w / ar; if(h > maxH){ h = maxH; w = h * ar; }
+        c.save(); rr(cx, cy, w, h, 4); c.clip();
+        if(im && im.complete && im.naturalWidth){ try{ c.drawImage(im, cx, cy, w, h); }catch(e){} } else { c.fillStyle = '#ECE8DF'; c.fillRect(cx, cy, w, h); }
+        var r = res[i] || {}; c.strokeStyle = '#E84518'; c.lineWidth = big ? 1.8 : 1.2;
+        LINES.forEach(function(t){ var v = r[t.k]; if(v == null) return; c.beginPath(); if(t.ax === 'v'){ c.moveTo(cx + w * v / 100, cy); c.lineTo(cx + w * v / 100, cy + h); } else { c.moveTo(cx, cy + h * v / 100); c.lineTo(cx + w, cy + h * v / 100); } c.stroke(); });
+        c.restore();
+        c.strokeStyle = big ? 'rgba(30,28,26,.5)' : 'rgba(30,28,26,.32)'; c.lineWidth = 1; rr(cx + .5, cy + .5, w - 1, h - 1, 4); c.stroke();
+        var nm = L(ORDJ[i], ORDEN[i]);
+        c.fillStyle = '#E84518'; c.font = (big ? '700 12.5px ' : '500 11px ') + FO; c.fillText(nm, cx, cy - 8);
+        if(big){   /* 題は大きい一枚だけに添える。小さい二枚は幅が足りず「…」で切れていた。三枚の題は下の一覧で読める */
+          var tw = c.measureText(nm).width + 10;
+          c.fillStyle = '#5A5955'; c.font = '12.5px ' + FS;
+          var t0 = L(b.t, b.te), lb = t0; while(lb.length > 2 && c.measureText(lb).width > w - tw - 4) lb = lb.slice(0, -1);
+          c.fillText(lb === t0 ? lb : lb.replace(/.$/, '…'), cx + tw, cy - 8);
+        }
+        return {x:cx, y:cy, w:w, h:h};
+      }
+      var A = card(bigI, 60, 178, 300, 262, true);
+      var rest = [0, 1, 2].filter(function(i){ return i !== bigI; });
+      var sx = 60 + A.w + 26;
+      var B = card(rest[0], sx, 178, 172, 126, false);
+      var C = card(rest[1], sx, B.y + B.h + 34, 172, 126, false);
+      var yBot = Math.max(A.y + A.h, C.y + C.h);
+      /* v386: 三枚の読みと一言。値だけでなく言葉が残る一枚に */
+      var ty = yBot + 46, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b';
       c.fillStyle = '#5A5955'; c.font = '11px ' + FS;
-      c.fillText(picks.map(function(b, i){ return 'ABC'[i] + '  ' + (enT ? (b.cate || b.cat || '') : (b.cat || '')); }).join(enT ? '   /   ' : '   ／   '), 60, ty);
-      (function(){ var tl = picks.map(function(b, i){ return 'ABC'[i] + '  ' + L(b.t, b.te); }), sep2 = enT ? '   /   ' : '   ／   ', one = tl.join(sep2); c.fillStyle = '#8E8B84'; c.font = '10.5px ' + FS; if(c.measureText(one).width <= 560) c.fillText(one, 60, ty + 16); else { tl.forEach(function(t2, i2){ c.fillText(t2, 60, ty + 16 + i2 * 14); }); ty += (tl.length - 1) * 14; } })();   /* v418: 題は切らずに一行で（細部係：B・C が「…」で切れていた） */
+      c.fillText(picks.map(function(b, i){ return L(ORDJ[i], ORDEN[i]) + '  ' + (enT ? (b.cate || b.cat || '') : (b.cat || '')); }).join(enT ? '   /   ' : '   ／   '), 60, ty);
+      (function(){   /* 題は切らずに。一行で入らなければ二行に畳む（v513 本人：さまざまな工夫を） */
+        var tl = picks.map(function(b, i){ return L(ORDJ[i], ORDEN[i]) + '  ' + L(b.t, b.te); }), sep2 = enT ? '   /   ' : '   ／   ';
+        c.fillStyle = '#8E8B84'; c.font = '10.5px ' + FS;
+        var one = tl.join(sep2);
+        if(c.measureText(one).width <= 560){ c.fillText(one, 60, ty + 16); return; }
+        var two = [tl[0], tl.slice(1).join(sep2)];
+        if(c.measureText(two[1]).width <= 560 && c.measureText(two[0]).width <= 560){ c.fillText(two[0], 60, ty + 16); c.fillText(two[1], 60, ty + 30); ty += 14; return; }
+        tl.forEach(function(t2, i2){ c.fillText(t2, 60, ty + 16 + i2 * 14); }); ty += (tl.length - 1) * 14;
+      })();
       if(obs){
         c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FM; var toks = enT ? obs.split(' ') : obs.split(''), line = '', ly = ty + 52, n = 0, maxL = ty > 420 ? 2 : 4, sep = enT ? ' ' : '';
         for(var ci = 0; ci < toks.length && n < maxL; ci++){ var tk = toks[ci], cand = line ? line + sep + tk : tk; if(c.measureText(cand).width > 520 && line){ c.fillText(line, 60, ly); line = tk; ly += 26; n++; } else line = cand; }
