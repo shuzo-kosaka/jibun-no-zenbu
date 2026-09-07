@@ -4184,6 +4184,13 @@
      説明文だけは骨格に連れて動かさず、左は 55% で止めて、最低限の幅を確保する。 */
   .gm-sheet .gm-scap{left:min(var(--sx1, 12%), 55%); min-width:min(320px, 78vw)}
 
+  /* v511 盤面の外で離したときの一言（線は引かず、引き直しに） */
+  .gm-outnote{position:absolute; left:50%; bottom:14px; transform:translate(-50%, 6px); margin:0; padding:7px 13px; border-radius:3px;
+    background:rgba(28,27,25,.86); color:#F2F1EC; font-size:12.5px; letter-spacing:.02em; line-height:1.5; white-space:nowrap;
+    opacity:0; transition:opacity .22s cubic-bezier(.22,.61,.36,1), transform .22s cubic-bezier(.22,.61,.36,1); pointer-events:none; z-index:6}
+  .gm-outnote.on{opacity:1; transform:translate(-50%, 0)}
+  html.phone .gm-outnote{font-size:12px; white-space:normal; max-width:78%; text-align:center}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}

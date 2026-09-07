@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4332,13 +4332,25 @@
         move(e);
       });
       var lcapDone = false;
+      function outNote(t){   /* v511 盤面の外で離したときの、一拍だけの知らせ */
+        var old = stage.querySelector('.gm-outnote'); if(old) old.parentNode.removeChild(old);
+        var p = el('p', 'gm-outnote', esc(t)); stage.appendChild(p);
+        requestAnimationFrame(function(){ p.classList.add('on'); });
+        setTimeout(function(){ p.classList.remove('on'); setTimeout(function(){ if(p.parentNode) p.parentNode.removeChild(p); }, 320); }, 1800);
+      }
       function up(e, ok){
         pend = null;
         var lc = liveEl.querySelector('.gm-lcap'); if(lc){ lc.parentNode.removeChild(lc); lcapDone = true; } var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld);
         if(!down) return; down = false; liveEl.classList.remove('press');
         if(!ok || state !== 'trace') return;
         if(moved < 6){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 動かさずに離した押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。 操作は「押したまま動かし、離す」と案内しているので、それに合わせる */
-        fresh = false; move(e); confirm();   /* 画像の外で離しても、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
+        var sr = stage.getBoundingClientRect(), ox = Math.max(sr.left - e.clientX, e.clientX - sr.right, 0), oy = Math.max(sr.top - e.clientY, e.clientY - sr.bottom, 0);
+        if(Math.max(ox, oy) > 40){   /* v511 盤面から大きく外れて離したら、端（0%・100%）に貼りつけず引き直しにする（流れ係） */
+          fresh = false; hideLive(); tipEl.classList.remove('off');
+          outNote(L('絵の中で離すと、線が引かれます。', 'Release inside the picture to draw the line.'));
+          return;
+        }
+        fresh = false; move(e); confirm();   /* 少しはみ出したくらいなら、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
       }
       stage.addEventListener('pointerup', function(e){ up(e, true); });
       var tmY = null; document.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true, capture:true});   /* v453: 遊びの外（見出しの帯など）に指を置いても数えるため、文書で受ける */
@@ -5306,18 +5318,21 @@
       GRID.v.forEach(function(v){ mkLine(sgd, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(sgd, 'h', v, 'mine', v + '%'); });
       LINES.forEach(function(t){ mkLine(sgd, t.ax, avg[t.k], 'you big', avg[t.k] + '%'); });
       FIXED.v.forEach(function(v){ mkLine(sgd, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(sgd, 'h', v, 'fixed', v + '%'); });
-      sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
-      sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
-      var wx = [avg.x1, 28 - avg.x1, avg.x3 - 28, 83 - avg.x3, 17], wy = [avg.y1, avg.y2 - avg.y1, 71 - avg.y2, 29];
       sheetEl.style.setProperty('--sx1', avg.x1 + '%');   /* v394: 注記は X1（あなたの主塊開始線）から、Y3（71％）の下の帯に置く */
-      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなたの四本', 'your four lines') + '</em> X ' + avg.x1 + ' · ' + avg.x3 + '　Y ' + avg.y1 + ' · ' + avg.y2 + '<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83　Y 14 · 32 · 71';
-      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between. Switch, and the same content sits on another grid.');
+      sheetText();
       sheetGrid('you');
       var mock = sheetEl.querySelector('.gm-mock'); mock.classList.remove('land'); void mock.offsetWidth;
       gm.classList.add('sheeton'); sheetEl.setAttribute('aria-hidden', 'false'); try{ sheetEl.inert = false; }catch(x){}
       setTimeout(function(){ mock.classList.add('land'); }, rm ? 0 : 360);   /* 見出し→図版→本文が線へ着地する（合計 500ms） */
       setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('画面いっぱいに表示 \u00b7 APPLIED \u00b7 ', 'VIEW GRID FULL SCREEN \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
       setTimeout(function(){ sheetEl.querySelector('.gm-sx').focus({preventScroll:true}); }, 240);
+    }
+    function sheetText(){   /* v511 紙面の文字だけを組み直す。言語を切り替えたときにも呼ぶ（説明文と見出しだけ前の言語で残っていた：流れ係） */
+      var avg = sheetAvg; if(!sheetEl || !avg) return;
+      sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
+      sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
+      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなたの四本', 'your four lines') + '</em> X ' + avg.x1 + ' · ' + avg.x3 + '\u3000Y ' + avg.y1 + ' · ' + avg.y2 + '<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83\u3000Y 14 · 32 · 71';
+      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は重心線の二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between those two. Switch, and the same content sits on another grid.');
     }
     /* 紙面の内容（見出し・図版・本文）を、あなたの骨格か研究の骨格に載せる。位置は CSS 変数で渡し、切り替えは transition */
     function sheetGrid(which){
@@ -5342,7 +5357,8 @@
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       axlText(); tbLabel();   /* 目盛りの向きの語と回すボタンの名も言語に合わせる */
-      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'research grid');
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
+      if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
       if(introOn){
         introEl.querySelectorAll('.gm-isec').forEach(function(d, i){ d.innerHTML = isecHTML(ISECS[i]); bindChoice(d); });
         introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('測り方とQ&A', 'How to measure & Q&A'); introScroll(); ibgW = ''; ibgBuild(); introBg();
