@@ -4437,6 +4437,27 @@
   .gm-intro .gm-idots button{box-shadow:none; border-color:rgba(30,28,26,.72)}
   .gm-intro .gm-idots button.done{background:rgba(30,28,26,.6); border-color:transparent}
 
+  /* ================= v555 平均の画面の間合いと見せ方（本人） ================= */
+  /* ① 観察文の行間が空きすぎ → 詰める。② 上の節との間は逆に開ける */
+  .gm-obs{line-height:1.5; margin:1.5em 0 .55em}
+  html.phone .gm-obs{line-height:1.55}
+  /* ③ 「32 ％」を、朱の地に紙色の札で見せる（何％だったのかを一目で） */
+  .gm-obs small{display:inline-block; margin-left:12px; padding:3px 9px 4px; border-radius:3px;
+    background:var(--acc, #E84518); color:#FBF7F2; font-family:var(--mono); font-weight:500; font-size:12.5px;
+    letter-spacing:.06em; line-height:1.2; vertical-align:.18em}
+  .gm-obs small .gm-pc{font-size:.82em; margin-left:1px}
+  html.phone .gm-obs small{font-size:12px; padding:3px 8px 4px}
+  /* ④ 「同じ％を、別の枠に」を、上の節から離す */
+  .gm-media{margin-top:1.9em}
+  /* ⑦ 畳んである二つの節（四本の平均／日本と西洋の平均）は隣り合わせ。あいだの罫を一本に */
+  .gm-jw{margin-top:.2em; padding-top:0; border-top:0}
+  /* ⑨ 「あなた／私／解釈の違い」の見出しと数字を同じ軸に */
+  .gm-cmp > div{text-align:center}
+  .gm-cmp > div:first-child{text-align:left}
+  /* ⑥ 保存の札の「閉じる」にも、ほかのボタンと同じ縁を */
+  .gm-take-b .gm-take-x{border-color:rgba(30,28,26,.32) !important}
+  .gm-take-b .gm-take-x:hover{border-color:#1C1B19 !important}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
@@ -4459,12 +4480,10 @@
   @keyframes cpDone{from{opacity:0; transform:translateY(8px)}}
   /* v552 判の置き場：列 1 の左端に寄せていたものを、X1 と X2 の真ん中（20%）へ。
      文字の案内は判の中に入れたので、外の .cap／.seqcap は出さない（v437 の移設ごと取り消し） */
-  /* v554 「このページは、その平均グリッドで組まれています。」の一文に、判を食い込ませる（本人）。
-     判は multiply で刷るので、下の文字は透けて読める。押すと少しだけ大きくなる（メニューの判と同じ作法） */
-  .seqplay{left:53.5% !important; transform:translateX(-50%); width:min(13vw, 168px); bottom:34vh !important;   /* 文の終わりに少しだけ食い込む位置。字を塗り潰さない */
-    transition:opacity .35s, transform .18s var(--ease)}
-  .seqplay .st{transition:transform .18s var(--ease)}
-  @media (hover:hover){ .seqplay:hover .st{transform:translate(2px,-2px) rotate(var(--rot)) scale(1.06)} }
-  .seqplay:active .st{transform:translate(2px,-2px) rotate(var(--rot)) scale(.98)}
-  .seqplay .cap,.seqcap{display:none !important}
-  html.pcview.phone .seqplay,html.pcview.tablet .seqplay{left:20% !important; transform:translateX(-50%)}
+  /* v555 判の置き場：一文が載っている箱（X2〜X3 × Y2〜Y3）の右下の内側へ。罫線をまたがない（本人）。
+     カーソルを乗せるとふくらむ演出は、判の絵（.st）ではなくボタン側に掛ける——
+     .st には押し込みの動き（mstamp）が forwards で残っていて、そちらが勝つことがあるため */
+  .seqplay{left:auto !important; right:calc(42% + 12px) !important; bottom:calc(29vh + 12px) !important;
+    transform:none; width:min(13vw, 168px); transition:opacity .35s, transform .18s var(--ease)}
+  @media (hover:hover){ .seqplay:hover{transform:scale(1.06)} }
+  .seqplay:active{transform:scale(.98)}

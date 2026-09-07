@@ -3410,7 +3410,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5197,7 +5197,7 @@
       goEl.innerHTML = '';
       if(bi === 0) help(t, false); else helpOff();
       hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
-      tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(L(t.q, t.qe).replace('%s', obj(b))) + '</span>'; tipEl.classList.remove('off');
+      tipText(); tipEl.classList.remove('off');
       if(ptype !== 'touch') setTimeout(function(){ if(state === 'trace') stage.focus({preventScroll:true}); }, 30);
       setTimeout(tipFit, 40); setTimeout(tipFit, 520);
       tbFit();
@@ -5434,9 +5434,9 @@
       stepEl.textContent = L('三枚の平均をとる', 'Averaging the three');
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
-        sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：三点の骨格', 'seven faint dashed: the three-work grid') + '</b></p>' +
+        sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         '<div class="gm-jw"><p class="gm-cmph">' + L('研究で引いた線を、日本の絵と西洋の絵に分けて平均しました。あなたの四本と見比べられます。',
           'These are the lines from my research, averaged separately for the Japanese and the Western pictures. You can compare them with your four.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
@@ -5759,7 +5759,12 @@
     }
     function sheetOff(){ sealOff(true); gm.classList.remove('sheeton'); takeOff(); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} }
     /* JA/EN が切り替わったら、見えている文を組み直す（案内・題・手番の欄） */
+    function tipText(){   /* v556 問いの一行。trace() の中だけで書いていたので、比べる・測り終えた・平均の場面で言語を切り替えると前の言語のまま残っていた（本人・挙動係） */
+      if(!tipEl) return; var t = LINES[ti], b = picks[bi]; if(!t || !b) return;
+      tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(L(t.q, t.qe).replace('%s', obj(b))) + '</span>';
+    }
     function relang(){
+      if(window.__seqSeal) window.__seqSeal();   /* v556 手順 08 の判は遊びの外にあるので、幕が閉じていても採り直す */
       if(!gm || gm.hidden) return;
       gm.querySelector('.gm-ttl').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
       gm.querySelector('.gm-sub').textContent = '';
@@ -5771,6 +5776,7 @@
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       axlText(); tbLabel(); lbLabel();   /* 目盛りの向きの語と、回す・虫眼鏡のボタンの名も言語に合わせる */
+      if(state === 'trace' || state === 'compare' || state === 'done') tipText();   /* v556 問いの一行も */
       if(tutOn && tutEl){ tutStep(tutAt); var sk = tutEl.querySelector('.gmt-skip'); if(sk) sk.textContent = L('手引きをとばす', 'Skip this'); }   /* v539 手引きの最中に切り替えると、出ている段だけ前の言語で残っていた（見せ方係） */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
       if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
@@ -5789,7 +5795,13 @@
     /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
     (function(){
       var sp = document.getElementById('seqplay'); if(!sp || typeof kakuSvg !== 'function') return;
-      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '測って\n遊んでみる', 77));   /* v554 二行で（本人） */
+      var st = sp.querySelector('.st');
+      window.__seqSeal = function(){   /* v556 二行に。言語で入れ替える（本人）。切替のたびに押し直す */
+        if(!st || typeof kakuSvg !== 'function') return;
+        while(st.firstChild) st.removeChild(st.firstChild);
+        st.appendChild(kakuSvg(L('PLAY', 'TRY'), L('測って\n遊んでみる', 'MEASURE\nAND PLAY'), 77));
+      };
+      window.__seqSeal();
       sp.addEventListener('click', function(){ open(); });
     })();
     /* #play=… で開いたときは、そのまま遊びを開く（面接用の入口） */
