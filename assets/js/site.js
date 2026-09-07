@@ -3410,7 +3410,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5197,7 +5197,7 @@
       goEl.innerHTML = '';
       if(bi === 0) help(t, false); else helpOff();
       hideLive(); liveEl.className = 'gm-live ' + t.ax; liveEl.style.left = ''; liveEl.style.top = '';
-      tipText(); tipEl.classList.remove('off');
+      tipText(); tipEl.classList.remove('off', 'hid');   /* v557 average() が付けた hid を外す行がどこにも無く、平均に一度着くと問いの一行が二局目以降ずっと opacity 0 だった（本人・二つの係が別々に同じ原因に到達） */
       if(ptype !== 'touch') setTimeout(function(){ if(state === 'trace') stage.focus({preventScroll:true}); }, 30);
       setTimeout(tipFit, 40); setTimeout(tipFit, 520);
       tbFit();
@@ -5370,7 +5370,8 @@
         '</tbody></table>';
     }
     function boardDone(){
-      state = 'done'; fixedAt = performance.now(); trayFill(bi);
+      state = 'done'; fixedAt = performance.now(); if(tipEl) tipEl.classList.add('hid');   /* v557 平均画面と同じく、測り終えた画面にも前の問いを残さない（ti が範囲外になり tipText() が空振りして言語も切り替わらなかった） */
+      trayFill(bi);
       var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); centerSeal(ms); }
       doneFn = bi < 2 ? function(){ doneFn = null; boardStart(bi + 1); } : function(){ doneFn = null; average(); };
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; listState(); mode(L('測り終える', 'measured'));
@@ -5788,7 +5789,13 @@
       if(state === 'trace' || state === 'compare') stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>';
       if(state === 'compare'){ var t2 = LINES[ti], b2 = picks[bi], p2 = res[bi][t2.k], a2 = b2.a[t2.k]; cmpRender(t2, b2, p2, a2, p2 - a2); mode(L('比べる', 'compare')); }
       else if(state === 'done'){ stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; doneRender(); mode(L('測り終える', 'measured')); }
-      else if(state === 'avg' && lastAvg && goEl.classList.contains('on')){ avgRender(lastAvg.avg, lastAvg.kav, lastAvg.diff, lastAvg.per); var sv = resEl.querySelector('.gm-seven'); if(sv) sv.classList.add('on'); mode(L('平均', 'average')); }
+      else if(state === 'avg' && lastAvg){   /* v557 goEl に 'on' が付くのは 3900ms のタイマー。それまでに言語を切り替えると右の列（ボタン五つ・凡例・観察文・手番の帯）が前の言語で固まっていた */
+        var sv0 = resEl.querySelector('.gm-seven'), th0 = resEl.querySelector('.gm-thanks');
+        var wasSeven = !!(sv0 && sv0.classList.contains('on')), wasTh = !!(th0 && th0.classList.contains('on'));
+        avgRender(lastAvg.avg, lastAvg.kav, lastAvg.diff, lastAvg.per);
+        var sv = resEl.querySelector('.gm-seven'); if(sv && wasSeven) sv.classList.add('on');   /* 演出の途中なら、まだ出ていないものを先に出さない */
+        var th = resEl.querySelector('.gm-thanks'); if(th && wasTh) th.classList.add('on');
+        mode(L('平均', 'average')); }
     }
     if(window.MutationObserver) new MutationObserver(relang).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
     window.__gmOpen = open;
