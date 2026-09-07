@@ -3775,7 +3775,8 @@
   .steps .seqcap{display:block; margin-top:10px; font-family:var(--mono); font-size:11px; letter-spacing:.14em; line-height:1.7; color:var(--fg2); opacity:.85; cursor:pointer; text-align:left}
   .steps .seqcap:hover{color:var(--acc)}
   /* v438 遊び方の札：幕は画面の全部を覆う（見出し行だけ明るいままだった：本人） */
-  html.gminfo #gm{z-index:100}
+  /* v507 ただし ☰ と JA/EN の上には出さない。z:100 だと見出し行（z:99）を覆って押せなくなっていた（本人：メニューと言語切替が出ない） */
+  html.gminfo #gm{z-index:98}
   .gm-info{top:0}
   /* v438 案内の本文は本編の本文と同じ大きさに（小さすぎた：本人）。注記や小さな添えはそのまま */
   @media (max-height:640px){ .gm-isec > span{font-size:15px; line-height:1.95} }
@@ -4143,6 +4144,20 @@
   .gm-oncetie.on{opacity:.55} .gm-oncetie.bye{opacity:0}
   html.phone .gm-once.gm-onceb{font-size:13px; max-width:min(280px, 72%)}
   html.rm .gm-once.gm-onceb,html.rm .gm-oncetie{transition:none}
+
+
+  /* ================= v507 ☰ と JA/EN は遊びの最中もいつでも押せる ================= */
+  html.gmopen .hd{z-index:101}                      /* 遊びの幕（98）と札（その中の 9）より上、カーソル演出（102）より下 */
+  html.gmopen .hd{background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important}
+  html.gmopen .hd{pointer-events:none}              /* 行そのものは素通し。押せるのは ☰ と JA/EN だけ */
+  html.gmopen .hd .burger,html.gmopen .hd .lang,html.gmopen .hd .lang button{pointer-events:auto}
+
+
+  /* ================= v507 遊びの中のハイライト（本編の <mark> と同じ下線） ================= */
+  .gm mark{color:inherit; background:linear-gradient(#1C1B19,#1C1B19) no-repeat 0 100%; background-size:0% 2px; transition:background-size 1.05s var(--ease) 0s; padding-bottom:2px; -webkit-box-decoration-break:clone; box-decoration-break:clone}
+  .gm mark.in{background-size:100% 2px}
+  html.rm .gm mark{background-size:100% 2px !important; transition:none !important}
+  .gm .gm-secq mark,.gm .gm-catq mark{background-image:none}   /* 見出しには掛けない */
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
