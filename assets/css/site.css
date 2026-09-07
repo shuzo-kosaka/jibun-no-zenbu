@@ -4098,6 +4098,11 @@
   .gm.out .gm-side{transition:opacity .2s var(--ease) .04s; opacity:.2}
   .gm.out .gm-hd{transition:opacity .2s var(--ease) .08s; opacity:.2}
   html.rm .gm.out{transition:none; clip-path:none; opacity:0}
+  /* v499 手番の行は「一枚目」と「01 / 12」だけにして、一本の朱の帯に白で載せる（本人） */
+  .gm-side .gm-step{background:var(--acc, #E84518); color:#FBF7F2; border-radius:3px; padding:5px 10px; margin-bottom:10px}
+  .gm-side .gm-step span{color:#FBF7F2; font-family:var(--sans); font-size:12.5px; letter-spacing:.02em}
+  .gm-side .gm-step .gm-cnt{color:#FBF7F2; opacity:.92; font-family:var(--mono); font-size:11.5px; top:0}
+  html.phone .gm-side .gm-step span{font-size:13.5px} html.phone .gm-side .gm-step .gm-cnt{font-size:12.5px}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
