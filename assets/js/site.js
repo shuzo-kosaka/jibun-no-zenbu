@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4959,6 +4959,29 @@
        ・手引きの間は朱の帯（help）と指の手本（demoOn）を止め、終わってから始める
        ・二度目からは出さない（localStorage 'gm-tut'）*/
     var tutEl = null, tutOn = false, tutAt = 0, tutPend = null, tutT = 0, tutAtT = 0;
+    var tutSayH = 0;   /* 案内の窓の高さ。三段で変えない（一度決まったら縮めない） */
+    /* 案内文：本編の body() で文節に割り《…》を mark にしたうえ、地の文を見出しと同じ混植にする。
+       混植は本編の mixSet をそのまま使う（かなは明朝、読点は明朝の詰め、他はゴシック）。
+       英語のときは掛けない（一字ずつ包むと語間とカーニングが壊れる） */
+    function tutSay(t){
+      var html = body(t);
+      if(document.documentElement.lang === 'en' || typeof mixSet !== 'function') return html;
+      var box = el('span'); box.innerHTML = html;
+      var w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, null), ns = [], n;
+      while((n = w.nextNode())) ns.push(n);
+      ns.forEach(function(x){
+        var s = el('span', 'mx'); s.textContent = x.nodeValue; mixSet(s);
+        x.parentNode.replaceChild(s, x);
+      });
+      return box.innerHTML;
+    }
+    /* 段の符号は「01 / 03」の等幅の組み。数と斜線を別の字で持たせて、濃さを分ける */
+    function tutNum(b, i, n){
+      b.innerHTML = '';
+      var a = el('em'), s = el('s'), z = el('u');
+      a.textContent = ('0' + (i + 1)).slice(-2); s.textContent = '/'; z.textContent = ('0' + n).slice(-2);
+      b.appendChild(a); b.appendChild(s); b.appendChild(z);
+    }
     var TUTS = [
       {k:['stage'], ja:'この絵に、《四本の線》を引きます。',
                                 en:'You will draw 《four lines》 on this picture.'},
@@ -5014,6 +5037,7 @@
       tutEl.setAttribute('aria-hidden', 'true');   /* 読み上げは本編の文が担う */
       tutEl.innerHTML =
         '<i class="gmt-p t"></i><i class="gmt-p b"></i><i class="gmt-p l"></i><i class="gmt-p r"></i>' +
+        '<i class="gmt-p wt"></i><i class="gmt-p wl"></i><i class="gmt-p wr"></i>' +   /* 案内の窓のまわり。t はこのとき窓の下だけを受け持つ */
         '<i class="gmt-c tl"></i><i class="gmt-c tr"></i><i class="gmt-c bl"></i><i class="gmt-c br"></i>' +
         '<p class="gmt-say"><b></b><span class="gmt-t"></span><i class="gmt-nx"></i></p>' +
         '<button class="gmt-skip" type="button"></button>';
@@ -5039,9 +5063,11 @@
       if(!tutEl) return;
       tutAt = i; tutAtT = performance.now();
       var s = TUTS[i], say = tutEl.querySelector('.gmt-say');
-      say.querySelector('b').textContent = (i + 1) + ' / ' + TUTS.length;
+      tutNum(say.querySelector('b'), i, TUTS.length);
       var w = tutWay();
-      say.querySelector('.gmt-t').innerHTML = body(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1])));
+      say.querySelector('.gmt-t').innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1])));
+      say.classList.remove('in'); void say.offsetWidth; say.classList.add('in');   /* 移動はしない。薄く現れるだけ */
+      lite(say);   /* 朱の下線を、本編と同じ間で引く */
       var nx = say.querySelector('.gmt-nx');
       nx.textContent = (i === TUTS.length - 1) ? L('押すと、始まります', 'Press to begin')
                                                : L('押して、次へ', 'Press for the next');
@@ -5068,23 +5094,40 @@
       tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y, cr, cr]);
       tutSet(tutEl.querySelector('.gmt-c.bl'), [x, b - cr, cr, cr]);
       tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr, cr]);
-      var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null, h;
-      if(f){   /* 一の手：見出し行の空き（三段とも同じ場所） */
-        say.classList.add('row'); say.style.width = Math.min(f[2], 640) + 'px';
-        h = say.offsetHeight;
-        var hy = Math.max(5, f[1] + Math.round((f[3] - h) / 2));
-        if(hy + h <= y - 6) put = [f[0], hy];
+      /* 案内文の置き場。見出し行の空きに三段とも固定し、そこの幕を開けて（窓を切って）、
+         文は本物の紙の上に置く。窓は三段とも左端と高さを同じにし、幅だけ文に合わせる */
+      var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null;
+      var wt = tutEl.querySelector('.gmt-p.wt'), wl = tutEl.querySelector('.gmt-p.wl'),
+          wr = tutEl.querySelector('.gmt-p.wr');
+      say.classList.remove('ts2', 'dim');
+      if(f){
+        say.style.width = 'max-content';
+        if(say.offsetWidth > f[2]){
+          if(f[3] >= 96){ say.classList.add('ts2'); say.style.width = 'max-content'; }   /* 縦に余地のある行（iPhone 横 120px）だけ二段 */
+          if(say.offsetWidth > f[2]) say.style.width = f[2] + 'px';                      /* 68px の行では一行のまま折り返す */
+        }
+        var nb = say.querySelector('b');
+        if(nb) say.style.setProperty('--tsnum', nb.offsetWidth + 'px');   /* 二段のとき、進め方の左端を案内にそろえる */
+        var pv = Math.min(14, Math.max(8, Math.round(f[3] * .12)));       /* 文の上下に置く紙の余白 */
+        tutSayH = Math.max(tutSayH, Math.min(say.offsetHeight + pv * 2, f[3] - 4));   /* 窓は見出し行から出ない（下の罫をまたがない） */
+        var wh = tutSayH, wy = f[1] + Math.max(2, Math.round((f[3] - wh) / 2));
+        var wx = f[0] - 22, ww = Math.min(say.offsetWidth + 48, Math.max(80, f[0] + f[2] + 14 - wx));
+        if(wy + wh <= y - 4){          /* 窓が絵の穴に掛からないときだけ、窓を切る */
+          put = [f[0], wy + Math.round((wh - say.offsetHeight) / 2)];
+          tutSet(wt, [0, 0, W, wy]);
+          tutSet(wl, [0, wy, wx, wh]);
+          tutSet(wr, [wx + ww, wy, W - wx - ww, wh]);
+          tutSet(tutEl.querySelector('.gmt-p.t'), [0, wy + wh, W, y - wy - wh]);   /* 元の板は窓の下だけ受け持つ */
+        }
       }
-      if(!put){   /* 二の手：穴の下の帯 */
-        var bw = Math.max(400, Math.min(660, open[2]));
-        say.classList.add('row'); say.style.width = bw + 'px'; h = say.offsetHeight;
-        if(H - b >= h + 28) put = [Math.max(24, Math.min(x, W - bw - 24)), b + 18];
-      }
-      if(!put){   /* 三の手：穴の右（または左）に段で組む */
-        var sw = Math.max(200, Math.min(320, Math.max(W - r - 72, x - 72)));
-        say.classList.remove('row'); say.style.width = sw + 'px'; h = say.offsetHeight;
-        var sx = (W - r - 72 >= x - 72) ? Math.min(r + 36, W - sw - 24) : 36;
-        put = [Math.max(16, sx), Math.max(20, Math.round(H / 2 - h / 2))];
+      if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
+        tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
+        say.classList.add('dim'); say.classList.add('ts2');
+        var bw = Math.max(300, Math.min(560, open[2]));
+        say.style.width = bw + 'px';
+        var sh = say.offsetHeight;
+        put = (H - b >= sh + 28) ? [Math.max(24, Math.min(x, W - bw - 24)), b + 18]
+                                 : [Math.max(16, Math.min(x, W - bw - 16)), Math.max(20, Math.round(H / 2 - sh / 2))];
       }
       say.style.left = Math.round(put[0]) + 'px'; say.style.top = Math.round(put[1]) + 'px';
     }
@@ -5097,7 +5140,7 @@
     }
     function tutEnd(){
       if(!tutOn) return;
-      tutOn = false; clearTimeout(tutT);
+      tutOn = false; clearTimeout(tutT); tutSayH = 0;
       try{ localStorage.setItem('gm-tut', '1'); }catch(e){}
       window.removeEventListener('resize', tutFit);
       document.removeEventListener('keydown', tutKey, true);
@@ -5671,6 +5714,7 @@
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       axlText(); tbLabel(); lbLabel();   /* 目盛りの向きの語と、回す・虫眼鏡のボタンの名も言語に合わせる */
+      if(tutOn && tutEl){ tutStep(tutAt); var sk = tutEl.querySelector('.gmt-skip'); if(sk) sk.textContent = L('手引きをとばす', 'Skip this'); }   /* v539 手引きの最中に切り替えると、出ている段だけ前の言語で残っていた（見せ方係） */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
       if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
       if(introOn){
