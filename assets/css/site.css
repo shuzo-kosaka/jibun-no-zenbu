@@ -4072,6 +4072,9 @@
   html.phone .gm-ick{font-size:13px}
   html.phone .gm-ilist .ik{width:40px; height:40px}
   html.phone .gm-ilist li{grid-template-columns:40px 1fr; column-gap:14px}
+  /* v494 タブバーが出た状態で、見出し行に指を当てて送ると本編が動く（本人・実機）。
+     見出し行から始まる指の動きでは、ブラウザに送りを起こさせない */
+  html.gmopen .hd,html.gmopen .hd *{touch-action:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
