@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4698,6 +4698,10 @@
       axlText();
       gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('測り方とQ&A', 'How to measure & Q&A');
       ['.gm-ix', '.gm-x'].forEach(function(sel){ var e = gm.querySelector(sel); if(e) e.setAttribute('aria-label', L('閉じる', 'Close')); });
+      /* v497: 英語でも日本語のままだった読み上げの名前（細部係⑬） */
+      (function(){ var i = gm.querySelector('.gm-hd .gm-i'); if(i) i.setAttribute('aria-label', L('この絵と線について', 'About this picture and the lines'));
+        var st = gm.querySelector('.gm-stage'); if(st) st.setAttribute('aria-label', L('盤面', 'The board'));
+        var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'research grid');
       siteInert(true);   /* v484: 遊びの最中は後ろの本編へ Tab で抜けない（流れ係） */
@@ -5117,7 +5121,7 @@
             CATS.map(function(c){ return '<li' + (c[0] === b.cat ? ' class="on"' : '') + '><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul></div>';   /* 絵の時代背景と特徴、分析カテゴリの説明（押すと開く） */
       }
       body += PURSEC;
-      if(!introOn) body +=
+      body +=
         QA.map(function(q){ return sec(L(q[0], q[1])) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + body_(L(q[2], q[3])) + '</p></div>'; }).join('');   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
@@ -5253,6 +5257,10 @@
       gm.querySelector('.gm-sub').textContent = '';
       gm.querySelector('.gm-sx').textContent = L('戻る', 'Back'); var gi0 = gm.querySelector('.gm-i'); if(gi0) gi0.textContent = L('測り方とQ&A', 'How to measure & Q&A');
       ['.gm-ix', '.gm-x'].forEach(function(sel){ var e = gm.querySelector(sel); if(e) e.setAttribute('aria-label', L('閉じる', 'Close')); });
+      /* v497: 英語でも日本語のままだった読み上げの名前（細部係⑬） */
+      (function(){ var i = gm.querySelector('.gm-hd .gm-i'); if(i) i.setAttribute('aria-label', L('この絵と線について', 'About this picture and the lines'));
+        var st = gm.querySelector('.gm-stage'); if(st) st.setAttribute('aria-label', L('盤面', 'The board'));
+        var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
       axlText(); tbLabel();   /* 目盛りの向きの語と回すボタンの名も言語に合わせる */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'research grid');
