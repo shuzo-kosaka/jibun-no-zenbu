@@ -3380,7 +3380,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4302,9 +4302,29 @@
       /* 押したときの応答：どのボタンも一瞬わずかに沈んで戻る（0.18 秒）。動きを控える設定では出さない */
       gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots > *') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
       turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb'); lbEl = gm.querySelector('.gm-lensb');
-      if(lbEl && !lbEl.__b){ lbEl.__b = true; lbEl.addEventListener('click', function(){ lensPref = !lensPref; try{ localStorage.setItem('gm-lens', lensPref ? '1' : '0'); }catch(e){} if(!lensPref) lensOff(); lbLabel(); }); lbLabel(); }
+      if(lbEl && !lbEl.__b){ lbEl.__b = true;
+        var lbDown = false;
+        var lbTog = function(){ lensPref = !lensPref; try{ localStorage.setItem('gm-lens', lensPref ? '1' : '0'); }catch(e){} if(!lensPref) lensOff(); lbLabel(); };
+        lbEl.addEventListener('pointerdown', function(e){ lbDown = true; if(e.pointerType !== 'touch'){ try{ lbEl.setPointerCapture(e.pointerId); }catch(x){} } });   /* v524 指は必ず少し滑る。滑ると click は出ないので、押下と離しで受ける（指は暗黙に捕まえているので捕まえ直さない） */
+        lbEl.addEventListener('pointerup', function(e){ if(!lbDown) return; lbDown = false;
+          var r = lbEl.getBoundingClientRect(), m = 32;
+          if(e.clientX < r.left - m || e.clientX > r.right + m || e.clientY < r.top - m || e.clientY > r.bottom + m) return;   /* 大きく外へ滑らせて離したときだけ取り消し */
+          lbTog(); });
+        lbEl.addEventListener('pointercancel', function(){ lbDown = false; });
+        lbEl.addEventListener('click', function(e){ e.stopPropagation(); if(e.detail !== 0) return; lbTog(); });   /* 鍵盤の Enter・Space（detail 0）だけここで受ける */
+        lbLabel(); }
       tbEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path class="r2" d="M10 14H23V21H10"/><path class="r1" d="M10 14V8H3V21H10"/><path class="rm" d="M10 14V21"/><path class="a" d="M7 4.6A12 12 0 0 1 19 10.9M15.6 9.9 19 10.9 20 7.5"/><path class="a2" d="M19 10.9A12 12 0 0 0 7 4.6M9.6 2.2 7 4.6 9.4 7.2"/></svg><span></span>';   /* v390: Astra の C 案「角をそろえる」（縦 7×13 と横 13×7 が角を共有、Material の rotate_90_degrees_cw の弧）。押した後は横が濃くなり、矢印が戻る向きに */   /* v388: 縦の絵（濃）が横（淡）になる、時計回りの矢印。写真アプリの「回転」と SF の rectangle.portrait.rotate の折衷。文字も添える */
-      tbEl.addEventListener('click', function(){ turnPic(!rot); }); tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+      /* v532 回すボタンも、指が滑ると click が出ない（虫眼鏡と同じ筋。入切係の実測）。押下と離しで受ける */
+      (function(){
+        var tbDown = false;
+        tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); tbDown = true; if(e.pointerType !== 'touch'){ try{ tbEl.setPointerCapture(e.pointerId); }catch(x){} } });
+        tbEl.addEventListener('pointerup', function(e){ if(!tbDown) return; tbDown = false;
+          var r = tbEl.getBoundingClientRect(), m = 32;
+          if(e.clientX < r.left - m || e.clientX > r.right + m || e.clientY < r.top - m || e.clientY > r.bottom + m) return;
+          turnPic(!rot); });
+        tbEl.addEventListener('pointercancel', function(){ tbDown = false; });
+        tbEl.addEventListener('click', function(e){ e.stopPropagation(); if(e.detail !== 0) return; turnPic(!rot); });   /* 鍵盤の Enter・Space だけ */
+      })();
       tbEl.addEventListener('pointerenter', function(e){ if(e.pointerType === 'touch') return; lastX = e.clientX; lastY = e.clientY; cringHold(rot ? L('縦に戻す \u00b7 TURN BACK \u00b7 ', 'TURN BACK \u00b7 ') : L('絵を横にして、大きく \u00b7 TURN \u00b7 ', 'TURN THE PICTURE \u00b7 ')); });
       tbEl.addEventListener('pointerleave', function(){ cringOff(false); });
       tbLabel();
@@ -4318,7 +4338,7 @@
       stage.addEventListener('pointerdown', function(e){
         if(demoEl){ demoDone = true; demoOff(); }
         if(e.button != null && e.button !== 0) return;
-        if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } return; }   /* v416: 二本目の指は線にしない（ピンチ） */
+        if(e.pointerType === 'touch' && e.isPrimary === false){ if(down){ down = false; hideLive(); } lensOff(); return; }   /* v416: 二本目の指は線にしない（ピンチ） */
         if(e.target && e.target.closest && e.target.closest('.gm-turnb, .gm-lensb')) return;   /* 回す・虫眼鏡のボタンの押下は線にしない（v521: 盤面が指を捕まえて、二度目が届いていなかった） */
         if(performance.now() - openedAt < 600) return;   /* 開いた直後の押下は読まない（メニューの押下が盤面に届いて線になるのを防ぐ） */
         if(stage.classList.contains('swapping')){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v512 切替中の押下も、そのまま動かせば線にする（流れ係：0.86 秒が捨てられていた） */
@@ -4375,6 +4395,7 @@
       stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } });
       stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); });   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
       stage.addEventListener('keydown', function(e){
+        if(e.target && e.target.closest && e.target.closest('button')) return;   /* v524 盤面の keydown が、盤面の中のボタン（虫眼鏡・回す）の Enter/Space まで preventDefault していた */
         var k = e.key;
         if(k === ' ' || k === 'Enter'){ if(state === 'compare') nextTurn(); else if(state === 'done' && doneFn) doneFn(); else if(state === 'trace' && live >= 0) confirm(); e.preventDefault(); return; }
         if(state !== 'trace') return;

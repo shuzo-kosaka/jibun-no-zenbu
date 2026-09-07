@@ -4224,6 +4224,7 @@
   .gm-lensb{position:absolute; left:8px; bottom:8px; width:34px; height:34px; padding:0; border-radius:50%; border:1px solid rgba(30,28,26,.32);
     background:rgba(242,241,236,.94); color:#1C1B19; cursor:pointer; z-index:9; display:flex; align-items:center; justify-content:center; gap:6px;
     box-shadow:0 1px 6px rgba(30,28,26,.14); transition:opacity .2s var(--ease), color .16s var(--ease), border-color .16s var(--ease)}
+  .gm-lensb::before{content:""; position:absolute; inset:-10px}   /* v524 丸は 34px のまま、指の当たりは 52×50px（実測。枠線の内側が基準なので 34+20−2）（.gm-turnb が既に ::before{inset:-6px} で同じことをしているので、書き方をそれに揃えた。絶対配置なので flex の並びにも入らず、丸の見た目は一切変わらない） */
   .gm-lensb svg{width:19px; height:19px; flex:none}
   .gm-lensb[aria-pressed="false"]{color:#8E8B84; border-color:rgba(30,28,26,.18)}
   .gm-lensb[aria-pressed="false"] svg{opacity:.55}
