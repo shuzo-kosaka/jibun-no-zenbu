@@ -4364,6 +4364,29 @@
   .gmt-c.w.bl{background:radial-gradient(circle at 100% 0,    transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
   .gmt-c.w.br{background:radial-gradient(circle at 0 0,       transparent var(--gmt-wr, 6px), var(--gmt-dim) 0)}
 
+
+  /* ================= v543 案内と札の見直し（本人） ================= */
+  /* ① 測り方とQ&A の章立ては、朱の帯に白い文字で。どこが切れ目か一目で分かるように */
+  .gm-info-in .gm-info-g,.gm-info-in .gm-info-k{
+    display:block; background:var(--acc, #E84518); color:#FBF7F2; opacity:1;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; line-height:1;
+    padding:9px 12px; border-radius:3px; border-top:0; margin:1.8em 0 .9em}
+  .gm-info-in .gm-info-g:first-child,.gm-info-in .gm-info-k:first-child{margin-top:.2em}
+  .gm-info-in .gm-info-k + h3{margin-top:.1em}
+  html.phone .gm-info-in .gm-info-g,html.phone .gm-info-in .gm-info-k{font-size:11px; letter-spacing:.12em; padding:10px 12px}
+  @media (max-height:640px){ .gm-info-in .gm-info-g,.gm-info-in .gm-info-k{padding:7px 10px; margin:1.4em 0 .7em} }
+
+  /* ② 案内のボタンの文字に掛けていた紙色のぼかしをやめる（本人：チープに見える）。板（box-shadow）は残す */
+  .gm-intro .gm-iskip,.gm-intro .gm-ihow,.gm-intro .gm-igo{text-shadow:none}
+
+  /* ③ 案内の見出しの白いもやが、文字そのものにも掛かって見えていた（本人）。
+     原因は、紙色の text-shadow を三枚重ねていたこと——影は字の後ろに出るが、明朝の細い画では
+     内側まで滲んで、字が白く痩せて見える。見出しは後ろの楕円の紙（.gm-isec::before）だけで足りるので、影を外す。
+     本文は図の線に負けるので、一枚だけ薄く残す。 */
+  .gm-isec > b{text-shadow:none}
+  .gm-isec > span{text-shadow:0 0 10px var(--ibg, #F2F1EC)}
+  .gm-isec::before{opacity:.92}
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
