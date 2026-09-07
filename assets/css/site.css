@@ -4239,6 +4239,20 @@
   /* v523 説明の一文を置かないので、空の p は畳む */
   .gm-take p:empty{display:none; margin:0}
 
+  /* ================= v525 保存の見本に重ねる判（ファイルには焼き込まない） ================= */
+  .gm-takefig{position:relative; display:block; width:-moz-max-content; width:max-content; max-width:100%; margin:0 auto}
+  .gm-takeseal{position:absolute; right:2.5%; bottom:3%; display:block; pointer-events:none; z-index:2; opacity:.94;
+    animation:gmPress .62s cubic-bezier(.2,.8,.2,1) .18s both}
+  .gm-takeseal svg{width:100%; height:100%; display:block; overflow:visible}
+  html.rm .gm-takeseal{animation:none; opacity:.94; transform:rotate(-9deg)}
+
+  /* v526 見本と「画像の形」が密着していた（本人）。あいだに息を入れる */
+  .gm-take-opt{margin:26px 0 20px; gap:9px 14px}
+  .gm-takefig{margin-bottom:2px}
+  .gm-take-b{margin-top:4px}
+  html.phone .gm-take-opt{margin:18px 0 14px}
+  @media (max-height:640px){ .gm-take-opt{margin:14px 0 10px} }
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}

@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5304,27 +5304,13 @@
       c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = Math.max(1.5, 2.6 * u);
       LINES.forEach(function(t){ var v = avg[t.k]; if(v == null) return; c.beginPath();
         if(t.ax === 'v'){ c.moveTo(W * v / 100, 0); c.lineTo(W * v / 100, H); } else { c.moveTo(0, H * v / 100); c.lineTo(W, H * v / 100); } c.stroke(); });
-      /* 判（v524 本人：保存する一枚にも「平均」の判を。角は他の判と同じく丸く） */
-      var cs2 = getComputedStyle(document.documentElement);
-      var FS2 = (cs2.getPropertyValue('--sans') || 'sans-serif').trim(), FO2 = (cs2.getPropertyValue('--mono') || 'monospace').trim();
-      var ss = Math.max(96, Math.min(300, Math.round(Math.min(W, H) * 0.145))), mg = Math.round(Math.min(W, H) * 0.055);
-      function rrect(x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-      c.save();
-      c.translate(W - mg - ss / 2, H - mg - ss / 2); c.rotate(-9 * Math.PI / 180); c.translate(-ss / 2, -ss / 2);
-      c.strokeStyle = '#E84518'; c.fillStyle = '#E84518'; c.textAlign = 'center';
-      c.lineWidth = ss * .031; rrect(c.lineWidth / 2, c.lineWidth / 2, ss - c.lineWidth, ss - c.lineWidth, ss * .085); c.stroke();
-      var pd = ss * .083; c.lineWidth = ss * .011; rrect(pd, pd, ss - pd * 2, ss - pd * 2, ss * .062); c.stroke();
-      c.font = '500 ' + (ss * .083).toFixed(1) + 'px ' + FO2; c.fillText('YOUR GRID', ss / 2, ss * .278);
-      c.font = '700 ' + (ss * .278).toFixed(1) + 'px ' + FS2; c.fillText('平均', ss / 2, ss * .639);   /* 画面の判（YOUR GRID ＋ 平均）と同じ組み。英語でも判は和字のまま */
-      c.font = (ss * .056).toFixed(1) + 'px ' + FO2; c.fillText('KOSAKA · PORTFOLIO', ss / 2, ss * .833);
-      c.restore(); c.textAlign = 'start';
       return cv;
     }
     function takeaway(avg){
       var d = new Date(), ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
       if(!takeEl){
         takeEl = el('div', 'gm-take'); takeEl.setAttribute('role', 'dialog'); takeEl.setAttribute('aria-label', L('あなたのものさし', 'Your ruler'));
-        takeEl.innerHTML = '<div class="gm-take-in"><div class="gm-take-h"><b></b><em></em></div><img alt=""><p></p>' +
+        takeEl.innerHTML = '<div class="gm-take-in"><div class="gm-take-h"><b></b><em></em></div><span class="gm-takefig"><img alt=""><i class="gm-takeseal" aria-hidden="true"></i></span><p></p>' +
           '<div class="gm-take-opt"><em class="gm-optl"></em><div class="gm-take-fr"></div><em class="gm-optl2"></em><div class="gm-take-fm"></div></div>' +
           '<div class="gm-take-b"><a class="gm-b go" download="monosashi.png"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 12.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></a>' +
           '<button type="button" class="gm-b gm-share" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 7.5v6h9v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
@@ -5334,7 +5320,25 @@
         takeEl.addEventListener('click', function(e){ if(e.target === takeEl) takeOff(); });
         gm.appendChild(takeEl);
       }
-      var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
+      var im = takeEl.querySelector('img'), a = takeEl.querySelector('a'), sealBox = takeEl.querySelector('.gm-takeseal');
+      /* v525 判は画像に焼き込まず、見本の上に重ねるだけ（本人）。質感は本編の判と同じ（kakuSvg の feTurbulence） */
+      function takeSeal(){
+        if(!sealBox) return;
+        if(!sealBox.firstChild){
+          var sv = null;
+          try{ if(typeof kakuSvg === 'function') sv = kakuSvg('YOUR GRID', '平均', 40 + (Date.now() % 50)); }catch(x){ sv = null; }
+          if(!sv){ sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('viewBox', '0 0 156 156');
+            sv.innerHTML = '<g fill="none" stroke="var(--acc)"><rect x="9" y="9" width="138" height="138" rx="12" stroke-width="4.2"/><rect x="21" y="21" width="114" height="114" rx="6" stroke-width="1.5"/>' +
+              '<text x="78" y="46" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="500" letter-spacing="2.6" fill="var(--acc)" stroke="none">YOUR GRID</text>' +
+              '<text x="78" y="94" text-anchor="middle" font-family="var(--sans)" font-weight="700" font-size="26" fill="var(--acc)" stroke="none">平均</text>' +
+              '<text x="78" y="124" text-anchor="middle" font-family="var(--mono)" font-size="6.5" letter-spacing="1.6" fill="var(--acc)" stroke="none">KOSAKA · PORTFOLIO</text></g>'; }
+          sealBox.appendChild(sv);
+        }
+        var w = im.clientWidth, h = im.clientHeight; if(!w || !h) return;
+        var sz = Math.max(76, Math.round(Math.min(w, h) * 0.34));
+        sealBox.style.width = sz + 'px'; sealBox.style.height = sz + 'px';
+        if(!rm){ sealBox.style.animation = 'none'; void sealBox.offsetWidth; sealBox.style.animation = ''; }
+      }
       takeEl.querySelector('.gm-take-h b').textContent = '';   /* v522 見出しは置かない（本人＋ChatGPT）。右肩の欧文が題として働く */
       takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
       takeEl.querySelector('p').textContent = '';   /* v523 説明の一文も置かない（本人）。何が保存されるかは見本を見れば分かる */
@@ -5364,7 +5368,7 @@
         a.download = name;
         im.style.aspectRatio = cv.width + ' / ' + cv.height;
         im.classList.toggle('alpha', takeFmt === 'alpha');
-        function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.src = url; a.href = url; takeEl.classList.add('on'); }
+        function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.onload = function(){ im.onload = null; takeSeal(); }; im.src = url; a.href = url; takeEl.classList.add('on'); if(im.complete) takeSeal(); }
         function share(bl){ takeFile = null;
           try{ if(bl && window.File && navigator.canShare){ var f = new File([bl], name, {type:fmt.mime}); if(navigator.canShare({files:[f]})) takeFile = f; } }catch(e){}
           sb0.hidden = !takeFile; }
