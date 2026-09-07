@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -5503,13 +5503,28 @@
         });
       });
     }
+    /* v547 一つ開いたら、開いていたほかの節は畳む（本人）。同じ括りの中だけを見る */
+    function secShut(x, q){
+      if(!x || x.hidden) return;
+      if(q) q.setAttribute('aria-expanded', 'false');
+      if(rm || document.documentElement.classList.contains('phone')){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); return; }
+      x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
+      setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200);
+    }
+    function secOnly(root, q){
+      if(!root) return;
+      root.querySelectorAll('.gm-secq[aria-expanded="true"], .gm-catq[aria-expanded="true"]').forEach(function(o){
+        if(o === q) return; secShut(o.nextElementSibling, o);
+      });
+    }
     function bindSecs(root){   /* v433: 右の列でも節を畳めるように（本人：平均の画面の情報量が多い） */
       if(!root) return;
       root.querySelectorAll('.gm-secq').forEach(function(q){
         if(q.__bound) return; q.__bound = true;
         var x = q.nextElementSibling; if(!x) return;
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
-          if(rm){ x.hidden = !on; return; }
+          if(on) secOnly(root, q);   /* v547 ほかは畳む */
+          if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
           if(on){   /* 開く：0 から実寸へ。終わったら auto に戻して中身の高さに追従させる */
             x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
             x.style.height = x.scrollHeight + 'px';
@@ -5555,7 +5570,8 @@
       var iin = infoEl.querySelector('.gm-info-in');
       infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
-          if(rm){ x.hidden = !on; }
+          if(on) secOnly(iin || infoEl, q);   /* v547 ほかは畳む */
+          if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); }   /* v546 同上 */
           else if(on){ x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight; x.style.height = x.scrollHeight + 'px';
             setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260); lite(x); }
           else { x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
