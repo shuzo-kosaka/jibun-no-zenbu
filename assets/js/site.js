@@ -536,6 +536,8 @@
       setTimeout(rvPut, 140); setTimeout(rvPut, 380); setTimeout(rvPut, 760); setTimeout(rvPut, 1200); setTimeout(rvPut, 1800); setTimeout(rvPut, 2500);
       clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800);
     }
+    var visAt = 0;   /* v528 別のタブ（アプリ）から戻ってきた時刻。戻ってきただけのときに、回したときの判を出さないため（本人） */
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) visAt = performance.now(); }, true);
     function onOrient(e){
       var m = e.matches;
       rvReflow();
@@ -546,8 +548,9 @@
       /* v291: 案内が出ていたかは「横になった時点」で見る。430ms 待つあいだに別の経路（章の切り替えなど）が
          案内を引っ込めることがあり、その場合に花の判が出ないままだった */
       var wasUp = started && !rv.classList.contains('gone');
+      var backFromTab = document.hidden || (visAt && performance.now() - visAt < 1600);   /* v528: 向きは変わっていないのに、戻ってきた拍子に change が届くことがある */
       onOrient.t = setTimeout(function(){
-        muted = false; hide(); startOpening(); if(wasUp) setTimeout(rotOk, 520);
+        muted = false; hide(); startOpening(); if(wasUp && !backFromTab) setTimeout(rotOk, 520);
       }, 430);
     }
     if(land.addEventListener) land.addEventListener('change', onOrient);
