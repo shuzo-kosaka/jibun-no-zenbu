@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4404,7 +4404,7 @@
         lensOff();   /* v536 down が既に false でも、丸だけは必ず閉じる */
         if(!down) return; down = false; liveEl.classList.remove('press');
         if(!ok || state !== 'trace') return;
-        if(moved < 6){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 動かさずに離した押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。 操作は「押したまま動かし、離す」と案内しているので、それに合わせる */
+        if(moved < 6 && (fresh || performance.now() - startedAt < 500)){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 進めるための押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。v538: それ以外の「押して離すだけ」は線にする（本人：クリックしても線が引けない） */
         var sr = stage.getBoundingClientRect(), ox = Math.max(sr.left - e.clientX, e.clientX - sr.right, 0), oy = Math.max(sr.top - e.clientY, e.clientY - sr.bottom, 0);
         if(Math.max(ox, oy) > 40){   /* v511 盤面から大きく外れて離したら、端（0%・100%）に貼りつけず引き直しにする（流れ係） */
           fresh = false; hideLive(); tipEl.classList.remove('off');
