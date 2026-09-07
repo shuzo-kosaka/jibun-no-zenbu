@@ -3409,7 +3409,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4401,7 +4401,8 @@
       function up(e, ok){
         pend = null;
         var lc = liveEl.querySelector('.gm-lcap'); if(lc){ lc.parentNode.removeChild(lc); lcapDone = true; } var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld);
-        if(!down) return; down = false; liveEl.classList.remove('press'); lensOff();
+        lensOff();   /* v536 down が既に false でも、丸だけは必ず閉じる */
+        if(!down) return; down = false; liveEl.classList.remove('press');
         if(!ok || state !== 'trace') return;
         if(moved < 6){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 動かさずに離した押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。 操作は「押したまま動かし、離す」と案内しているので、それに合わせる */
         var sr = stage.getBoundingClientRect(), ox = Math.max(sr.left - e.clientX, e.clientX - sr.right, 0), oy = Math.max(sr.top - e.clientY, e.clientY - sr.bottom, 0);
@@ -4413,6 +4414,7 @@
         fresh = false; move(e); confirm();   /* 少しはみ出したくらいなら、端に丸めた位置で一度だけ確定（pointercancel では確定しない） */
       }
       stage.addEventListener('pointerup', function(e){ up(e, true); });
+      ['pointerup', 'pointercancel', 'blur'].forEach(function(t){ window.addEventListener(t, function(){ if(!down) lensOff(); }, true); });   /* v536 保険。押していないのに丸が残る道を塞ぐ */
       var tmY = null; document.addEventListener('touchstart', function(e){ tmY = e.touches[0] ? e.touches[0].clientY : null; }, {passive:true, capture:true});   /* v453: 遊びの外（見出しの帯など）に指を置いても数えるため、文書で受ける */
       document.addEventListener('touchmove', function(e){ if(!phoneFree || !document.documentElement.classList.contains('gmopen')) return;   /* v431/v453: 案内中も遊び中も、後ろの本編は動かさない。遊びの外に触れても効くよう、文書で捕まえる（本人） */ var sc = e.target && e.target.closest ? e.target.closest('.gm-side, .gm-iscroll, .gm-info-in, .gm-take-in, .gm-sheet, .menu') : null;
         if(sc){ var y = e.touches[0] ? e.touches[0].clientY : tmY, dy = (tmY === null || y === null) ? 0 : y - tmY; tmY = y;   /* v398: 列の端で引いても紙面へ伝えない（帯が戻り、本編が見える） */
@@ -4421,8 +4423,8 @@
           return; }
         e.preventDefault(); }, {passive:false, capture:true});   /* v391: 盤面の間、指で紙面が動かないように */
       stage.addEventListener('pointercancel', function(e){ up(e, false); if(state === 'trace') tipEl.classList.remove('off'); });
-      stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } });
-      stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); });   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
+      stage.addEventListener('lostpointercapture', function(){ if(down){ down = false; liveEl.classList.remove('press'); if(state === 'trace') hideLive(); } lensOff(); });   /* v536 ここで虫眼鏡を閉じていなかった。押していないのに丸が残り、線も引けなくなっていた（本人） */
+      stage.addEventListener('pointercancel', function(){ down = false; liveEl.classList.remove('press'); lensOff(); if(state === 'trace') hideLive(); });   /* v536 同上 */   /* ブラウザに指を取られたら、なぞりを白紙に戻す */
       stage.addEventListener('keydown', function(e){
         if(e.target && e.target.closest && e.target.closest('button')) return;   /* v524 盤面の keydown が、盤面の中のボタン（虫眼鏡・回す）の Enter/Space まで preventDefault していた */
         var k = e.key;
@@ -5093,7 +5095,7 @@
         else if(!lead2.hidden){ lead2.className = 'gm-lead2 gm-res bye'; setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); } }   /* v477: 何をする遊びかを、いちばん先に目につく所へ（本人） */
       if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ if(tutOn) return;   /* 手引きの最中は出さない。tutEnd から始める */ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
-      state = 'trace'; live = -1; down = false;
+      state = 'trace'; live = -1; down = false; lensOff();   /* v536 前の手番の丸を持ち越さない */
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
       resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
       resPre(true);   /* v510 次の線へ移るとき、上の情報が消えて下がぶつかるのを止める（本人）。薄くなってから畳む */
