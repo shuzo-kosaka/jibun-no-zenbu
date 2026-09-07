@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4320,7 +4320,7 @@
         if(performance.now() - startedAt < 400){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v421: 守りの窓でも、動いたら線にする（叩くだけは無視） */
         down = true; moved = 0; downX = e.clientX; downY = e.clientY;
         try{ stage.setPointerCapture(e.pointerId); }catch(x){}
-        liveEl.classList.add('press'); move(e);
+        liveEl.classList.add('press'); move(e); lensOn(); lensMove(e);   /* v515 */
         if(bi === 0 && ti === 0 && !lcapDone && !rot){ var lc0 = el('i', 'gm-lcap'); lc0.textContent = L('離すと、ここに線が引かれます', 'Release to place the line'); liveEl.appendChild(lc0); liveEl.appendChild(el('i', 'gm-ldot')); }   /* v408: 手本の円を、押している間の線の中心にも */   /* v405: 一本目は、押している間だけ線に付いて回る一言（小坂さんの案） */
       });
       stage.addEventListener('pointermove', function(e){
@@ -4341,7 +4341,7 @@
       function up(e, ok){
         pend = null;
         var lc = liveEl.querySelector('.gm-lcap'); if(lc){ lc.parentNode.removeChild(lc); lcapDone = true; } var ld = liveEl.querySelector('.gm-ldot'); if(ld) ld.parentNode.removeChild(ld);
-        if(!down) return; down = false; liveEl.classList.remove('press');
+        if(!down) return; down = false; liveEl.classList.remove('press'); lensOff();
         if(!ok || state !== 'trace') return;
         if(moved < 6){ fresh = false; hideLive(); if(state === 'trace') tipEl.classList.remove('off'); return; }   /* v483: 動かさずに離した押下は線にしない（流れ係：進めたつもりの二度目の押下が、そのまま線になっていた）。 操作は「押したまま動かし、離す」と案内しているので、それに合わせる */
         var sr = stage.getBoundingClientRect(), ox = Math.max(sr.left - e.clientX, e.clientX - sr.right, 0), oy = Math.max(sr.top - e.clientY, e.clientY - sr.bottom, 0);
@@ -4880,6 +4880,27 @@
       setTimeout(tipFit, 40); setTimeout(tipFit, 520);
       tbFit();
     }
+    /* v515 虫眼鏡：押しているあいだ、指やカーソルの真下を 2.2 倍で見せる（本人）。回して置いているときは出さない */
+    var lensEl = null;
+    function lensOn(){
+      if(rm || rot || !picEl) return;
+      var im = picEl.querySelector('img'); if(!im) return;
+      var src = im.currentSrc || im.src; if(!src) return;
+      if(!lensEl){ lensEl = el('div', 'gm-lens'); lensEl.appendChild(el('i', 'gm-lensx')); stage.appendChild(lensEl); }
+      if(lensEl.parentNode !== stage) stage.appendChild(lensEl);
+      lensEl.style.backgroundImage = 'url("' + src + '")';
+      lensEl.classList.add('on');
+    }
+    function lensMove(e){
+      if(!lensEl || !lensEl.classList.contains('on')) return;
+      var r = stage.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, Z = 2.2, R = 58;
+      var oy = ptype === 'touch' ? -96 : 0;   /* 指のときは上へ逃がす（指で隠れる） */
+      lensEl.style.left = x + 'px'; lensEl.style.top = (y + oy) + 'px';
+      lensEl.style.backgroundSize = (r.width * Z) + 'px ' + (r.height * Z) + 'px';
+      lensEl.style.backgroundPosition = (R - x * Z) + 'px ' + (R - y * Z) + 'px';
+      lensEl.classList.toggle('v', LINES[ti] && LINES[ti].ax === 'v');
+    }
+    function lensOff(){ if(lensEl) lensEl.classList.remove('on'); }
     function move(e){
       if(state !== 'trace') return;
       var t = LINES[ti], r = stage.getBoundingClientRect(), px, py;
@@ -4887,6 +4908,7 @@
       else { px = (e.clientX - r.left) / r.width * 100; py = (e.clientY - r.top) / r.height * 100; }
       var p = t.ax === 'v' ? px : py;
       setLive(Math.max(0, Math.min(100, p)));
+      if(down) lensMove(e);   /* v515 押しているあいだだけ虫眼鏡が追う */
     }
     /* なぞる：線は補間なしで追従。数値は指に隠れない位置——たての線は上端、よこの線は右端——に。目盛りには 0 からここまでの寸法 */
     function setLive(p){
@@ -5234,107 +5256,97 @@
     function infoOff(){ if(infoEl) infoEl.classList.remove('on'); var ib = gm && gm.querySelector('.gm-i'); if(ib){ ib.setAttribute('aria-expanded', 'false'); if(document.activeElement && document.activeElement !== ib && infoEl && infoEl.contains(document.activeElement)) ib.focus({preventScroll:true}); if(ptype === 'touch') ib.blur(); } } document.documentElement.classList.remove('gminfo');
     var takeEl = null, takeUrl = null;
     var takeFile = null;
+    /* C：持ち帰れる「あなたのものさし」——絵は入れず、選んだ枠にグリッドだけを描いて保存する（v517 本人：
+       他の方の絵を保存できるようにするのは筋が通らない／レイアウトも要らない／枠と形式を選べるように） */
+    var takeAR = 'screen', takeFmt = 'png';
+    var FRAMES = [
+      {k:'screen', ja:'この画面',   en:'This screen'},
+      {k:'phone',  ja:'スマホ（縦）', en:'Phone', ar:9 / 19.5},
+      {k:'phoneL', ja:'スマホ（横）', en:'Phone (landscape)', ar:19.5 / 9},
+      {k:'tab',    ja:'タブレット',  en:'Tablet', ar:3 / 4},
+      {k:'a4',     ja:'A4（縦）',    en:'A4 portrait',  ar:1 / 1.4142},
+      {k:'a4l',    ja:'A4（横）',    en:'A4 landscape', ar:1.4142},
+      {k:'sq',     ja:'正方形',      en:'Square', ar:1},
+      {k:'wide',   ja:'16 : 9',      en:'16 : 9', ar:16 / 9}
+    ];
+    var FMTS = [
+      {k:'png',   ja:'PNG',          en:'PNG',   mime:'image/png',  ext:'png'},
+      {k:'jpg',   ja:'JPEG',         en:'JPEG',  mime:'image/jpeg', ext:'jpg'},
+      {k:'alpha', ja:'PNG（背景透過）', en:'PNG (transparent)', mime:'image/png', ext:'png'}
+    ];
+    function frameAR(){
+      if(takeAR === 'screen') return window.innerWidth / Math.max(1, window.innerHeight);
+      for(var i = 0; i < FRAMES.length; i++) if(FRAMES[i].k === takeAR) return FRAMES[i].ar;
+      return 1;
+    }
+    function drawTake(avg){
+      var ar = frameAR(), LONG = 2400, W, H;
+      if(ar >= 1){ W = LONG; H = Math.round(LONG / ar); } else { H = LONG; W = Math.round(LONG * ar); }
+      var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var c = cv.getContext('2d'), u = Math.max(W, H) / 1000;
+      if(takeFmt !== 'alpha'){ c.fillStyle = '#F2F1EC'; c.fillRect(0, 0, W, H); }
+      /* 三点の骨格（薄い破線・七本） */
+      c.setLineDash([7 * u, 7 * u]); c.lineWidth = Math.max(1, 1.3 * u);
+      c.strokeStyle = takeFmt === 'alpha' ? 'rgba(30,28,26,.55)' : 'rgba(46,44,41,.5)';
+      GRID.v.forEach(function(v){ c.beginPath(); c.moveTo(W * v / 100, 0); c.lineTo(W * v / 100, H); c.stroke(); });
+      GRID.h.forEach(function(v){ c.beginPath(); c.moveTo(0, H * v / 100); c.lineTo(W, H * v / 100); c.stroke(); });
+      /* あなたの四本（朱の実線） */
+      c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = Math.max(1.5, 2.6 * u);
+      LINES.forEach(function(t){ var v = avg[t.k]; if(v == null) return; c.beginPath();
+        if(t.ax === 'v'){ c.moveTo(W * v / 100, 0); c.lineTo(W * v / 100, H); } else { c.moveTo(0, H * v / 100); c.lineTo(W, H * v / 100); } c.stroke(); });
+      return cv;
+    }
     function takeaway(avg){
-      var cs = getComputedStyle(document.documentElement), FM = (cs.getPropertyValue('--mincho') || 'serif').trim(), FS = (cs.getPropertyValue('--sans') || 'sans-serif').trim(), FO = (cs.getPropertyValue('--mono') || 'monospace').trim();
-      var W = 1200, H = 675, cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2; var c = cv.getContext('2d'); c.scale(2, 2);
-      function rr(x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-      c.fillStyle = '#F2F1EC'; c.fillRect(0, 0, W, H);
-      c.fillStyle = '#1C1B19'; c.font = '900 40px ' + FM; c.textBaseline = 'alphabetic'; c.fillText(L('あなたの、ものさし', 'Your ruler'), 60, 92);
-      c.fillStyle = '#E84518'; c.font = '500 12px ' + FO; c.fillText(L('絵を、測る。  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO', 'MEASURE THE PICTURE  ·  CHECKPOINT 06  ·  KOSAKA · PORTFOLIO'), 60, 120);
-      /* 左：三枚の札とあなたの四本。いちばん解釈が分かれた一枚を大きく置き、残る二枚を添える（v513 本人：横に三つ並べていて緩急がない） */
-      var ORDJ = ['一枚目', '二枚目', '三枚目'], ORDEN = ['First', 'Second', 'Third'];
-      var bigI = 0, bigD = -1;
-      picks.forEach(function(b, i){ var r = res[i] || {}, m = 0; LINES.forEach(function(t){ if(r[t.k] != null && b.a && b.a[t.k] != null) m = Math.max(m, Math.abs(r[t.k] - b.a[t.k])); }); if(m > bigD){ bigD = m; bigI = i; } });
-      function card(i, cx, cy, maxW, maxH, big){
-        var b = picks[i], im = trayEl.children[i] && trayEl.children[i].querySelector('img'), ar = +b.ar || 1;
-        var w = maxW, h = w / ar; if(h > maxH){ h = maxH; w = h * ar; }
-        c.save(); rr(cx, cy, w, h, 4); c.clip();
-        if(im && im.complete && im.naturalWidth){ try{ c.drawImage(im, cx, cy, w, h); }catch(e){} } else { c.fillStyle = '#ECE8DF'; c.fillRect(cx, cy, w, h); }
-        var r = res[i] || {}; c.strokeStyle = '#E84518'; c.lineWidth = big ? 1.8 : 1.2;
-        LINES.forEach(function(t){ var v = r[t.k]; if(v == null) return; c.beginPath(); if(t.ax === 'v'){ c.moveTo(cx + w * v / 100, cy); c.lineTo(cx + w * v / 100, cy + h); } else { c.moveTo(cx, cy + h * v / 100); c.lineTo(cx + w, cy + h * v / 100); } c.stroke(); });
-        c.restore();
-        c.strokeStyle = big ? 'rgba(30,28,26,.5)' : 'rgba(30,28,26,.32)'; c.lineWidth = 1; rr(cx + .5, cy + .5, w - 1, h - 1, 4); c.stroke();
-        var nm = L(ORDJ[i], ORDEN[i]);
-        c.fillStyle = '#E84518'; c.font = (big ? '700 12.5px ' : '500 11px ') + FO; c.fillText(nm, cx, cy - 8);
-        if(big){   /* 題は大きい一枚だけに添える。小さい二枚は幅が足りず「…」で切れていた。三枚の題は下の一覧で読める */
-          var tw = c.measureText(nm).width + 10;
-          c.fillStyle = '#5A5955'; c.font = '12.5px ' + FS;
-          var t0 = L(b.t, b.te), lb = t0; while(lb.length > 2 && c.measureText(lb).width > w - tw - 4) lb = lb.slice(0, -1);
-          c.fillText(lb === t0 ? lb : lb.replace(/.$/, '…'), cx + tw, cy - 8);
-        }
-        return {x:cx, y:cy, w:w, h:h};
-      }
-      var A = card(bigI, 60, 178, 300, 262, true);
-      var rest = [0, 1, 2].filter(function(i){ return i !== bigI; });
-      var sx = 60 + A.w + 26;
-      var B = card(rest[0], sx, 178, 172, 126, false);
-      var C = card(rest[1], sx, B.y + B.h + 34, 172, 126, false);
-      var yBot = Math.max(A.y + A.h, C.y + C.h);
-      /* v386: 三枚の読みと一言。値だけでなく言葉が残る一枚に */
-      var ty = yBot + 46, obsEl = gm.querySelector('.gm-obs'), obs = obsEl ? obsEl.textContent.trim() : '', enT = L('a', 'b') === 'b';
-      c.fillStyle = '#5A5955'; c.font = '11px ' + FS;
-      c.fillText(picks.map(function(b, i){ return L(ORDJ[i], ORDEN[i]) + '  ' + (enT ? (b.cate || b.cat || '') : (b.cat || '')); }).join(enT ? '   /   ' : '   ／   '), 60, ty);
-      (function(){   /* 題は切らずに。一行で入らなければ二行に畳む（v513 本人：さまざまな工夫を） */
-        var tl = picks.map(function(b, i){ return L(ORDJ[i], ORDEN[i]) + '  ' + L(b.t, b.te); }), sep2 = enT ? '   /   ' : '   ／   ';
-        c.fillStyle = '#8E8B84'; c.font = '10.5px ' + FS;
-        var one = tl.join(sep2);
-        if(c.measureText(one).width <= 560){ c.fillText(one, 60, ty + 16); return; }
-        var two = [tl[0], tl.slice(1).join(sep2)];
-        if(c.measureText(two[1]).width <= 560 && c.measureText(two[0]).width <= 560){ c.fillText(two[0], 60, ty + 16); c.fillText(two[1], 60, ty + 30); ty += 14; return; }
-        tl.forEach(function(t2, i2){ c.fillText(t2, 60, ty + 16 + i2 * 14); }); ty += (tl.length - 1) * 14;
-      })();
-      if(obs){
-        c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FM; var toks = enT ? obs.split(' ') : obs.split(''), line = '', ly = ty + 52, n = 0, maxL = ty > 420 ? 2 : 4, sep = enT ? ' ' : '';
-        for(var ci = 0; ci < toks.length && n < maxL; ci++){ var tk = toks[ci], cand = line ? line + sep + tk : tk; if(c.measureText(cand).width > 520 && line){ c.fillText(line, 60, ly); line = tk; ly += 26; n++; } else line = cand; }
-        if(line && n < maxL) c.fillText(line, 60, ly);
-      }
-      /* 右：平均グリッド（あなたの 4 本＋研究の 3 本） */
-      var gx = 640, gy = 170, gw = 480, gh = 300;
-      c.fillStyle = '#FBFAF6'; rr(gx, gy, gw, gh, 6); c.fill(); c.strokeStyle = '#E1BD2B'; c.lineWidth = 1.5; rr(gx, gy, gw, gh, 6); c.stroke();
-      c.save(); rr(gx, gy, gw, gh, 6); c.clip();
-      c.setLineDash([4, 4]); c.strokeStyle = 'rgba(46,44,41,.5)'; c.lineWidth = 1;
-      GRID.v.forEach(function(v){ c.beginPath(); c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); });   /* v514 説明は七本を挙げているのに三本しか引いていなかった（見張り番） */
-      GRID.h.forEach(function(v){ c.beginPath(); c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); });
-      c.setLineDash([]); c.strokeStyle = '#E84518'; c.lineWidth = 2; c.fillStyle = '#E84518'; c.font = '500 11px ' + FO;
-      LINES.forEach(function(t){ var v = avg[t.k]; c.beginPath(); if(t.ax === 'v'){ c.moveTo(gx + gw * v / 100, gy); c.lineTo(gx + gw * v / 100, gy + gh); c.stroke(); c.fillText(v + '%', gx + gw * v / 100 + 4, gy + 14); } else { c.moveTo(gx, gy + gh * v / 100); c.lineTo(gx + gw, gy + gh * v / 100); c.stroke(); c.fillText(v + '%', gx + 4, gy + gh * v / 100 - 5); } });
-      c.restore();
-      c.fillStyle = '#1C1B19'; c.font = '700 15px ' + FS; c.fillText(L('あなたの四本', 'your four lines') + '　X ' + avg.x1 + ' · ' + avg.x3 + '%　／　Y ' + avg.y1 + ' · ' + avg.y2 + '%', gx, gy + gh + 34);
-      c.fillStyle = '#5A5955'; c.font = '13px ' + FS; c.fillText(L('三点の骨格', 'three-work grid') + '　X 12 · 28 · 58 · 83%　／　Y 14 · 32 · 71%　（' + L('破線', 'dashed') + '）', gx, gy + gh + 58);
-      c.fillStyle = '#8E8B84'; c.font = '11px ' + FO; var d = new Date(); c.fillText(d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) + '  ·  ' + L('絵の幅と高さを 100 とした％', 'percent of the outline as 100'), gx, gy + gh + 82);
-      /* 判（静止） */
-      var sx = 1040, sy = 560, ss = 72; c.save(); c.translate(sx + ss / 2, sy + ss / 2); c.rotate(-9 * Math.PI / 180); c.translate(-ss / 2, -ss / 2);
-      c.strokeStyle = '#E84518'; c.lineWidth = 2.2; c.strokeRect(0, 0, ss, ss); c.lineWidth = .8; c.strokeRect(6, 6, ss - 12, ss - 12);
-      c.fillStyle = '#E84518'; c.font = '500 6px ' + FO; c.textAlign = 'center'; c.fillText('YOUR GRID', ss / 2, 20); c.font = '700 20px ' + FS; c.fillText('平均', ss / 2, 46); c.font = '4px ' + FO; c.fillText('KOSAKA · PORTFOLIO', ss / 2, 60); c.restore(); c.textAlign = 'start';
+      var d = new Date(), ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
       if(!takeEl){
         takeEl = el('div', 'gm-take'); takeEl.setAttribute('role', 'dialog'); takeEl.setAttribute('aria-label', L('あなたのものさし', 'Your ruler'));
-        takeEl.innerHTML = '<div class="gm-take-in"><div class="gm-take-h"><b></b><em></em></div><img alt=""><p></p><div class="gm-take-b"><a class="gm-b go" download="monosashi.png"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 12.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></a><button type="button" class="gm-b gm-share" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 7.5v6h9v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="gm-b gm-take-x"></button></div></div>';
-        takeEl.querySelector('.gm-take-x').addEventListener('click', takeOff); takeEl.querySelector('.gm-share').addEventListener('click', function(){ if(!takeFile || !navigator.share) return; navigator.share({files:[takeFile], title:L('あなたの、ものさし', 'Your ruler')}).catch(function(){}); });   /* v386: 共有（AirDrop・LINE など。共有できる環境でだけ出る） */ takeEl.addEventListener('click', function(e){ if(e.target === takeEl) takeOff(); });
+        takeEl.innerHTML = '<div class="gm-take-in"><div class="gm-take-h"><b></b><em></em></div><img alt=""><p></p>' +
+          '<div class="gm-take-opt"><em class="gm-optl"></em><div class="gm-take-fr"></div><em class="gm-optl2"></em><div class="gm-take-fm"></div></div>' +
+          '<div class="gm-take-b"><a class="gm-b go" download="monosashi.png"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 12.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></a>' +
+          '<button type="button" class="gm-b gm-share" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 7.5v6h9v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+          '<button type="button" class="gm-b gm-take-x"></button></div></div>';
+        takeEl.querySelector('.gm-take-x').addEventListener('click', takeOff);
+        takeEl.querySelector('.gm-share').addEventListener('click', function(){ if(!takeFile || !navigator.share) return; navigator.share({files:[takeFile], title:L('あなたの、ものさし', 'Your ruler')}).catch(function(){}); });
+        takeEl.addEventListener('click', function(e){ if(e.target === takeEl) takeOff(); });
         gm.appendChild(takeEl);
       }
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a');
-      takeEl.querySelector('p').textContent = L('三枚の解釈と平均のグリッド、それに一言を、一枚の画像にしました。保存して、手元のものさしに。', 'Your three readings, the average grid and a note, on one image. Save it and keep the ruler with you.');
-      var ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-      a.querySelector('span').textContent = L('画像を保存', 'Save image'); a.download = 'monosashi-' + ymd + '.png';
-      var sb0 = takeEl.querySelector('.gm-share'); sb0.setAttribute('aria-label', L('共有', 'Share')); sb0.title = L('共有（AirDrop・LINE など）', 'Share (AirDrop, LINE and more)'); takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
-      takeEl.querySelector('.gm-take-h b').textContent = L('保存する一枚', 'The sheet you keep'); takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
-      function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.onload = function(){ im.onload = null; takeFly(); }; im.src = url; a.href = url; takeEl.classList.add('on'); }
-      function share(bl){ var sb = takeEl.querySelector('.gm-share'); takeFile = null; try{ if(bl && window.File && navigator.canShare){ var f = new File([bl], 'monosashi-' + ymd + '.png', {type:'image/png'}); if(navigator.canShare({files:[f]})) takeFile = f; } }catch(e){} sb.hidden = !takeFile;
-        if(takeFile) takeEl.querySelector('p').textContent += L(' 丸いボタンから、AirDrop などでも送れます。', ' The round button shares it, by AirDrop and more.'); }
-      /* v387: 平均のグリッドが保存画像の中へ縮んで収まってから、プリントが下から出る（Sol 第 15：平均→保存がいちばん唐突になり得る） */
-      function takeFly(){
-        if(rm || !stage || !window.Animation) return;
-        var sr = stage.getBoundingClientRect(), tr = takeEl.getBoundingClientRect(); if(!sr.width || !im.offsetWidth) return;
-        var ir = {left: tr.left + im.offsetLeft, top: tr.top + im.offsetTop, width: im.offsetWidth, height: im.offsetHeight};   /* 札はまだ動いている最中なので、変形の影響を受けない offset で最終位置を出す */
-        var tx = ir.left + ir.width * .533, ty = ir.top + ir.height * .252, tw = ir.width * .4, th = ir.height * .444;
-        var g = el('div', 'gm-fly'); g.style.cssText = 'left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px';
-        LINES.forEach(function(t){ var v = avg[t.k]; if(v == null) return; var i = el('i', t.ax); i.style[t.ax === 'v' ? 'left' : 'top'] = v + '%'; g.appendChild(i); });
-        document.body.appendChild(g);
-        try{ var an = g.animate([{transform:'none', opacity:1}, {transform:'translate(' + (tx - sr.left).toFixed(1) + 'px,' + (ty - sr.top).toFixed(1) + 'px) scale(' + (tw / sr.width).toFixed(4) + ',' + (th / sr.height).toFixed(4) + ')', opacity:.2}], {duration:560, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards'}); an.onfinish = function(){ if(g.parentNode) g.remove(); }; }catch(e){ g.remove(); }
-        setTimeout(function(){ if(g.parentNode) g.remove(); }, 1000);
+      takeEl.querySelector('.gm-take-h b').textContent = L('保存する一枚', 'The sheet you keep');
+      takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
+      takeEl.querySelector('p').textContent = L('あなたの四本と三点の骨格を、選んだ枠に引いた一枚です。', 'Your four lines and the three-work grid, drawn in the frame you choose.');
+      takeEl.querySelector('.gm-optl').textContent = L('枠', 'Frame');
+      takeEl.querySelector('.gm-optl2').textContent = L('形式', 'Format');
+      takeEl.querySelector('.gm-take-x').textContent = L('閉じる', 'Close');
+      a.querySelector('span').textContent = L('画像を保存', 'Save image');
+      var sb0 = takeEl.querySelector('.gm-share'); sb0.setAttribute('aria-label', L('共有', 'Share')); sb0.title = L('共有（AirDrop・LINE など）', 'Share (AirDrop, LINE and more)');
+      function opts(host, list, cur, set){
+        host.innerHTML = '';
+        list.forEach(function(o){
+          var b = el('button', 'gm-opt'); b.type = 'button'; b.textContent = L(o.ja, o.en);
+          b.setAttribute('aria-pressed', o.k === cur() ? 'true' : 'false');
+          b.addEventListener('click', function(){ set(o.k); render(); });
+          host.appendChild(b);
+        });
       }
-      if(cv.toBlob) cv.toBlob(function(bl){ share(bl); put(bl ? URL.createObjectURL(bl) : cv.toDataURL('image/png')); }, 'image/png'); else { share(null); put(cv.toDataURL('image/png')); }
-      setTimeout(function(){ var b = takeEl.querySelector('a'); if(b) b.focus({preventScroll:true}); }, 260);
+      function render(){
+        opts(takeEl.querySelector('.gm-take-fr'), FRAMES, function(){ return takeAR; }, function(k){ takeAR = k; });
+        opts(takeEl.querySelector('.gm-take-fm'), FMTS, function(){ return takeFmt; }, function(k){ takeFmt = k; });
+        var fmt = FMTS[0]; FMTS.forEach(function(f){ if(f.k === takeFmt) fmt = f; });
+        var cv = drawTake(avg), name = 'monosashi-' + ymd + '-' + takeAR + (takeFmt === 'alpha' ? '-alpha' : '') + '.' + fmt.ext;
+        a.download = name;
+        im.style.aspectRatio = cv.width + ' / ' + cv.height;
+        im.classList.toggle('alpha', takeFmt === 'alpha');
+        function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.src = url; a.href = url; takeEl.classList.add('on'); }
+        function share(bl){ takeFile = null;
+          try{ if(bl && window.File && navigator.canShare){ var f = new File([bl], name, {type:fmt.mime}); if(navigator.canShare({files:[f]})) takeFile = f; } }catch(e){}
+          sb0.hidden = !takeFile; }
+        if(cv.toBlob) cv.toBlob(function(bl){ share(bl); put(bl ? URL.createObjectURL(bl) : cv.toDataURL(fmt.mime)); }, fmt.mime, fmt.k === 'jpg' ? .92 : undefined);
+        else { share(null); put(cv.toDataURL(fmt.mime)); }
+      }
+      render();
+      setTimeout(function(){ if(a) a.focus({preventScroll:true}); }, 260);
     }
+
     function takeOff(){ if(takeEl) takeEl.classList.remove('on'); }
     var sheetAvg = null;
     function sheet(avg){

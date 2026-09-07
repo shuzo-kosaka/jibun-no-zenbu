@@ -4194,6 +4194,32 @@
   /* v514 一本目の「離すと、ここに線が引かれます」の札が、カーソル演出の座標に 7px 食い込んでいた（見張り番） */
   .gm-live.h .gm-lcap{top:34px}
 
+  /* ================= v515 虫眼鏡（押しているあいだだけ） ================= */
+  .gm-lens{position:absolute; width:116px; height:116px; margin:-58px 0 0 -58px; border-radius:50%; background-repeat:no-repeat; background-color:#F2F1EC;
+    box-shadow:0 0 0 1.5px rgba(232,69,24,.85), 0 6px 20px rgba(30,28,26,.20); pointer-events:none; z-index:7;
+    opacity:0; transform:scale(.86); transition:opacity .16s cubic-bezier(.22,.61,.36,1), transform .16s cubic-bezier(.22,.61,.36,1)}
+  .gm-lens.on{opacity:1; transform:scale(1)}
+  .gm-lensx{position:absolute; left:0; right:0; top:50%; height:0; border-top:1.5px solid #E84518; margin-top:-.75px}
+  .gm-lens.v .gm-lensx{left:50%; right:auto; top:0; bottom:0; height:auto; margin:0 0 0 -.75px; border-top:0; border-left:1.5px solid #E84518}
+  html.phone .gm-lens{width:104px; height:104px; margin:-52px 0 0 -52px}
+  html.rm .gm-lens{display:none}
+
+  /* ================= v517 保存の一枚：枠と形式を選ぶ ================= */
+  .gm-take img{max-height:44vh; background:#F2F1EC}
+  .gm-take img.alpha{background-image:linear-gradient(45deg, rgba(30,28,26,.06) 25%, transparent 25%, transparent 75%, rgba(30,28,26,.06) 75%),
+    linear-gradient(45deg, rgba(30,28,26,.06) 25%, transparent 25%, transparent 75%, rgba(30,28,26,.06) 75%);
+    background-size:14px 14px; background-position:0 0, 7px 7px; background-color:#FBFAF6}   /* 背景透過は市松で示す */
+  .gm-take-opt{display:grid; grid-template-columns:auto 1fr; align-items:start; gap:7px 12px; margin:2px 0 14px}
+  .gm-take-opt .gm-optl,.gm-take-opt .gm-optl2{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; opacity:.62; padding-top:6px; font-style:normal}
+  .gm-take-fr,.gm-take-fm{display:flex; flex-wrap:wrap; gap:6px}
+  .gm-opt{font:inherit; font-size:12px; line-height:1; padding:7px 11px; border:1px solid rgba(30,28,26,.28); border-radius:3px; background:transparent; color:var(--fg); cursor:pointer;
+    transition:background-color .16s var(--ease), color .16s var(--ease), border-color .16s var(--ease)}
+  .gm-opt:hover{border-color:var(--acc); color:var(--acc)}
+  .gm-opt[aria-pressed="true"]{background:#1C1B19; color:#F2F1EC; border-color:#1C1B19}
+  html.phone .gm-opt{font-size:11.5px; padding:6px 9px}
+  html.phone .gm-take img{max-height:36vh}
+  @media (max-height:640px){ .gm-take img{max-height:32vh} .gm-take-opt{margin-bottom:10px; gap:5px 10px} }
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
