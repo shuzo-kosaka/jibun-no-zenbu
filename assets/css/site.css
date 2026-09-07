@@ -4459,6 +4459,6 @@
   @keyframes cpDone{from{opacity:0; transform:translateY(8px)}}
   /* v552 判の置き場：列 1 の左端に寄せていたものを、X1 と X2 の真ん中（20%）へ。
      文字の案内は判の中に入れたので、外の .cap／.seqcap は出さない（v437 の移設ごと取り消し） */
-  .seqplay{left:20% !important; transform:translateX(-50%); width:min(13vw, 168px)}
+  .seqplay{left:20% !important; transform:translateX(-50%); width:min(13vw, 168px); bottom:calc(29vh + env(safe-area-inset-bottom, 0px)) !important}   /* v553 もう少し上へ（本人）。Y3（71vh）のすぐ上に載せ、大きな一文と同じ帯に置く */
   .seqplay .cap,.seqcap{display:none !important}
   html.pcview.phone .seqplay,html.pcview.tablet .seqplay{left:20% !important; transform:translateX(-50%)}

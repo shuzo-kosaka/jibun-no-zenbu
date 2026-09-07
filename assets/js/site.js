@@ -3249,6 +3249,7 @@
       sw.querySelector('.tag b').textContent = en ? 'JA' : 'EN';
       sw.querySelector('.tag b.to').textContent = en ? 'EN' : 'JA';
       sw.classList.remove('run'); void sw.offsetWidth; sw.classList.add('run');
+      clearTimeout(sw.__lgt); sw.__lgt = setTimeout(function(){ sw.classList.remove('run'); }, 1000);   /* v553 帯が通り過ぎたら印を外す。付けっぱなしだと、カーソルの色を紙色に固定する規則（html:has(.lgsw.run)）がずっと効いて、どの地でも白いままになっていた（本人） */
     })();
     curLang = lang;
     surStop(true); if(surOld){ clearTimeout(surT); surOld.remove(); surOld = null; if(cpage) cpage.classList.remove('surhid'); }
