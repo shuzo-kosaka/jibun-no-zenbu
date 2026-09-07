@@ -4131,6 +4131,18 @@
   html.phone .gm-igo svg{width:20px; height:20px}
   /* v504 一行の項目だけ、字が図の上に寄っていた（本人）。図と字の中心を合わせる */
   .gm-ilist li{align-items:center}
+  /* v506 一度だけの一言は、列の段落から出して盤面の上に浮かせる（本人：出入りで前後が歪に動く） */
+  .gm-sw{position:relative}
+  .gm-once.gm-onceb{position:absolute; z-index:9; transform:translate(-50%,-50%) translateY(6px); margin:0; max-width:min(300px, 62%);
+    background:rgba(242,241,236,.95); border-left:2px solid var(--acc); padding:9px 12px; font-size:12.5px; line-height:1.7;
+    opacity:0; pointer-events:none; transition:opacity .42s var(--ease), transform .42s var(--ease)}
+  .gm-once.gm-onceb.on{opacity:1; transform:translate(-50%,-50%)}
+  .gm-once.gm-onceb.bye{opacity:0; transform:translate(-50%,-50%) translateY(-6px)}
+  .gm-oncetie{position:absolute; z-index:8; background:var(--acc); opacity:0; transition:opacity .32s var(--ease) .1s; pointer-events:none}
+  .gm-oncetie.v{width:1px} .gm-oncetie.h{height:1px}
+  .gm-oncetie.on{opacity:.55} .gm-oncetie.bye{opacity:0}
+  html.phone .gm-once.gm-onceb{font-size:13px; max-width:min(280px, 72%)}
+  html.rm .gm-once.gm-onceb,html.rm .gm-oncetie{transition:none}
 
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}

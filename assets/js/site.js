@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4880,7 +4880,34 @@
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
         var once = el('p', 'gm-once'); once.innerHTML = body(L('この差が示すのは、正解・不正解ではなく、私との解釈の違いです。', 'This difference is not about right or wrong. It shows how your interpretation differs from mine.'));
-        resEl.insertBefore(once, resEl.firstChild); setTimeout(function(){ if(once.parentNode) once.classList.add('bye'); }, 7000); setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); }, 8200); }
+        /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
+           盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */
+        once.classList.add('gm-onceb');
+        var host = gm.querySelector('.gm-sw') || stage.parentNode;
+        var tie = el('i', 'gm-oncetie');
+        host.appendChild(tie); host.appendChild(once);
+        (function place(){
+          var sr = stage.getBoundingClientRect(), hr = host.getBoundingClientRect();
+          var you = linesEl.querySelector('.gm-ln.you.now') || linesEl.querySelector('.gm-ln.you');
+          var mine = linesEl.querySelector('.gm-ln.mine');
+          if(!you || !mine){ once.style.left = '50%'; once.style.top = '62%'; return; }
+          var yr = you.getBoundingClientRect(), mr = mine.getBoundingClientRect();
+          var horiz = you.classList.contains('h');
+          if(horiz){
+            var y1 = yr.top - hr.top, y2 = mr.top - hr.top, x = sr.left - hr.left + sr.width * .62;
+            tie.className = 'gm-oncetie v';
+            tie.style.left = x + 'px'; tie.style.top = Math.min(y1, y2) + 'px'; tie.style.height = Math.max(6, Math.abs(y2 - y1)) + 'px';
+            once.style.left = x + 'px'; once.style.top = ((y1 + y2) / 2) + 'px';
+          } else {
+            var x1 = yr.left - hr.left, x2 = mr.left - hr.left, y = sr.top - hr.top + sr.height * .62;
+            tie.className = 'gm-oncetie h';
+            tie.style.left = Math.min(x1, x2) + 'px'; tie.style.top = y + 'px'; tie.style.width = Math.max(6, Math.abs(x2 - x1)) + 'px';
+            once.style.left = ((x1 + x2) / 2) + 'px'; once.style.top = y + 'px';
+          }
+        })();
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ once.classList.add('on'); tie.classList.add('on'); }); });
+        setTimeout(function(){ once.classList.add('bye'); tie.classList.add('bye'); }, 7000);
+        setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); if(tie.parentNode) tie.parentNode.removeChild(tie); }, 8200); }
       first = false; setTimeout(reveal, 80);
     }
     function cmpRender(t, b, p, a, d){
