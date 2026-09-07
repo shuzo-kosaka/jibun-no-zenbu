@@ -3371,7 +3371,7 @@
   /* the chosen language survives a reload (per browser); the opening itself stays Japanese */
   try{ if(localStorage.getItem('kosaka-lang') === 'en') setLang('en', true); }catch(e){}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ===== v361: 遊び「絵を、測る。」を、応答を軸に組み直した（2026-09-05、ChatGPT Work との議論を踏まえて）。
      五つの状態——なぞる／押す／離して確定／比べる／次へ——を分け、演出の待ち時間を置かない。
      ・導入は一手目に統合（最初から盤面が触れる）。手番の一行に、その盤面で読む対象（山・橋・幹…）を入れる
      ・確定はポインタを離した位置。確定した線は残し、わたしの線を破線で重ね、二本のあいだに寸法（％差）を出す。比較は次の押下まで残す
@@ -4257,7 +4257,7 @@
               '<div class="gm-rt"><span>0</span><span>50</span><span>100</span></div><div class="gm-rl"><span>0</span><span>50</span><span>100</span></div><i class="gm-axl h"></i><i class="gm-axl v"></i>' +
               '<i class="gm-dimr v"></i><i class="gm-dimr h"></i>' +
               '<div class="gm-lines"></div><i class="gm-dim"></i><i class="gm-live"></i><span class="gm-read"></span>' +
-              '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' +
+              '</div><span class="gm-tip"></span><span class="gm-mode" aria-hidden="true"></span><button class="gm-turnb" type="button" aria-pressed="false" hidden></button>' + '<button class="gm-lensb" type="button" aria-pressed="true" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12.9 12.9 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span></span></button>' +
             '</div></div>' +
             '<div class="gm-side"><div class="gm-lead2" hidden></div><p class="gm-step"></p><div class="gm-tray" aria-hidden="true"></div><div class="gm-card" hidden></div><ul class="gm-list" hidden></ul><div class="gm-res"></div><div class="gm-qa"></div><div class="gm-btns"></div></div>' +
           '</div>' +
@@ -4291,7 +4291,8 @@
       gm.querySelector('.gm-i').addEventListener('click', function(){ if(infoEl && infoEl.classList.contains('on')) infoOff(); else info(); });
       /* 押したときの応答：どのボタンも一瞬わずかに沈んで戻る（0.18 秒）。動きを控える設定では出さない */
       gm.addEventListener('pointerdown', function(e){ var b = e.target && e.target.closest ? e.target.closest('button, .gm-igo, .gm-idots > *') : null; if(!b || rm) return; b.classList.remove('gm-pressed'); void b.offsetWidth; b.classList.add('gm-pressed'); setTimeout(function(){ b.classList.remove('gm-pressed'); }, 220); }, true);
-      turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb');
+      turnEl = gm.querySelector('.gm-turn'); tbEl = gm.querySelector('.gm-turnb'); lbEl = gm.querySelector('.gm-lensb');
+      if(lbEl && !lbEl.__b){ lbEl.__b = true; lbEl.addEventListener('click', function(){ lensPref = !lensPref; try{ localStorage.setItem('gm-lens', lensPref ? '1' : '0'); }catch(e){} if(!lensPref) lensOff(); lbLabel(); }); lbLabel(); }
       tbEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path class="r2" d="M10 14H23V21H10"/><path class="r1" d="M10 14V8H3V21H10"/><path class="rm" d="M10 14V21"/><path class="a" d="M7 4.6A12 12 0 0 1 19 10.9M15.6 9.9 19 10.9 20 7.5"/><path class="a2" d="M19 10.9A12 12 0 0 0 7 4.6M9.6 2.2 7 4.6 9.4 7.2"/></svg><span></span>';   /* v390: Astra の C 案「角をそろえる」（縦 7×13 と横 13×7 が角を共有、Material の rotate_90_degrees_cw の弧）。押した後は横が濃くなり、矢印が戻る向きに */   /* v388: 縦の絵（濃）が横（淡）になる、時計回りの矢印。写真アプリの「回転」と SF の rectangle.portrait.rotate の折衷。文字も添える */
       tbEl.addEventListener('click', function(){ turnPic(!rot); }); tbEl.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
       tbEl.addEventListener('pointerenter', function(e){ if(e.pointerType === 'touch') return; lastX = e.clientX; lastY = e.clientY; cringHold(rot ? L('縦に戻す \u00b7 TURN BACK \u00b7 ', 'TURN BACK \u00b7 ') : L('絵を横にして、大きく \u00b7 TURN \u00b7 ', 'TURN THE PICTURE \u00b7 ')); });
@@ -4314,7 +4315,7 @@
         if(performance.now() - boardAt < 700){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v462: 盤面が出た直後でも、実際に動かせば線にする（動き係：一本目の 0.85 秒が捨てられていた） */
         ptype = e.pointerType || 'mouse';
         if(state === 'compare'){ if(performance.now() - fixedAt < 350) return; nextTurn(); fresh = true; startedAt = performance.now() + 100; pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v417: そのまま動いたら次の線にする（pend） */   /* v416: 進めた直後 500ms の押下は線にしない（ダブルタップ） */   /* v403: 進めるための押下はここで終わり。同じ押下で仮の線を出さない（離すまで「押している」が残っていた） */
-        else if(state === 'done'){ if(performance.now() - fixedAt < 350) return; if(doneFn) doneFn(); fresh = true; startedAt = performance.now() + 100; return; }
+        else if(state === 'done'){ if(performance.now() - fixedAt < 350) return; if(doneFn) doneFn(); fresh = true; startedAt = performance.now() + 100; pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v518 そのまま動かしたら次の絵の一本目を引き始める（compare と同じ作法。虫眼鏡もここから出る） */
         else fresh = false;
         if(state !== 'trace') return;
         if(performance.now() - startedAt < 400){ pend = {id:e.pointerId, x:e.clientX, y:e.clientY}; return; }   /* v421: 守りの窓でも、動いたら線にする（叩くだけは無視） */
@@ -4326,7 +4327,7 @@
       stage.addEventListener('pointermove', function(e){
         if(e.pointerType) ptype = e.pointerType;
         if(state !== 'trace') return;
-        if(pend && !down && e.pointerId === pend.id){ var pdx = e.clientX - pend.x, pdy = e.clientY - pend.y; if(pdx * pdx + pdy * pdy > 64){ pend = null; startedAt = 0; fresh = false; if(e.pointerType !== 'touch'){ try{ stage.setPointerCapture(e.pointerId); }catch(x){} } down = true; moved = 0; downX = e.clientX; downY = e.clientY; liveEl.classList.add('press'); } }   /* v423: 指はすでに絵が暗黙に捕まえている。ここで捕まえ直すと lostpointercapture が出て、なぞりが殺されていた（実機の記録で判明） */   /* v417: 進めるための押下がそのまま動いたら、その指で次の線を引き始める（実機で一回目のドラッグが消えていた） */
+        if(pend && !down && e.pointerId === pend.id){ var pdx = e.clientX - pend.x, pdy = e.clientY - pend.y; if(pdx * pdx + pdy * pdy > 64){ pend = null; startedAt = 0; fresh = false; if(e.pointerType !== 'touch'){ try{ stage.setPointerCapture(e.pointerId); }catch(x){} } down = true; moved = 0; downX = e.clientX; downY = e.clientY; liveEl.classList.add('press'); lensOn(); lensMove(e); } }   /* v518 二本目以降もこの経路で始まるので、ここでも虫眼鏡を出す（本人：一本目しか出ない） */   /* v423: 指はすでに絵が暗黙に捕まえている。ここで捕まえ直すと lostpointercapture が出て、なぞりが殺されていた（実機の記録で判明） */   /* v417: 進めるための押下がそのまま動いたら、その指で次の線を引き始める（実機で一回目のドラッグが消えていた） */
         if(down){ moved = Math.max(moved, Math.abs(e.clientX - downX) + Math.abs(e.clientY - downY)); if(moved > 6) helpOff(); }   /* なぞり始めたら帯は引っ込める */
         if(ptype === 'touch' && !down) return;
         move(e);
@@ -4779,7 +4780,16 @@
       var ar = b.ar, w0 = Math.min(W, H * ar), a0 = w0 * w0 / ar, w1 = Math.min(W, H / ar), a1 = w1 * w1 * ar;
       return a1 > a0 * 1.2;   /* 回すと二割以上大きく見えるときだけ */
     }
-    function tbFit(){ if(tbEl) tbEl.hidden = !turnAllowed(); }
+    function tbFit(){ if(tbEl) tbEl.hidden = !turnAllowed(); lbFit(); }
+    /* v518 虫眼鏡は初めから出ている。要らない方はここで消せる（本人） */
+    function lbFit(){ if(!lbEl) return; lbEl.hidden = !(!rot && (state === 'trace' || state === 'compare')); }
+    function lbLabel(){
+      if(!lbEl) return;
+      lbEl.setAttribute('aria-pressed', lensPref ? 'true' : 'false');
+      var sp = lbEl.querySelector('span'); if(sp) sp.textContent = L('虫眼鏡', 'Lens');
+      var t = lensPref ? L('虫眼鏡をしまう', 'Turn the lens off') : L('虫眼鏡を出す', 'Turn the lens on');
+      lbEl.setAttribute('aria-label', t); lbEl.title = t;
+    }
     function turnPic(on){
       var b = picks[bi]; if(!b || on === rot || !turnEl) return;
       if(demoEl){ demoDone = true; demoOff(); }   /* v405: 回したら手本は消す（位置が合わなくなる） */
@@ -4881,9 +4891,10 @@
       tbFit();
     }
     /* v515 虫眼鏡：押しているあいだ、指やカーソルの真下を 2.2 倍で見せる（本人）。回して置いているときは出さない */
-    var lensEl = null;
+    var lensEl = null, lbEl = null, lensPref = true;
+    try{ lensPref = localStorage.getItem('gm-lens') !== '0'; }catch(e){}
     function lensOn(){
-      if(rm || rot || !picEl) return;
+      if(rm || rot || !lensPref || !picEl) return;
       var im = picEl.querySelector('img'); if(!im) return;
       var src = im.currentSrc || im.src; if(!src) return;
       if(!lensEl){ lensEl = el('div', 'gm-lens'); lensEl.appendChild(el('i', 'gm-lensx')); stage.appendChild(lensEl); }
@@ -4908,7 +4919,8 @@
       else { px = (e.clientX - r.left) / r.width * 100; py = (e.clientY - r.top) / r.height * 100; }
       var p = t.ax === 'v' ? px : py;
       setLive(Math.max(0, Math.min(100, p)));
-      if(down) lensMove(e);   /* v515 押しているあいだだけ虫眼鏡が追う */
+      if(down){ if(!lensEl || !lensEl.classList.contains('on')) lensOn();   /* v518 絵が入れ替わった直後は img がまだ無く、出そびれていた */
+        lensMove(e); }
     }
     /* なぞる：線は補間なしで追従。数値は指に隠れない位置——たての線は上端、よこの線は右端——に。目盛りには 0 からここまでの寸法 */
     function setLive(p){
@@ -5322,7 +5334,11 @@
       function opts(host, list, cur, set){
         host.innerHTML = '';
         list.forEach(function(o){
-          var b = el('button', 'gm-opt'); b.type = 'button'; b.textContent = L(o.ja, o.en);
+          var lab = L(o.ja, o.en);
+          var b = el('button', 'gm-opt'); b.type = 'button'; b.textContent = lab;
+          /* 全角の括弧は字面の右（左）が空くので、そのぶん寄せて、目で見て中心に揃える（本人） */
+          var lb = /[（〔「『]/.test(lab.charAt(0)), rb = /[）〕」』]/.test(lab.charAt(lab.length - 1));
+          if(rb && !lb) b.style.textIndent = '.25em'; else if(lb && !rb) b.style.textIndent = '-.25em';
           b.setAttribute('aria-pressed', o.k === cur() ? 'true' : 'false');
           b.addEventListener('click', function(){ set(o.k); render(); });
           host.appendChild(b);
@@ -5393,7 +5409,7 @@
         var st = gm.querySelector('.gm-stage'); if(st) st.setAttribute('aria-label', L('盤面', 'The board'));
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
-      axlText(); tbLabel();   /* 目盛りの向きの語と回すボタンの名も言語に合わせる */
+      axlText(); tbLabel(); lbLabel();   /* 目盛りの向きの語と、回す・虫眼鏡のボタンの名も言語に合わせる */
       var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
       if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
       if(introOn){

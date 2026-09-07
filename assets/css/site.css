@@ -4220,6 +4220,22 @@
   html.phone .gm-take img{max-height:36vh}
   @media (max-height:640px){ .gm-take img{max-height:32vh} .gm-take-opt{margin-bottom:10px; gap:5px 10px} }
 
+  /* v518 虫眼鏡の入切（初めは出ている。要らない方はここで消せる） */
+  .gm-lensb{position:absolute; left:8px; bottom:8px; width:34px; height:34px; padding:0; border-radius:50%; border:1px solid rgba(30,28,26,.32);
+    background:rgba(242,241,236,.94); color:#1C1B19; cursor:pointer; z-index:9; display:flex; align-items:center; justify-content:center; gap:6px;
+    box-shadow:0 1px 6px rgba(30,28,26,.14); transition:opacity .2s var(--ease), color .16s var(--ease), border-color .16s var(--ease)}
+  .gm-lensb svg{width:19px; height:19px; flex:none}
+  .gm-lensb span{display:none}
+  .gm-lensb[aria-pressed="false"]{color:#8E8B84; border-color:rgba(30,28,26,.18)}
+  .gm-lensb[aria-pressed="false"] svg{opacity:.55}
+  .gm-lensb:hover{color:#E84518; border-color:rgba(232,69,24,.5)}
+  .gm-stage.swapping .gm-lensb,.gm-stage.blank .gm-lensb{opacity:0; pointer-events:none}
+  .gm-lensb[hidden]{display:none}
+  .gm-pcview .gm-lensb,.gm-lensb.wide{width:auto; min-width:34px; padding:0 12px 0 9px; border-radius:17px}
+  @media (min-width:900px){ .gm-lensb{width:auto; min-width:34px; padding:0 12px 0 9px; border-radius:17px}
+    .gm-lensb span{display:inline; font-family:var(--sans); font-weight:600; font-size:12px; line-height:1; letter-spacing:.04em; white-space:nowrap} }
+  @media (max-height:640px){ .gm-lensb{height:32px} .gm-lensb svg{width:17px; height:17px} }
+
   .cp-send,.menu .mopt .gridbtn{border-radius:5px}
   .lang{border-radius:4px}
   .cp-send:active,.menu .mopt .gridbtn:active,.lang button:active,.cta-fx:active .c{transform:translateY(1px)}
