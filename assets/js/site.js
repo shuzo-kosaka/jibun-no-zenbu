@@ -5788,7 +5788,7 @@
     /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
     (function(){
       var sp = document.getElementById('seqplay'); if(!sp || typeof kakuSvg !== 'function') return;
-      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '遊ぶ', 77));
+      var st = sp.querySelector('.st'); if(st && !st.firstChild) st.appendChild(kakuSvg('PLAY', '測ってみる', 77));   /* v552 外の案内文をやめ、用件を判の中に（本人） */
       sp.addEventListener('click', function(){ open(); });
     })();
     /* #play=… で開いたときは、そのまま遊びを開く（面接用の入口） */
