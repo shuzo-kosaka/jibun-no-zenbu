@@ -4554,3 +4554,13 @@
     #ch7b .p[data-at],#ch7c .p[data-at]{font-size:15px; line-height:1.68; margin-bottom:.8em}
     html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{line-height:1.62}
   }
+
+  /* v594 ① フッターの「メッセージを送る」を「このサイトを共有」に揃える。
+     枠が var(--fg) だったので、地に対していちばん強い色で光って見えていた（本人） */
+  .ft-cta{border-color:var(--line); font-size:12.5px; line-height:1; padding:12px 16px; gap:9px}   /* line-height:1 は共有ボタンと同じ。無いと箱の高さが 7px 高くなる */
+  .ft-cta .mi{width:24px; height:17px; stroke-width:1.4}   /* 高さ 17px は共有ボタンの絵と同じ。箱の高さがそろう */
+  /* ② 連絡シートの「送る」も同じ枠の色に */
+  .cp-send{border-color:var(--line)}
+  /* ③ 送信後の札：明朝 → ゴシック、地を朱・文字を白に */
+  .cp-done,#cpdone.cp-done{font-family:var(--sans); font-weight:600; background:var(--acc); border-color:var(--acc); color:#FBF7F2; border-radius:3px}
+  .cp-done a{color:#FBF7F2}
