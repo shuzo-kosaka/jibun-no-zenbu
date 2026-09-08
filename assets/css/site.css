@@ -4687,3 +4687,7 @@
 
   .gm-sheet:has(.gm-mock.tight) .gm-scap{top:auto; bottom:calc(3vh + 46px); left:max(4vw, env(safe-area-inset-left, 0px)); right:auto; max-width:min(70vw, 640px)}
   @media (max-height:640px){ .gm-sheet:has(.gm-mock.tight) .gm-scap{bottom:calc(1.5vh + 40px)} }
+
+  #seq text.pct.bd{font-size:15px}
+  #seq .steps li.act span{height:12.6em}
+  html.pcview.phone #seq .steps li.act span{max-height:14em}
