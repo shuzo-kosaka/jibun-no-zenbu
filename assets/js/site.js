@@ -2354,8 +2354,13 @@
        html.rewind * { transition:none } のせいで紙面の動きまで止まっていた */
     document.documentElement.classList.remove('flying', 'rewind', 'fwd'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
   ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, flyStop, {passive:true}); });
+  /* v599 `footer a` から #ftcta を外した。#ftcta は href="#write" だが **#write という要素は無く**
+     （'#write' は開いたことを履歴に残すための印）、下の `else if(!flyToEl(h, rew)) flyTo(0, rew)` に落ちて
+     押すたび「紙面の頭へ 1.4 秒かけて巻き戻す」飛行が始まっていた。開いている間は幕で見えないが、
+     閉じたあとそのまま最上部まで滑る。cpClose の置き直しは 620ms までなので、1400ms の飛行に必ず負ける（見張り係）。
+     #ftcta には 3003 行に自前の click（cpOpen）があるので、こちらの仕掛けは要らない。 */
   function flyToEl(id, rew){ var el = id && document.querySelector(id); if(!el) return false; flyTo(el.getBoundingClientRect().top + window.scrollY, rew); return true; }
-  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');
+  document.querySelectorAll('.brand, .cta-fx, #top .toc a, footer a:not(#ftcta)').forEach(function(a){ a.addEventListener('click', function(e){ var h = a.getAttribute('href'); if(!h || h.charAt(0) !== '#') return; e.preventDefault(); var rew = a.classList.contains('cta-fx') || a.classList.contains('brand');
     if(body.classList.contains('menuopen') && typeof setMenu === 'function') setMenu(false);   /* v287: メニューを開いたままロゴで TOP へ飛ぶと、メニューが開きっぱなしだった */   /* v108: the mark and the name wind the page back too */
     if(h === '#top' || h === '#' || (a.classList.contains('cta-fx') && body.classList.contains('atend'))){ flyTo(0, rew); } else if(a.closest('#top .toc')){ if(!skipTo(h)) flyTo(0, rew); }   /* v237: TOP の目次も年数の札つき */ else if(!flyToEl(h, rew)) flyTo(0, rew); }); });
 
@@ -2838,7 +2843,14 @@
   var cpage = document.getElementById('cpage'), cpform = document.getElementById('cpform'), cpLast = null, cpT = 0, cpPushed = false; var surHintT = 0;
   var cpY = 0;   /* v533 開いたときの居場所。閉じたあと、頭に飛んでから戻ってくるのを止める（本人） */
   function cpOpen(){
-    if(!cpage || !cpage.hidden) return; clearTimeout(cpT);
+    if(!cpage) return;
+    if(!cpage.hidden){
+      /* v599 閉じる途中（out）に押し直すと、`cpage.hidden` はまだ false なので、ここで撥ねられて開かなかった。
+         閉じ切るのを待たず、その場で閉じ切ってから開き直す（見張り係：8通り×6回すべて開かなかった） */
+      if(!cpage.classList.contains('out')) return;
+      clearTimeout(cpT); cpage.hidden = true; cpage.classList.remove('out');
+    }
+    clearTimeout(cpT);
     cpY = window.scrollY;
     cpLast = document.activeElement; var hdEl = document.querySelector('.hd'); if(hdEl) cpage.style.setProperty('--hdh', hdEl.offsetHeight + 'px');   /* the sheet begins under the site's header, which stays usable */
     /* one bar only: the page's CONTACT label and × move into the header (the logo's and the hamburger's places) while it is open */
@@ -2986,6 +2998,7 @@
     if(cpRotEl){ clearTimeout(cpRotT); cpRotEl.classList.remove('on'); }   /* v288 */
     if(window.__rvPortrait) window.__rvPortrait();   /* v286: 閉じた時点で縦持ちなら案内を出す */
     var bar = cpage.querySelector('.cp-bar'), cpx1 = document.getElementById('cpx'), cpl1 = document.querySelector('.hd .cp-lab'); if(bar){ if(cpl1) bar.appendChild(cpl1); if(cpx1) bar.appendChild(cpx1); }   /* and back into the page */
+    clearTimeout(surHintT); document.documentElement.classList.remove('surhint');   /* v599 点滅の合図は開いている間だけのもの。閉じても付いたままだった（見張り係） */
     cpT = setTimeout(function(){ cpage.hidden = true; cpage.classList.remove('out'); }, 620);
     if(mkbtn && mkbtn.__t !== undefined) mkbtn.title = mkbtn.__t; togFit();
     if(cpPushed && !fromPop){ cpPushed = false; try{ history.back(); }catch(e){} }
@@ -4363,6 +4376,8 @@
         '<div class="gm-intro" hidden><div class="gm-iscroll" tabindex="0"><div class="gm-ipin"><div class="gm-isecs"></div><div class="gm-idots"></div><button class="gm-iskip" type="button"></button><button class="gm-igo" type="button"></button><i class="gm-idot"><i><b></b></i></i></div><div class="gm-ispace"></div></div><div class="gm-ihd"><button class="gm-ihow" type="button"></button><button class="gm-ix" type="button" aria-label="閉じる">×</button></div></div>' +
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
+          /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
+          '<div class="gm-stool" role="group"><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
       document.body.appendChild(gm);
       stage = gm.querySelector('.gm-stage'); picEl = gm.querySelector('.gm-pic'); linesEl = gm.querySelector('.gm-lines');
@@ -4533,15 +4548,15 @@
       var title = {k:4, at:0, title:true, big:'測る', ja:['絵を、測る。', ''], en:['Measure the picture.', '']};
       var IK = ['<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6" height="12"/><rect x="9" y="6" width="6" height="12"/><rect x="16" y="6" width="6" height="12"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 12h18"/><circle class="d" cx="12" cy="12" r="2.6"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 10h18"/><path class="m" d="M3 15h18"/><path class="a" d="M17.5 10.4v4.2M16.2 11.4l1.3-1.3 1.3 1.3M16.2 13.6l1.3 1.3 1.3-1.3"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M9 4v16M15 4v16M3 9h18M3 15h18"/></svg>'];
       function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
-      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>《離したところに線が引かれます》。', 1) + il('一本引くたびに、私の線が現れ、《解釈の違いが％で出ます》。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>三点の骨格と重ねて見比べられます。', 3) + '</ul>';
-      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over the three-work grid and compare.', 3) + '</ul>';
+      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>《離したところに線が引かれます》。', 1) + il('一本引くたびに、私の線が現れ、《解釈の違いが％で出ます》。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>このサイトのグリッドと重ねて見比べられます。', 3) + '</ul>';
+      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over this site’s grid and compare.', 3) + '</ul>';
       var info = {k:4, at:.36, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、《私が引いた線との差を％で見比べます》。') + '</p>' +
-        '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッドができ》、三点の骨格と重ねられます。') + '</p>' +
+        '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッドができ》、このサイトのグリッドと重ねられます。') + '</p>' +
         '<p class="gm-ick">測る絵を選んでください　　詳しくは右上の「測り方とQ&A」から</p>';
       var PE = '<p class="gm-ipur">' + body('Japanese and Western pictures are measured the same way, and 《your lines are compared with mine in percent》.') + '</p>' +
-        '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over the three-work grid.') + '</p>' +
+        '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over this site’s grid.') + '</p>' +
         '<p class="gm-ick">Choose the pictures　　details in “How to measure &amp; Q&amp;A”, top right</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。ここでは見比べる相手として、西洋の絵も同じやり方で測りました。') + '</p>' +
         '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>';
@@ -4571,7 +4586,7 @@
     function bindChoice(d){ d.querySelectorAll('.gm-ichoice button').forEach(function(bt){ bt.addEventListener('click', function(){ cat = bt.getAttribute('data-c'); var fs = introEl.querySelectorAll('.gm-ibg.b4 .jf'); fs.forEach(function(f){ if(cat === 'both' || (cat === 'jp' && f.classList.contains('l')) || (cat === 'we' && f.classList.contains('r'))) f.classList.add('pick'); }); if(rm) introEnd(false); else setTimeout(function(){ introEnd(false); }, 110); }); }); }   /* 選んだ側の枠が一瞬濃くなってから去る（応答） */
     function jwMeans(){ var g = {jp:{}, we:{}}; ['jp', 'we'].forEach(function(k){ var bs = BOARDS.filter(function(b){ return k === 'jp' ? !!b.jp : !b.jp; }); LINES.forEach(function(t){ var sum = 0; bs.forEach(function(b){ sum += b.a[t.k]; }); g[k][t.k] = bs.length ? Math.round(sum / bs.length) : 0; }); }); return g; }
     function jwTable(){ var g = jwMeans(); return '<table class="gm-tb gm-jwt"><thead><tr><th>' + L('線', 'line') + '</th><th>' + L('日本', 'Japan') + '</th><th>' + L('西洋', 'West') + '</th><th>' + L('差', 'diff') + '</th></tr></thead><tbody>' + LINES.map(function(t){ return '<tr><td>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</td><td>' + g.jp[t.k] + PC + '</td><td>' + g.we[t.k] + PC + '</td><td>' + sg(g.we[t.k] - g.jp[t.k]) + PC + '</td></tr>'; }).join('') + '</tbody></table>'; }
-    function jwLabel(on){   /* v550 重ねているあいだは、凡例に一項目足し、ボタンの札も「外す」に（三点の骨格と同じ作法。文言係） */
+    function jwLabel(on){   /* v550 重ねているあいだは、凡例に一項目足し、ボタンの札も「外す」に（このサイトのグリッドと同じ作法。文言係） */
       var lg = resEl && resEl.querySelector('.gm-legend'), b = resEl && resEl.querySelector('.gm-jwb');
       if(b) b.textContent = on ? L(cat === 'jp' ? '西洋の絵の平均を外す' : '日本の絵の平均を外す', cat === 'jp' ? 'Hide the Western average' : 'Hide the Japanese average')
                                : L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average');
@@ -4894,7 +4909,7 @@
         var st = gm.querySelector('.gm-stage'); if(st) st.setAttribute('aria-label', L('盤面', 'The board'));
         var tt = gm.querySelector('.gm-ttl'); if(tt) tt.setAttribute('aria-label', L('絵を、測る。', 'Measure the picture.')); })();
       if(typeof qaBuild === 'function') qaBuild();   /* v444: × の読み上げ名と Q&A も言語に合わせる（確認係） */   /* v400: 右の列の ? と見分けがつくよう文字で */
-      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('このサイトのグリッド', 'this site’s grid');
       siteInert(true);   /* v484: 遊びの最中は後ろの本編へ Tab で抜けない（流れ係） */
       if(!histPushed){ try{ history.pushState({gm:1}, ''); histPushed = true; }catch(e){} }   /* v485: 端末の「戻る」で遊びだけを閉じられるように（流れ係） */
       gm.hidden = false; document.documentElement.classList.add('gmopen'); void gm.offsetWidth; hdFit(); fit(); gm.classList.add('on');
@@ -5494,10 +5509,13 @@
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
         observe(diff, per) +
-        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：三点の骨格', 'seven faint dashed: the three-work grid') + '</b></p>' +
+        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：このサイトのグリッド<small>桜を主題とした三点から起こしました</small>', 'seven faint dashed: this site’s grid<small>drawn from three pictures on the cherry-blossom theme</small>') + '</b></p>' +
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
-        '<div class="gm-jw"><p class="gm-cmph">' + L('研究で引いた線を、日本の絵と西洋の絵に分けて平均しました。あなたの四本と見比べられます。',
-          'These are the lines from my research, averaged separately for the Japanese and the Western pictures. You can compare them with your four.') + '</p>' + sec(L('日本と西洋の平均', 'Japan and the West')) + '<div class="gm-catx gm-secx" hidden>' +
+        '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
+          /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
+             日本と西洋の平均の見出しの下へ移す */
+          '<p class="gm-cmph">' + L('研究で引いた線を、日本の絵と西洋の絵に分けて平均しました。あなたの四本と見比べられます。',
+          'These are the lines from my research, averaged separately for the Japanese and the Western pictures. You can compare them with your four.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
             return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点を、私が研究で測りました。《あなたが引いたのと同じ四本の位置を、一本ずつ平均しています》。あなたが測った三枚も、この中に含まれます。',
               'I measured ' + nj + ' Japanese and ' + nw + ' Western pictures in my research. 《I averaged the position of each of the same four lines you drew》. The three pictures you measured are among them.')); })() + '</p>' +
@@ -5524,7 +5542,7 @@
       }); });
       goEl.innerHTML = ''; goEl.classList.add('hold'); try{ goEl.inert = true; }catch(x){}   /* v484: 伏せている間はキーボードでも触れない（流れ係） */
       btn(L('画面いっぱいに表示', 'Show full screen'), function(){ sheet(avg); }, 'go');
-      var ovb = btn(L('三点の骨格と重ねる', 'Compare with the three-work grid'), overlay); if(ovb) ovb.__ov = true;
+      var ovb = btn(L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
       btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
@@ -5535,14 +5553,14 @@
       if(l3) l3.hidden = !!on;
       if(l7) l7.hidden = !on;
       if(goEl) goEl.querySelectorAll('button').forEach(function(b){
-        if(b.__ov) b.textContent = on ? L('三点の骨格を外す', 'Hide the three-work grid') : L('三点の骨格と重ねる', 'Compare with the three-work grid'); });
+        if(b.__ov) b.textContent = on ? L('このサイトのグリッドを外す', 'Hide this site’s grid') : L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'); });
       if(linesEl) linesEl.classList.toggle('ovl', !!on);   /* 補った三本は隠す（七本と二重に引かれていた） */
     }
     function overlay(){
       var on = linesEl.querySelector('.mine');
-      if(on){ linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); }); var n0 = resEl.querySelector('.gm-avnote'); if(n0) n0.parentNode.removeChild(n0); ovLabel(false); return; }
+      if(on){ linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); }); ovLabel(false); return; }
       GRID.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'mine', v + '%'); }); ovLabel(true);
-      resEl.insertAdjacentHTML('beforeend', '<p class="gm-note gm-avnote">' + L('破線は、桜を主題とした三点から起こした、このサイトの骨格です。', 'The dashed lines are this site’s grid, drawn from three pictures on the cherry-blossom theme.') + '</p>');
+      /* v600 ここに足していた一文は、凡例の「薄い破線の七本：このサイトのグリッド」の中へ移した（本人） */
     }
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
     /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
@@ -5699,7 +5717,7 @@
       var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
       var c = cv.getContext('2d'), u = Math.max(W, H) / 1000;
       if(takeFmt !== 'alpha'){ c.fillStyle = '#F2F1EC'; c.fillRect(0, 0, W, H); }
-      /* 三点の骨格（薄い破線・七本） */
+      /* このサイトのグリッド（薄い破線・七本） */
       c.setLineDash([7 * u, 7 * u]); c.lineWidth = Math.max(1, 1.3 * u);
       c.strokeStyle = takeFmt === 'alpha' ? 'rgba(30,28,26,.55)' : 'rgba(46,44,41,.5)';
       GRID.v.forEach(function(v){ c.beginPath(); c.moveTo(W * v / 100, 0); c.lineTo(W * v / 100, H); c.stroke(); });
@@ -5785,6 +5803,125 @@
 
     function takeOff(){ if(takeEl) takeEl.classList.remove('on'); }
     var sheetAvg = null;
+    /* v600/v601 紙面を「自分の引いたグリッドの上でレイアウトを試す場」にする（本人）。
+       ・見出し・図版・本文を、つまんで動かせる（紙面の外へは出さない）。
+       ・右下と右端をつまむと大きさを変えられる。
+       ・押して選ぶと、複製・削除ができる。道具の列から新しく足すこともできる。
+       ・置き直した位置は inline の left/top/width/height で持ち、骨格を切り替えるか「戻す」で元へ返る。 */
+    var MOCKK = {mk1:['見出し', 'title'], mk3:['図版', 'figure'], mk2:['本文', 'text']};
+    function mockEls(){ var m = sheetEl && sheetEl.querySelector('.gm-mock'); return m ? Array.prototype.slice.call(m.querySelectorAll('.gm-drag')) : []; }
+    function mockSel(el){
+      mockEls().forEach(function(x){ x.classList.toggle('sel', x === el); });
+      var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
+      t.querySelectorAll('[data-act="dup"],[data-act="del"]').forEach(function(b){ b.disabled = !el; });
+    }
+    function mockPct(el, mock){   /* いまの位置と大きさを、紙面に対する百分率で */
+      var r = mock.getBoundingClientRect(), b = el.getBoundingClientRect();
+      return {l:(b.left - r.left) / r.width * 100, t:(b.top - r.top) / r.height * 100,
+              w:b.width / r.width * 100, h:b.height / r.height * 100, r:r, b:b};
+    }
+    function mockArm(el){
+      if(el.__armed) return; el.__armed = true;
+      el.classList.add('gm-drag'); el.setAttribute('tabindex', '0');
+      if(!el.querySelector('.gm-rz')){ var rz = document.createElement('i'); rz.className = 'gm-rz'; el.appendChild(rz); }
+      el.addEventListener('pointerdown', function(e){
+        if(e.button) return;
+        var mock = el.parentNode, rz = e.target && e.target.classList && e.target.classList.contains('gm-rz');
+        var p = mockPct(el, mock), r = p.r, b = p.b;
+        var ox = e.clientX - b.left, oy = e.clientY - b.top;
+        e.preventDefault(); e.stopPropagation(); mockSel(el);
+        el.classList.add('grab'); mock.classList.add('dragging');
+        try{ el.setPointerCapture(e.pointerId); }catch(x){}
+        var move = function(ev){
+          el.style.transition = 'none'; el.style.margin = '0';
+          if(rz){
+            var w = Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), ev.clientX - b.left));
+            var h = Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), ev.clientY - b.top));
+            el.style.width = (w / r.width * 100).toFixed(2) + '%';
+            if(!el.classList.contains('gm-mk1')) el.style.height = (h / r.height * 100).toFixed(2) + '%';
+          } else {
+            var x = Math.max(0, Math.min(r.width - b.width, ev.clientX - ox - r.left));
+            var y = Math.max(0, Math.min(r.height - b.height, ev.clientY - oy - r.top));
+            el.style.left = (x / r.width * 100).toFixed(2) + '%';
+            el.style.top = (y / r.height * 100).toFixed(2) + '%';
+          }
+        };
+        var up = function(ev){
+          el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+          el.classList.remove('grab'); mock.classList.remove('dragging'); el.style.transition = '';
+          try{ el.releasePointerCapture(ev.pointerId); }catch(x){}
+        };
+        el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+      });
+      el.addEventListener('focus', function(){ mockSel(el); });
+      /* 指が使えなくても動かせる。矢印で 1%（Shift で 5%）、Delete で消す、⌘/Ctrl+D で複製 */
+      el.addEventListener('keydown', function(e){
+        if((e.key === 'Backspace' || e.key === 'Delete') && el.classList.contains('gm-clone')){ e.preventDefault(); mockDel(); return; }
+        if(e.key === 'd' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); mockDup(); return; }
+        var d = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]}[e.key]; if(!d) return;
+        e.preventDefault(); var mock = el.parentNode, p = mockPct(el, mock), k = e.shiftKey ? 5 : 1;
+        el.style.margin = '0';
+        el.style.left = Math.max(0, Math.min(100 - p.w, p.l + d[0] * k)).toFixed(2) + '%';
+        el.style.top = Math.max(0, Math.min(100 - p.h, p.t + d[1] * k)).toFixed(2) + '%';
+      });
+    }
+    function mockKind(el){ return el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'; }
+    function mockPlace(el, from){   /* 元から少しずらして置く（重ねたままだと増えたのが分からない） */
+      var mock = sheetEl.querySelector('.gm-mock'), p = mockPct(from || el, mock);
+      el.style.margin = '0';
+      el.style.left = Math.max(0, Math.min(100 - p.w, p.l + (from ? 4 : 0))).toFixed(2) + '%';
+      el.style.top = Math.max(0, Math.min(100 - p.h, p.t + (from ? 4 : 0))).toFixed(2) + '%';
+      el.style.width = p.w.toFixed(2) + '%';
+      if(mockKind(el) !== 'mk1') el.style.height = p.h.toFixed(2) + '%';
+    }
+    function mockAdd(kind){
+      var mock = sheetEl.querySelector('.gm-mock'); if(!mock) return;
+      var base = mock.querySelector('.gm-' + kind); if(!base) return;
+      var el = base.cloneNode(true); el.classList.add('gm-clone'); el.classList.remove('sel', 'grab'); el.__armed = false;
+      var rz = el.querySelector('.gm-rz'); if(rz) rz.parentNode.removeChild(rz);
+      mock.appendChild(el); mockArm(el); mockPlace(el, base); mockSel(el);
+      try{ el.focus({preventScroll:true}); }catch(x){}
+      return el;
+    }
+    function mockDup(){
+      var el = sheetEl.querySelector('.gm-mock .gm-drag.sel'); if(!el) return;
+      var mock = el.parentNode, c = el.cloneNode(true); c.classList.add('gm-clone'); c.classList.remove('sel', 'grab'); c.__armed = false;
+      var rz = c.querySelector('.gm-rz'); if(rz) rz.parentNode.removeChild(rz);
+      mock.appendChild(c); mockArm(c); mockPlace(c, el); mockSel(c);
+      try{ c.focus({preventScroll:true}); }catch(x){}
+    }
+    function mockDel(){
+      var el = sheetEl.querySelector('.gm-mock .gm-drag.sel'); if(!el) return;
+      if(!el.classList.contains('gm-clone')){ el.classList.add('gone'); el.style.display = 'none'; mockSel(null); return; }   /* もとの三つは消さずに伏せる（戻せる） */
+      el.parentNode.removeChild(el); mockSel(null);
+    }
+    function mockReset(){
+      var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
+      mock.querySelectorAll('.gm-clone').forEach(function(el){ el.parentNode.removeChild(el); });
+      mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab'); el.removeAttribute('style'); });
+      mockSel(null);
+    }
+    function mockDrag(){
+      var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
+      ['.gm-mk1', '.gm-mk3', '.gm-mk2'].forEach(function(sel){ var el = mock.querySelector(sel); if(el) mockArm(el); });
+      if(mock.__drag) return; mock.__drag = true;
+      mock.addEventListener('pointerdown', function(e){ if(e.target === mock) mockSel(null); });
+      var tool = sheetEl.querySelector('.gm-stool'); if(!tool) return;
+      tool.addEventListener('click', function(e){
+        var b = e.target.closest && e.target.closest('button'); if(!b) return;
+        var a = b.getAttribute('data-add');
+        if(a) return mockAdd(a);
+        var k = b.getAttribute('data-act');
+        if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
+      });
+    }
+    function mockText(){
+      var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
+      t.querySelector('b').textContent = L('置いて試す', 'try a layout');
+      t.querySelectorAll('[data-add]').forEach(function(b){ var k = MOCKK[b.getAttribute('data-add')]; b.textContent = '＋' + L(k[0], k[1]); });
+      var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset']};
+      t.querySelectorAll('[data-act]').forEach(function(b){ var k = m[b.getAttribute('data-act')]; b.textContent = L(k[0], k[1]); });
+    }
     function sheet(avg){
       sheetAvg = avg;
       var sgd = sheetEl.querySelector('.gm-sgrid'); sgd.innerHTML = '';
@@ -5795,6 +5932,7 @@
       sheetText();
       sheetGrid('you');
       var mock = sheetEl.querySelector('.gm-mock'); mock.classList.remove('land'); void mock.offsetWidth;
+      mockDrag(); mockReset();   /* v600 つまんで動かす仕掛けを張り、置き直した位置は開くたびに戻す */
       gm.classList.add('sheeton'); sheetEl.setAttribute('aria-hidden', 'false'); try{ sheetEl.inert = false; }catch(x){}
       setTimeout(function(){ mock.classList.add('land'); }, rm ? 0 : 360);   /* 見出し→図版→本文が線へ着地する（合計 500ms） */
       setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('画面いっぱいに表示 \u00b7 APPLIED \u00b7 ', 'VIEW GRID FULL SCREEN \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
@@ -5804,15 +5942,19 @@
       var avg = sheetAvg; if(!sheetEl || !avg) return;
       sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
       sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
-      sheetEl.querySelector('.gm-scap span').innerHTML = '<em>' + L('あなたの四本', 'your four lines') + '</em> X ' + avg.x1 + ' · ' + avg.x3 + '\u3000Y ' + avg.y1 + ' · ' + avg.y2 + '<br><em>' + L('三点の骨格', 'three-work grid') + '</em> X 12 · 28 · 58 · 83\u3000Y 14 · 32 · 71';
-      sheetEl.querySelector('.gm-scap small').textContent = L('朱があなたの四本、薄い破線が三点の骨格。見出しは開始線の交点に置きます。本文は重心線から始め、図版は重心線の二本のあいだに収めます。切り替えると、同じ内容が別の骨格に乗ります。', 'Solid red is your four lines; the faint dashed is the three-work grid. The title sits at the crossing of the start lines. The text starts from the centroid lines, and the figure fits between those two. Switch, and the same content sits on another grid.');
+      /* v600 「あなたの四本／このサイトのグリッド」の数値と、その下の長い説明は、この画面には要らない（本人）。
+         代わりに、つまんで動かせることだけを一行で伝える */
+      sheetEl.querySelector('.gm-scap span').innerHTML = '';
+      sheetEl.querySelector('.gm-scap small').textContent = L('見出し・図版・本文は、つまんで動かせます。右下をつまむと大きさが変わります。押して選ぶと、複製や削除ができます。', 'Drag the title, the figure and the text. Pull the corner to resize. Select one to duplicate or delete it.');
+      mockText();
     }
     /* 紙面の内容（見出し・図版・本文）を、あなたの骨格か研究の骨格に載せる。位置は CSS 変数で渡し、切り替えは transition */
     function sheetGrid(which){
       var g = which === 'mine' ? {y1:14, x1:12, y2:32, x3:58} : sheetAvg; if(!g) return;
       var m = sheetEl.querySelector('.gm-mock');
+      mockReset();   /* v600 骨格を切り替えたら、つまんで動かした位置は元へ戻す（別の骨格に乗るところを見せる場面なので） */
       m.style.setProperty('--gx1', g.x1 + '%'); m.style.setProperty('--gy1', g.y1 + '%'); m.style.setProperty('--gx3', g.x3 + '%'); m.style.setProperty('--gy2', g.y2 + '%');
-      m.classList.toggle('nofig', g.x3 - g.x1 < 8 || 71 - g.y2 < 6); m.classList.toggle('notxt', 83 - g.x3 < 8);
+      m.classList.toggle('tight', g.x3 - g.x1 < 8 || 71 - g.y2 < 6); m.classList.toggle('ttight', 83 - g.x3 < 8);   /* v600 隠さず、いちばん小さい大きさで必ず出す（本人：黄色の枠が出なくなっていた） */
       sheetEl.querySelectorAll('.gm-swk button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-g') === which ? 'true' : 'false'); });
       sheetEl.classList.toggle('mineg', which === 'mine');
     }
@@ -5837,7 +5979,7 @@
       axlText(); tbLabel(); lbLabel();   /* 目盛りの向きの語と、回す・虫眼鏡のボタンの名も言語に合わせる */
       if(state === 'trace' || state === 'compare' || state === 'done') tipText();   /* v556 問いの一行も */
       if(tutOn && tutEl){ tutStep(tutAt); var sk = tutEl.querySelector('.gmt-skip'); if(sk) sk.textContent = L('手引きをとばす', 'Skip this'); }   /* v539 手引きの最中に切り替えると、出ている段だけ前の言語で残っていた（見せ方係） */
-      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('三点の骨格', 'three-work grid');
+      var sw = sheetEl.querySelectorAll('.gm-swk button'); sw[0].textContent = L('あなたの骨格', 'your grid'); sw[1].textContent = L('このサイトのグリッド', 'this site’s grid');
       if(gm.classList.contains('sheeton')) sheetText();   /* v511 紙面を開いたまま言語を切り替えたとき（流れ係） */
       if(introOn){
         introEl.querySelectorAll('.gm-isec').forEach(function(d, i){ d.innerHTML = isecHTML(ISECS[i]); bindChoice(d); });
