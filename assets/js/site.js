@@ -658,8 +658,13 @@
   document.querySelectorAll('.io').forEach(function(el){ (el.classList.contains('p') || el.classList.contains('sub')) ? ioP.observe(el) : ioEl.observe(el); });
   var brBody = document.querySelector('#bridge .br-body'); if(brBody) ioEl.observe(brBody);   /* the bridge's heading waits for its own arrival, not the section's top edge */
   /* every highlight draws itself when it comes into view */
-  var ioM = new IntersectionObserver(function(es){ es.forEach(function(e){ var m = e.target; if(e.isIntersecting) m.classList.add('in'); else if(e.boundingClientRect.top > (e.rootBounds ? e.rootBounds.bottom : vh())) m.classList.remove('in'); }); }, {threshold:0, rootMargin:'0px 0px -22% 0px'});
+  /* v583 「。」で終わる帯は、句点のうしろの空きぶんまで朱が伸びて次の字に掛かって見える（本人）。
+     帯だけを少し短くする。要素の中身は言語で入れ替わるので、クラスは**その都度**付け直す。 */
+  window.__kuMark = function(root){ (root || document).querySelectorAll('mark').forEach(function(m){
+    m.classList.toggle('ku', /。$/.test((m.textContent || '').replace(/\s+$/, ''))); }); };
+  var ioM = new IntersectionObserver(function(es){ es.forEach(function(e){ var m = e.target; if(e.isIntersecting){ m.classList.toggle('ku', /。$/.test((m.textContent || '').replace(/\s+$/, ''))); m.classList.add('in'); } else if(e.boundingClientRect.top > (e.rootBounds ? e.rootBounds.bottom : vh())) m.classList.remove('in'); }); }, {threshold:0, rootMargin:'0px 0px -22% 0px'});
   document.querySelectorAll('mark').forEach(function(m){ if(!m.closest('[data-at]')) ioM.observe(m); });
+  window.__kuMark();
 
   /* handwritten headings: play once when the heading comes into view */
   var ioHw = new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) return; var v = e.target; ioHw.unobserve(v); v.closest('.hwv').classList.add('on'); if(reduce){ try{ v.currentTime = 9; }catch(x){} return; } try{ var pr = v.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(x){} }); }, {threshold:.6});
@@ -3125,7 +3130,9 @@
       if(a.classList.contains('play')){ e.preventDefault(); return; }   /* v97: the player owns the box — a stray click must never follow the href to YouTube */
       e.preventDefault();
       var f = document.createElement('iframe');
-      f.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&rel=0&enablejsapi=1');
+      /* v584: enablejsapi=1 を付けるときは origin が要る。無いと YouTube 側が埋め込みを拒み、
+         プレイヤーに「動画プレイヤーの設定エラー 153」が出る（本人の報告）。公開先の生成元を渡す。 */
+      f.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&rel=0&enablejsapi=1&origin=' + encodeURIComponent(location.origin) + '&widget_referrer=' + encodeURIComponent(location.origin + location.pathname));
       /* v146: the film starts at half volume. The player is told through the iframe API, so no script of
          YouTube's is loaded; the command is repeated for a few seconds because the player answers only once it
          is ready. On a phone or tablet the volume belongs to the hardware and the command is ignored — that is
@@ -3270,6 +3277,7 @@
       if(wEn.__ja !== undefined && wJa.__ja !== undefined){ wEn.innerHTML = en ? wJa.__ja : wEn.__ja; reMark(wEn); } });
     /* the highlights inside the replaced text are new elements: watch them again, or they never draw */
     changed.forEach(function(el){ el.querySelectorAll('mark').forEach(function(m){ if(!m.closest('[data-at]')) ioM.observe(m); }); });
+    if(window.__kuMark) window.__kuMark();   /* v583 「。」で終わるかは言語で変わるので付け直す */
     if(window.__armAnnot) window.__armAnnot();   /* v569 注釈の引き金も張り直す（段落ごと差し替わっている） */
     soloReset();
     ttlClasses(!en); ttlWords(!en); opticalAlign(); mixedSubs(!en);

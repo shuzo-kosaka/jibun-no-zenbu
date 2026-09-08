@@ -4534,3 +4534,8 @@
   /* v580 帯の食み出しを一定に。em だと字の大きさで 0.93〜1.14px と変わっていた（本人）。
      左右だけを指定する——padding の一括指定にすると .gm mark の padding-bottom:3px を消してしまう */
   mark{padding-left:1.1px; padding-right:1.1px; margin-left:-1.1px; margin-right:-1.1px}
+
+  /* v583 「。」で終わる帯は、句点のうしろの空きぶんだけ短く（本人）。クラスは script.js が付け替える */
+  mark.ku.in,[data-at].in mark.ku{background-size:calc(100% - .4em) .92em}
+  .gm mark.ku.in{background-size:calc(100% - .4em) 2px}
+  html.rm .gm mark.ku{background-size:calc(100% - .4em) 2px !important}
