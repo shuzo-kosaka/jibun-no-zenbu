@@ -3262,9 +3262,10 @@
       if(el.classList.contains('split') || el.classList.contains('scx')) splitEl(el);
     });
     /* ch2's translation wipe runs the other way in English: Japanese underneath, English revealed */
+    var reMark = function(el){ if(el) el.querySelectorAll('mark').forEach(function(m){ if(!m.closest('[data-at]')) ioM.observe(m); }); };   /* v568: 下敷きの層も innerHTML ごと差し替わるので、その中の mark を観測し直す（下の changed だけでは .en が漏れる） */
     wipes.forEach(function(wipeEl){ var wEn = wipeEl.querySelector('.en'), wJa = wipeEl.querySelector('.ja'); if(!wEn || !wJa) return;
-      if(wipeEl.classList.contains('scr')){ var sc = wEn.querySelector('.sc'); if(sc) sc.innerHTML = wJa.innerHTML; return; }   /* ch3: the scrawl underneath is always the same text as the layer above, so the lines break alike */
-      if(wEn.__ja !== undefined && wJa.__ja !== undefined){ wEn.innerHTML = en ? wJa.__ja : wEn.__ja; } });
+      if(wipeEl.classList.contains('scr')){ var sc = wEn.querySelector('.sc'); if(sc){ sc.innerHTML = wJa.innerHTML; reMark(sc); } return; }   /* ch3: the scrawl underneath is always the same text as the layer above, so the lines break alike */
+      if(wEn.__ja !== undefined && wJa.__ja !== undefined){ wEn.innerHTML = en ? wJa.__ja : wEn.__ja; reMark(wEn); } });
     /* the highlights inside the replaced text are new elements: watch them again, or they never draw */
     changed.forEach(function(el){ el.querySelectorAll('mark').forEach(function(m){ if(!m.closest('[data-at]')) ioM.observe(m); }); });
     soloReset();
