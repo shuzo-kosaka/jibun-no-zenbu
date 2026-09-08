@@ -4539,3 +4539,18 @@
   mark.ku.in,[data-at].in mark.ku{background-size:calc(100% - .4em) .92em}
   .gm mark.ku.in{background-size:calc(100% - .4em) 2px}
   html.rm .gm mark.ku{background-size:calc(100% - .4em) 2px !important}
+
+  /* v592 締めの二節が低い画面で下に隠れる。余白と本文だけを詰める（見出し・判はそのまま） */
+  @media (max-height:920px){ #ch7b .stick,#ch7c .stick{padding:7vh 0} }
+  @media (max-height:860px){
+    #ch7b .stick,#ch7c .stick{padding:2.5vh 0}
+    #ch7b .p[data-at],#ch7c .p[data-at]{line-height:1.8; margin-bottom:1.3em}
+  }
+  @media (max-height:760px){
+    #ch7b .p[data-at],#ch7c .p[data-at]{font-size:16px; line-height:1.75; margin-bottom:1.1em}
+  }
+  @media (max-height:640px){
+    #ch7b .stick,#ch7c .stick{padding:1.5vh 0}
+    #ch7b .p[data-at],#ch7c .p[data-at]{font-size:15px; line-height:1.68; margin-bottom:.8em}
+    html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{line-height:1.62}
+  }
