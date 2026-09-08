@@ -4510,3 +4510,8 @@
   .ft-cta:hover .mi .env > path:nth-of-type(1),
   .cp-send:hover .mi .env > path:nth-of-type(1){transform:scaleY(-1)}
   html.rm .ft-cta .mi .env > path:nth-of-type(1),html.rm .cp-send .mi .env > path:nth-of-type(1){transition:none}
+
+  /* v560 MESSAGE：横幅だけでなく画面の高さでも字を決める（英語は同じ内容で 1.2 倍の高さになる） */
+  #message .body .mh{font-size:clamp(19px, min(2.9vw, 6cqw, 4.6vh), 42px)}
+  #message .body .p{font-size:clamp(12.5px, min(19px, 2.3vh), 19px); line-height:1.82; margin-bottom:1.15em}
+  @media (max-width:1024px){ #message .body .p{font-size:clamp(12px, min(14px, 2.0vh), 14px); line-height:1.8} }
