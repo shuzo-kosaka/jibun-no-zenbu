@@ -4568,14 +4568,6 @@
   body.menuopen{overflow-x:clip; overflow-y:visible}
   html:has(body.menuopen){overflow-y:hidden}
 
-  #ch5pin .bgph img{opacity:0; z-index:1; transition:opacity 1.4s var(--ease) 1.4s, transform 9s linear}
-  #ch5pin .bgph img.on{opacity:1; z-index:2; transition:opacity 1.4s var(--ease) 0s, transform 9s linear}
-  #ch5pin .bgph::before{content:""; position:absolute; inset:0; z-index:3; background:rgba(21,21,26,.66); pointer-events:none}
-  #ch5pin .bgph::after{z-index:4}
-  #ch5pin.in .spot{opacity:.95}
-  #ch5pin .spot img{opacity:0; z-index:1; transition:opacity 1.4s var(--ease) 1.4s, transform 9s linear}
-  #ch5pin .spot img.on{opacity:1; z-index:2; transition:opacity 1.4s var(--ease) 0s, transform 9s linear}
-
   /* ② 畳んだ二つの節を近づける（あいだに一文が挟まらなくなったぶん） */
   .gm-jw > .gm-secq{margin-top:.25em}
   .gm-jw .gm-cmph{margin:.55em 0 .1em}

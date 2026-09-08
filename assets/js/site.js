@@ -253,7 +253,13 @@
     var a = ov.getBoundingClientRect(), b = fr.getBoundingClientRect(); if(!a.width || !b.width) return;
     var dx = (a.left + a.width / 2) - (b.left + b.width / 2), ft = fr.closest('.ft-top') || fr.parentElement, lim = ft ? ft.getBoundingClientRect() : null;
     if(lim){ dx = Math.max(lim.left - b.left, Math.min(lim.right - b.right, dx)); }   /* never off the footer */
-    fr.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+    /* v604 「メッセージを送る」の上端を「このサイトを共有」にそろえる（本人：高さが揃っていない）。
+       別の枠にいるので、ここで実測して差を埋める。下の「文字で遊べる仕掛け」の一行も一緒に下がる */
+    var dy = 0, cta = document.getElementById('ftcta'), sb = document.getElementById('ftshare');
+    if(cta && sb){ var rc = cta.getBoundingClientRect(), rs = sb.getBoundingClientRect();
+      /* そろえるのは、二つが**横に並んでいるとき**だけ。iPad のように縦に積む組み方では触らない */
+      if(rc.width && rs.width && rc.left > rs.right && Math.abs(rs.top - rc.top) <= 40) dy = rs.top - rc.top; }
+    fr.style.transform = 'translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px)';
   }
   function alignAll(){ opticalAlign(); hugLine(); tagAlign(); ftFit(); ovalFit(); ftAlign(); }
   alignAll();
