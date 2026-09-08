@@ -4530,3 +4530,7 @@
     #message .body .p:not(.mh){font-size:15.5px; line-height:1.82; margin-bottom:1.1em}
     #message .body .mh{margin-bottom:.55em}
   }
+
+  /* v580 帯の食み出しを一定に。em だと字の大きさで 0.93〜1.14px と変わっていた（本人）。
+     左右だけを指定する——padding の一括指定にすると .gm mark の padding-bottom:3px を消してしまう */
+  mark{padding-left:1.1px; padding-right:1.1px; margin-left:-1.1px; margin-right:-1.1px}
