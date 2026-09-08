@@ -3145,6 +3145,11 @@
         }, 400);
       });
       var t = a.querySelector('.t'); f.setAttribute('title', t ? t.textContent : 'YouTube');
+      /* v586: 153 の本当の原因は origin ではなく Referer だった（見張り係）。公開版（dist）の head に
+         <meta name="referrer" content="no-referrer"> が入っていて（make_dist.py:155）、iframe が
+         Referer 無しで飛ぶため YouTube が埋め込みを拒む。この iframe だけ既定の送り方に戻す。
+         ページ全体の no-referrer は触らない（影響範囲を広げない）。 */
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
       f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
       f.setAttribute('allowfullscreen', '');
       a.classList.add('play'); a.appendChild(f);
