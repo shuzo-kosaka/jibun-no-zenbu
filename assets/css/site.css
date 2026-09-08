@@ -4511,7 +4511,22 @@
   .cp-send:hover .mi .env > path:nth-of-type(1){transform:scaleY(-1)}
   html.rm .ft-cta .mi .env > path:nth-of-type(1),html.rm .cp-send .mi .env > path:nth-of-type(1){transition:none}
 
-  /* v560 MESSAGE：横幅だけでなく画面の高さでも字を決める（英語は同じ内容で 1.2 倍の高さになる） */
-  #message .body .mh{font-size:clamp(19px, min(2.9vw, 6cqw, 4.6vh), 42px)}
-  #message .body .p{font-size:clamp(12.5px, min(19px, 2.3vh), 19px); line-height:1.82; margin-bottom:1.15em}
-  @media (max-width:1024px){ #message .body .p{font-size:clamp(12px, min(14px, 2.0vh), 14px); line-height:1.8} }
+  /* v562 英語の MESSAGE は縦に伸びるので、低い画面でだけ詰める（日本語は本来の値のまま）。
+     ★ 見出しは <h3 class="p mh mh2">＝.p を持つので、.p への指定は必ず :not(.mh) で外すこと。
+     v560 で見出しが小さくなった（本人「Message の見出しのサイズが崩れている」）のは、これが原因。 */
+  @media (max-height:800px){
+    html[lang="en"] #message .pg{top:6vh; bottom:4vh}
+    html[lang="en"] #message .body .mh{line-height:1.14; margin-bottom:.72em}
+    html[lang="en"] #message .body .p:not(.mh){line-height:1.74; margin-bottom:1.1em}
+  }
+  @media (max-height:660px){
+    html[lang="en"] #message .body .mh{font-size:clamp(19px, min(2.9vw, 6cqw, 5.1vh), 42px); line-height:1.1; margin-bottom:.58em}
+    html[lang="en"] #message .body .p:not(.mh){font-size:clamp(12.5px, min(16.9px, 2.55vh), 16.9px); line-height:1.68; margin-bottom:.95em}
+  }
+
+  /* v565 iPhone 横など、画面が 620px より低いときだけ MESSAGE の本文を詰める。
+     見出し（.mh／.mh2）の font-size と line-height は本来の値のまま。.p への指定は必ず :not(.mh) で外す */
+  @media (max-height:620px){
+    #message .body .p:not(.mh){font-size:15.5px; line-height:1.82; margin-bottom:1.1em}
+    #message .body .mh{margin-bottom:.55em}
+  }
