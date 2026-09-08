@@ -4233,6 +4233,26 @@
       if(label != null){ var b = el('b'); b.textContent = label; d.appendChild(b); }
       host.appendChild(d); return d;
     }
+    /* v610 段の幅の札。線ではなく「線で分けた段」の真ん中に置く。
+       vals は同じ向きの線の位置（0〜100）。小さい順に並べ、0→一本目、一本目→二本目、…、最後→100 の幅を出す。
+       並べ替えるのは、重心線を開始線より上（左）に引く方が実際にいるため。負の幅を出さないための備え。
+       線が何本あっても、幅の合計は必ず 100 になる。 */
+    function bands(vals){
+      var a = vals.slice().sort(function(x, y){ return x - y; }), out = [], prev = 0, i;
+      for(i = 0; i < a.length; i++){ out.push({mid:(prev + a[i]) / 2, w:a[i] - prev}); prev = a[i]; }
+      out.push({mid:(prev + 100) / 2, w:100 - prev});
+      return out;
+    }
+    function mkBands(host, ax, vals, cls){
+      return bands(vals).map(function(b, i){
+        /* 狭い段（二本をほとんど同じ所に引いた場合）は札が隣と重なるので、一回り小さくして一段ずらす。
+           札は間引かない——間引くと、見えている数字の合計が 100 にならなくなる */
+        var d = el('i', 'gm-bd ' + ax + (cls ? ' ' + cls : '') + (b.w < 6 ? ' tiny' + (i % 2 ? ' alt' : '') : ''));
+        d.style[ax === 'v' ? 'left' : 'top'] = b.mid.toFixed(2) + '%';
+        var t = el('b'); t.textContent = Math.round(b.w) + '%'; d.appendChild(t);
+        host.appendChild(d); return d;
+      });
+    }
     function ruler(host, n){ for(var i = 0; i <= 10; i++){ var t = el('i', i % 5 ? '' : 'big'); t.style[n === 'v' ? 'left' : 'top'] = (i * 10) + '%'; host.appendChild(t); } }
     /* 盤面の高さの上限は、欄（.gm-sw）の実寸から。vh／svh は iOS の帯ぶん小さく評価され、盤面が画面の四割ほどにしかならなかった */
     function vvFit(){   /* v428: ブラウザの帯が出ている間も、見出し行とボタンが指の届く所に残るよう、見えている枠の内側へ寄せる（本人） */
@@ -5512,7 +5532,7 @@
       var ticks = [];
       LINES.forEach(function(t, n){
         res.forEach(function(r, k){ ticks.push({el: mkLine(linesEl, t.ax, r[t.k], 'tick', 'ABC'[k]), to: avg[t.k]}); });
-        var av = mkLine(linesEl, t.ax, avg[t.k], 'you avg', avg[t.k] + '%'); av.style.transitionDelay = (n * .95 + 1.15) + 's';
+        var av = mkLine(linesEl, t.ax, avg[t.k], 'you avg'); av.style.transitionDelay = (n * .95 + 1.15) + 's';   /* v610 位置の札はやめ、段の幅の札に替える（下の mkBands）。線ごとの位置は「四本の平均」の表に出ている */
       });
       void linesEl.offsetWidth;
       /* v389: 役割ごとに三本→一本を順に見せる（Astra の手本：保持 300ms、集約 780ms）。いま何を集めているかを一語で */
@@ -5520,7 +5540,10 @@
       setTimeout(function(){ if(state === 'avg') mode(L('平均', 'average')); }, rm ? 0 : 4300);
       var step = rm ? 0 : 1;
       setTimeout(function(){ ticks.forEach(function(x, i){ x.el.style.transitionDelay = (.35 + Math.floor(i / 3) * .95) + 's'; x.el.style[x.el.classList.contains('v') ? 'left' : 'top'] = x.to + '%'; }); linesEl.classList.add('gathered'); }, 120 * step);
-      setTimeout(function(){ FIXED.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'fixed', v + '%'); }); FIXED.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'fixed', v + '%'); }); linesEl.classList.add('fixed'); }, rm ? 60 : 4300);
+      setTimeout(function(){ FIXED.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'fixed'); }); FIXED.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'fixed'); }); linesEl.classList.add('fixed');
+        /* v610 段の幅の札。あなたが引いた四本で分けた段——横は x1・x3 で三段、縦は y1・y2 で三段。どちらも合計 100。
+           補った三本（28・83・71）はこのサイトのグリッドの位置なので、幅の計算には入れない（入れると出どころの違う数が混ざる） */
+        mkBands(linesEl, 'v', [avg.x1, avg.x3], 'you'); mkBands(linesEl, 'h', [avg.y1, avg.y2], 'you'); }, rm ? 60 : 4300);
       setTimeout(function(){ var n = resEl.querySelector('.gm-seven'); if(n) n.classList.add('on'); if(state === 'avg'){ seal('YOUR GRID', '平均', stage, 'center'); cring(L('あなたの平均グリッド \u00b7 YOUR GRID \u00b7 ', 'YOUR AVERAGE GRID \u00b7 YOUR GRID \u00b7 ')); var th = resEl.querySelector('.gm-thanks'); if(th) th.classList.add('on'); trayEl.classList.add('pulse'); setTimeout(function(){ trayEl.classList.remove('pulse'); }, 500); } }, rm ? 100 : 4900);
       setTimeout(function(){ goEl.classList.add('on'); try{ goEl.inert = false; }catch(x){} focusBtn(); revealRes(); }, rm ? 150 : 3900);   /* v496: 終点で 5.7 秒何もできなかった（細部係②）。骨格が描き終わる時刻に寄せる */
       lastAvg = {avg:avg, kav:kav, diff:diff, per:per}; avgRender(avg, kav, diff, per);
@@ -5529,6 +5552,9 @@
       stepEl.textContent = L('三枚の平均をとる', 'Averaging the three');
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('十二本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
+        /* v610 盤面に出るのは位置ではなく段の幅なので、その断りを一行だけ置く */
+        '<p class="gm-note">' + body(L('盤面の数字は、あなたの四本で分けた《段の幅》です。横も縦も、足すと 100 になります。線そのものの位置は、下の「四本の平均」に出しています。',
+          'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：このサイトのグリッド<small>桜を主題とした三点から起こしました</small>', 'seven faint dashed: this site’s grid<small>drawn from three pictures on the cherry-blossom theme</small>') + '</b></p>' +
         sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
@@ -5542,8 +5568,8 @@
               'I measured ' + nj + ' Japanese and ' + nw + ' Western pictures in my research. 《I averaged the position of each of the same four lines you drew》. The three pictures you measured are among them.')); })() + '</p>' +
           '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が《西洋の絵にもあるのかどうか》を、同じやり方で測って見比べています。',
             'I use the same method to see whether ratios that recur in Japanese pictures 《also appear in Western ones》.')) + '</p>' +
-          '<p class="gm-note gm-jwgo">' + body(L('盤面のあなたの％と、《表の同じ線の％を見比べてください》。',
-            '《Compare your percentages on the board with the same lines in the table》.')) + '</p>' +
+          '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「四本の平均」に出たあなたの％と、《この表の同じ線の％を見比べてください》。どちらも線の位置です。',
+            'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions: compare them.')) + '</p>' +
           jwTable() +
           '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値です。《あなたと私の解釈の違いとは別です》。',
             'The “diff” column is the Japanese average subtracted from the Western one. 《It is not the difference between your reading and mine》.')) + '</p>' +
@@ -5580,7 +5606,8 @@
     function overlay(){
       var on = linesEl.querySelector('.mine');
       if(on){ linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); }); ovLabel(false); return; }
-      GRID.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'mine', v + '%'); }); ovLabel(true);
+      /* v610 重ねるのは形を見比べるため。ここに位置の％を出すと、盤面の段の幅と出どころの違う数字が並ぶので、線だけを重ねる */
+      GRID.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'mine'); }); GRID.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'mine'); }); ovLabel(true);
       /* v600 ここに足していた一文は、凡例の「薄い破線の七本：このサイトのグリッド」の中へ移した（本人） */
     }
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
@@ -5639,14 +5666,19 @@
     function secOnly(root, q){
       if(!root) return;
       root.querySelectorAll('.gm-secq[aria-expanded="true"], .gm-catq[aria-expanded="true"]').forEach(function(o){
-        if(o === q) return; secShut(o.nextElementSibling, o);
+        if(o === q) return;
+        var y = o.nextElementSibling;
+        while(y && !y.classList.contains('gm-catx')) y = y.nextElementSibling;   /* v620 開くほうと同じ。ここがずれていたので、畳む側だけ動かず引っかかって見えた（本人） */
+        secShut(y, o);
       });
     }
     function bindSecs(root){   /* v433: 右の列でも節を畳めるように（本人：平均の画面の情報量が多い） */
       if(!root) return;
       root.querySelectorAll('.gm-secq').forEach(function(q){
         if(q.__bound) return; q.__bound = true;
-        var x = q.nextElementSibling; if(!x) return;
+        var x = q.nextElementSibling;
+        while(x && !x.classList.contains('gm-catx')) x = x.nextElementSibling;   /* v619 あいだに説明の一文を挟んだので、次の要素ではなく**中身の箱**を探す（本人：日本と西洋の平均を開いても何も出ない） */
+        if(!x) return;
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
           if(on){ secOnly(root, q); setTimeout(function(){ var sc = gm.querySelector('.gm-side'); if(!sc) return; var top = sc.scrollTop + (q.getBoundingClientRect().top - sc.getBoundingClientRect().top) - 8; if(top > sc.scrollTop) try{ sc.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = top; } }, 300); }   /* v547 ほかは畳む。v550 開いた節の頭を見えるところへ（中身がボタン群の下に潜っていた） */
           if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
@@ -5911,23 +5943,39 @@
       el.setAttribute('aria-roledescription', L('置いたもの', 'block'));
       (function(){ var _k = MOCKK[el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'];
         el.setAttribute('aria-label', L(_k[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', _k[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); })();
-      if(!el.querySelector('.gm-rz')){ var rz = document.createElement('i'); rz.className = 'gm-rz'; el.appendChild(rz); }
+      if(!el.querySelector('.gm-rz')){
+        /* v620 つまみを三つに。右下＝両方、右端＝幅だけ、下端＝丈だけ（本人：本文の大きさが変えられない） */
+        ['se', 'e', 's'].forEach(function(k){ if(k === 's' && el.classList.contains('gm-mk1')) return;
+          var rz = document.createElement('i'); rz.className = 'gm-rz ' + k; el.appendChild(rz); });
+      }
       el.addEventListener('pointerdown', function(e){
         if(e.button) return;
         if(el.__pid != null) return;
         el.__pid = e.pointerId;
-        var mock = el.parentNode, rz = e.target && e.target.classList && e.target.classList.contains('gm-rz');
+        var mock = el.parentNode, _t = e.target, rz = !!(_t && _t.classList && _t.classList.contains('gm-rz'));
+        var rzW = rz && !_t.classList.contains('s'), rzH = rz && !_t.classList.contains('e');
         var p = mockPct(el, mock), r = p.r, b = p.b;
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
+        /* v620 見出しには `-0.12em` の微調整（transform）がかかっている。位置を**見た目の矩形**から
+           書き戻していたので、掴んで離すたびにその分だけ上へ積み重なっていた（本人：二回掴むと上へ逃げる）。
+           以後は**組みの座標**（offsetLeft／offsetTop）を起点に、指の移動ぶんだけ足す。 */
+        el.style.margin = '0'; el.style.transition = 'none';   /* 遷移が効いていると、外した直後の矩形が古いままで写しが空振りする */
+        var _pre = el.getBoundingClientRect(); el.classList.add('moved'); var _post = el.getBoundingClientRect();
+        if(Math.abs(_post.top - _pre.top) > .5 || Math.abs(_post.left - _pre.left) > .5){
+          /* `moved` を付けると逃がしの transform が外れるので、見た目の位置が動かないように写しておく */
+          el.style.left = ((el.offsetLeft + (_pre.left - _post.left)) / r.width * 100).toFixed(2) + '%';
+          el.style.top = ((el.offsetTop + (_pre.top - _post.top)) / r.height * 100).toFixed(2) + '%';
+        }
+        var sl = el.offsetLeft, st = el.offsetTop;
         if(mock.lastElementChild !== el) mock.appendChild(el);
         el.classList.add('grab'); mock.classList.add('dragging');
         try{ el.setPointerCapture(e.pointerId); }catch(x){}
         var move = function(ev){
           el.style.transition = 'none'; el.style.margin = '0';
           if(rz){
-            var w = Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX)));
-            var h = Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY)));
+            var w = rzW ? Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX))) : b.width;
+            var h = rzH ? Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY))) : b.height;
             var l0 = (b.left - r.left) / r.width * 100, t0 = (b.top - r.top) / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
             var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
@@ -5937,8 +5985,8 @@
             if(el.classList.contains('gm-mk1')) mk1Fit(el);
             else { el.style.height = hp.toFixed(2) + '%'; mk2Lines(el); }
           } else {
-            var x = Math.max(0, Math.min(r.width - b.width, ev.clientX - ox - r.left));
-            var y = Math.max(0, Math.min(r.height - b.height, ev.clientY - oy - r.top));
+            var x = Math.max(0, Math.min(r.width - b.width, sl + (ev.clientX - downX)));
+            var y = Math.max(0, Math.min(r.height - b.height, st + (ev.clientY - downY)));
             var xp = x / r.width * 100, yp = y / r.height * 100, wp2 = b.width / r.width * 100, hp2 = b.height / r.height * 100;
             var s1 = snapTo(xp, wp2, 'v', r); if(s1) xp = Math.max(0, Math.min(100 - wp2, xp + s1.d));
             var s2 = snapTo(yp, hp2, 'h', r); if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
@@ -5991,8 +6039,15 @@
       var cs = getComputedStyle(el);
       var w = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       if(!(w > 0)) return;
-      el.style.fontSize = ''; var nat = el.scrollWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), fs = parseFloat(getComputedStyle(el).fontSize);
-      if(nat > 0) el.style.fontSize = Math.max(12, Math.min(140, fs * w / nat)).toFixed(2) + 'px';
+      el.style.fontSize = '';
+      /* v620 `scrollWidth` は箱より狭い字を測れない（箱の幅を返す）ので、広げても字が大きくならなかった（本人）。
+         字そのものを Range で測る。つまみは絶対配置なので、測るあいだだけ伏せる */
+      /* Range も行の箱を返すので使えない。いちど `max-content` にして字そのものの幅を採る */
+      var _w0 = el.style.width; el.style.width = 'max-content';
+      var nat = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      el.style.width = _w0;
+      var fs = parseFloat(getComputedStyle(el).fontSize);
+      if(nat > 0) el.style.fontSize = Math.max(12, Math.min(240, fs * w / nat)).toFixed(2) + 'px';
     }
     function mockKind(el){ return el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'; }
     function mockPlace(el, from){   /* 元から少しずらして置く（重ねたままだと増えたのが分からない） */
@@ -6032,7 +6087,7 @@
     function mockReset(){
       var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
       mock.querySelectorAll('.gm-clone').forEach(function(el){ el.parentNode.removeChild(el); });
-      mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab', 'snapon'); el.removeAttribute('style'); mk2Lines(el); });
+      mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab', 'snapon', 'moved'); el.removeAttribute('style'); mk2Lines(el); });
       mockSel(null);
     }
     function mockDrag(){
@@ -6041,10 +6096,55 @@
       if(mock.__drag) return; mock.__drag = true;
       mock.addEventListener('pointerdown', function(e){ if(e.target === mock) mockSel(null); });
       var tool = sheetEl.querySelector('.gm-stool'); if(!tool) return;
+      /* v620 ＋の札は、押しても足せるし、**そのまま引き出しても**足せる（本人）。
+         引き出しているあいだは小さく畳んで持ち、離すと元の大きさへ開く */
+      tool.querySelectorAll('[data-add]').forEach(function(b){
+        b.addEventListener('pointerdown', function(e){
+          if(e.button) return;
+          var el = mockAdd(b.getAttribute('data-add')); if(!el) return;
+          e.preventDefault();
+          var r = mock.getBoundingClientRect(), bb = el.getBoundingClientRect();
+          el.classList.add('spawn', 'grab'); mock.classList.add('dragging'); el.__pid = e.pointerId;
+          var ox = bb.width / 2, oy = bb.height / 2;
+          var mv = function(ev){
+            el.style.transition = 'none'; el.style.margin = '0';
+            var x = Math.max(0, Math.min(r.width - bb.width, ev.clientX - ox - r.left));
+            var y = Math.max(0, Math.min(r.height - bb.height, ev.clientY - oy - r.top));
+            el.style.left = (x / r.width * 100).toFixed(2) + '%';
+            el.style.top = (y / r.height * 100).toFixed(2) + '%';
+          };
+          var up = function(){
+            document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+            el.__pid = null; el.style.transition = ''; el.classList.remove('grab');
+            void el.offsetWidth; el.classList.remove('spawn');   /* 離すと元の大きさへ開く */
+            mock.classList.remove('dragging');
+          };
+          mv(e);
+          document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+        });
+      });
+      /* v620 道具の列そのものを、紙面の好きな所へ（本人）。題の「置いて試す」を掴む */
+      (function(){
+        var grip = tool.querySelector('b'); if(!grip) return;
+        grip.addEventListener('pointerdown', function(e){
+          if(e.button) return; e.preventDefault();
+          var t = tool.getBoundingClientRect(), sh = sheetEl.getBoundingClientRect();
+          var ox = e.clientX - t.left, oy = e.clientY - t.top;
+          tool.classList.add('grab');
+          var mv = function(ev){
+            var x = Math.max(0, Math.min(sh.width - t.width, ev.clientX - ox - sh.left));
+            var y = Math.max(0, Math.min(sh.height - t.height, ev.clientY - oy - sh.top));
+            tool.style.left = x + 'px'; tool.style.top = y + 'px'; tool.style.bottom = 'auto'; tool.style.right = 'auto';
+          };
+          var up = function(){ tool.classList.remove('grab');
+            document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); };
+          document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+        });
+      })();
       tool.addEventListener('click', function(e){
         var b = e.target.closest && e.target.closest('button'); if(!b) return;
         var a = b.getAttribute('data-add');
-        if(a) return mockAdd(a);
+        if(a) return;   /* v620 足すのは pointerdown 側の役目（引き出しと共通） */
         var k = b.getAttribute('data-act');
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
@@ -6075,8 +6175,10 @@
     function sheet(avg){
       sheetAvg = avg;
       var sgd = sheetEl.querySelector('.gm-sgrid'); sgd.innerHTML = '';
-      GRID.v.forEach(function(v){ mkLine(sgd, 'v', v, 'mine', v + '%'); }); GRID.h.forEach(function(v){ mkLine(sgd, 'h', v, 'mine', v + '%'); });
-      LINES.forEach(function(t){ mkLine(sgd, t.ax, avg[t.k], 'you big', avg[t.k] + '%'); });
+      /* v610 紙面は組むための面なので、線の位置ではなく段の幅を出す。
+         札は sheetBands() が、いま中身が載っているグリッドのぶんだけ描く（二組を同時に出すと数字が十五個並ぶ） */
+      GRID.v.forEach(function(v){ mkLine(sgd, 'v', v, 'mine'); }); GRID.h.forEach(function(v){ mkLine(sgd, 'h', v, 'mine'); });
+      LINES.forEach(function(t){ mkLine(sgd, t.ax, avg[t.k], 'you big'); });
       /* v602 画面の中心軸（本人）。緑の破線で縦横に一本ずつ。置くときの目安になる */
       mkLine(sgd, 'v', 50, 'mid', L('中心', 'centre')); mkLine(sgd, 'h', 50, 'mid', L('中心', 'centre'));
       /* v514 ここで FIXED の三本を足すと、上の七本と重なって三本だけ濃くなっていた（見張り番） */
@@ -6102,6 +6204,16 @@
       sheetEl.querySelector('.gm-scap small').textContent = L('見出し・図版・本文は、つまんで動かせます。右下をつまむと大きさが変わります。押して選ぶと、複製や削除ができます。', 'Drag the title, the figure and the text. Pull the corner to resize. Select one to duplicate or delete it.');
       mockText();
     }
+    /* v610 紙面の段の幅。中身が載っているグリッドのぶんだけ出す。
+       このサイトのグリッド：横 12・16・30・25・17／縦 14・18・39・29。
+       あなたのグリッド：横は x1・x3 で三段、縦は y1・y2 で三段。どちらも合計 100 */
+    function sheetBands(which){
+      var sgd = sheetEl && sheetEl.querySelector('.gm-sgrid'); if(!sgd || !sheetAvg) return;
+      sgd.querySelectorAll('.gm-bd').forEach(function(x){ x.parentNode.removeChild(x); });
+      var mine = which === 'mine';
+      mkBands(sgd, 'v', mine ? GRID.v : [sheetAvg.x1, sheetAvg.x3], mine ? 'mine' : 'you');
+      mkBands(sgd, 'h', mine ? GRID.h : [sheetAvg.y1, sheetAvg.y2], mine ? 'mine' : 'you');
+    }
     /* 紙面の内容（見出し・図版・本文）を、あなたの骨格か研究の骨格に載せる。位置は CSS 変数で渡し、切り替えは transition */
     function sheetGrid(which){
       var g = which === 'mine' ? {y1:14, x1:12, y2:32, x3:58} : sheetAvg; if(!g) return;
@@ -6112,6 +6224,7 @@
       sheetEl.querySelectorAll('.gm-swk button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-g') === which ? 'true' : 'false'); });
       sheetEl.classList.toggle('mineg', which === 'mine');
       mockUntangle(g);
+      sheetBands(which);   /* v610 段の幅の札は、いま中身が載っているグリッドのぶんだけ */
     }
     function mockUntangle(g){
       var m = sheetEl && sheetEl.querySelector('.gm-mock'); if(!m || !g) return;

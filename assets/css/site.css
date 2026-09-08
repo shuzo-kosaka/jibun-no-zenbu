@@ -4663,7 +4663,7 @@
   /* ③ 本文の最後の行が切れないように */
   .gm-sheet .gm-mock .gm-mk2.gm-drag{padding:0}
   /* ⑥ たての線の札を、頭のボタンの帯の下へ逃がす */
-  .gm-sheet .gm-sgrid .gm-ln.v b{top:calc(var(--hdh, 60px) + 14px)}
+  .gm-sheet .gm-sgrid .gm-ln.v:not(.mine):not(.fixed) b{top:calc(var(--hdh, 60px) + 14px)}   /* v619 .mine は 3895 行で bottom に留めてある。top を足すと上下が同時に決まり、札が縦に伸びて**黒い帯**になっていた（本人） */
 
   #seq text.ct.sum{fill:var(--acc)}
 
@@ -4720,3 +4720,44 @@
     #seq .steps li.act strong{font-size:19px}
     #seq .steps .tip{margin-top:7px}
   }
+
+  /* 箱の寸法は元のまま（76×37px）。中の数字だけ 16px → 20px に */
+  .gm-obs small{font-size:20px; padding:6px 11px 6px; line-height:1.2}
+  html.phone .gm-obs small{font-size:18px; padding:6px 10px 6px}
+  .gm-obs small .gm-pc{font-size:.7em}
+
+  /* v610 段の幅の札。線は引かない（幅も高さも 0 の目印）。数字は段の真ん中に */
+  .gm-bd{position:absolute; pointer-events:none; font-style:normal; z-index:4}
+  .gm-bd.v{top:0; bottom:0; width:0}
+  .gm-bd.h{left:0; right:0; height:0}
+  .gm-bd b{position:absolute; font-family:var(--mono); font-weight:500; font-size:10.5px; line-height:16px;
+           padding:0 4px; border-radius:2px; white-space:nowrap; background:var(--acc); color:#FBF7F2}
+  .gm-bd.v b{top:4px; left:0; transform:translateX(-50%)}
+  .gm-bd.h b{left:4px; top:0; transform:translateY(-50%)}
+  .gm-bd.mine b{background:#2E2C29}
+  /* 狭い段の札：小さく、一段ずらして重なりを避ける */
+  .gm-bd.tiny b{font-size:9px; padding:0 2px}
+  .gm-bd.tiny.v b{top:22px} .gm-bd.tiny.v.alt b{top:38px}
+  .gm-bd.tiny.h b{left:44px} .gm-bd.tiny.h.alt b{left:74px}
+  /* 紙面：たての段の札は、頭のボタンの帯の下へ（v608 と同じ逃がし方） */
+  .gm-sheet .gm-sgrid .gm-bd.v b{top:calc(var(--hdh, 60px) + 14px)}
+
+  .gm-sheet .gm-mock .gm-drag .gm-rz{position:absolute; width:14px; height:14px; opacity:0; pointer-events:auto}
+  .gm-sheet .gm-mock .gm-drag .gm-rz::before{content:''; position:absolute; inset:-13px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se{right:-5px; bottom:-5px; border-right:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:nwse-resize}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.e{right:-5px; top:50%; margin-top:-7px; border-right:2px solid var(--acc); cursor:ew-resize}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.s{left:50%; bottom:-5px; margin-left:-7px; border-bottom:2px solid var(--acc); cursor:ns-resize}
+  .gm-sheet .gm-mock .gm-drag:hover .gm-rz,.gm-sheet .gm-mock .gm-drag.sel .gm-rz{opacity:.75}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz{opacity:.6}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-18px}
+  /* 引き出しているあいだは小さく畳む。離すと元の大きさへ開く */
+  .gm-sheet .gm-mock .gm-drag.spawn{transform:scale(.55); transform-origin:50% 50%; opacity:.85}
+  .gm-sheet .gm-mock .gm-drag{transition:transform .22s var(--ease), opacity .22s var(--ease)}
+  .gm-sheet .gm-mock.dragging .gm-drag.grab{transition:none}
+  .gm-sheet .gm-mock .gm-drag.spawn{transition:transform .12s var(--ease), opacity .12s var(--ease)}
+  /* 掴んで動かした見出しは、逃がしの transform を外す */
+  .gm-mock.vtight .gm-mk1.moved,.gm-mock.vtight.land .gm-mk1.moved{transform:translate(0,-.12em)}
+  /* 道具の列は掴んで動かせる */
+  .gm-stool b{cursor:grab; user-select:none}
+  .gm-stool.grab b{cursor:grabbing}
+  .gm-stool.grab{opacity:.9}
