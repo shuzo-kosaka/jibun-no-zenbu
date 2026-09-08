@@ -4560,14 +4560,16 @@
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、《私が引いた線との差を％で見比べます》。') + '</p>' +
         '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッドができ》、このサイトのグリッドと重ねられます。') + '</p>' +
-        '<p class="gm-ick">測る絵を選んでください　　詳しくは右上の「測り方とQ&A」から</p>';
+        '<p class="gm-ick">測る絵を選んでください</p>';
       var PE = '<p class="gm-ipur">' + body('Japanese and Western pictures are measured the same way, and 《your lines are compared with mine in percent》.') + '</p>' +
         '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over this site’s grid.') + '</p>' +
-        '<p class="gm-ick">Choose the pictures　　details in “How to measure &amp; Q&amp;A”, top right</p>';
+        '<p class="gm-ick">Choose the pictures</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。ここでは見比べる相手として、西洋の絵も同じやり方で測りました。') + '</p>' +
-        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>';
+        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>' +
+        '<p class="gm-ick">詳しくは右上の「測り方とQ&A」から</p>';   /* v613 方法の話が終わった直後に。ボタンは同じ画面の右上に見えている（本人の記憶どおり 03 の後） */
       var RE = '<p class="gm-ipur">' + body('In my research I measure 《where form and empty space sit inside Japanese pictures》. For this game I measured Western pictures the same way, so that you have something to compare against.') + '</p>' +
-        '<p class="gm-ipur">' + body('What you do here is a simplified version: three pictures, and 《only where the main form begins and where its visual centre falls》.') + '</p>';
+        '<p class="gm-ipur">' + body('What you do here is a simplified version: three pictures, and 《only where the main form begins and where its visual centre falls》.') + '</p>' +
+        '<p class="gm-ick">More in “How to measure &amp; Q&amp;A”, top right</p>';
       var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
       var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
       return [title, info, brief, choice];
@@ -4671,19 +4673,29 @@
         var rows = ibgRows(PH), rowH = PH / rows;
         for(var mr = 0; mr < rows; mr++){
           var row = el('div', 'row' + (mr % 2 ? ' rev' : '')), strip = el('div', 'strip');
-          row.style.height = (100 / rows) + '%'; row.style.top = (mr * 100 / rows) + '%';
+          /* v613 ① 段の丈と位置を％で入れていたので、境目が半端な画素に落ちると
+             `contain:paint` が上の段も下の段もその一画素を塗らず、後ろの紙（#F2F1EC）が
+             **横一本の白い線**として出ていた（本人：二枚目から三枚目へ移るとき）。
+             位置を整数画素に丸め、次の段へ 1px かぶせる（重なりは後の段が勝つので見た目は変わらない）。 */
+          var ry0 = Math.round(mr * PH / rows), ry1 = Math.round((mr + 1) * PH / rows);
+          row.style.top = ry0 + 'px'; row.style.height = (ry1 - ry0 + 1) + 'px';
           /* v521: 一巡がちょうど面幅になる枚数を選ぶ。丈なりに並べていたので帯が青天井に伸び、
              iPhone 縦持ちで 20,901 実ピクセル・196.9MB に達して iOS が描き切れず、
              空白と停止が出ていた（→ 2,358px・23.0MB） */
-          var s = 0, best = Infinity, need = 1;
+          /* v613 ② 一巡が面幅ちょうどだったので、継ぎ目の絵が必ず左右の端に半分ずつ残り、
+             そのあいだの絵が「白い板」に、端の細い残りが「角から出た線」に見えていた（本人）。
+             一巡を面幅の 1.5 倍にすると、継ぎ目の片側は画面の外へ出る。渡る速さは前のまま。 */
+          var s = 0, best = Infinity, need = 1, sum = 0, TARGET = PW * 1.5;
           for(var t = 1; t <= 24; t++){
             s += (BOARDS[(t - 1 + mr * 5) % BOARDS.length].ar || 1);
-            var dd = Math.abs(s * rowH - PW);
-            if(dd < best){ best = dd; need = t; }
+            var dd = Math.abs(s * rowH - TARGET);
+            if(dd < best){ best = dd; need = t; sum = s; }
           }
-          strip.style.width = (2 * PW) + 'px';   /* 二枚組。渡る距離＝面幅ちょうどなので、向きが変わっても速さが変わらない */
+          var GW = Math.round(sum * rowH);
+          strip.style.width = (2 * GW) + 'px';   /* 二枚組。渡る距離は一巡ぶん */
+          strip.style.animationDuration = ((mr % 2 ? 80 : 63) * GW / PW).toFixed(1) + 's';
           for(var cp = 0; cp < 2; cp++){
-            var grp = el('div', 'grp'); grp.style.width = PW + 'px';
+            var grp = el('div', 'grp'); grp.style.width = GW + 'px';
             for(var mi = 0; mi < need; mi++){
               var mb = BOARDS[(mi + mr * 5) % BOARDS.length];
               var mim = document.createElement('img'); mim.alt = ''; mim.decoding = 'async'; mim.draggable = false;
