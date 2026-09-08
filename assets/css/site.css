@@ -4666,3 +4666,5 @@
   .gm-sheet .gm-sgrid .gm-ln.v b{top:calc(var(--hdh, 60px) + 14px)}
 
   #seq text.ct.sum{fill:var(--acc)}
+
+  html.phone .lines .bv s,html.phone #seq .page .bv s{top:calc(var(--y1) + 34px)}
