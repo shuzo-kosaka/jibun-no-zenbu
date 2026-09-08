@@ -4664,3 +4664,5 @@
   .gm-sheet .gm-mock .gm-mk2.gm-drag{padding:0}
   /* ⑥ たての線の札を、頭のボタンの帯の下へ逃がす */
   .gm-sheet .gm-sgrid .gm-ln.v b{top:calc(var(--hdh, 60px) + 14px)}
+
+  #seq text.ct.sum{fill:var(--acc)}
