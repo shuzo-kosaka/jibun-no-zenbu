@@ -5971,12 +5971,25 @@
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
     }
+    /* v603 道具の絵。Illustrator の道具箱と同じ約束で、線だけの 24 角（文字は T、画像は山と丸、
+       本文は行、複製は重ねた二枚、削除はごみ箱、戻すは巻き戻しの矢印） */
+    var MOCKI = {
+      mk1:'<path d="M5 6h14M12 6v13M9.5 19h5"/>',
+      mk3:'<rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="8.4" cy="10" r="1.5"/><path d="M3.4 16.6l4.6-3.8 3.6 2.8 3.2-2.2 6.2 5"/>',
+      mk2:'<path d="M4 6.5h16M4 10.5h16M4 14.5h16M4 18.5h9"/>',
+      dup:'<rect x="3.5" y="3.5" width="12" height="12" rx="1"/><rect x="8.5" y="8.5" width="12" height="12" rx="1"/>',
+      del:'<path d="M4 6.5h16M9.5 6.5V3.5h5v3M6.5 6.5l1 14h9l1-14M10 10v7M14 10v7"/>',
+      rst:'<path d="M4.5 9.5h11a5 5 0 010 10H9"/><path d="M8.5 5.5l-4 4 4 4"/>'
+    };
+    function mockIcon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + MOCKI[k] + '</svg>'; }
     function mockText(){
       var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
       t.querySelector('b').textContent = L('置いて試す', 'try a layout');
-      t.querySelectorAll('[data-add]').forEach(function(b){ var k = MOCKK[b.getAttribute('data-add')]; b.textContent = '＋' + L(k[0], k[1]); });
+      t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
+        b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset']};
-      t.querySelectorAll('[data-act]').forEach(function(b){ var k = m[b.getAttribute('data-act')]; b.textContent = L(k[0], k[1]); });
+      t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
+        b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
     }
     function sheet(avg){
       sheetAvg = avg;
