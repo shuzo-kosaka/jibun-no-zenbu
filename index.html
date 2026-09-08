@@ -30,8 +30,8 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" id="themec" content="#E84518">
 <style>body{margin:0;font-size:14px;font-family:system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
-<link rel="stylesheet" href="assets/css/site.css?v=7c2bf43b">
-<script src="assets/js/i18n.js?v=4d1205e6" defer></script>
+<link rel="stylesheet" href="assets/css/site.css?v=20414ea8">
+<script src="assets/js/i18n.js?v=3fb8da25" defer></script>
 <script src="assets/js/matter.min.js?v=d79ceded" defer></script>
 <script src="assets/js/site.js?v=b40d321c" defer></script>
 </head>
@@ -691,14 +691,14 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
             <line class="ln" x1="350" y1="155" x2="650" y2="155" pathLength="1" style="transition-delay:.4s"></line>
             <line class="ln" x1="350" y1="233" x2="650" y2="233" pathLength="1" style="transition-delay:.5s"></line>
             <line class="ln" x1="350" y1="400" x2="650" y2="400" pathLength="1" style="transition-delay:.6s"></line>
-            <text class="pct" x="386" y="546" text-anchor="middle">12</text><text class="pct" x="434" y="546" text-anchor="middle">28</text><text class="pct" x="524" y="546" text-anchor="middle">58</text><text class="pct" x="599" y="546" text-anchor="middle">83</text>
-            <text class="pct" x="342" y="160" text-anchor="end">14</text><text class="pct" x="342" y="238" text-anchor="end">32</text><text class="pct" x="342" y="405" text-anchor="end">71</text>
+            <text class="pct bd" x="368" y="546" text-anchor="middle">12%</text><text class="pct bd" x="410" y="546" text-anchor="middle">16%</text><text class="pct bd" x="479" y="546" text-anchor="middle">30%</text><text class="pct bd" x="561" y="546" text-anchor="middle">25%</text><text class="pct bd" x="624" y="546" text-anchor="middle">17%</text>
+            <text class="pct bd" x="342" y="129" text-anchor="end">14%</text><text class="pct bd" x="342" y="198" text-anchor="end">18%</text><text class="pct bd" x="342" y="320" text-anchor="end">39%</text><text class="pct bd" x="342" y="467" text-anchor="end">29%</text>
             <text class="lbl" x="389" y="108" transform="rotate(90 389 108)">X1 主塊開始線</text>
             <text class="lbl" x="437" y="108" transform="rotate(90 437 108)">X2 密度転換線</text>
             <text class="lbl" x="527" y="108" transform="rotate(90 527 108)">X3 主塊重心線</text>
             <text class="lbl" x="602" y="108" transform="rotate(90 602 108)">X4 副次要素境界線</text>
             <text class="lbl" x="656" y="152">Y1 主塊開始線</text><text class="lbl" x="656" y="230">Y2 主塊重心線</text><text class="lbl" x="656" y="397">Y3 密度転換線</text>
-            <text class="name" x="350" y="82" style="opacity:1">平均グリッド　左から 12% 28% 58% 83%　上から 14% 32% 71%</text>
+            <text class="name" x="350" y="82" style="opacity:1">平均グリッド　横 12% 16% 30% 25% 17%　縦 14% 18% 39% 29%</text>
           </g>
         </svg>
         <div class="legend" id="legend">
@@ -734,7 +734,7 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
           <li><b>04</b><strong>線を引く</strong><span>凡例に従って、解釈した境界を水平と垂直の線に置き換えます。主塊の始まり、重心、余白の始まり、密度の転換を、一本ずつ根拠を添えて引いていきます。</span></li>
           <li><b>05</b><strong>測る</strong><span>作品のふちを物差しにして、それぞれの線が「左から何％」「上から何％」の位置にあるかを読み取ります。読み取った値は、小数点以下を落として整数にそろえます。「なんとなく」を数字として取り出していく作業です。</span></li>
           <li><b>06</b><strong>対応させる</strong><span>三作品の線を、X1やY1の番号ではなく「主塊開始線」「主塊重心線」といった機能名称で結びます。番号は並び順にすぎません。同じ役割の線どうしを、色ごとに重ねて見ます。</span></li>
-          <li><b>07</b><strong>平均をとる</strong><span>共通する機能線の平均位置から、ひとつの平均グリッドをつくります。現段階の値は、左から 12％・28％・58％・83％、上から 14％・32％・71％です。</span></li>
+          <li><b>07</b><strong>平均をとる</strong><span>共通する機能線の平均位置から、ひとつの平均グリッドをつくります。現段階の値は、横が 12％・16％・30％・25％・17％、縦が 14％・18％・39％・29％。線で分けた各段の幅の比で、どちらも合計 100％です。</span></li>
           <li><b>08</b><strong>紙面、画面へ</strong><span>比率を、文字を置ける実寸に起こします。紙の判型でも、画面の幅でも、同じ比率のまま引き直せる。絵から取り出したものさしが、そのまま組版の骨格になります。</span></li>
         </ol>
         <div class="tip">CLICK · 番号を押すとその段階へ</div>

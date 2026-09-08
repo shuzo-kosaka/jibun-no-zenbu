@@ -4640,3 +4640,6 @@
   .gm-stool button svg{width:14px; height:14px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; overflow:visible}
   .gm-stool button span{display:block}
   @media (max-height:640px){ .gm-stool button svg{width:13px; height:13px} }
+
+  /* v606 段の幅の札は、いちばん狭い段（12％＝36 の幅）にも収まるよう一回り小さく */
+  #seq text.pct.bd{font-size:13px}
