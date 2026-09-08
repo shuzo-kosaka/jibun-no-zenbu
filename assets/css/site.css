@@ -4656,3 +4656,11 @@
   html.grid #top .lines .bv,html.grid #top .lines .bh{opacity:1 !important}
   #seq .page .bv,#seq .page .bh{opacity:0; transition:opacity .8s .4s}
   #seq.s8 .page .bv,#seq.s8 .page .bh{opacity:1}
+
+  /* ① 横の段の札は Y1 の線の上に。② 縦の段の札は縦組みに */
+  .lines .bv s,#seq .page .bv s{top:calc(var(--y1) - 24px)}
+  .lines .bh s,#seq .page .bh s{writing-mode:vertical-rl; left:4px}
+  /* ③ 本文の最後の行が切れないように */
+  .gm-sheet .gm-mock .gm-mk2.gm-drag{padding:0}
+  /* ⑥ たての線の札を、頭のボタンの帯の下へ逃がす */
+  .gm-sheet .gm-sgrid .gm-ln.v b{top:calc(var(--hdh, 60px) + 14px)}

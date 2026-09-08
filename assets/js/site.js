@@ -5832,9 +5832,26 @@
     function snapPx(){
       try{ return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? SNAP_COARSE : SNAP_FINE; }catch(e){ return SNAP_FINE; }
     }
-    function snapLines(ax){
+    function snapLines(ax, r){
       var a = (ax === 'v' ? GRID.v : GRID.h).slice(); a.push(50);
       if(sheetAvg) a.push(ax === 'v' ? sheetAvg.x1 : sheetAvg.y1, ax === 'v' ? sheetAvg.x3 : sheetAvg.y2);
+      /* v608 あなたの線とこのサイトの線が近いと、二つの吸着の帯が重なって**あいだに置けなく**なる
+         （58％ と 59％ が 14px しか離れていない、という実例：見張り係）。
+         許容の二倍より近い候補は、真ん中の一本にまとめる */
+      if(r){
+        var span = ax === 'v' ? r.width : r.height;
+        if(span > 0){
+          var tol = snapPx() / span * 100 * 2, out = [], run;
+          a.sort(function(x, y){ return x - y; });
+          run = [a[0]];
+          for(var i = 1; i < a.length; i++){
+            if(a[i] - run[run.length - 1] < tol) run.push(a[i]);
+            else { out.push(run.reduce(function(q, w2){ return q + w2; }, 0) / run.length); run = [a[i]]; }
+          }
+          out.push(run.reduce(function(q, w2){ return q + w2; }, 0) / run.length);
+          return out;
+        }
+      }
       return a;
     }
     function snapMark(ax, v){
@@ -5848,7 +5865,7 @@
     }
     function snapTo(v, w, ax, r){   /* v＝いまの位置（％）、w＝大きさ（％）。左端・中心・右端のどれかが線に乗るように */
       var span = ax === 'v' ? r.width : r.height; if(!(span > 0)) return null;
-      var tol = snapPx() / span * 100, best = null, cand = snapLines(ax);
+      var tol = snapPx() / span * 100, best = null, cand = snapLines(ax, r);
       [0, w / 2, w].forEach(function(o){
         cand.forEach(function(L0){ var d = L0 - o - v; if(Math.abs(d) < tol && (!best || Math.abs(d) < Math.abs(best.d))) best = {d:d, at:L0}; });
       });
@@ -5879,15 +5896,15 @@
         if(e.button) return;
         var mock = el.parentNode, rz = e.target && e.target.classList && e.target.classList.contains('gm-rz');
         var p = mockPct(el, mock), r = p.r, b = p.b;
-        var ox = e.clientX - b.left, oy = e.clientY - b.top;
+        var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
         el.classList.add('grab'); mock.classList.add('dragging');
         try{ el.setPointerCapture(e.pointerId); }catch(x){}
         var move = function(ev){
           el.style.transition = 'none'; el.style.margin = '0';
           if(rz){
-            var w = Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), ev.clientX - b.left));
-            var h = Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), ev.clientY - b.top));
+            var w = Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX)));
+            var h = Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY)));
             var l0 = (b.left - r.left) / r.width * 100, t0 = (b.top - r.top) / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
             var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
