@@ -4626,3 +4626,20 @@
   .gm-sheet .gm-mock .gm-mk2.gm-drag{overflow:hidden}
   .gm-sheet .gm-mock .gm-mk3.gm-drag{box-sizing:border-box}
   .gm-sheet .gm-mock .gm-clone{opacity:1 !important; transform:none !important}
+
+  /* 中心軸（緑の破線）。日本の絵の平均と同じ緑 */
+  .gm-sheet .gm-sgrid .gm-ln.mid{--acc:#2F8F5B; opacity:.5}
+  .gm-sheet .gm-sgrid .gm-ln.mid.v{border-left-style:dashed}
+  .gm-sheet .gm-sgrid .gm-ln.mid.h{border-top-style:dashed}
+  .gm-sheet .gm-sgrid .gm-ln.mid b{background:#2F8F5B; color:#FBF7F2}
+  /* 吸い寄せているあいだ、その線を濃く */
+  .gm-sheet .gm-sgrid .gm-ln.snap{opacity:1}
+  .gm-sheet .gm-sgrid .gm-ln.snap.v{border-left-width:2px} .gm-sheet .gm-sgrid .gm-ln.snap.h{border-top-width:2px}
+  .gm-sheet .gm-mock .gm-drag.snapon{outline:1px solid var(--acc); outline-offset:3px}
+  /* 本文は行の集まり。伸ばすと行が増え、横に広げると一行が長くなる */
+  .gm-sheet .gm-mk2 i{width:100%} .gm-sheet .gm-mk2 i.short{width:46%}
+  /* 説明の一行と判は、置いたものの上に載っているだけ。掴む手が当たらないように当たり判定を抜く
+     （紙面の下半分では .gm-scap が z-index:2 で覆っていて、本文のつまみに指が届かなかった） */
+  .gm-sheet .gm-scap,.gm-sheet .gm-seal{pointer-events:none}
+  /* 頭の三つのボタンの間を等しく（あなたのグリッド｜このサイトのグリッド｜戻る） */
+  .gm-shd{gap:6px} .gm-shd .gm-sx{margin-left:0}
