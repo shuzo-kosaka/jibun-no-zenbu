@@ -1808,6 +1808,30 @@
     shift(caps[2], 413.5, -370);    /* 右下の説明 → 右の列（v250） */
   })();
   /* v244: 三つのことの説明文 — 見出しと同じ混植（漢字＝ゴシック、かな＝明朝）を tspan で。行間は文字の大きさに合わせ、PC は長い行を分ける */
+  /* v596 行末の「墨の右端」から「送りの右端」までの空き（＋字送り）。単位は viewBox の座標系。
+     hugLine と同じく、大きく描いて画素を走査する。measureText の actualBoundingBoxRight は
+     WebKit だと和字で送り幅をそのまま返してきて、「。」の右の空きが 0 に見えた（見張り係）。
+     canvas は palt を効かせないが、この図の説明には palt を掛けていないので、そのまま使える */
+  var capCv = document.createElement('canvas'), capCx = capCv.getContext('2d');
+  function capTrail(el, ch){
+    if(!capCx || !ch) return 0;
+    var cs = getComputedStyle(el), px = parseFloat(cs.fontSize), S = 4;
+    if(!(px > 0)) return 0;
+    var fnt = cs.fontStyle + ' ' + cs.fontWeight + ' ' + (px * S) + 'px ' + cs.fontFamily;
+    capCx.font = fnt;
+    var adv = capCx.measureText(ch).width; if(!(adv > 0)) return 0;
+    var x0 = Math.round(px * S * .4);
+    capCv.width = Math.ceil(x0 + adv + px * S * .8); capCv.height = Math.ceil(px * S * 1.8);
+    capCx.font = fnt;   /* 大きさを変えると context の状態が消える */
+    capCx.textBaseline = 'middle'; capCx.fillStyle = '#000';
+    capCx.fillText(ch, x0, capCv.height / 2);
+    var d = capCx.getImageData(0, 0, capCv.width, capCv.height).data, right = x0 + adv, x, y;
+    for(x = capCv.width - 1; x >= 0; x--){
+      for(y = 0; y < capCv.height; y++){ if(d[(y * capCv.width + x) * 4 + 3] > 40){ right = x + 1; x = -1; break; } }
+    }
+    var ls = parseFloat(cs.letterSpacing); if(!isFinite(ls)) ls = 0;
+    return Math.max(0, (x0 + adv - right) / S) + ls;
+  }
   function dgCaps(){
     var svg = document.getElementById('dgsvg'); if(!svg) return;
     var phone = document.documentElement.classList.contains('pcview') && document.documentElement.classList.contains('phone');
@@ -1819,6 +1843,9 @@
       if(t.__mixed && t.__mixedLang === curLang) return;
       var lines = Array.prototype.slice.call(t.querySelectorAll(':scope > tspan')).map(function(ts){ return {x: ts.getAttribute('x'), ref: ts.classList.contains('ref'), text: ts.textContent}; });
       if(!lines.length) return;
+      /* v596 元の x を憶えておく。参照の行は下で寄せるので、憶えずに読み直すと寄せが積み重なる */
+      if(t.__x0 && t.__x0.length === lines.length) lines.forEach(function(l, i){ l.x = t.__x0[i]; });
+      else t.__x0 = lines.map(function(l){ return l.x; });
       /* PC・タブレット：左下の説明は輪の左（右揃え）、右下の説明は輪の右（左揃え）。上の説明はそのまま 2 行 */
       var x = null;
       if(!phone){
@@ -1838,6 +1865,20 @@
         } else ts.textContent = l.text;
         t.appendChild(ts);
       });
+      /* v596 右下の説明は右揃え。ただし本文の行末が「。」で、字の枠の右に空きが残るため、
+         空きのない参照の行（CHECKPOINT 02 / 05 / 07）だけが右へ出て、揃って見えなかった（本人）。
+         → 参照の行を、二つの行末の空きの差ぶんだけ左へ寄せ、**墨の右端**をそろえる。
+         寄せは dx で入れる。x を書き換えると、次に組み直すときに寄せた値を読み直して二重にかかる */
+      if(t.getAttribute('text-anchor') === 'end'){
+        var rf = null, bd = null;
+        t.querySelectorAll(':scope > tspan').forEach(function(ts){ if(ts.classList.contains('ref')) rf = ts; else bd = ts; });
+        if(rf && bd){
+          var bTx = bd.textContent, rTx = rf.textContent;
+          var d = capTrail(bd.lastElementChild || bd, bTx.charAt(bTx.length - 1)) - capTrail(rf, rTx.charAt(rTx.length - 1));
+          /* 寄せは x に入れる。dx だと WebKit（Safari）が text-anchor:end の塊に効かせてくれない（見張り係） */
+          if(d > .5) rf.setAttribute('x', (parseFloat(rf.getAttribute('x')) - d).toFixed(2));
+        }
+      }
       t.__mixed = true; t.__mixedLang = curLang;
     });
   }
