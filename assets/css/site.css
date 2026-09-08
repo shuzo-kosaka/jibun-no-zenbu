@@ -4673,3 +4673,17 @@
   .gm-isec .gm-ick{opacity:.78}
 
   html.phone .seqplay{top:calc(var(--y3, 71vh) + 14px) !important; bottom:auto !important}
+
+  .gm-sheet .gm-mock .gm-drag.sel{z-index:4}
+  .gm-sheet .gm-sgrid .gm-ln.snap.v{border-left-style:solid; box-shadow:0 0 0 3px rgba(232,69,24,.16)}
+  .gm-sheet .gm-sgrid .gm-ln.snap.h{border-top-style:solid; box-shadow:0 0 0 3px rgba(232,69,24,.16)}
+  .gm-sheet .gm-sgrid .gm-ln.snap b{opacity:1; background:var(--acc); color:#FBF7F2}
+  .gm-stool button{min-height:34px}
+  html.phone .gm-stool button{min-height:44px; padding:10px 12px}
+  .gm-sheet .gm-mock .gm-drag::after{content:''; position:absolute; inset:0; border:1px solid rgba(232,69,24,.28); opacity:0; transition:opacity .18s; pointer-events:none}
+  .gm-sheet .gm-mock .gm-drag:hover::after{opacity:1}
+  .gm-sheet .gm-mock .gm-drag.sel::after{opacity:0}
+  .gm-mock.vtight .gm-mk1,.gm-mock.vtight.land .gm-mk1{transform:translate(0,-.12em) translateY(calc(-100% - 6px))}
+
+  .gm-sheet:has(.gm-mock.tight) .gm-scap{top:auto; bottom:calc(3vh + 46px); left:max(4vw, env(safe-area-inset-left, 0px)); right:auto; max-width:min(70vw, 640px)}
+  @media (max-height:640px){ .gm-sheet:has(.gm-mock.tight) .gm-scap{bottom:calc(1.5vh + 40px)} }

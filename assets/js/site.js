@@ -3365,12 +3365,15 @@
        読み手が自分で動かしたら（指・ホイール・キー）そこでやめる。位置の差で判断すると、直したいずれ自体を
        「自分で動かした」と誤って読んでしまうため、入力そのものを合図にする */
       var moved = false, onUser = function(){ moved = true; };
-      ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.addEventListener(ev, onUser, {passive:true}); });
+      /* v616 クリックが「読み手が動かした」合図に入っていなかった。指の端末は touchstart で止まるが、
+         マウスの端末だけこのループに勝てず、言語を切り替えて 3 秒以内に連絡シートを開閉すると
+         置き直しと綱引きになって紙面が頭へ滑っていた（見張り係：pc・pcsmall・英語・一回目だけ再現） */
+      ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function(ev){ window.addEventListener(ev, onUser, {passive:true}); });
       var keep = function(){ if(!moved) langRestore(langAnc); };
       requestAnimationFrame(function(){ requestAnimationFrame(keep); });
       var t0 = Date.now(), iv = setInterval(function(){
         keep();
-        if(moved || Date.now() - t0 > 3000){ clearInterval(iv); ['wheel', 'touchstart', 'keydown'].forEach(function(ev){ window.removeEventListener(ev, onUser); }); }
+        if(moved || Date.now() - t0 > 3000){ clearInterval(iv); ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function(ev){ window.removeEventListener(ev, onUser); }); }
       }, 110);
     }
   }
@@ -5868,7 +5871,7 @@
     }
     function snapMark(ax, v){
       if(!sheetEl) return;
-      sheetEl.querySelectorAll('.gm-sgrid .gm-ln.snap').forEach(function(x){ x.classList.remove('snap'); });
+      sheetEl.querySelectorAll('.gm-sgrid .gm-ln.' + ax + '.snap').forEach(function(x){ x.classList.remove('snap'); });
       if(v === null) return;
       sheetEl.querySelectorAll('.gm-sgrid .gm-ln.' + ax).forEach(function(x){
         var p = parseFloat(ax === 'v' ? x.style.left : x.style.top);
@@ -5887,7 +5890,8 @@
     var MK2LH = 16;   /* 線 7px ＋ あき 9px */
     function mk2Lines(el, h){
       if(!el || !el.classList.contains('gm-mk2')) return;
-      var n = Math.max(1, Math.round((h || el.getBoundingClientRect().height) / MK2LH));
+      if(h == null){ var _cs = getComputedStyle(el); h = el.getBoundingClientRect().height - parseFloat(_cs.paddingTop) - parseFloat(_cs.paddingBottom); }
+      var n = Math.max(1, Math.round(h / MK2LH));
       var have = el.querySelectorAll('i:not(.gm-rz)');   /* つまみ（.gm-rz）も i なので、数から外す */
       for(var i = have.length; i < n; i++) el.appendChild(document.createElement('i'));
       for(var j = have.length - 1; j >= n; j--) el.removeChild(have[j]);
@@ -5903,13 +5907,20 @@
     function mockArm(el){
       if(el.__armed) return; el.__armed = true;
       el.classList.add('gm-drag'); el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'group');
+      el.setAttribute('aria-roledescription', L('置いたもの', 'block'));
+      (function(){ var _k = MOCKK[el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'];
+        el.setAttribute('aria-label', L(_k[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', _k[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); })();
       if(!el.querySelector('.gm-rz')){ var rz = document.createElement('i'); rz.className = 'gm-rz'; el.appendChild(rz); }
       el.addEventListener('pointerdown', function(e){
         if(e.button) return;
+        if(el.__pid != null) return;
+        el.__pid = e.pointerId;
         var mock = el.parentNode, rz = e.target && e.target.classList && e.target.classList.contains('gm-rz');
         var p = mockPct(el, mock), r = p.r, b = p.b;
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
+        if(mock.lastElementChild !== el) mock.appendChild(el);
         el.classList.add('grab'); mock.classList.add('dragging');
         try{ el.setPointerCapture(e.pointerId); }catch(x){}
         var move = function(ev){
@@ -5921,40 +5932,67 @@
             var wp = w / r.width * 100, hp = h / r.height * 100;
             var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
             var sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d;   /* 下端を線に乗せる */
-            snapMark('v', sx ? sx.at : null); if(!sx) snapMark('h', sy ? sy.at : null);
+            snapMark('v', sx ? sx.at : null); snapMark('h', sy ? sy.at : null);
             el.style.width = wp.toFixed(2) + '%';
-            if(!el.classList.contains('gm-mk1')){ el.style.height = hp.toFixed(2) + '%'; mk2Lines(el, hp / 100 * r.height); }
+            if(el.classList.contains('gm-mk1')) mk1Fit(el);
+            else { el.style.height = hp.toFixed(2) + '%'; mk2Lines(el); }
           } else {
             var x = Math.max(0, Math.min(r.width - b.width, ev.clientX - ox - r.left));
             var y = Math.max(0, Math.min(r.height - b.height, ev.clientY - oy - r.top));
             var xp = x / r.width * 100, yp = y / r.height * 100, wp2 = b.width / r.width * 100, hp2 = b.height / r.height * 100;
             var s1 = snapTo(xp, wp2, 'v', r); if(s1) xp = Math.max(0, Math.min(100 - wp2, xp + s1.d));
             var s2 = snapTo(yp, hp2, 'h', r); if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
-            snapMark('v', s1 ? s1.at : null); if(!s1) snapMark('h', s2 ? s2.at : null);
+            snapMark('v', s1 ? s1.at : null); snapMark('h', s2 ? s2.at : null);
             el.classList.toggle('snapon', !!(s1 || s2));
             el.style.left = xp.toFixed(2) + '%';
             el.style.top = yp.toFixed(2) + '%';
           }
         };
         var up = function(ev){
+          if(ev && ev.pointerId != null && el.__pid != null && ev.pointerId !== el.__pid) return;
+          el.__end = null;
+          el.__pid = null;
+          document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); window.removeEventListener('blur', up);
           el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
           el.classList.remove('grab', 'snapon'); mock.classList.remove('dragging'); el.style.transition = '';
           snapMark('v', null); snapMark('h', null);
-          try{ el.releasePointerCapture(ev.pointerId); }catch(x){}
+          try{ if(ev && ev.pointerId != null) el.releasePointerCapture(ev.pointerId); }catch(x){}
         };
+        el.__end = up;
         el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+        document.addEventListener('pointermove', move); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up); window.addEventListener('blur', up);
       });
       el.addEventListener('focus', function(){ mockSel(el); });
       /* 指が使えなくても動かせる。矢印で 1%（Shift で 5%）、Delete で消す、⌘/Ctrl+D で複製 */
       el.addEventListener('keydown', function(e){
-        if((e.key === 'Backspace' || e.key === 'Delete') && el.classList.contains('gm-clone')){ e.preventDefault(); mockDel(); return; }
+        if(!el.classList.contains('sel')) mockSel(el);
+        if(e.key === 'Backspace' || e.key === 'Delete'){ e.preventDefault(); mockDel(); return; }
         if(e.key === 'd' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); mockDup(); return; }
+        var mock = el.parentNode, p = mockPct(el, mock), k = e.shiftKey ? 5 : 1;
+        if(e.key === '+' || e.key === '=' || e.key === '-'){
+          e.preventDefault(); var sgn = (e.key === '-' ? -k : k); el.style.margin = '0';
+          el.style.width = Math.max(4, Math.min(100 - p.l, p.w + sgn)).toFixed(2) + '%';
+          if(mockKind(el) !== 'mk1'){ el.style.height = Math.max(3, Math.min(100 - p.t, p.h + sgn)).toFixed(2) + '%'; mk2Lines(el); }
+          return;
+        }
         var d = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]}[e.key]; if(!d) return;
-        e.preventDefault(); var mock = el.parentNode, p = mockPct(el, mock), k = e.shiftKey ? 5 : 1;
+        e.preventDefault();
         el.style.margin = '0';
-        el.style.left = Math.max(0, Math.min(100 - p.w, p.l + d[0] * k)).toFixed(2) + '%';
-        el.style.top = Math.max(0, Math.min(100 - p.h, p.t + d[1] * k)).toFixed(2) + '%';
+        var _x = Math.max(0, Math.min(100 - p.w, p.l + d[0] * k)), _y = Math.max(0, Math.min(100 - p.h, p.t + d[1] * k));
+        var _s1 = snapTo(_x, p.w, 'v', p.r); if(_s1) _x = Math.max(0, Math.min(100 - p.w, _x + _s1.d));
+        var _s2 = snapTo(_y, p.h, 'h', p.r); if(_s2) _y = Math.max(0, Math.min(100 - p.h, _y + _s2.d));
+        snapMark('v', _s1 ? _s1.at : null); snapMark('h', _s2 ? _s2.at : null);
+        clearTimeout(el.__snapT); el.__snapT = setTimeout(function(){ snapMark('v', null); snapMark('h', null); }, 800);
+        el.style.left = _x.toFixed(2) + '%';
+        el.style.top = _y.toFixed(2) + '%';
       });
+    }
+    function mk1Fit(el){
+      var cs = getComputedStyle(el);
+      var w = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if(!(w > 0)) return;
+      el.style.fontSize = ''; var nat = el.scrollWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), fs = parseFloat(getComputedStyle(el).fontSize);
+      if(nat > 0) el.style.fontSize = Math.max(12, Math.min(140, fs * w / nat)).toFixed(2) + 'px';
     }
     function mockKind(el){ return el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'; }
     function mockPlace(el, from){   /* 元から少しずらして置く（重ねたままだと増えたのが分からない） */
@@ -5968,9 +6006,14 @@
     function mockAdd(kind){
       var mock = sheetEl.querySelector('.gm-mock'); if(!mock) return;
       var base = mock.querySelector('.gm-' + kind); if(!base) return;
-      var el = base.cloneNode(true); el.classList.add('gm-clone'); el.classList.remove('sel', 'grab'); el.__armed = false;
+      var hid = base.classList.contains('gone'), d0 = base.style.display;
+      if(hid) base.style.display = '';
+      var same = mock.querySelectorAll('.gm-' + kind + '.gm-drag'), from = same.length ? same[same.length - 1] : base;
+      if(from.classList.contains('gone')) from = base;
+      var el = base.cloneNode(true); el.classList.add('gm-clone'); el.classList.remove('sel', 'grab', 'gone'); el.style.display = ''; el.__armed = false;
       var rz = el.querySelector('.gm-rz'); if(rz) rz.parentNode.removeChild(rz);
-      mock.appendChild(el); mockArm(el); mockPlace(el, base); mk2Lines(el); mockSel(el);
+      mock.appendChild(el); mockArm(el); mockPlace(el, from); mk2Lines(el); mockSel(el);
+      if(hid) base.style.display = d0;
       try{ el.focus({preventScroll:true}); }catch(x){}
       return el;
     }
@@ -6025,6 +6068,9 @@
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
+      sheetEl.querySelectorAll('.gm-mock .gm-drag').forEach(function(e){ var kk = MOCKK[mockKind(e)];
+        e.setAttribute('aria-roledescription', L('置いたもの', 'block'));
+        e.setAttribute('aria-label', L(kk[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', kk[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); });
     }
     function sheet(avg){
       sheetAvg = avg;
@@ -6046,8 +6092,10 @@
     }
     function sheetText(){   /* v511 紙面の文字だけを組み直す。言語を切り替えたときにも呼ぶ（説明文と見出しだけ前の言語で残っていた：流れ係） */
       var avg = sheetAvg; if(!sheetEl || !avg) return;
-      sheetEl.querySelector('.gm-mk1').innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
-      sheetEl.querySelector('.gm-scap b').innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
+      sheetEl.querySelectorAll('.gm-mock .gm-mk1').forEach(function(_e){ var _rz = _e.querySelector(':scope > .gm-rz'); _e.innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る'); if(_rz) _e.appendChild(_rz); });
+      (function(){ var _b = sheetEl.querySelector('.gm-scap b');
+        _b.innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
+        if(!_b.textContent.trim()) _b.textContent = L('あなたの、ものさし', 'Your ruler'); })();
       /* v600 「あなたの四本／このサイトのグリッド」の数値と、その下の長い説明は、この画面には要らない（本人）。
          代わりに、つまんで動かせることだけを一行で伝える */
       sheetEl.querySelector('.gm-scap span').innerHTML = '';
@@ -6063,8 +6111,19 @@
       m.classList.toggle('tight', g.x3 - g.x1 < 8 || 71 - g.y2 < 6); m.classList.toggle('ttight', 83 - g.x3 < 8);   /* v600 隠さず、いちばん小さい大きさで必ず出す（本人：黄色の枠が出なくなっていた） */
       sheetEl.querySelectorAll('.gm-swk button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-g') === which ? 'true' : 'false'); });
       sheetEl.classList.toggle('mineg', which === 'mine');
+      mockUntangle(g);
     }
-    function sheetOff(){ sealOff(true); gm.classList.remove('sheeton'); takeOff(); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} }
+    function mockUntangle(g){
+      var m = sheetEl && sheetEl.querySelector('.gm-mock'); if(!m || !g) return;
+      var a = m.querySelector('.gm-mk1'); if(!a) return;
+      var r = m.getBoundingClientRect(); if(!(r.height > 0)) return;
+      var h1 = a.getBoundingClientRect().height / r.height * 100;
+      m.classList.toggle('vtight', (g.y2 - g.y1) < h1 && (g.y1 - h1) >= 0);
+    }
+    function sheetOff(){ (function(){ var _m = sheetEl && sheetEl.querySelector('.gm-mock'); if(!_m) return;
+      _m.querySelectorAll('.gm-drag').forEach(function(e){ if(e.__end) e.__end(); });
+      _m.classList.remove('dragging'); snapMark('v', null); snapMark('h', null); })();
+      sealOff(true); gm.classList.remove('sheeton'); takeOff(); sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} }
     /* JA/EN が切り替わったら、見えている文を組み直す（案内・題・手番の欄） */
     function tipText(){   /* v556 問いの一行。trace() の中だけで書いていたので、比べる・測り終えた・平均の場面で言語を切り替えると前の言語のまま残っていた（本人・挙動係） */
       if(!tipEl) return; var t = LINES[ti], b = picks[bi]; if(!t || !b) return;
