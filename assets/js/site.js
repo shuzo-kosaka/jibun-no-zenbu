@@ -1207,7 +1207,7 @@
     var H = vh();
     function seen(el){ if(!el) return null; var r = el.getBoundingClientRect(); return (r.width && r.top > 64 && r.bottom < H - 24) ? el : null; }
     function pick(list){ for(var i = 0; i < list.length; i++){ var el = seen(typeof list[i] === 'string' ? document.querySelector(list[i]) : list[i]); if(el) return el; } return null; }
-    var trigP = trig ? (trig.closest('p') || trig) : null, mid = H / 2;
+    var trigNow = document.getElementById('annot-trigger'), trigP = trigNow ? (trigNow.closest('p') || trigNow) : null, mid = H / 2;   /* v569 言語を切り替えると段落ごと innerHTML が差し替わるので、掴んでおいた節点ではなく、その都度引き直す */
     var figs = Array.prototype.slice.call(document.querySelectorAll('#ch4 .marg img, #ch4 figure img')).filter(seen)
       .sort(function(a, b){ var d = function(e){ var r = e.getBoundingClientRect(); return Math.abs(r.top + r.height / 2 - mid); }; return d(a) - d(b); });
     var targets = [
@@ -1240,10 +1240,12 @@
      inertia that often never happened, and the one chance was spent anyway (shown was set before the labels were
      drawn, so a run that drew nothing could never be retried). Now it fires when the sentence is in the middle
      band of the screen, and the flag is only spent on a run that actually put labels up. */
-  var trig = document.getElementById('annot-trigger');
-  if(trig) new IntersectionObserver(function(es){
+  var annoIO = new IntersectionObserver(function(es){
     es.forEach(function(e){ if(e.isIntersecting && !shown) setTimeout(function(){ if(!shown && annotate()) shown = true; }, 240); });
-  }, {threshold:0, rootMargin:'-25% 0px -25% 0px'}).observe(trig);
+  }, {threshold:0, rootMargin:'-25% 0px -25% 0px'});
+  /* v569 setLang が段落の innerHTML を差し替えると、観測していた引き金の節点が切り離され、英語では演出が一度も走らなかった（見張り係）。言語を切り替えるたびに張り直す */
+  window.__armAnnot = function(){ if(shown) return; var t = document.getElementById('annot-trigger'); if(t && t !== annoIO.__t){ annoIO.disconnect(); annoIO.observe(t); annoIO.__t = t; } };
+  window.__armAnnot();
   var again = document.getElementById('annot-again'); if(again) again.addEventListener('click', annotate);   /* v126: the button itself is gone — the annotation runs when the sentence is reached */
 
   /* works shuffle */
@@ -3268,6 +3270,7 @@
       if(wEn.__ja !== undefined && wJa.__ja !== undefined){ wEn.innerHTML = en ? wJa.__ja : wEn.__ja; reMark(wEn); } });
     /* the highlights inside the replaced text are new elements: watch them again, or they never draw */
     changed.forEach(function(el){ el.querySelectorAll('mark').forEach(function(m){ if(!m.closest('[data-at]')) ioM.observe(m); }); });
+    if(window.__armAnnot) window.__armAnnot();   /* v569 注釈の引き金も張り直す（段落ごと差し替わっている） */
     soloReset();
     ttlClasses(!en); ttlWords(!en); opticalAlign(); mixedSubs(!en);
     if(!en){ document.querySelectorAll('#top .rot span, .menu .mmsg .txt .mx, #message .mh .mx').forEach(mixSet); }
