@@ -4691,3 +4691,32 @@
   #seq text.pct.bd{font-size:15px}
   #seq .steps li.act span{height:12.6em}
   html.pcview.phone #seq .steps li.act span{max-height:14em}
+
+  @media (max-height:700px){
+    #seq .legend .lg-head{margin-bottom:5px; gap:10px}
+    #seq .legend .lg-k{font-size:9.5px}
+    #seq .legend .lg-t{font-size:14.5px}
+    #seq .legend .lg-row{grid-template-columns:8.2em 1fr; gap:12px; padding:6px 0}
+    #seq .legend .lg-l b{font-size:16px; margin-right:6px}
+    #seq .legend .lg-l strong{font-size:12.5px}
+    #seq .legend .lg-l span{font-size:9.5px; line-height:1.35; margin-top:2px}
+    #seq .legend .lg-a{row-gap:1px}
+    #seq .legend .lg-a li{grid-template-columns:28px auto 1fr; column-gap:7px; line-height:1.28}
+    #seq .legend .lg-a li b{font-size:11px}
+    #seq .legend .lg-a li span{font-size:9.5px; padding-left:7px}
+    #seq .legend .lg-b,#seq .legend .lg-c{font-size:11.5px; line-height:1.4; gap:1px 0}
+    html.pcview.phone #seq .steps li{padding:0}
+    html.pcview.phone #seq .steps li:not(.act) strong{font-size:13.5px}
+    html.pcview.phone #seq .steps li span{font-size:16px; line-height:1.6}
+    html.pcview.phone #seq .steps li.act span{max-height:none; margin-top:5px}
+    html.pcview.phone #seq .steps li.act strong{font-size:19px}
+    html.pcview.phone #seq .steps .tip{margin-top:7px}
+    /* v618b 丈の低い**窓**（1280×640 など。スマホの組みではないので上の指定が効かない）でも同じ詰めを。
+       高さは auto に戻す——v617 の 12.6em は、字を小さくしたこの場面では余りすぎる */
+    #seq .steps li{padding:0}
+    #seq .steps li:not(.act) strong{font-size:13.5px}
+    #seq .steps li span{font-size:15px; line-height:1.6}
+    #seq .steps li.act span{height:auto; max-height:none; margin-top:5px}
+    #seq .steps li.act strong{font-size:19px}
+    #seq .steps .tip{margin-top:7px}
+  }
