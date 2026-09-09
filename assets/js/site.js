@@ -261,6 +261,27 @@
       if(rc.width && rs.width && rc.left > rs.right && Math.abs(rs.top - rc.top) <= 40) dy = rs.top - rc.top; }
     fr.style.transform = 'translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px)';
   }
+  /* v638 左に枚数が出てスクロールで見せる節（MESSAGE と「目の前の人が、いちばんの教科書だった」）は、
+     押しても次へ進む（本人）。案内の文言は出さない。 */
+  (function(){
+    ['message', 'ch5pin'].forEach(function(id){
+      var pin = document.getElementById(id); if(!pin) return;
+      pin.addEventListener('click', function(e){
+        var t = e.target;
+        if(t && t.closest && t.closest('a, button, input, label, figure, .lb, .vid, .hw')) return;
+        if(window.getSelection && String(window.getSelection())) return;   /* 文を選んでいるときは進めない */
+        var r = pin.getBoundingClientRect(), total = r.height - vh(); if(!(total > 0)) return;
+        var p = Math.max(0, Math.min(1, (-r.top) / total));
+        var ats = [];
+        pin.querySelectorAll('[data-at]').forEach(function(el){ var v = parseFloat(el.getAttribute('data-at')); if(isFinite(v)) ats.push(v); });
+        ats.push(1); ats.sort(function(a, b){ return a - b; });
+        var nx = null, i;
+        for(i = 0; i < ats.length; i++){ if(ats[i] > p + .012){ nx = ats[i]; break; } }
+        if(nx === null) return;
+        flyTo(window.scrollY + r.top + total * Math.min(1, nx + .015));
+      });
+    });
+  })();
   function alignAll(){ opticalAlign(); hugLine(); tagAlign(); ftFit(); ovalFit(); ftAlign(); }
   alignAll();
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(alignAll, 30); });
@@ -2258,7 +2279,7 @@
     cancelAnimationFrame(flyRaf);
     /* v106: the button at the end winds the page back like tape — a long spool that runs fast and eases out, the page stepping backwards a frame at a time */
     var dur = rew ? Math.max(900, Math.min(2400, 620 + Math.abs(dist) / 7)) : Math.max(650, Math.min(1400, 450 + Math.abs(dist) / 10)), t0 = performance.now();
-    flying = true; document.documentElement.classList.add('flying');
+    flying = true; flyT0 = performance.now(); document.documentElement.classList.add('flying');
     if(rew){ document.documentElement.classList.add('rewind'); document.documentElement.classList.toggle('fwd', dist > 0); }   /* v107: the same tape, wound the other way when the button sends you down */
     function ease(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeRew(t){ return 1 - Math.pow(1 - t, 2.3); }   /* away at once, slowing as it reaches the head of the tape */
@@ -2274,7 +2295,8 @@
     (function step(now){
       if(!flying) return;
       var k = Math.min(1, (now - t0) / dur);
-      var yy = start + dist * (rew ? easeRew(k) : ease(k));
+      var lim = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+      var yy = Math.min(lim, start + dist * (rew ? easeRew(k) : ease(k)));   /* v638 途中で紙面の丈が変わっても行きすぎない */
       window.scrollTo({top: yy, behavior:'instant'});
       if(k < 1) flyRaf = requestAnimationFrame(step); else land();
     })(t0);
@@ -2357,7 +2379,17 @@
     window.addEventListener('scroll', function(){ if(!active) { target = cur = window.scrollY; } }, {passive:true});
     window.addEventListener('keydown', function(){ if(active){ active = false; cancelAnimationFrame(raf); raf = 0; } }, {passive:true});
   })();
-  function flyStop(){ if(!flying || snapping) return; cancelAnimationFrame(flyRaf); flying = false;
+  var flyT0 = 0;
+  function flyStop(e){ if(!flying || snapping) return;
+    /* v638 引っかかって止まる正体（本人）：トラックパッドは**指を離したあとも惰性の wheel を出し続ける**。
+       飛び立った直後にそれが届いて、飛行が途中で打ち切られていた。
+       立ち上がりの 420ms は wheel を無視し、それ以降も**惰性の尻尾（小さな delta）では止めない**。
+       指やキーはこれまでどおり、いつでも止められる。 */
+    if(e && e.type === 'wheel'){
+      if(performance.now() - flyT0 < 420) return;
+      if(Math.abs(e.deltaY || 0) < 8 && Math.abs(e.deltaX || 0) < 8) return;
+    }
+    cancelAnimationFrame(flyRaf); flying = false;
     /* v320: 巻き戻しの帯（rewind / fwd）も一緒に外す。ここで残ると、途中で止まったまま帯が出っぱなしになり、
        html.rewind * { transition:none } のせいで紙面の動きまで止まっていた */
     document.documentElement.classList.remove('flying', 'rewind', 'fwd'); ticking = false; onScroll(); if(window.__skipHudOff) window.__skipHudOff(); }   /* v281: 飛行中にホイール・指・キーで割り込むと着地しないため、年数の札が出たまま残っていた */
