@@ -6644,6 +6644,9 @@
       e.preventDefault();
       var wasIntro = introOn;
       if(wasIntro){ try{ introEnd(true); }catch(x){} }
+      /* v662 案内から飛んだとき、一枚目の手引き（幕と指の手本）が平均の画面にかぶっていた（本人）。
+         近道のときは手引きを出さない。すでに出ていれば畳む */
+      try{ tutEnd(); tutOn = false; if(typeof tutPend !== 'undefined') tutPend = null; }catch(x){}
       if(!picks || !picks.length){ try{ start(); }catch(x){} }
       setTimeout(function(){
         if(!picks || picks.length < 3) return;
@@ -6658,6 +6661,7 @@
           try{ trayFill(i); }catch(x){}
         }
         bi = 2; ti = LINES.length; state = 'done';
+        try{ tutEnd(); tutOn = false; }catch(x){}   /* v662 start() が予約した手引きを、飛ぶ直前にもう一度落とす */
         try{ average(); }catch(x){}
       }, wasIntro ? 120 : 0);
     });
