@@ -6634,6 +6634,33 @@
         mode(L('平均', 'average')); }
     }
     if(window.MutationObserver) new MutationObserver(relang).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+    /* v661 開発用の近道（本人）：**⌘⇧S**（Windows は Ctrl+Shift+S）で、平均グリッドの画面へ飛ぶ。
+       案内の画面でも、測っている最中でも効く。まだ引いていない線は、私の値を少しずらした値で埋める。
+       画面に案内は出さない（隠しコマンド） */
+    document.addEventListener('keydown', function(e){
+      if(!(e.metaKey || e.ctrlKey) || !e.shiftKey) return;
+      if(String(e.key || '').toLowerCase() !== 's') return;
+      if(!gm || gm.hidden) return;
+      e.preventDefault();
+      var wasIntro = introOn;
+      if(wasIntro){ try{ introEnd(true); }catch(x){} }
+      if(!picks || !picks.length){ try{ start(); }catch(x){} }
+      setTimeout(function(){
+        if(!picks || picks.length < 3) return;
+        for(var i = 0; i < 3; i++){
+          if(!res[i]) res[i] = {};
+          LINES.forEach(function(t, n){
+            if(res[i][t.k] == null){
+              var a = picks[i].a[t.k]; if(a == null) a = 50;
+              res[i][t.k] = Math.max(2, Math.min(98, Math.round(a + [8, -6, 12, -10][(i + n) % 4])));
+            }
+          });
+          try{ trayFill(i); }catch(x){}
+        }
+        bi = 2; ti = LINES.length; state = 'done';
+        try{ average(); }catch(x){}
+      }, wasIntro ? 120 : 0);
+    });
     window.__gmOpen = open;
     /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
     (function(){
