@@ -5148,7 +5148,7 @@
     function obj(b){ return L(b.obj || '塊', b.obje || 'mass'); }
     /* v390: 一枚目の一本目だけ、絵の上で「押したまま下へ、離す」を指の影で見せる。触れたら消える */
     var demoEl = null, demoDone = false;
-    function demoOn(){ if(demoDone || rm) return; demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i>';   /* v495: 同じ操作の一文が右の列の頭にもあり、絵の上の板が絵を隠していた（細部係）。指の図だけ残す */; stage.appendChild(demoEl);
+    function demoOn(){ if(demoDone || rm || state === 'avg' || state === 'done') return;   /* v667 近道で平均へ飛んだとき、指の手本だけが盤面に居残っていた（パトロール係） */ demoOff(); demoEl = el('div', 'gm-demo'); demoEl.innerHTML = '<i class="gm-demo-ln"></i><i class="gm-demo-dot"></i>';   /* v495: 同じ操作の一文が右の列の頭にもあり、絵の上の板が絵を隠していた（細部係）。指の図だけ残す */; stage.appendChild(demoEl);
       /* v399: 問いの札が絵の中にあるとき（iPhone）は、その下に 8px 空けて同じ幅で置く */
       requestAnimationFrame(function(){ if(!demoEl || !tipEl) return; var tr = tipEl.getBoundingClientRect(), sr = stage.getBoundingClientRect(), b = demoEl.querySelector('b'); if(b && tr.height && tr.top >= sr.top - 1){   /* v511 b が無い版で毎回 TypeError（流れ係） */ b.style.left = (tr.left - sr.left) + 'px'; b.style.top = (tr.bottom - sr.top + 8) + 'px'; b.style.bottom = 'auto'; b.style.width = tr.width + 'px'; b.style.transform = 'none'; } }); }
     function demoFit(){   /* v429: 手本の文は、問いの札と同じ中心に（iPhone で 35px ずれていた：本人） */
@@ -5650,7 +5650,7 @@
     function average(){
       var avg = {}, kav = {}, diff = {}, per = [];
       LINES.forEach(function(t){ var s = 0, m = 0; res.forEach(function(r, k){ s += r[t.k]; m += picks[k].a[t.k]; per.push({i:k, t:t, d:r[t.k] - picks[k].a[t.k]}); }); avg[t.k] = Math.round(s / 3); kav[t.k] = Math.round(m / 3); diff[t.k] = (s - m) / 3; });
-      state = 'avg'; cardEl.hidden = true; if(tipEl) tipEl.classList.add('hid');   /* v468: 測り終えた画面に前の問いを残さない */ hideLive(); clearDim(); helpOff(); sealOff(true); unturn(); tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
+      state = 'avg'; cardEl.hidden = true; if(tipEl) tipEl.classList.add('hid');   /* v468: 測り終えた画面に前の問いを残さない */ hideLive(); clearDim(); helpOff(); demoOff(); sealOff(true); unturn();   /* v667 指の手本も片づける */ tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
       picEl.classList.add('swap'); linesEl.innerHTML = ''; stage.classList.remove('narrow');
       setTimeout(function(){ stage.style.transition = 'none'; stage.style.setProperty('--ar', (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3)); stage.classList.add('blank'); picEl.innerHTML = ''; picEl.classList.remove('swap'); void stage.offsetWidth; requestAnimationFrame(function(){ stage.style.transition = ''; }); }, rm ? 0 : 220);   /* v408: 幅だけ遷移して小箱が出る一瞬を無くす（細部係） */   /* 絵が薄れてから、白い盤面に目盛りが並ぶ */
       /* 目盛り→平均線。動きは left/top の transition（線は細く、集まったら平均線だけ濃く） */
@@ -6648,7 +6648,7 @@
       if(wasIntro){ try{ introEnd(true); }catch(x){} }
       /* v662 案内から飛んだとき、一枚目の手引き（幕と指の手本）が平均の画面にかぶっていた（本人）。
          近道のときは手引きを出さない。すでに出ていれば畳む */
-      try{ tutEnd(); tutOn = false; if(typeof tutPend !== 'undefined') tutPend = null; }catch(x){}
+      try{ tutPend = null; tutEnd(); tutOn = false; demoDone = true; demoOff(); }catch(x){}   /* v667 帯の点滅と指の手本を止める */
       if(!picks || !picks.length){ try{ start(); }catch(x){} }
       setTimeout(function(){
         if(!picks || picks.length < 3) return;
@@ -6663,7 +6663,7 @@
           try{ trayFill(i); }catch(x){}
         }
         bi = 2; ti = LINES.length; state = 'done';
-        try{ tutEnd(); tutOn = false; }catch(x){}   /* v662 start() が予約した手引きを、飛ぶ直前にもう一度落とす */
+        try{ tutPend = null; tutEnd(); tutOn = false; demoDone = true; demoOff(); }catch(x){}   /* v662 start() が予約した手引きを、飛ぶ直前にもう一度落とす。v667 指の手本も */
         try{ average(); }catch(x){}
       }, wasIntro ? 120 : 0);
     });
