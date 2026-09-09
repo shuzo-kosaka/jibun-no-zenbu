@@ -2035,8 +2035,13 @@
   }
   var caSeal = document.querySelector('#ch7c .ca-seal');
   /* v641 指の画面は送りが短く、本文が出そろう（.43）すぐあとに .67 で判が押され、
-     本文が薄れて読み終える前に消えていた（本人）。指のときだけ、判を後ろへ送る */
-  if(caSeal && document.documentElement.classList.contains('handheld')) caSeal.setAttribute('data-at', '.88');
+     本文が薄れて読み終える前に消えていた（本人）。指のときだけ、判を後ろへ送る。
+     v643 スマホはそれでもまだ早い（本人）。節の送りそのものを 270vh → 420vh に伸ばした上で（CSS）、
+     判は .90 に。本文が出そろう .43 から判までが 452px → **約 890px**（画面 1.5 枚ぶん）になる。
+     タブレットは今までどおり .88（本人：スマホ版のみ）。 */
+  if(caSeal){ var _cl = document.documentElement.classList;
+    if(_cl.contains('phone')) caSeal.setAttribute('data-at', '.90');
+    else if(_cl.contains('handheld')) caSeal.setAttribute('data-at', '.88'); }
   function renderThanks(){ if(!caSeal) return; while(caSeal.firstChild) caSeal.removeChild(caSeal.firstChild); caSeal.appendChild(thanksSeal()); }
   window.__renderThanks = renderThanks;
   renderThanks();

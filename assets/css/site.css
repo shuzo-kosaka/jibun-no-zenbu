@@ -4938,3 +4938,5 @@
         字数の少ない “All of me.” は 30px まで膨らみ、行送り 1.9 のぶん銘の塊が 128 → 153px になっていた。
         字の大きさは合わせたまま、英語のときだけ行送りを詰める（JS 側は言語が確定する前に走ることがあるので CSS で） */
   html[lang="en"] .ft-tag{line-height:1.14}
+
+  html.pcview.phone #ch7c .solopin{min-height:420vh}
