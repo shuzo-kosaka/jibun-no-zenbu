@@ -4923,28 +4923,9 @@
   html.handheld .ft-top{grid-template-columns:auto auto minmax(0,1fr); gap:24px 2.6vw; align-items:center}
   html.handheld .ft-right{justify-self:end}
   html.handheld .ft-share{margin-top:-1px}
-  /* ④ 締めの二節の本文 */
-  #ch7b .p[data-at],#ch7c .p[data-at]{font-size:16px}
-  html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{font-size:15px}
-  @media (max-height:760px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:15px} }
-  @media (max-height:640px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:14px} }
+  /* ④ 締めの二節の本文は v646 で**元に戻した**（本人：一度もとの状態へ）。ここには何も置かない */
 
-  #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(608px, 84vw)}                                  /* 16px × 38 字 */
-  @media (max-height:760px){ #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(570px, 84vw)} }      /* 15px × 38 字 */
-  @media (max-height:640px){ #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(684px, 84vw)}        /* 指の横持ちは丈が足りない */
-    #ch7b .stick,#ch7c .stick{padding:1vh 0}
-    html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{line-height:1.56} }
   /* ③ 英語のフッターだけ 236／240px と高かった。標語（.ft-tag）は名前の右端に合わせて字を大きくする作りで、
         字数の少ない “All of me.” は 30px まで膨らみ、行送り 1.9 のぶん銘の塊が 128 → 153px になっていた。
         字の大きさは合わせたまま、英語のときだけ行送りを詰める（JS 側は言語が確定する前に走ることがあるので CSS で） */
   html[lang="en"] .ft-tag{line-height:1.14}
-
-  html.pcview.phone #ch7c .solopin{min-height:420vh}
-
-  @supports (height:100dvh){
-    html.pcview.phone #ch7b .solopin .stick,html.pcview.phone #ch7c .solopin .stick{min-height:100dvh}
-  }
-  html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{font-size:44px}
-  html.pcview.phone #ch7b .p[data-at],html.pcview.phone #ch7c .p[data-at]{font-size:13px; line-height:1.6; margin-bottom:.7em}
-  /* 見出しと本文のあいだが 1.2em（44px の見出しで 53px）あった。帯が出ているときは、ここが効く */
-  html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{margin-bottom:.5em}
