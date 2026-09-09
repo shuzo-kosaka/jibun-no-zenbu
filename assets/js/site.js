@@ -4593,7 +4593,7 @@
         if(document.documentElement.classList.contains('phone') && w === lastW && vw === lastVW) return;
         lastW = w; lastVW = vw; fit();
       }
-      window.addEventListener('resize', fitW); window.addEventListener('resize', function(){ setTimeout(blurFit, 80); }); window.addEventListener('resize', function(){ setTimeout(moreMark, 80); }); (function(){ var sc = gm.querySelector('.gm-side'); if(sc){ sc.addEventListener('scroll', moreMark, {passive:true}); if(window.MutationObserver) new MutationObserver(function(){ setTimeout(moreMark, 60); setTimeout(moreMark, 700); }).observe(sc, {childList:true, subtree:true}); } })();   /* v420: 列の下端に続きの印 */ window.addEventListener('resize', function(){ if(introOn){ ibgBuild(); introBg(); } else if(state === 'compare' || state === 'done'){ setTimeout(reveal, 60); } });   /* v409: 帯の出入りで高さが変わってもボタンを見せる（想定外係 #3） */ window.addEventListener('orientationchange', function(){ setTimeout(fit, 80); setTimeout(fit, 400); });
+      window.addEventListener('resize', fitW); window.addEventListener('resize', function(){ setTimeout(blurFit, 80); }); window.addEventListener('resize', function(){ setTimeout(moreMark, 80); }); (function(){ var sc = gm.querySelector('.gm-side'); if(sc){ sc.addEventListener('scroll', moreMark, {passive:true}); if(window.MutationObserver) new MutationObserver(function(){ setTimeout(moreMark, 60); setTimeout(moreMark, 700); }).observe(sc, {childList:true, subtree:true}); } })();   /* v420: 列の下端に続きの印 */ window.addEventListener('resize', function(){ if(introOn){ ibgBuild(); ibgFit(); introBg(); setTimeout(ibgFit, 300); } else if(state === 'compare' || state === 'done'){ setTimeout(reveal, 60); } });   /* v409: 帯の出入りで高さが変わってもボタンを見せる（想定外係 #3） */ window.addEventListener('orientationchange', function(){ setTimeout(fit, 80); setTimeout(fit, 400); });
       if(window.visualViewport){ window.visualViewport.addEventListener('resize', fitW); window.visualViewport.addEventListener('resize', vvFit); window.visualViewport.addEventListener('scroll', vvFit); }
       window.addEventListener('resize', vvFit); vvFit();
       document.addEventListener('click', function(e){   /* 遊びの最中にメニューの判（章・制作・プロフィール・連絡）を押したら、遊びを閉じてそこへ */
@@ -4730,6 +4730,20 @@
       var pin = introEl.querySelector('.gm-ipin'); if(!pin) return '';
       var r = pin.getBoundingClientRect();
       return Math.round(r.width) + ':' + ibgRows(r.height);
+    }
+    /* v654 段の丈は組んだときの px で入れてある（v613 の継ぎ目対策）。iOS の Safari は帯が引っ込むと
+       画面が高くなるが、`ibgKey` は丈を鍵に含めない（組み直すと二秒半止まるため）ので、
+       **下に余白が残っていた**（本人：スマホの案内画面で下だけ余白）。組み直さずに段だけ張り直す */
+    function ibgFit(){
+      var pin = introEl && introEl.querySelector('.gm-ipin'); if(!pin) return;
+      var mos = pin.querySelector('.gm-imos'); if(!mos) return;
+      var PH = pin.getBoundingClientRect().height; if(!(PH > 0)) return;
+      var rows = mos.querySelectorAll(':scope > .row'), n = rows.length; if(!n) return;
+      for(var i = 0; i < n; i++){
+        var y0 = Math.round(i * PH / n), y1 = Math.round((i + 1) * PH / n);
+        rows[i].style.top = y0 + 'px';
+        rows[i].style.height = (y1 - y0 + (i < n - 1 ? 1 : 0)) + 'px';   /* 最後の段は下端ぴったり、あいだは 1px かぶせる */
+      }
     }
     function ibgBuild(){
       var pin = introEl.querySelector('.gm-ipin'); if(!pin) return;
