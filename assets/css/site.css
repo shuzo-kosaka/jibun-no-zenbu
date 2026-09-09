@@ -4908,3 +4908,23 @@
   html:not(.handheld) .gm-cmp{gap:12px; margin-bottom:1.35em}
   html:not(.handheld) .gm-cmp dt{font-size:11.5px; margin-bottom:2px}
   html:not(.handheld) .gm-why{margin-top:.55em; line-height:1.95}
+
+  .gm-mseal svg{transition:transform .26s var(--ease); transform-origin:50% 50%}
+  .gm-tray.pulse .gm-mseal{animation:gmMSeal .5s cubic-bezier(.2,.9,.3,1) .9s both}
+  .gm-tray.pulse .gm-mseal svg{transform:scale(1.22)}
+  html.rm .gm-mseal svg{transition:none}
+
+  /* ① 指の端末の道具の列 ── 下の縁と切り欠きから逃がす */
+  html.handheld .gm-stool{left:calc(max(4vw, env(safe-area-inset-left, 0px)) + 30px);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 26px); max-width:calc(100vw - max(8vw, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px)) - 60px)}
+  html.handheld .gm-stool .gm-sfold{min-width:44px; min-height:44px; padding:0}
+  html.handheld .gm-stool.mini .gm-sfold{min-width:52px; min-height:52px}
+  /* ② フッター ── 共有の釦を PC と同じ段へ */
+  html.handheld .ft-top{grid-template-columns:auto auto minmax(0,1fr); gap:24px 2.6vw; align-items:center}
+  html.handheld .ft-right{justify-self:end}
+  html.handheld .ft-share{margin-top:-1px}
+  /* ④ 締めの二節の本文 */
+  #ch7b .p[data-at],#ch7c .p[data-at]{font-size:16px}
+  html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{font-size:15px}
+  @media (max-height:760px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:15px} }
+  @media (max-height:640px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:14px} }

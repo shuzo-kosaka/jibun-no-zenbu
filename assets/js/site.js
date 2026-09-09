@@ -2034,6 +2034,9 @@
     return sv;
   }
   var caSeal = document.querySelector('#ch7c .ca-seal');
+  /* v641 指の画面は送りが短く、本文が出そろう（およそ .55）すぐあとに .67 で判が押され、
+     本文が薄れて読み終える前に消えていた（本人）。指のときだけ、判を後ろへ送る */
+  if(caSeal && document.documentElement.classList.contains('handheld')) caSeal.setAttribute('data-at', '.88');
   function renderThanks(){ if(!caSeal) return; while(caSeal.firstChild) caSeal.removeChild(caSeal.firstChild); caSeal.appendChild(thanksSeal()); }
   window.__renderThanks = renderThanks;
   renderThanks();
@@ -6023,6 +6026,23 @@
       return {l:(b.left - r.left) / r.width * 100, t:(b.top - r.top) / r.height * 100,
               w:b.width / r.width * 100, h:b.height / r.height * 100, r:r, b:b};
     }
+    /* v641 見出し（.gm-mk1）には `transform:translate(0,-.12em)` が常に掛かっている。
+       見た目の矩形（getBoundingClientRect）から left／top を書き戻すと、その分だけ毎回上へ積み重なり、
+       掴む所を押すたび 6.9px ずつ上がっていた（本人：拡大縮小を押そうとすると少しずつ上昇していく）。
+       → 吸い寄せも当たりも**見た目の箱**で考え、書き戻すときだけ transform のぶんを引く。 */
+    function mockTf(el){
+      var t = getComputedStyle(el).transform;
+      if(!t || t === 'none') return {x:0, y:0};
+      try{ var m = new DOMMatrix(t); return {x:m.e, y:m.f}; }catch(x){}
+      var mm = /matrix\(([^)]+)\)/.exec(t);
+      if(mm){ var a = mm[1].split(','); return {x:parseFloat(a[4]) || 0, y:parseFloat(a[5]) || 0}; }
+      return {x:0, y:0};
+    }
+    function mockPut(el, xp, yp, r){   /* xp・yp は「見た目の箱」を置きたい位置（紙面に対する百分率） */
+      var tf = mockTf(el);
+      if(xp != null) el.style.left = (xp - tf.x / r.width * 100).toFixed(2) + '%';
+      if(yp != null) el.style.top = (yp - tf.y / r.height * 100).toFixed(2) + '%';
+    }
     function mockArm(el){
       if(el.__armed) return; el.__armed = true;
       el.classList.add('gm-drag'); el.setAttribute('tabindex', '0');
@@ -6077,7 +6097,7 @@
           el.style.left = ((el.offsetLeft + (_pre.left - _post.left)) / r.width * 100).toFixed(2) + '%';
           el.style.top = ((el.offsetTop + (_pre.top - _post.top)) / r.height * 100).toFixed(2) + '%';
         }
-        var sl = el.offsetLeft, st = el.offsetTop;
+        b = el.getBoundingClientRect();   /* v641 逃がしを外したあとの、いまの見た目の箱で測り直す */
         if(mock.lastElementChild !== el) mock.appendChild(el);
         el.classList.add('grab'); mock.classList.add('dragging');
         try{ el.setPointerCapture(e.pointerId); }catch(x){}
@@ -6091,8 +6111,6 @@
             if(mW){ w = Math.max(12, Math.min(bl + b.width, b.width - dx)); nl = bl + b.width - w; }
             if(mS) h = Math.max(10, Math.min(r.height - bt, b.height + dy));
             if(mN){ h = Math.max(10, Math.min(bt + b.height, b.height - dy)); nt = bt + b.height - h; }
-            el.style.left = (nl / r.width * 100).toFixed(2) + '%';
-            el.style.top = (nt / r.height * 100).toFixed(2) + '%';
             var l0 = nl / r.width * 100, t0 = nt / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
             /* v635 動く辺だけを線に乗せる。いままで右端と下端しか見ていなかったので、
@@ -6103,7 +6121,6 @@
             if(mS){ sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d; }
             if(mN){ sy = snapTo(t0, 0, 'h', r); if(sy){ t0 += sy.d; hp -= sy.d; } }
             wp = Math.max(.6, wp); hp = Math.max(.6, hp);
-            el.style.left = l0.toFixed(2) + '%'; el.style.top = t0.toFixed(2) + '%';
             snapMark('v', sx ? sx.at : null); snapMark('h', sy ? sy.at : null);
             el.style.width = wp.toFixed(2) + '%';
             if(el.classList.contains('gm-mk1')){
@@ -6111,13 +6128,14 @@
               if(mN){   /* v633 上の辺を掴んだときは下の辺を固定する。字の大きさで丈が変わるので、
                            そのままだと見出しごと動いて見えた（本人：左上と右上で挙動が違う） */
                 var _nb = el.getBoundingClientRect();
-                el.style.top = ((bt + b.height - _nb.height) / r.height * 100).toFixed(2) + '%';
+                t0 = (bt + b.height - _nb.height) / r.height * 100;
               }
             }
             else { el.style.height = hp.toFixed(2) + '%'; mk2Lines(el); }
+            mockPut(el, l0, t0, r);   /* v641 字の大きさを決めてから、transform のぶんを引いて置く */
           } else {
-            var x = Math.max(0, Math.min(r.width - b.width, sl + (ev.clientX - downX)));
-            var y = Math.max(0, Math.min(r.height - b.height, st + (ev.clientY - downY)));
+            var x = Math.max(0, Math.min(r.width - b.width, (b.left - r.left) + (ev.clientX - downX)));
+            var y = Math.max(0, Math.min(r.height - b.height, (b.top - r.top) + (ev.clientY - downY)));
             var xp = x / r.width * 100, yp = y / r.height * 100, wp2 = b.width / r.width * 100, hp2 = b.height / r.height * 100;
             var s1 = snapTo(xp, wp2, 'v', r); if(s1) xp = Math.max(0, Math.min(100 - wp2, xp + s1.d));
             /* v635 見出しも**箱**で吸い寄せる（本人の言い直し）。掴む所も点線も箱に沿っているので、
@@ -6126,8 +6144,7 @@
             if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
             snapMark('v', s1 ? s1.at : null); snapMark('h', s2 ? s2.at : null);
             el.classList.toggle('snapon', !!(s1 || s2));
-            el.style.left = xp.toFixed(2) + '%';
-            el.style.top = yp.toFixed(2) + '%';
+            mockPut(el, xp, yp, r);
           }
         };
         var up = function(ev){
@@ -6165,8 +6182,7 @@
         var _s2 = snapTo(_y, p.h, 'h', p.r); if(_s2) _y = Math.max(0, Math.min(100 - p.h, _y + _s2.d));
         snapMark('v', _s1 ? _s1.at : null); snapMark('h', _s2 ? _s2.at : null);
         clearTimeout(el.__snapT); el.__snapT = setTimeout(function(){ snapMark('v', null); snapMark('h', null); }, 800);
-        el.style.left = _x.toFixed(2) + '%';
-        el.style.top = _y.toFixed(2) + '%';
+        mockPut(el, _x, _y, p.r);
       });
     }
     function mk1Fit(el){
@@ -6186,9 +6202,9 @@
     function mockKind(el){ return el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'; }
     function mockPlace(el, from){   /* 元から少しずらして置く（重ねたままだと増えたのが分からない） */
       var mock = sheetEl.querySelector('.gm-mock'), p = mockPct(from || el, mock);
-      el.style.margin = '0';
-      el.style.left = Math.max(0, Math.min(100 - p.w, p.l + (from ? 4 : 0))).toFixed(2) + '%';
-      el.style.top = Math.max(0, Math.min(100 - p.h, p.t + (from ? 4 : 0))).toFixed(2) + '%';
+      el.style.margin = '0'; el.classList.add('moved');   /* v641 置き場所を決める＝逃がしを外した姿。transform を確定させてから測る */
+      mockPut(el, Math.max(0, Math.min(100 - p.w, p.l + (from ? 4 : 0))),
+                  Math.max(0, Math.min(100 - p.h, p.t + (from ? 4 : 0))), p.r);
       el.style.width = p.w.toFixed(2) + '%';
       if(mockKind(el) !== 'mk1') el.style.height = p.h.toFixed(2) + '%';
     }
@@ -6300,8 +6316,12 @@
             tool.__moved = true;
             tool.style.left = x + 'px'; tool.style.top = y + 'px'; tool.style.bottom = 'auto'; tool.style.right = 'auto';
           };
-          var up = function(){ tool.classList.remove('grab');
-            document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); };
+          var up = function(ev){ tool.classList.remove('grab');
+            document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+            /* v641 指では畳めない／開けないことがあった（本人：スマホで置いて試すが格納できない）。
+               pointerdown で preventDefault しているぶん、iOS では click が出ないことがある。
+               動かさずに離したら、その場で畳む／開く。click 側とは 500ms の見張りで二重に働かないようにする */
+            if(ev && ev.type === 'pointerup' && !tool.__moved && document.documentElement.classList.contains('handheld')){ tool.__foldAt = Date.now(); mockFold(); } };
           document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
         };
         grip.addEventListener('pointerdown', onDown);
@@ -6325,7 +6345,7 @@
         if(a){ if(Date.now() - (b.__spawned || 0) > 400) mockAdd(a);   /* v629 鍵盤（Enter／Space）でも足せる。指で足した直後は二重に足さない */
           return; }
         var k = b.getAttribute('data-act');
-        if(k === 'fold'){ mockFold(); return; }   /* v630 丸に畳む／開く（本人） */
+        if(k === 'fold'){ if(Date.now() - (tool.__foldAt || 0) > 500) mockFold(); return; }   /* v630 丸に畳む／開く（本人）。v641 指で畳んだ直後の click では二度目を打たない */
         if(k === 'num'){   /* v634 出ている％と「中心」の札を、まとめて出し入れする（本人） */
           var on = sheetEl.classList.toggle('nonum');
           b.setAttribute('aria-pressed', on ? 'false' : 'true');
