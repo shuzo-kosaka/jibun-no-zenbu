@@ -4942,3 +4942,10 @@
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-26px 0 0 -26px}
 
   #ch7b,#ch7c{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+
+  html:not(.phone) .gm-cmp{grid-template-columns:1fr 1fr 1fr; gap:6px; align-items:end}
+  html:not(.phone) .gm-cmp > div,
+  html:not(.phone) .gm-cmp > div:first-child,
+  html:not(.phone) .gm-cmp > div:nth-child(2),
+  html:not(.phone) .gm-cmp > div:last-child{justify-self:stretch}
+  html:not(.phone) .gm-cmp dd{font-size:var(--cmpfs, 30px); line-height:1.02; white-space:nowrap}

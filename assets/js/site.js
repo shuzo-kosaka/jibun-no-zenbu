@@ -5459,7 +5459,8 @@
        三つの列で同じ大きさにそろえたいので、いちばん厳しい列に合わせる */
     function cmpFit(){
       var d = resEl && resEl.querySelector('.gm-cmp');
-      if(!d || document.documentElement.classList.contains('handheld')){ if(d) d.style.removeProperty('--cmpfs'); return; }
+      /* v653 PC とタブレットでは、比べる欄の数値を枠いっぱいまで大きく（本人）。指の端末はこれまでどおり */
+      if(!d || document.documentElement.classList.contains('phone')){ if(d) d.style.removeProperty('--cmpfs'); return; }
       var cols = Array.prototype.slice.call(d.children), best = Infinity;
       cols.forEach(function(c){
         var dd = c.querySelector('dd'); if(!dd) return;
@@ -5468,14 +5469,41 @@
         var avail = c.getBoundingClientRect().width - 2, fs = parseFloat(getComputedStyle(dd).fontSize);
         if(nat > 0 && avail > 0) best = Math.min(best, fs * avail / nat);
       });
-      if(isFinite(best)) d.style.setProperty('--cmpfs', Math.max(26, Math.min(64, best)).toFixed(1) + 'px');
+      if(isFinite(best)) d.style.setProperty('--cmpfs', Math.max(26, Math.min(132, best)).toFixed(1) + 'px');   /* v653 上限 64 → 132 */
+    }
+    /* v653 平均の画面で、数値の上の札（あなた／わたし・日本／西洋／差）が「％まで含めた」中心に
+       乗っていた（本人）。**数字の部分だけ**の中心へ寄せる。％の幅の半分ぶん左へ動かすのと同じことだが、
+       字の幅を実測して決めるので、言語や画面が変わっても合う */
+    function numOn(head, cell){
+      if(!head || !cell) return;
+      head.style.transform = '';
+      var tn = null;
+      (function walk(n){ if(tn) return;
+        if(n.nodeType === 3 && /\d/.test(n.textContent)){ tn = n; return; }
+        for(var i = 0; i < n.childNodes.length; i++) walk(n.childNodes[i]); })(cell);
+      if(!tn) return;
+      var m = /[-+]?\d[\d.]*/.exec(tn.textContent); if(!m) return;
+      var r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length);
+      var nb = r.getBoundingClientRect(), hb = head.getBoundingClientRect();
+      if(!(nb.width > 0) || !(hb.width > 0)) return;
+      var dx = (nb.left + nb.width / 2) - (hb.left + hb.width / 2);
+      if(Math.abs(dx) > .5) head.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+    }
+    function numHead(){
+      if(!resEl) return;
+      var av = resEl.querySelector('.gm-avg'), h = av && av.querySelector('.gm-avgh'), r1 = av && av.querySelector('li:not(.gm-avgh)');
+      if(h && r1){ numOn(h.querySelector('em'), r1.querySelector('em')); numOn(h.querySelector('small'), r1.querySelector('small')); }
+      var jt = resEl.querySelector('.gm-jwt'), tr = jt && jt.querySelector('tbody tr');
+      if(jt && tr){ var th = jt.querySelectorAll('thead th'), td = tr.querySelectorAll('td');
+        for(var i = 1; i < th.length && i < td.length; i++) numOn(th[i], td[i]); }
     }
     function cmpRender(t, b, p, a, d){
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir, t.dire) + '</small></b></p>' +
-        '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
+        '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('わたし', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
         (first ? '<p class="gm-note">' + L('絵の幅と高さをそれぞれ 100 として、線の位置を％で示します。', 'Line positions are shown as percentages, with the picture\'s width and height each set to 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('絵をもう一度押すと、次の線。', 'Click the picture again for the next line.')) + '</p>' : '');
       cmpFit(); requestAnimationFrame(cmpFit);
+      if(!cmpFit.__rz){ cmpFit.__rz = 1; window.addEventListener('resize', function(){ clearTimeout(cmpFit.__t); cmpFit.__t = setTimeout(function(){ cmpFit(); numHead(); }, 180); }, {passive:true}); }   /* v653 窓が変わったら測り直す */
       goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
     }
     /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
@@ -5650,6 +5678,7 @@
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に。同じパーセントを別の枠に表示できます。', 'The same % in another frame — see how the ratios sit in a different shape.') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);
+      numHead(); requestAnimationFrame(numHead); setTimeout(numHead, 300);   /* v653 札を数字の中心へ */
       var jwb = resEl.querySelector('.gm-jwb'); if(jwb){ jwb.__jw = true; jwb.addEventListener('click', jwOverlay); }
       resEl.querySelectorAll('.gm-media button').forEach(function(b){ b.addEventListener('click', function(){
         resEl.querySelectorAll('.gm-media button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
@@ -5749,12 +5778,13 @@
         if(!x) return;
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
           if(on){ secOnly(root, q); setTimeout(function(){ var sc = gm.querySelector('.gm-side'); if(!sc) return; var top = sc.scrollTop + (q.getBoundingClientRect().top - sc.getBoundingClientRect().top) - 8; if(top > sc.scrollTop) try{ sc.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = top; } }, 300); }   /* v547 ほかは畳む。v550 開いた節の頭を見えるところへ（中身がボタン群の下に潜っていた） */
-          if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
+          if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on){ lite(x); requestAnimationFrame(numHead); } return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
           if(on){   /* 開く：0 から実寸へ。終わったら auto に戻して中身の高さに追従させる */
             x.hidden = false; x.classList.remove('shut'); x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
             x.style.height = x.scrollHeight + 'px';
             setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260);
             lite(x);   /* v507 開いた節の中の下線を引く */
+            setTimeout(numHead, 280); requestAnimationFrame(numHead);   /* v653 節を開いてから札を数字の中心へ（畳んでいる間は幅が測れない） */
           } else {   /* 閉じる：実寸から 0 へ */
             x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight;
             x.style.height = '0px';
