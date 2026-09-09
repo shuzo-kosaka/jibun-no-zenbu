@@ -4882,3 +4882,19 @@
   /* ② 紙面の案内は、少し置いてから静かに引く */
   .gm-sheet .gm-scap small{transition:opacity .9s var(--ease) 6s}
   .gm.sheeton .gm-sheet .gm-scap small{opacity:0}
+
+  .gm-sheet .gm-mock .gm-mk2.gm-drag{overflow:visible}
+  .gm-sheet .gm-mock .gm-mk2.gm-drag > i:not(.gm-rz){clip-path:inset(0 0 0 0)}
+  .gm-sheet .gm-mock .gm-drag .gm-rz{z-index:5}
+
+  .gm-catx.anim{overflow:hidden; transition:height .26s var(--ease), padding .26s var(--ease), border-width .26s var(--ease)}
+  .gm-catx.anim.shut{padding-top:0; padding-bottom:0; border-top-width:0; border-bottom-width:0}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-13px 0 0 -13px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-13px -13px 0 0}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:0 0 -13px -13px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:0 -13px -13px 0}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-22px 0 0 -22px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-22px -22px 0 0}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:0 0 -22px -22px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:0 -22px -22px 0}
+  .gm-sheet .gm-mock .gm-mk1{max-width:100%}

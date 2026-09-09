@@ -5320,7 +5320,7 @@
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false; lensOff();   /* v536 前の手番の丸を持ち越さない */
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + ti + 1) + '</span>'; listState(); mode(L('なぞる', 'trace'));
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
+      /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       resPre(true);   /* v510 次の線へ移るとき、上の情報が消えて下がぶつかるのを止める（本人）。薄くなってから畳む */
       resEl.innerHTML =
         '' +
@@ -5386,7 +5386,7 @@
       if(!rm) setTimeout(function(){ ln.classList.remove('now'); }, 420);
       mkLine(linesEl, t.ax, a, 'mine', a + '%');
       dim(t.ax, p, a, d);
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
+      /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
         var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この一本について', 'ABOUT THIS LINE') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむ遊びです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
@@ -5507,7 +5507,7 @@
       var slot = trayEl.children[bi]; if(slot && !slot.querySelector('.gm-mseal')){ var ms = el('i', 'gm-mseal'); try{ if(typeof kakuSvg === 'function') ms.appendChild(kakuSvg('', ['壱', '弐', '参'][bi], 60 + bi)); }catch(x){} slot.appendChild(ms); centerSeal(ms); }
       doneFn = bi < 2 ? function(){ doneFn = null; boardStart(bi + 1); } : function(){ doneFn = null; average(); };
       stepEl.innerHTML = '<span>' + esc(L(ORD[bi], ORDE[bi])) + '</span><span class="gm-cnt">' + cnt(bi * 4 + 4) + '</span>'; listState(); mode(L('測り終える', 'measured'));
-      resEl.classList.add('sw'); setTimeout(function(){ resEl.classList.remove('sw'); }, 120);
+      /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       doneRender();
       focusBtn(); setTimeout(reveal, 80); setTimeout(reveal, 460);   /* v419: iPad の一枚目は列の伸びが遅れて 5px 欠けたので、もう一度（細部係） */   /* v414: 表が出て列が伸びたあとにボタンまで（細部係） */
       seal('MEASURED', '採寸', stage, 'tr');   /* v426: 記録用紙の横ではなく絵の右上に（本人） */   /* v397: iPhone は絵の右上に押す（右の列の下は目に入らない） */
@@ -5607,7 +5607,7 @@
       }); });
       goEl.innerHTML = ''; goEl.classList.add('hold'); try{ goEl.inert = true; }catch(x){}   /* v484: 伏せている間はキーボードでも触れない（流れ係） */
       btn(L('レイアウトしてみる', 'Try a layout'), function(){ sheet(avg); }, 'go');   /* v627 名前を変えた（本人） */
-      var ovb = btn(L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'), overlay); if(ovb) ovb.__ov = true;
+      var ovb = btn(L('サイトのグリッドと重ねる', 'Compare with the site’s grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
       btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1, true); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
@@ -5618,7 +5618,7 @@
       if(l3) l3.hidden = !!on;
       if(l7) l7.hidden = !on;
       if(goEl) goEl.querySelectorAll('button').forEach(function(b){
-        if(b.__ov) b.textContent = on ? L('このサイトのグリッドを外す', 'Hide this site’s grid') : L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'); });
+        if(b.__ov) b.textContent = on ? L('サイトのグリッドを外す', 'Hide the site’s grid') : L('サイトのグリッドと重ねる', 'Compare with the site’s grid'); });
       if(linesEl) linesEl.classList.toggle('ovl', !!on);   /* 補った三本は隠す（七本と二重に引かれていた） */
     }
     function overlay(){
@@ -5677,9 +5677,9 @@
     function secShut(x, q){
       if(!x || x.hidden) return;
       if(q) q.setAttribute('aria-expanded', 'false');
-      if(rm || document.documentElement.classList.contains('phone')){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); return; }
-      x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
-      setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 270);   /* v627 高さの補間は .26s。200ms で隠すと**閉じ切る手前で消えて**一瞬引っかかって見えた（本人） */
+      if(rm || document.documentElement.classList.contains('phone')){ x.hidden = true; x.style.height = ''; x.classList.remove('anim', 'shut'); return; }
+      x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.classList.add('shut'); x.style.height = '0px';
+      setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim', 'shut'); }, 270);   /* v627 高さの補間は .26s。200ms で隠すと**閉じ切る手前で消えて**一瞬引っかかって見えた（本人） */
     }
     function secOnly(root, q){
       if(!root) return;
@@ -5701,14 +5701,14 @@
           if(on){ secOnly(root, q); setTimeout(function(){ var sc = gm.querySelector('.gm-side'); if(!sc) return; var top = sc.scrollTop + (q.getBoundingClientRect().top - sc.getBoundingClientRect().top) - 8; if(top > sc.scrollTop) try{ sc.scrollTo({top: top, behavior: rm ? 'auto' : 'smooth'}); }catch(e){ sc.scrollTop = top; } }, 300); }   /* v547 ほかは畳む。v550 開いた節の頭を見えるところへ（中身がボタン群の下に潜っていた） */
           if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); return; }   /* v546 スマホは高さを補間しない。開き切った所で字が組み直され、一拍おいて大きく跳ねて見えていた（本人） */
           if(on){   /* 開く：0 から実寸へ。終わったら auto に戻して中身の高さに追従させる */
-            x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
+            x.hidden = false; x.classList.remove('shut'); x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight;
             x.style.height = x.scrollHeight + 'px';
             setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260);
             lite(x);   /* v507 開いた節の中の下線を引く */
           } else {   /* 閉じる：実寸から 0 へ */
             x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight;
             x.style.height = '0px';
-            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200);
+            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim', 'shut'); }, 270);   /* v636 見出しを押して閉じる経路にも 270ms を（見張り係：ここだけ 200ms のままだった） */
           } });   /* v487: 開閉を滑らかに（本人） */
       });
     }
@@ -5747,10 +5747,10 @@
         q.addEventListener('click', function(){ var on = x.hidden; q.setAttribute('aria-expanded', on ? 'true' : 'false');
           if(on) secOnly(iin || infoEl, q);   /* v547 ほかは畳む */
           if(rm || document.documentElement.classList.contains('phone')){ x.hidden = !on; if(on) lite(x); }   /* v546 同上 */
-          else if(on){ x.hidden = false; x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight; x.style.height = x.scrollHeight + 'px';
+          else if(on){ x.hidden = false; x.classList.remove('shut'); x.classList.add('anim'); x.style.height = '0px'; void x.offsetHeight; x.style.height = x.scrollHeight + 'px';
             setTimeout(function(){ if(x.classList.contains('anim')){ x.style.height = ''; x.classList.remove('anim'); } }, 260); lite(x); }
-          else { x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
-            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200); }
+          else { x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.classList.add('shut'); x.style.height = '0px';
+            setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim', 'shut'); }, 270);   /* v636 見出しを押して閉じる経路にも 270ms を（見張り係：ここだけ 200ms のままだった） */ }
           if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: top, behavior: 'smooth'}); }, 280); });
       });   /* v487: 開閉を滑らかに（本人） */
       var cq = infoEl.querySelector('.gm-catq:not(.gm-secq)'), cx = cq && cq.nextElementSibling;
@@ -6011,6 +6011,13 @@
            以後は**組みの座標**（offsetLeft／offsetTop）を起点に、指の移動ぶんだけ足す。 */
         el.style.margin = '0'; el.style.transition = 'none';   /* 遷移が効いていると、外した直後の矩形が古いままで写しが空振りする */
         var _pre = el.getBoundingClientRect(); el.classList.add('moved'); var _post = el.getBoundingClientRect();
+        if(Math.abs(_post.width - _pre.width) > .5 || Math.abs(_post.height - _pre.height) > .5){
+          /* v636 `moved` を付けると `.tight` の下限（min-width／min-height）が外れ、
+             押しただけで箱が潰れていた（本人）。付ける前の寸法を写しておく */
+          el.style.width = (_pre.width / r.width * 100).toFixed(2) + '%';
+          el.style.height = (_pre.height / r.height * 100).toFixed(2) + '%';
+          if(el.classList.contains('gm-mk2')) mk2Lines(el, _pre.height);
+        }
         if(Math.abs(_post.top - _pre.top) > .5 || Math.abs(_post.left - _pre.left) > .5){
           /* `moved` を付けると逃がしの transform が外れるので、見た目の位置が動かないように写しておく */
           el.style.left = ((el.offsetLeft + (_pre.left - _post.left)) / r.width * 100).toFixed(2) + '%';
@@ -6034,8 +6041,15 @@
             el.style.top = (nt / r.height * 100).toFixed(2) + '%';
             var l0 = nl / r.width * 100, t0 = nt / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
-            var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
-            var sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d;   /* 下端を線に乗せる */
+            /* v635 動く辺だけを線に乗せる。いままで右端と下端しか見ていなかったので、
+               左上・右上・左下の角では上や左が吸い寄らなかった（本人） */
+            var sx = null, sy = null;
+            if(mE){ sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d; }
+            if(mW){ sx = snapTo(l0, 0, 'v', r); if(sx){ l0 += sx.d; wp -= sx.d; } }
+            if(mS){ sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d; }
+            if(mN){ sy = snapTo(t0, 0, 'h', r); if(sy){ t0 += sy.d; hp -= sy.d; } }
+            wp = Math.max(.6, wp); hp = Math.max(.6, hp);
+            el.style.left = l0.toFixed(2) + '%'; el.style.top = t0.toFixed(2) + '%';
             snapMark('v', sx ? sx.at : null); snapMark('h', sy ? sy.at : null);
             el.style.width = wp.toFixed(2) + '%';
             if(el.classList.contains('gm-mk1')){
@@ -6052,11 +6066,9 @@
             var y = Math.max(0, Math.min(r.height - b.height, st + (ev.clientY - downY)));
             var xp = x / r.width * 100, yp = y / r.height * 100, wp2 = b.width / r.width * 100, hp2 = b.height / r.height * 100;
             var s1 = snapTo(xp, wp2, 'v', r); if(s1) xp = Math.max(0, Math.min(100 - wp2, xp + s1.d));
-            var _ik = inkPad(el, r);
-            /* yp は**組みの座標**、_ik は**見た目**を基準にした墨の内寄せなので、
-               その差（見出しに掛かっている -0.12em の微調整）をここで差し引く */
-            var _sh = _ik ? ((b.top - r.top) - st) / r.height * 100 : 0;
-            var s2 = snapTo(yp + (_ik ? _ik.t + _sh : 0), hp2 - (_ik ? _ik.t + _ik.b : 0), 'h', r);
+            /* v635 見出しも**箱**で吸い寄せる（本人の言い直し）。掴む所も点線も箱に沿っているので、
+               墨で寄せると見た目と合わなかった */
+            var s2 = snapTo(yp, hp2, 'h', r);
             if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
             snapMark('v', s1 ? s1.at : null); snapMark('h', s2 ? s2.at : null);
             el.classList.toggle('snapon', !!(s1 || s2));
@@ -6250,6 +6262,9 @@
           sheetEl.classList.toggle('arfix', sr !== 'screen');
           if(sr !== 'screen') sheetEl.style.setProperty('--sar', sr);
           mockReset();
+          /* v636 枠を狭めると見出しが外へはみ出していた（見張り係：pc 英語の A4 で 198px）。
+             紙面が動き終わってから字を組み直す */
+          setTimeout(function(){ var h = sheetEl.querySelector('.gm-mock .gm-mk1'); if(h) mk1Fit(h); }, 460);
           return;
         }
         var a = b.getAttribute('data-add');
