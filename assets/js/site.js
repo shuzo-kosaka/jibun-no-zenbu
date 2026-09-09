@@ -4417,6 +4417,12 @@
       iscroll.addEventListener('scroll', introScroll, {passive:true});
       gm.querySelector('.gm-ihow').addEventListener('click', function(){ infoWantHow = true; info(); });
       gm.querySelector('.gm-iskip').addEventListener('click', function(){ if(introAt() >= ISECS.length - 1) return; introTo(ISECS.length - 1); });   /* v431: スキップを戻す（本人）。遊び方はその隣 */   /* v425: スキップをやめ、案内の右上は「遊び方」に（本人） */   /* スキップは「絵を選ぶ」の画面へ */
+      /* v623 案内は、画面のどこを押しても次の面へ（本人）。押した先がボタンや選ぶ札なら、そちらに譲る */
+      introEl.addEventListener('click', function(e){
+        var t = e.target;
+        if(t && t.closest && t.closest('button, a, input, label, .gm-ichoice, .gm-idots')) return;
+        var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1);
+      });
       gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1);
         setTimeout(function(){ var g = gm.querySelector('.gm-igo'); if(g && g.matches(':hover') && introAt() < ISECS.length - 1) cringHold(L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 ')); }, 420); });   /* v450: 押したあと輪が消えたままだった（本人） */
       gm.querySelector('.gm-ix').addEventListener('click', close);
@@ -5931,6 +5937,15 @@
       all.forEach(function(x, k){ x.className = (k === all.length - 1 && all.length > 1) ? 'short' : ''; });
       var rz = el.querySelector('.gm-rz'); if(rz) el.appendChild(rz);
     }
+    /* v621 見出しは、箱の上端と**墨の上端**が 0.122em ずれている（実測：57.6px の字で 7.0px）。
+       箱で吸い寄せると、線に合わせたつもりでも字が下にずれて見える（本人）。
+       吸い寄せのときだけ、墨の箱に置き換えて測る。下は 0.182em 余る。 */
+    var INK_T = .122, INK_B = .182;
+    function inkPad(el, r){
+      if(!el.classList.contains('gm-mk1') || !r || !(r.height > 0)) return null;
+      var fs = parseFloat(getComputedStyle(el).fontSize); if(!(fs > 0)) return null;
+      return {t: INK_T * fs / r.height * 100, b: INK_B * fs / r.height * 100};
+    }
     function mockPct(el, mock){   /* いまの位置と大きさを、紙面に対する百分率で */
       var r = mock.getBoundingClientRect(), b = el.getBoundingClientRect();
       return {l:(b.left - r.left) / r.width * 100, t:(b.top - r.top) / r.height * 100,
@@ -5945,7 +5960,7 @@
         el.setAttribute('aria-label', L(_k[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', _k[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); })();
       if(!el.querySelector('.gm-rz')){
         /* v620 つまみを三つに。右下＝両方、右端＝幅だけ、下端＝丈だけ（本人：本文の大きさが変えられない） */
-        ['se', 'e', 's'].forEach(function(k){ if(k === 's' && el.classList.contains('gm-mk1')) return;
+        ['se', 'ne', 'sw'].forEach(function(k){ if(k === 'sw' && el.classList.contains('gm-mk1')) return;
           var rz = document.createElement('i'); rz.className = 'gm-rz ' + k; el.appendChild(rz); });
       }
       el.addEventListener('pointerdown', function(e){
@@ -5953,7 +5968,7 @@
         if(el.__pid != null) return;
         el.__pid = e.pointerId;
         var mock = el.parentNode, _t = e.target, rz = !!(_t && _t.classList && _t.classList.contains('gm-rz'));
-        var rzW = rz && !_t.classList.contains('s'), rzH = rz && !_t.classList.contains('e');
+        var rzW = rz && !_t.classList.contains('sw'), rzH = rz && !_t.classList.contains('ne');   /* 右上＝幅だけ、左下＝丈だけ、右下＝両方 */
         var p = mockPct(el, mock), r = p.r, b = p.b;
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
@@ -5974,8 +5989,8 @@
         var move = function(ev){
           el.style.transition = 'none'; el.style.margin = '0';
           if(rz){
-            var w = rzW ? Math.max(r.width * .04, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX))) : b.width;
-            var h = rzH ? Math.max(r.height * .03, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY))) : b.height;
+            var w = rzW ? Math.max(12, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX))) : b.width;
+            var h = rzH ? Math.max(10, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY))) : b.height;   /* v621 下限は「掴める最低限」だけ（本人：ある大きさより小さくできない） */
             var l0 = (b.left - r.left) / r.width * 100, t0 = (b.top - r.top) / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
             var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
@@ -5989,7 +6004,12 @@
             var y = Math.max(0, Math.min(r.height - b.height, st + (ev.clientY - downY)));
             var xp = x / r.width * 100, yp = y / r.height * 100, wp2 = b.width / r.width * 100, hp2 = b.height / r.height * 100;
             var s1 = snapTo(xp, wp2, 'v', r); if(s1) xp = Math.max(0, Math.min(100 - wp2, xp + s1.d));
-            var s2 = snapTo(yp, hp2, 'h', r); if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
+            var _ik = inkPad(el, r);
+            /* yp は**組みの座標**、_ik は**見た目**を基準にした墨の内寄せなので、
+               その差（見出しに掛かっている -0.12em の微調整）をここで差し引く */
+            var _sh = _ik ? ((b.top - r.top) - st) / r.height * 100 : 0;
+            var s2 = snapTo(yp + (_ik ? _ik.t + _sh : 0), hp2 - (_ik ? _ik.t + _ik.b : 0), 'h', r);
+            if(s2) yp = Math.max(0, Math.min(100 - hp2, yp + s2.d));
             snapMark('v', s1 ? s1.at : null); snapMark('h', s2 ? s2.at : null);
             el.classList.toggle('snapon', !!(s1 || s2));
             el.style.left = xp.toFixed(2) + '%';
@@ -6094,7 +6114,13 @@
       var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
       ['.gm-mk1', '.gm-mk3', '.gm-mk2'].forEach(function(sel){ var el = mock.querySelector(sel); if(el) mockArm(el); });
       if(mock.__drag) return; mock.__drag = true;
-      mock.addEventListener('pointerdown', function(e){ if(e.target === mock) mockSel(null); });
+      /* v621 .gm-mock は当たりを抜いてあるので、紙面そのもので受ける。
+         置いたもの・道具の列・頭のボタン以外を押したら、選びの点線を外す（本人） */
+      sheetEl.addEventListener('pointerdown', function(e){
+        var t = e.target;
+        if(t && t.closest && (t.closest('.gm-drag') || t.closest('.gm-stool') || t.closest('.gm-shd'))) return;
+        mockSel(null);
+      });
       var tool = sheetEl.querySelector('.gm-stool'); if(!tool) return;
       /* v620 ＋の札は、押しても足せるし、**そのまま引き出しても**足せる（本人）。
          引き出しているあいだは小さく畳んで持ち、離すと元の大きさへ開く */

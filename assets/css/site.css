@@ -4581,8 +4581,11 @@
      二本の縦線が近すぎて段が組めないときは、**図版を上・本文を下**の一段組に落とす。
      消してしまうより、そう見えるほうが「自分の線だとこうなる」が伝わる */
   .gm-mock.tight .gm-mk3,.gm-mock.ttight .gm-mk2{display:block}
-  .gm-sheet .gm-mk3{min-width:11%; min-height:9%}
-  .gm-sheet .gm-mk2{min-width:11%}
+  /* v621 下限は外す（本人：ある大きさより小さくできない）。詰まった組みの既定だけ min で守る */
+  .gm-sheet .gm-mk3{min-width:0; min-height:0}
+  .gm-sheet .gm-mk2{min-width:0}
+  .gm-mock.tight .gm-mk3:not(.moved){min-width:11%; min-height:9%}
+  .gm-mock.ttight .gm-mk2:not(.moved){min-width:11%}
   .gm-mock.tight .gm-mk3{width:calc(83% - var(--gx1)); height:calc((71% - var(--gy2)) * .52)}
   .gm-mock.tight .gm-mk2{left:var(--gx1); top:calc(var(--gy2) + (71% - var(--gy2)) * .60); width:calc(83% - var(--gx1))}
   .gm-mock.ttight:not(.tight) .gm-mk2{left:var(--gx1); top:calc(71% + 1.5%); width:calc(83% - var(--gx1))}
@@ -4744,9 +4747,10 @@
 
   .gm-sheet .gm-mock .gm-drag .gm-rz{position:absolute; width:14px; height:14px; opacity:0; pointer-events:auto}
   .gm-sheet .gm-mock .gm-drag .gm-rz::before{content:''; position:absolute; inset:-13px}
+  /* v621 掴む所は**角**に（本人）。右下＝両方、右上＝幅だけ、左下＝丈だけ。どれも L の字 */
   .gm-sheet .gm-mock .gm-drag .gm-rz.se{right:-5px; bottom:-5px; border-right:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:nwse-resize}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.e{right:-5px; top:50%; margin-top:-7px; border-right:2px solid var(--acc); cursor:ew-resize}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.s{left:50%; bottom:-5px; margin-left:-7px; border-bottom:2px solid var(--acc); cursor:ns-resize}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne{right:-5px; top:-5px; border-right:2px solid var(--acc); border-top:2px solid var(--acc); cursor:ew-resize}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw{left:-5px; bottom:-5px; border-left:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:ns-resize}
   .gm-sheet .gm-mock .gm-drag:hover .gm-rz,.gm-sheet .gm-mock .gm-drag.sel .gm-rz{opacity:.75}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz{opacity:.6}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-18px}
@@ -4761,3 +4765,16 @@
   .gm-stool b{cursor:grab; user-select:none}
   .gm-stool.grab b{cursor:grabbing}
   .gm-stool.grab{opacity:.9}
+
+  .gm-stool{border:1px solid var(--line); border-radius:4px; padding:6px 8px; background:rgba(242,241,236,.72)}
+  .gm-stool b{padding:0 4px 0 2px; border-right:1px solid var(--line); margin-right:6px; line-height:22px}
+  .gm-stool.grab{border-color:var(--acc)}
+  @media (max-height:640px){ .gm-stool{padding:4px 6px} }
+
+  .gm-catx.anim{overflow:hidden; transition:height .26s var(--ease); animation:none}
+  .gm-info-in .gm-catq.gm-secq,.gm-info-in .gm-catq.gm-secq[aria-expanded="true"]{color:var(--fg)}
+  .gm-info-in .gm-catq.gm-secq i{color:var(--fg2)}
+
+  .gm-intro .gm-igo{display:none !important}
+  .gm-intro .gm-iscroll{cursor:pointer}
+  .gm-intro .gm-isec button,.gm-intro .gm-ichoice,.gm-intro .gm-idots,.gm-intro .gm-ihd{cursor:auto}
