@@ -6333,7 +6333,9 @@
             /* v641 指では畳めない／開けないことがあった（本人：スマホで置いて試すが格納できない）。
                pointerdown で preventDefault しているぶん、iOS では click が出ないことがある。
                動かさずに離したら、その場で畳む／開く。click 側とは 500ms の見張りで二重に働かないようにする */
-            if(ev && ev.type === 'pointerup' && Date.now() - (tool.__movedAt || 0) > 400 && document.documentElement.classList.contains('handheld')){ tool.__foldAt = Date.now(); mockFold(); } };
+            /* v652A 離すときは「一度も動かしていない」で見る。時刻で見ると、狙いを定めて 0.4 秒止めてから
+               離したときに畳んでしまう（再検査係：500ms 以上の止めで 3/3 暴発）。click 側は時刻のまま */
+            if(ev && ev.type === 'pointerup' && !tool.__moved && document.documentElement.classList.contains('handheld')){ tool.__foldAt = Date.now(); mockFold(); } };
           document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
         };
         grip.addEventListener('pointerdown', onDown);
@@ -6396,6 +6398,17 @@
         t.style.width = w0 + 'px'; void t.offsetWidth;
         t.style.width = t.scrollWidth + 'px';
         setTimeout(function(){ if(!t.classList.contains('mini')) t.style.width = ''; }, 340);
+        /* v652B 丸のまま端へ運んでから開くと、伸びた列が画面の外へ出て押せなくなっていた（再検査係：
+           右へ運ぶと 1050px はみ出し、十三個中十二個が画面外）。**開き終わった実寸で**はみ出しを測り、
+           その分だけ戻す（幅の見積もりではなく、出てしまった量で直す） */
+        setTimeout(function(){
+          if(t.classList.contains('mini') || !(t.style.left || t.style.top)) return;
+          var r = t.getBoundingClientRect(), sh = sheetEl.getBoundingClientRect(), pad = 8;
+          var dx = Math.min(0, sh.right - pad - r.right) + Math.max(0, sh.left + pad - r.left);
+          var dy = Math.min(0, sh.bottom - pad - r.bottom) + Math.max(0, sh.top + pad - r.top);
+          if(dx) t.style.left = ((parseFloat(t.style.left) || (r.left - sh.left)) + dx).toFixed(0) + 'px';
+          if(dy) t.style.top = ((parseFloat(t.style.top) || (r.top - sh.top)) + dy).toFixed(0) + 'px';
+        }, 380);
       } else {
         t.style.width = w0 + 'px'; void t.offsetWidth;
         t.classList.add('mini'); mockText(); t.style.width = '';

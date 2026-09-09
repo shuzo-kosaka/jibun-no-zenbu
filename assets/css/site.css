@@ -4930,13 +4930,15 @@
         字の大きさは合わせたまま、英語のときだけ行送りを詰める（JS 側は言語が確定する前に走ることがあるので CSS で） */
   html[lang="en"] .ft-tag{line-height:1.14}
 
-  .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-4px -18px -18px -4px}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-4px -4px -18px -18px}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-18px -18px -4px -4px}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-18px -4px -4px -18px}
-  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-5px -26px -26px -5px}
-  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-5px -5px -26px -26px}
-  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-26px -26px -5px -5px}
-  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-26px -5px -5px -26px}
+  /* v652C 外向きは 0 に。図版の左下が本文の左上に取られていた（隙間 7.2px、当たりの上端が −9px だった）。
+     つまみ自体が角から 5px 出ているので、外から掴める幅は 4〜5px 残る */
+  .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:0 -18px -18px 0}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:0 0 -18px -18px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-18px -18px 0 0}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-18px 0 0 -18px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:0 -26px -26px 0}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:0 0 -26px -26px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-26px -26px 0 0}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-26px 0 0 -26px}
 
   #ch7b,#ch7c{-webkit-text-size-adjust:100%; text-size-adjust:100%}
