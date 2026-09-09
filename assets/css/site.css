@@ -4725,8 +4725,10 @@
   }
 
   /* 箱の寸法は元のまま（76×37px）。中の数字だけ 16px → 20px に */
-  .gm-obs small{font-size:20px; padding:6px 11px 6px; line-height:1.2}
-  html.phone .gm-obs small{font-size:18px; padding:6px 10px 6px}
+  /* v626 箱の丈を詰め、字を**見た目の中心**へ。字送り（.06em）のぶん右に空きが出て左寄りに見えていたので、
+     右の余白をその分だけ削る */
+  .gm-obs small{font-size:20px; padding:3px 10px 3px 11px; line-height:1.15}
+  html.phone .gm-obs small{font-size:18px; padding:3px 9px 3px 10px}
   .gm-obs small .gm-pc{font-size:.7em}
 
   /* v610 段の幅の札。線は引かない（幅も高さも 0 の目印）。数字は段の真ん中に */
@@ -4771,10 +4773,19 @@
   .gm-stool.grab{border-color:var(--acc)}
   @media (max-height:640px){ .gm-stool{padding:4px 6px} }
 
-  .gm-catx.anim{overflow:hidden; transition:height .26s var(--ease); animation:none}
+  /* v625 `animation:none` を書いていたため、260ms 後にそれが外れた瞬間に `gmAcc`（薄れて現れる演出）が
+     **改めて頭から走り**、中身が一瞬消えてから出ていた（本人：開くと点滅する）。
+     高さの補間が入った今は、`gmAcc` と喧嘩しないので止める必要がない。止めないほうが継ぎ目も出ない。 */
+  .gm-catx.anim{overflow:hidden; transition:height .26s var(--ease)}
   .gm-info-in .gm-catq.gm-secq,.gm-info-in .gm-catq.gm-secq[aria-expanded="true"]{color:var(--fg)}
   .gm-info-in .gm-catq.gm-secq i{color:var(--fg2)}
 
   .gm-intro .gm-igo{display:none !important}
   .gm-intro .gm-iscroll{cursor:pointer}
   .gm-intro .gm-isec button,.gm-intro .gm-ichoice,.gm-intro .gm-idots,.gm-intro .gm-ihd{cursor:auto}
+
+  .gm-isec .gm-ick.gm-iqa{margin:1.5em 0 0; font-size:13px; opacity:.9; letter-spacing:.04em}
+  html.pcview.phone .gm-isec .gm-ick.gm-iqa{font-size:14px}
+  @media (max-height:640px){ .gm-isec .gm-ick.gm-iqa{margin-top:.9em; font-size:12px} }
+
+  @media (max-height:640px){ .gm-intro .gm-idots{top:50% !important} }

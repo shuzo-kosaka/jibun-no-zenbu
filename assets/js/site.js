@@ -4583,8 +4583,10 @@
       var title = {k:4, at:0, title:true, big:'測る', ja:['絵を、測る。', ''], en:['Measure the picture.', '']};
       var IK = ['<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6" height="12"/><rect x="9" y="6" width="6" height="12"/><rect x="16" y="6" width="6" height="12"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 12h18"/><circle class="d" cx="12" cy="12" r="2.6"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M3 10h18"/><path class="m" d="M3 15h18"/><path class="a" d="M17.5 10.4v4.2M16.2 11.4l1.3-1.3 1.3 1.3M16.2 13.6l1.3 1.3 1.3-1.3"/></svg>', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path class="a" d="M9 4v16M15 4v16M3 9h18M3 15h18"/></svg>'];
       function il(t, i){ return '<li><i class="ik">' + IK[i] + '</i><span>' + t.split('<br>').map(body).join('<br>') + '</span></li>'; }   /* v415: 文節で折る（表係：語中で折れていた） */
-      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>《離したところに線が引かれます》。', 1) + il('一本引くたびに、私の線が現れ、《解釈の違いが％で出ます》。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>このサイトのグリッドと重ねて見比べられます。', 3) + '</ul>';
-      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over this site’s grid and compare.', 3) + '</ul>';
+      var LJ = '<ul class="gm-ilist">' + il('三枚の絵を測ります。一枚につき四本、二分ほどです。', 0) + il('操作は一つ。絵を押して、そのまま動かします。<br>《離したところに線が引かれます》。', 1) + il('一本引くたびに、私の線が現れ、《解釈の違いが％で出ます》。', 2) + il('十二本を引き終えると、あなたの平均グリッドができます。<br>このサイトのグリッドと重ねて見比べられます。', 3) + '</ul>' +
+        '<p class="gm-ick gm-iqa">分からないことは、右上の「測り方とQ&A」からご確認ください。</p>';   /* v624 手順のすぐ下に（本人） */
+      var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over this site’s grid and compare.', 3) + '</ul>' +
+        '<p class="gm-ick gm-iqa">If anything is unclear, see “How to measure &amp; Q&amp;A”, top right.</p>';
       var info = {k:4, at:.36, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、《私が引いた線との差を％で見比べます》。') + '</p>' +
@@ -4595,10 +4597,10 @@
         '<p class="gm-ick">Choose the pictures</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。ここでは見比べる相手として、西洋の絵も同じやり方で測りました。') + '</p>' +
         '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>' +
-        '<p class="gm-ick">詳しくは右上の「測り方とQ&A」から</p>';   /* v613 方法の話が終わった直後に。ボタンは同じ画面の右上に見えている（本人の記憶どおり 03 の後） */
+        '';   /* v624 「測り方とQ&A」への案内は、四つの手順のすぐ下へ移した（本人） */
       var RE = '<p class="gm-ipur">' + body('In my research I measure 《where form and empty space sit inside Japanese pictures》. For this game I measured Western pictures the same way, so that you have something to compare against.') + '</p>' +
         '<p class="gm-ipur">' + body('What you do here is a simplified version: three pictures, and 《only where the main form begins and where its visual centre falls》.') + '</p>' +
-        '<p class="gm-ick">More in “How to measure &amp; Q&amp;A”, top right</p>';
+        '';
       var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
       var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
       return [title, info, brief, choice];
@@ -6296,7 +6298,12 @@
       else if(state === 'avg' && lastAvg){   /* v557 goEl に 'on' が付くのは 3900ms のタイマー。それまでに言語を切り替えると右の列（ボタン五つ・凡例・観察文・手番の帯）が前の言語で固まっていた */
         var sv0 = resEl.querySelector('.gm-seven'), th0 = resEl.querySelector('.gm-thanks');
         var wasSeven = !!(sv0 && sv0.classList.contains('on')), wasTh = !!(th0 && th0.classList.contains('on'));
+        /* v626 `avgRender` は下のボタンを伏せ直す（`hold` ＋ `inert`）。出し直すのは `average()` の
+           3900ms のタイマーなので、**演出が終わったあとに言語を切り替えると伏せたまま**になり、
+           「画面いっぱいに表示」なども一括で押せなくなっていた（本人）。開いていたなら戻す。 */
+        var wasOn = !!(goEl && goEl.classList.contains('on'));
         avgRender(lastAvg.avg, lastAvg.kav, lastAvg.diff, lastAvg.per);
+        if(wasOn && goEl){ goEl.classList.add('on'); try{ goEl.inert = false; }catch(x){} }
         var sv = resEl.querySelector('.gm-seven'); if(sv && wasSeven) sv.classList.add('on');   /* 演出の途中なら、まだ出ていないものを先に出さない */
         var th = resEl.querySelector('.gm-thanks'); if(th && wasTh) th.classList.add('on');
         mode(L('平均', 'average')); }
