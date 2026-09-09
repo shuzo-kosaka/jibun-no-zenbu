@@ -3348,7 +3348,7 @@
     (function(){   /* v409: 連絡欄の見出しの先頭の文字と、08 のボタンの読み上げ名も切り替える（本編係） */
       var M = {'お名前':'Name', 'メールアドレス':'Email', '件名':'Subject', 'メッセージ':'Message', '本文':'Message'};
       document.querySelectorAll('.cp-form label > span').forEach(function(sp){ var tn = sp.firstChild; if(!tn || tn.nodeType !== 3) return; var ja = tn.__ja || tn.nodeValue.trim(); if(!M[ja]) return; tn.__ja = ja; tn.nodeValue = en ? M[ja] : ja; });
-      var sq = document.getElementById('seqplay'); if(sq) sq.setAttribute('aria-label', en ? 'Open the game: Measure the composition.' : '遊びを開く：絵を、測る。');
+      var sq = document.getElementById('seqplay'); if(sq) sq.setAttribute('aria-label', en ? 'Open the game: Measure the composition.' : 'ゲームを開く：絵を、測る。');
     })();
     /* v120: the switch is a pass of the translator's rule — a ruled band sweeps the screen, carrying the pair of
        languages with it, and the page changes tongue as it goes by. The text swap below happens under the band. */
@@ -4614,7 +4614,7 @@
                           en:['Measure from the edge.',     'When you set a line, mine appears dashed on the same picture. With the width and height as 100, your position, mine, and the difference are read in percent.']},
       {at:.66, big:'四本',   ja:['十二本を、四本にまとめる。', '三枚を測り終えると、同じ役割の三本が一本にまとまります。できた四本を、このサイトのグリッドと重ねます。'],
                           en:['Twelve lines become four.',  'After the third picture, the three lines of each role merge into one. Your four lines are then laid over the grid from my research.']},
-      {at:.88, big:'絵',     ja:['測る絵を、選ぶ。',         '研究で測った日本と西洋の絵には、主塊の位置や間の取り方に違いがありました。測る絵を選ぶと三枚が無作為に出て、最後に二つのグリッドを比べられます。'],
+      {at:.88, big:'絵',     ja:['測る絵を、選ぶ。',         '日本の絵と西洋の絵では、主塊の位置や間の取り方に違いがありました。測る絵を選ぶと三枚が無作為に出て、最後に二つのグリッドを比べられます。'],
                           en:['Choose the pictures.',       'In my research, Japanese and Western pictures placed the main mass and the empty space differently. Choose which to measure; three pictures are drawn at random, and the two grids are compared at the end.'], choice:true}
     ];
     var ISECS = [];
@@ -4634,7 +4634,7 @@
       var PE = '<p class="gm-ipur">' + body('Japanese and Western pictures are measured the same way, and 《your lines are compared with mine in percent》.') + '</p>' +
         '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over this site’s grid.') + '</p>' +
         '<p class="gm-ick">Choose the pictures</p>';
-      var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。ここでは見比べる相手として、西洋の絵も同じやり方で測りました。') + '</p>' +
+      var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。西洋の絵は、このゲームのために見比べる相手として、同じやり方で測りました。') + '</p>' +
         '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>' +
         '';   /* v624 「測り方とQ&A」への案内は、四つの手順のすぐ下へ移した（本人） */
       var RE = '<p class="gm-ipur">' + body('In my research I measure 《where form and empty space sit inside Japanese pictures》. For this game I measured Western pictures the same way, so that you have something to compare against.') + '</p>' +
@@ -5450,7 +5450,7 @@
       /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この差について', 'ABOUT THIS GAP') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむ遊びです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
+        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この差について', 'ABOUT THIS GAP') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむゲームです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
         lite(once);
         /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
            盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */
@@ -5686,13 +5686,13 @@
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
              日本と西洋の平均の見出しの下へ移す */
-          '<p class="gm-cmph">' + L('研究で引いた線を、日本の絵と西洋の絵に分けて平均しました。あなたの四本と見比べられます。',
-          'These are the lines from my research, averaged separately for the Japanese and the Western pictures. You can compare them with your four.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
+          '<p class="gm-cmph">' + L('日本の絵は研究で、西洋の絵は《このゲームのために》、どちらも同じやり方で私が測りました。それぞれの平均を、あなたの四本と見比べられます。',
+          'The Japanese pictures come from my research; the Western ones 《I measured for this game》, by the same method. You can compare each average with your four lines.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
-            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点を、私が研究で測りました。《あなたが引いたのと同じ四本の位置を、一本ずつ平均しています》。あなたが測った三枚も、この中に含まれます。',
-              'I measured ' + nj + ' Japanese and ' + nw + ' Western pictures in my research. 《I averaged the position of each of the same four lines you drew》. The three pictures you measured are among them.')); })() + '</p>' +
-          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が《西洋の絵にもあるのかどうか》を、同じやり方で測って見比べています。',
-            'I use the same method to see whether ratios that recur in Japanese pictures 《also appear in Western ones》.')) + '</p>' +
+            return body(L('日本の絵 ' + nj + ' 点は研究で、西洋の絵 ' + nw + ' 点は《このゲームのために》、私が測りました。あなたが引いたのと同じ四本の位置を、一本ずつ平均しています。あなたが測った三枚も、この中に含まれます。',
+              'The ' + nj + ' Japanese pictures come from my research; the ' + nw + ' Western ones 《I measured for this game》. For each, I averaged the position of the same four lines you drew. The three you measured are among them.')); })() + '</p>' +
+          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。このゲームのために同じやり方で測って、並べて見られるようにしました。',
+            'How do the ratios that recur in Japanese pictures 《come out in Western ones》? For this game I measured them the same way, so the two can sit side by side.')) + '</p>' +
           '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「四本の平均」に出たあなたの％と、《この表の同じ線の％を見比べてください》。どちらも線の位置です。',
             'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions: compare them.')) + '</p>' +
           jwTable() +
@@ -5705,10 +5705,10 @@
             '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
         '<div class="gm-sev">' + sec(L('研究で引く七本と、七つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
-          '<p class="gm-note">' + body(L('私の研究では、どの作品にも同じ七種類の線を引き、同じ七つの見方で構図を捉えます。この遊びで引いていただいたのは、《そのうち二種類》 ── よことたてで一本ずつ、合わせて四本です。',
+          '<p class="gm-note">' + body(L('私の研究では、どの作品にも同じ七種類の線を引き、同じ七つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち二種類》 ── よことたてで一本ずつ、合わせて四本です。',
             'In my research I draw the same seven kinds of line on every work, and read every composition through the same seven views. This game asked for 《two of those kinds》 — one horizontal and one vertical each, four lines in all.')) + '</p>' +
           '<p class="gm-info-s">' + L('基準線の名称（七つ）', 'The seven reference lines') + '</p>' +
-          '<ul class="gm-nlist">' + RLINES.map(function(r){ return '<li' + (r[2] ? ' class="on"' : '') + '><b>' + esc(L(r[0], r[1])) + '</b>' + (r[2] ? '<em>' + L('この遊びで引いた線', 'drawn in this game') + '</em>' : '') + '</li>'; }).join('') + '</ul>' +
+          '<ul class="gm-nlist">' + RLINES.map(function(r){ return '<li' + (r[2] ? ' class="on"' : '') + '><b>' + esc(L(r[0], r[1])) + '</b>' + (r[2] ? '<em>' + L('このゲームで引いた線', 'drawn in this game') + '</em>' : '') + '</li>'; }).join('') + '</ul>' +
           '<p class="gm-info-s">' + L('分析カテゴリ（七つ）', 'The seven categories') + '</p>' +
           '<ul class="gm-nlist gm-nlist2">' + CATS.map(function(c){ return '<li><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul>' +
           '</div></div>' +
@@ -5780,8 +5780,8 @@
        'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、十九点すべてを同じ手順で測り、《同じ名前の線同士》を比べています。なぜそこに引いたかも、絵ごとに書いています。',
        'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
       ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
-       'はい、選ぶ絵によって平均は変わります。主な形と余白を同じ手順で測れることを条件に、日本の絵十二点と西洋の絵七点を選びました。《この十九点で見えた違い》として比べています。',
-       'Yes, the averages change with the pictures chosen. I chose twelve Japanese and seven Western pictures whose main forms and empty space I could measure by the same method. The differences describe 《this set of nineteen》.'],
+       'はい、選ぶ絵によって平均は変わります。研究で測った日本の絵十二点に、《このゲームのために測った西洋の絵七点》を加えました。どちらも、主な形と余白を同じ手順で測れることを条件に選んでいます。',
+       'Yes, the averages change with the pictures chosen. To the twelve Japanese pictures from my research I added 《seven Western ones, measured for this game》. For both, the rule was that the main form and the empty space could be measured by the same method.'],
       ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
        '写真の複製は、撮り方で色も切り取り方も変わります。それでは測る条件が揃いません。そこで《どの絵も同じ手順で描き起こし》、細部を省いて、形と余白の置かれ方が見えるようにしました。測っているのは描き起こした絵で、原画そのものではありません。',
        'Photographs of paintings differ in colour and in cropping, so the conditions of measuring would never match. I 《redraw every picture by the same method》 and leave out the detail, so that the placing of form and empty space can be seen. What you measure here is the redrawn picture, not the original work.'],
@@ -5859,9 +5859,9 @@
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
       /* v659 見出しは「研究の目的」だったが、中身は研究の目的そのものではなく**この遊びの目的**だった（本人）。
          名前を替え、遊びのことの側へ移し、文も遊びの話から始める形にした */
-      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《三枚の絵で試していただくための遊び》です。研究では、日本の絵に繰り返し現れる比率を探していて、それが日本の絵に特有かどうかを確かめるために、西洋の絵も同じものさしで測っています。ここで試せるのは、その一部です。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, and I measure Western ones with the same ruler to see whether those proportions are particular to them. What you try here is part of that method.')) + '</p>' + '</div>';
+      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《三枚の絵で試していただくためのゲーム》です。研究では、日本の絵に繰り返し現れる比率を探しています。西洋の絵は、このゲームのために私が同じものさしで測って、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures. The Western pictures I measured with the same ruler for this game, so that the two can be compared.')) + '</p>' + '</div>';
       if(introOn){
-        body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では、《その始まりと重心の位置を、絵の端からの％で測ります》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
+        body += '<p class="gm-info-k">' + L('このゲームについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では、《その始まりと重心の位置を、絵の端からの％で測ります》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
           sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
           sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを一つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合うところ。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>';
       } else if(b && state !== 'avg' && state !== 'idle'){
@@ -5875,7 +5875,7 @@
       /* v501: 問いが一列に並んで雑然としていた（本人）。遊びのことと、調べのことに分けて括る */
       var qsec = function(a, b2){ return QA.slice(a, b2).map(function(q){ return sec(L(q[0], q[1])) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + body_(L(q[2], q[3])) + '</p></div>'; }).join(''); };
       /* v659 遊びのこと＝1〜7（目的の節を先頭に）、研究のこと＝8〜11。以前は 3 問目で切っていた */
-      body += '<p class="gm-info-g">' + L('遊びのこと', 'About the game') + '</p>' + PURSEC + qsec(0, 7) +
+      body += '<p class="gm-info-g">' + L('ゲームのこと', 'About the game') + '</p>' + PURSEC + qsec(0, 7) +
         '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + CATSEC + qsec(7, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
