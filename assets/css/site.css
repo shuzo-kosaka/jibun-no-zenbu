@@ -4938,3 +4938,5 @@
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-5px -5px -26px -26px}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-26px -26px -5px -5px}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-26px -5px -5px -26px}
+
+  #ch7b,#ch7c{-webkit-text-size-adjust:100%; text-size-adjust:100%}
