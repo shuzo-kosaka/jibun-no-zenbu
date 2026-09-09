@@ -4813,3 +4813,5 @@
   .gm-cmp > div:nth-child(2){justify-self:center}
   .gm-cmp > div:last-child{justify-self:end}
   .gm-cmp dt,.gm-cmp dd{text-align:center}
+
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-25px}

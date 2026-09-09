@@ -6101,7 +6101,7 @@
       var same = mock.querySelectorAll('.gm-' + kind + '.gm-drag'), from = same.length ? same[same.length - 1] : base;
       if(from.classList.contains('gone')) from = base;
       var el = base.cloneNode(true); el.classList.add('gm-clone'); el.classList.remove('sel', 'grab', 'gone'); el.style.display = ''; el.__armed = false;
-      var rz = el.querySelector('.gm-rz'); if(rz) rz.parentNode.removeChild(rz);
+      el.querySelectorAll(':scope > .gm-rz').forEach(function(x){ x.parentNode.removeChild(x); });   /* v629 四隅ぶん全部外す。一つだけだと門番が働いて残りが足されない（見張り係） */
       mock.appendChild(el); mockArm(el); mockPlace(el, from); mk2Lines(el); mockSel(el);
       if(hid) base.style.display = d0;
       try{ el.focus({preventScroll:true}); }catch(x){}
@@ -6110,7 +6110,7 @@
     function mockDup(){
       var el = sheetEl.querySelector('.gm-mock .gm-drag.sel'); if(!el) return;
       var mock = el.parentNode, c = el.cloneNode(true); c.classList.add('gm-clone'); c.classList.remove('sel', 'grab'); c.__armed = false;
-      var rz = c.querySelector('.gm-rz'); if(rz) rz.parentNode.removeChild(rz);
+      c.querySelectorAll(':scope > .gm-rz').forEach(function(x){ x.parentNode.removeChild(x); });   /* v629 同上 */
       mock.appendChild(c); mockArm(c); mockPlace(c, el); mk2Lines(c); mockSel(c);
       try{ c.focus({preventScroll:true}); }catch(x){}
     }
@@ -6143,6 +6143,7 @@
         b.addEventListener('pointerdown', function(e){
           if(e.button) return;
           var el = mockAdd(b.getAttribute('data-add')); if(!el) return;
+          b.__spawned = Date.now();   /* v629 鍵盤の Enter は click しか出さない。指で足した直後かどうかで見分ける */
           e.preventDefault();
           var r = mock.getBoundingClientRect(), bb = el.getBoundingClientRect();
           el.classList.add('spawn', 'grab'); mock.classList.add('dragging'); el.__pid = e.pointerId;
@@ -6193,7 +6194,8 @@
           return;
         }
         var a = b.getAttribute('data-add');
-        if(a) return;   /* v620 足すのは pointerdown 側の役目（引き出しと共通） */
+        if(a){ if(Date.now() - (b.__spawned || 0) > 400) mockAdd(a);   /* v629 鍵盤（Enter／Space）でも足せる。指で足した直後は二重に足さない */
+          return; }
         var k = b.getAttribute('data-act');
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
@@ -6247,7 +6249,12 @@
     }
     function sheetText(){   /* v511 紙面の文字だけを組み直す。言語を切り替えたときにも呼ぶ（説明文と見出しだけ前の言語で残っていた：流れ係） */
       var avg = sheetAvg; if(!sheetEl || !avg) return;
-      sheetEl.querySelectorAll('.gm-mock .gm-mk1').forEach(function(_e){ var _rz = _e.querySelector(':scope > .gm-rz'); _e.innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る'); if(_rz) _e.appendChild(_rz); });
+      sheetEl.querySelectorAll('.gm-mock .gm-mk1').forEach(function(_e){
+        /* v629 つまみは四隅にある。**一つだけ**退避していたので、言語を往復すると残りが消え、
+           `mockArm` の門番（一つでもあれば足さない）のせいで二度と戻らなかった（見張り係） */
+        var _rz = Array.prototype.slice.call(_e.querySelectorAll(':scope > .gm-rz'));
+        _e.innerHTML = mix('絵を、測る。', 'Measure the picture.', '測る');
+        _rz.forEach(function(x){ _e.appendChild(x); }); });
       (function(){ var _b = sheetEl.querySelector('.gm-scap b');
         _b.innerHTML = mix('あなたの、ものさし', 'Your ruler', 'ものさし');
         if(!_b.textContent.trim()) _b.textContent = L('あなたの、ものさし', 'Your ruler'); })();
