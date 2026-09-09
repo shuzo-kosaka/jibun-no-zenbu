@@ -402,6 +402,24 @@
       requestAnimationFrame(frame);
     })(t0);
   }
+  /* v678 焼き付け（v676）の足切り。監視係の指摘：`#ch6` を名指しで外したが、残る帯も大きい
+     （1440px 幅で ch4 が 1440×2532＝3.6Mpx、ch5intern が 1440×1845＝2.7Mpx。1920px 幅ではその 1.8 倍）。
+     見た目には出ないが、層の記憶を無駄に食う。**面積で足切り**して、大きいものは焼き付けない。
+     速さは変わらない（実機の macOS Safari で、足切りありでもカクつき 2.0%）。CSS だけでも動くよう、
+     ここでは「大きすぎるものを外す」側だけを持つ */
+  (function(){
+    if(document.documentElement.classList.contains('handheld')) return;   /* 掛けているのは PC だけ */
+    var SEL = '.chtrail,.wktrail,.mtrail,.illo,.route,.br-svg,.dg-svg,.mp-svg', CAP = 2500000, t = 0;
+    function pass(){
+      document.querySelectorAll(SEL).forEach(function(e){
+        var r = e.getBoundingClientRect();
+        e.style.willChange = (r.width * r.height > CAP) ? 'auto' : '';
+      });
+    }
+    window.addEventListener('load', function(){ setTimeout(pass, 900); });
+    setTimeout(pass, 2500);
+    window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(pass, 400); }, {passive:true});
+  })();
   /* v197: スマホ・タブレットには先に「横に持ち替えて」の案内を出し、それが終わってからオープニングを始める */
   (function(){
     var rv = document.getElementById('rotv');
