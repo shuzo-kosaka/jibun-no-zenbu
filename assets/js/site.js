@@ -4753,7 +4753,9 @@
       for(var i = 0; i < n; i++){
         var y0 = Math.round(i * PH / n), y1 = Math.round((i + 1) * PH / n);
         rows[i].style.top = y0 + 'px';
-        rows[i].style.height = (y1 - y0 + (i < n - 1 ? 1 : 0)) + 'px';   /* 最後の段は下端ぴったり、あいだは 1px かぶせる */
+        /* v672 最後の段は `Math.round` で切り下がると下端に毛筋の余白が残る（実機係：iPhone 1.0css・iPad 0.5css）。
+           切り上げて面を越えさせる（`.gm-imos` は `overflow:hidden` なのではみ出しは見えない） */
+        rows[i].style.height = ((i < n - 1 ? y1 - y0 + 1 : Math.ceil(PH) - y0 + 1)) + 'px';
       }
     }
     function ibgBuild(){
@@ -5528,7 +5530,9 @@
         if(n.nodeType === 3 && /\d/.test(n.textContent)){ tn = n; return; }
         for(var i = 0; i < n.childNodes.length; i++) walk(n.childNodes[i]); })(cell);
       if(!tn) return;
-      var m = /[-+]?\d[\d.]*/.exec(tn.textContent); if(!m) return;
+      /* v672 `sg()` はマイナスに U+2212「−」、ゼロに U+00B1「±」を使う。ASCII だけを見ていたので
+         「−2」は数字の「2」だけを中心にしていた（実機係：iPad の比べる欄で 10.25px 右へ）。符号も数のうち */
+      var m = /[-+\u2212\u00b1]?\d[\d.]*/.exec(tn.textContent); if(!m) return;
       var r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length);
       /* v669 札の「箱」ではなく**字そのもの**の中心をとる。表の見出しは右揃えで、
          箱（列の幅）の中心と字の中心が食い違っていた（本人：測り終わりの表の あなた／私／違い） */
