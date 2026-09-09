@@ -4861,3 +4861,24 @@
   .gm-sheet.arfix .gm-sgrid{outline:1px solid rgba(30,28,26,.34)}
   /* 見出しの右の余白を詰める */
   .gm-sheet .gm-mock .gm-mk1.gm-drag{padding:2px 2px 2px 6px}
+
+  /* ① 畳んで開くとき、題が縦組みになり丈が膨らんでいた。折り返さない・丈を固定 */
+  .gm-stool b{white-space:nowrap; flex:0 0 auto}
+  .gm-stool{align-items:center; height:48px; box-sizing:border-box}
+  html.phone .gm-stool{height:58px}
+  .gm-stool.mini{height:46px; width:46px}
+  html.phone .gm-stool.mini{height:52px; width:52px}
+  /* ④ 「置いて試す」の外枠だけ、もう少し濃く */
+  .gm-stool{border-color:rgba(30,28,26,.42)}
+  /* ⑤ 枠は**中心から**育つ。左上から流れてこないように、いつも中心に置いておく */
+  .gm-sheet .gm-sgrid,.gm-sheet .gm-mock{inset:auto; left:50%; top:50%; transform:translate(-50%, -50%); width:100%; height:100%}
+  .gm-sheet.arfix .gm-sgrid,.gm-sheet.arfix .gm-mock{width:min(88%, calc(76vh * var(--sar, 1))); height:min(76vh, calc(88vw / var(--sar, 1)))}
+  /* ⑥ 数値と「中心」の札を、まとめて出し入れ */
+  .gm-sheet.nonum .gm-sgrid .gm-ln b,.gm-sheet.nonum .gm-bd{opacity:0; transition:opacity .28s var(--ease)}
+  .gm-stool [data-act="num"][aria-pressed="false"]{opacity:.45}
+  /* ⑦ 骨格の切り替えを緩やかに */
+  .gm-sheet .gm-sgrid .gm-ln{transition:opacity .45s var(--ease)}
+  .gm-sheet .gm-bd b{transition:opacity .3s var(--ease)}
+  /* ② 紙面の案内は、少し置いてから静かに引く */
+  .gm-sheet .gm-scap small{transition:opacity .9s var(--ease) 6s}
+  .gm.sheeton .gm-sheet .gm-scap small{opacity:0}

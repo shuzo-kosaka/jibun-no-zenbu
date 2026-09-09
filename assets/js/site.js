@@ -1140,10 +1140,12 @@
       if(!done) counting = requestAnimationFrame(tick);
     })();
   }
-  function goStep(n){
+  function goStep(n, jump){
     var r = seq.getBoundingClientRect(), total = r.height - vh();
     var y = window.scrollY + r.top + total * ((n - 1) / STEPS + .5 / STEPS);
-    window.scrollTo({top: Math.round(y), behavior: reduce ? 'auto' : 'smooth'});
+    /* v634 遊びから来たときは滑らせない。遠くにいると長い距離を流れていくので、
+       最初からそこが見えている形にする（本人） */
+    window.scrollTo({top: Math.round(y), behavior: (jump || reduce) ? 'auto' : 'smooth'});
   }
   window.__goStep = goStep;   /* v398: 遊びの「研究の手順 08 へ」から呼ぶ */
   /* v186: the grid lines are drawn by shrinking stroke-dashoffset over a stroke-dasharray of 1 against
@@ -4406,7 +4408,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><button type="button" data-act="num" aria-pressed="true"></button>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -5595,7 +5597,7 @@
           '<p class="gm-note gm-jwend">' + body(L('《近さは、正解を示すものではありません》。測る三枚や線の引き方によって、結果は変わります。',
             '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
-        '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に', 'the same % in another frame') + '</span>' +
+        '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に。同じパーセントを別の枠に表示できます。', 'The same % in another frame — see how the ratios sit in a different shape.') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);
       var jwb = resEl.querySelector('.gm-jwb'); if(jwb){ jwb.__jw = true; jwb.addEventListener('click', jwOverlay); }
@@ -5608,7 +5610,7 @@
       var ovb = btn(L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
-      btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
+      btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1, true); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */
@@ -6222,10 +6224,14 @@
           var t = tool.getBoundingClientRect(), sh = sheetEl.getBoundingClientRect();
           var ox = e.clientX - t.left, oy = e.clientY - t.top;
           tool.classList.add('grab');
+          var dx0 = e.clientX, dy0 = e.clientY;
           var mv = function(ev){
+            /* v634 わずかな震えで「動かした」と見なされ、丸を押しても開かないことがあった（本人）。
+               4px 動くまでは動かしたことにしない */
+            if(!tool.__moved && Math.abs(ev.clientX - dx0) < 4 && Math.abs(ev.clientY - dy0) < 4) return;
             var x = Math.max(0, Math.min(sh.width - t.width, ev.clientX - ox - sh.left));
             var y = Math.max(0, Math.min(sh.height - t.height, ev.clientY - oy - sh.top));
-            tool.__moved = true;   /* v630 動かしたあとに続く click で開いてしまわないように */
+            tool.__moved = true;
             tool.style.left = x + 'px'; tool.style.top = y + 'px'; tool.style.bottom = 'auto'; tool.style.right = 'auto';
           };
           var up = function(){ tool.classList.remove('grab');
@@ -6251,6 +6257,10 @@
           return; }
         var k = b.getAttribute('data-act');
         if(k === 'fold'){ mockFold(); return; }   /* v630 丸に畳む／開く（本人） */
+        if(k === 'num'){   /* v634 出ている％と「中心」の札を、まとめて出し入れする（本人） */
+          var on = sheetEl.classList.toggle('nonum');
+          b.setAttribute('aria-pressed', on ? 'false' : 'true');
+          return; }
         if(k === 'undo'){ mockUndo(); return; }
         if(k === 'redo'){ mockRedo(); return; }
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
@@ -6269,6 +6279,7 @@
       fold:'<path d="M15.5 5.5l-7 6.5 7 6.5"/>',
       undo:'<path d="M9 6.5L4.5 11 9 15.5"/><path d="M4.5 11h9a5.5 5.5 0 010 11H9"/>',
       redo:'<path d="M15 6.5L19.5 11 15 15.5"/><path d="M19.5 11h-9a5.5 5.5 0 000 11H15"/>',
+      num:'<path d="M8.5 4.5L6 19.5M15.5 4.5L13 19.5M4 9h15M3.5 15h15"/>',
       open:'<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8.5v7M8.5 12h7"/>'
     };
     function mockIcon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + MOCKI[k] + '</svg>'; }
@@ -6292,7 +6303,7 @@
       t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
         b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset'], fold:['畳む', 'fold'],
-               undo:['取り消す', 'undo'], redo:['やり直す', 'redo']};
+               undo:['取り消す', 'undo'], redo:['やり直す', 'redo'], num:['数値', 'numbers']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
       var fd = t.querySelector('.gm-sfold');
