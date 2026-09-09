@@ -4815,3 +4815,29 @@
   .gm-cmp dt,.gm-cmp dd{text-align:center}
 
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-25px}
+
+  .gm-stool{max-width:min(96vw, 1000px)}   /* v630 畳む丸と枠の切替が増えたぶん、広い画面では一段に収まるように */
+  .gm-stool .gm-sfold{padding:6px; min-height:0; border:0; background:none; opacity:.6}
+  .gm-stool .gm-sfold:hover{opacity:1; border-color:transparent}
+  .gm-stool .gm-sfold svg{width:15px; height:15px}
+  .gm-stool.mini{width:46px; height:46px; min-height:0; padding:0; border-radius:50%; justify-content:center; gap:0; cursor:grab}
+  .gm-stool.mini.grab{cursor:grabbing}
+  .gm-stool.mini > *:not(.gm-sfold){display:none}
+  .gm-stool.mini .gm-sfold{opacity:1; padding:0; width:46px; height:46px; display:inline-flex; align-items:center; justify-content:center}
+  .gm-stool.mini .gm-sfold svg{width:19px; height:19px}
+  html.phone .gm-stool.mini{width:52px; height:52px}
+  html.phone .gm-stool.mini .gm-sfold{width:52px; height:52px}
+
+  .gm-intro .gm-idots button::after{inset:-4px -18px}
+  .gm-intro .gm-idots button.on::after{inset:-2px -13px}
+  .gm-itap{position:absolute; left:0; right:0; bottom:calc(11vh + var(--vvb, 0px)); margin:0; text-align:center;
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--fg2); opacity:0;
+    transition:opacity .5s var(--ease) 1.2s; pointer-events:none; z-index:3}
+  .gm-intro .gm-itap{opacity:.72}   /* 一面目のあいだ。`moved` は開いた直後から付くので当てにしない */
+  .gm-intro.tapped .gm-itap{opacity:0; transition:opacity .25s}   /* v631 一面目を離れたら消す。`s4` は面の数であって現在地ではない（＝最初から付いている） */
+  .gm-intro.end .gm-itap,.gm-intro.bye .gm-itap{opacity:0; transition:opacity .2s}
+  @media (max-height:640px){ .gm-itap{bottom:calc(9vh + var(--vvb, 0px)); font-size:10.5px} }
+
+  .gm-intro .gm-idots{left:max(4vw, calc(env(safe-area-inset-left, 0px) + 30px)) !important}
+  .gm-obs small{padding:3px 6px 3px 15px}
+  html.phone .gm-obs small{padding:3px 5px 3px 14px}

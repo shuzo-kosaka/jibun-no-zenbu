@@ -4406,7 +4406,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -4424,6 +4424,7 @@
         var t = e.target;
         if(t && t.closest && t.closest('button, a, input, label, .gm-ichoice, .gm-idots')) return;
         var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1);
+        introEl.classList.add('tapped');   /* v631 一度でも送ったら、押せるという手掛かりは引っ込める */
       });
       gm.querySelector('.gm-igo').addEventListener('click', function(){ var cur = introAt(); if(cur >= ISECS.length - 1) return; introTo(cur + 1);
         setTimeout(function(){ var g = gm.querySelector('.gm-igo'); if(g && g.matches(':hover') && introAt() < ISECS.length - 1) cringHold(L('次の一文へ \u00b7 NEXT \u00b7 ', 'NEXT \u00b7 次の一文へ \u00b7 ')); }, 420); });   /* v450: 押したあと輪が消えたままだった（本人） */
@@ -4782,6 +4783,10 @@
         var dbt = el('button', i === 0 ? 'on' : ''); dbt.type = 'button'; dbt.setAttribute('aria-label', L((i + 1) + ' 枚目の案内へ', 'Go to slide ' + (i + 1))); dots.appendChild(dbt);   /* v439: ボタンにして、本編と同じくカーソルの輪が反応するように（本人） */
       });
       introEl.querySelector('.gm-iskip').textContent = L('スキップ', 'Skip'); introEl.querySelector('.gm-ihow').textContent = L('測り方とQ&A', 'How to measure & Q&A');
+      /* v631 右下の送りを消したので、押せると分かる手掛かりを一面目にだけ（見張り係） */
+      (function(){ var h = introEl.querySelector('.gm-itap');
+        if(!h){ h = document.createElement('p'); h.className = 'gm-itap'; introEl.querySelector('.gm-ipin').appendChild(h); }
+        h.textContent = ptype === 'touch' ? L('押して、次へ', 'Tap to continue') : L('押す、またはスクロールで次へ', 'Click or scroll to continue'); })();
       introEl.querySelector('.gm-igo').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';   /* v491: 案内の送りはいつも同じ形（本人） */
       var one = ISECS.length < 2; [dots, introEl.querySelector('.gm-igo'), introEl.querySelector('.gm-iskip')].forEach(function(x){ if(x) x.style.display = one ? 'none' : ''; });
       ibgRuns = ISECS.map(function(){ return 0; }); introEl.classList.remove('end', 'moved', 's0', 's1', 's2', 's3', 's4'); iscroll.scrollTop = 0; introTgt = -1; introScroll(); introBg();
@@ -4810,6 +4815,7 @@
     function introScroll(){
       if(!introOn) return;
       var p = introP(), secs = introEl.querySelectorAll('.gm-isec'), dots = introEl.querySelectorAll('.gm-idots > *'), cur = 0;
+      if(p > .04) introEl.classList.add('tapped');   /* v631 スクロールで送ったときも同じ */
       if(introTgt >= 0 && introCur() === introTgt && performance.now() - introTgtAt > 250) introTgt = -1;   /* 行き先に着いたら解く */
       cur = introCur();   /* v396: 隣の面との中点で切り替える（二面の案内で、一度の送りで着くように） */
       secs.forEach(function(d, i){ d.classList.toggle('on', i === cur); d.classList.toggle('past', i < cur);
@@ -6168,22 +6174,30 @@
       /* v620 道具の列そのものを、紙面の好きな所へ（本人）。題の「置いて試す」を掴む */
       (function(){
         var grip = tool.querySelector('b'); if(!grip) return;
-        grip.addEventListener('pointerdown', function(e){
-          if(e.button) return; e.preventDefault();
+        var onDown = function(e){
+          if(e.button) return;
+          /* v630 畳んでいるときは丸そのものを、開いているときは題「置いて試す」だけを掴む。
+             丸は動かさずに離せば click が出て開く */
+          if(!tool.classList.contains('mini') && !(e.target.closest && e.target.closest('b'))) return;
+          e.preventDefault();
           var t = tool.getBoundingClientRect(), sh = sheetEl.getBoundingClientRect();
           var ox = e.clientX - t.left, oy = e.clientY - t.top;
           tool.classList.add('grab');
           var mv = function(ev){
             var x = Math.max(0, Math.min(sh.width - t.width, ev.clientX - ox - sh.left));
             var y = Math.max(0, Math.min(sh.height - t.height, ev.clientY - oy - sh.top));
+            tool.__moved = true;   /* v630 動かしたあとに続く click で開いてしまわないように */
             tool.style.left = x + 'px'; tool.style.top = y + 'px'; tool.style.bottom = 'auto'; tool.style.right = 'auto';
           };
           var up = function(){ tool.classList.remove('grab');
             document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); };
           document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
-        });
+        };
+        grip.addEventListener('pointerdown', onDown);
+        tool.addEventListener('pointerdown', function(e){ if(tool.classList.contains('mini')) onDown(e); });
       })();
       tool.addEventListener('click', function(e){
+        if(tool.__moved){ tool.__moved = false; return; }   /* v630 動かした直後の click は無視（丸を引き回すと開いてしまっていた） */
         var b = e.target.closest && e.target.closest('button'); if(!b) return;
         var sr = b.getAttribute('data-sar');
         if(sr){   /* v627 紙面の枠を替える */
@@ -6197,6 +6211,7 @@
         if(a){ if(Date.now() - (b.__spawned || 0) > 400) mockAdd(a);   /* v629 鍵盤（Enter／Space）でも足せる。指で足した直後は二重に足さない */
           return; }
         var k = b.getAttribute('data-act');
+        if(k === 'fold'){ tool.classList.toggle('mini'); mockText(); return; }   /* v630 丸に畳む／開く（本人） */
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
     }
@@ -6208,7 +6223,10 @@
       mk2:'<path d="M4 6.5h16M4 10.5h16M4 14.5h16M4 18.5h9"/>',
       dup:'<rect x="3.5" y="3.5" width="12" height="12" rx="1"/><rect x="8.5" y="8.5" width="12" height="12" rx="1"/>',
       del:'<path d="M4 6.5h16M9.5 6.5V3.5h5v3M6.5 6.5l1 14h9l1-14M10 10v7M14 10v7"/>',
-      rst:'<path d="M4.5 9.5h11a5 5 0 010 10H9"/><path d="M8.5 5.5l-4 4 4 4"/>'
+      rst:'<path d="M4.5 9.5h11a5 5 0 010 10H9"/><path d="M8.5 5.5l-4 4 4 4"/>',
+      /* v630 畳む／開く。畳んだときは「置いて試す」道具そのものの絵（枠と＋） */
+      fold:'<path d="M15.5 5.5l-7 6.5 7 6.5"/>',
+      open:'<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8.5v7M8.5 12h7"/>'
     };
     function mockIcon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + MOCKI[k] + '</svg>'; }
     function mockText(){
@@ -6216,9 +6234,14 @@
       t.querySelector('b').textContent = L('置いて試す', 'try a layout');
       t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
         b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
-      var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset']};
+      var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset'], fold:['畳む', 'fold']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
+      var fd = t.querySelector('.gm-sfold');
+      if(fd){ var mini = t.classList.contains('mini');
+        fd.innerHTML = mockIcon(mini ? 'open' : 'fold');
+        fd.setAttribute('aria-label', mini ? L('置いて試す道具を開く', 'Open the layout tools') : L('道具を畳む', 'Fold the tools'));
+        fd.setAttribute('aria-expanded', mini ? 'false' : 'true'); }
       var sar = t.querySelector('.gm-sar'); if(sar){
         sar.querySelector('em').textContent = L('枠', 'frame');
         sar.querySelector('[data-sar="screen"]').textContent = L('この画面', 'screen');
