@@ -4626,22 +4626,22 @@
         '<p class="gm-ick gm-iqa">分からないことは、右上の「測り方とQ&A」からご確認ください。</p>';   /* v624 手順のすぐ下に（本人） */
       var LE = '<ul class="gm-ilist">' + il('You measure three pictures: four lines each, about two minutes.', 0) + il('One gesture. Drag on the picture,<br>《then release to place a line》.', 1) + il('Each time you draw a line, mine appears and 《the difference is shown in percent》.', 2) + il('After twelve lines your average grid is ready.<br>Lay it over this site’s grid and compare.', 3) + '</ul>' +
         '<p class="gm-ick gm-iqa">If anything is unclear, see “How to measure &amp; Q&amp;A”, top right.</p>';
-      var info = {k:4, at:.36, html:true, info:true, big:'四本', ja:['三枚の絵に、四本ずつ。', LJ], en:['Four lines on each of three pictures.', LE]};
+      var info = {k:4, at:.36, html:true, info:true, big:'ゲーム', ja:['三枚の絵に線を引くゲーム。', LJ], en:['A game: draw lines on three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
-      var PJ = '<p class="gm-ipur">' + body('日本の絵と西洋の絵を同じやり方で測り、《私が引いた線との差を％で見比べます》。') + '</p>' +
-        '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッドができ》、このサイトのグリッドと重ねられます。') + '</p>' +
+      var PJ = '<p class="gm-ipur">' + body('十二本を引き終えると、《あなたの平均グリッド》ができます。このサイトのグリッドと重ねて、線の置きどころを見比べられます。') + '</p>' +
+        '<p class="gm-ipur">' + body('そのグリッドの上に、《見出しや図版を置いて試せます》。紙面がどう変わるか、その場で確かめられます。') + '</p>' +
         '<p class="gm-ick">測る絵を選んでください</p>';
-      var PE = '<p class="gm-ipur">' + body('Japanese and Western pictures are measured the same way, and 《your lines are compared with mine in percent》.') + '</p>' +
-        '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》, to lay over this site’s grid.') + '</p>' +
+      var PE = '<p class="gm-ipur">' + body('After twelve lines 《your average grid is ready》. Lay it over the grid of this site and compare where the lines fall.') + '</p>' +
+        '<p class="gm-ipur">' + body('You can then 《place a heading and a figure on that grid》 and see how the page changes.') + '</p>' +
         '<p class="gm-ick">Choose the pictures</p>';
       var RJ = '<p class="gm-ipur">' + body('私の研究では、《日本の絵の中で、形と余白がどこに置かれているか》を測っています。西洋の絵は、このゲームのために見比べる相手として、同じやり方で測りました。') + '</p>' +
-        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち、《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。') + '</p>' +
+        '<p class="gm-ipur">' + body('ここでは、研究で使う七本のうち《主塊（いちばん大きなまとまり）の始まりと重心を示す四本》を引きます。三枚分を同じ線同士で平均すると、あなたの四本になります。') + '</p>' +
         '';   /* v624 「測り方とQ&A」への案内は、四つの手順のすぐ下へ移した（本人） */
       var RE = '<p class="gm-ipur">' + body('In my research I measure 《where form and empty space sit inside Japanese pictures》. For this game I measured Western pictures the same way, so that you have something to compare against.') + '</p>' +
-        '<p class="gm-ipur">' + body('What you do here is a simplified version: three pictures, and 《only where the main form begins and where its visual centre falls》.') + '</p>' +
+        '<p class="gm-ipur">' + body('Here you draw four of those seven: 《where the main form begins and where its weight sits》. Averaging the three pictures line by line gives your own four.') + '</p>' +
         '';
-      var brief = {k:4, at:.68, html:true, big:'線で試す', ja:['研究の方法を、線で試す。', RJ], en:['Try the research method, line by line.', RE]};
-      var choice = {k:4, at:1, html:true, choice:true, big:'見比べる', ja:['線の置きどころを、見比べる。', PJ], en:['Compare where the lines fall.', PE]};
+      var brief = {k:4, at:.68, html:true, big:'平均', ja:['線を引いて、平均を出す。', RJ], en:['Draw the lines, then take the average.', RE]};
+      var choice = {k:4, at:1, html:true, choice:true, big:'グリッド', ja:['平均グリッドを、使ってみよう。', PJ], en:['Put your average grid to work.', PE]};
       return [title, info, brief, choice];
     }
     var cat = 'both';   /* 日本／西洋／両方（小坂さんの指示）。最後に二つの骨格の違いも見せる */
