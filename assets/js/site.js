@@ -540,33 +540,42 @@
     var rvAnc = null, rvLock = 0, rvRaf = 0;
     /* 覚え方は「どの章の、どこまで進んだか」。向きが変わると章の高さそのものが変わるので、
        画素ではなく章の中の割合で持っておくのがいちばん狂わない */
+    /* v677 v674 では節の表を毎コマ引き直していた（`section[id]` の走査と `offsetHeight`＝組み直しの強制）。
+       間引いて逃げたら、**送った直後に回すと 250ms 前の位置**を覚えたままになり、別の章へ飛んだ
+       （監視係の実測：36 試行中 22 件で章が変わり、最大 18,056px）。
+       そこで**節の位置と高さを表にして持つ**。表は組み直しのときだけ作り直すので、`rvMark` は
+       数十個の数値を見るだけになり、毎コマ走らせても紙面を触らない（＝組み直しを強制しない）。 */
+    var rvTab = null;
+    function rvBuild(){
+      var secs = document.querySelectorAll('section[id]'), t = [];
+      for(var i = 0; i < secs.length; i++){ var e = secs[i]; t.push({el:e, id:e.id, o:langDocTop(e), h:e.offsetHeight}); }
+      rvTab = t; rvTab.at = Date.now();
+      return t;
+    }
     function rvMark(){
       if(rvLock || H.classList.contains('rotvup') || !land.matches) return;
-      var secs = document.querySelectorAll('section[id]'), sec = null, top0 = 0, y = window.scrollY;
-      for(var i = 0; i < secs.length; i++){ var o = langDocTop(secs[i]), h = secs[i].offsetHeight;   /* 節は入れ子のこともあるので、紙面の頭からの位置で測る */
-        if(y >= o - 2 && y < o + h){ sec = secs[i]; top0 = o; break; } }
+      var t = rvTab || rvBuild(), y = window.scrollY, sec = null, top0 = 0, hh = 1;
+      for(var i = 0; i < t.length; i++){ if(y >= t[i].o - 2 && y < t[i].o + t[i].h){ sec = t[i]; top0 = t[i].o; hh = t[i].h; break; } }
+      if(!sec && t.length && y >= t[t.length - 1].o + t[t.length - 1].h){ t = rvBuild();   /* 表が古い（丈が伸びた）ときだけ作り直す */
+        for(var j = 0; j < t.length; j++){ if(y >= t[j].o - 2 && y < t[j].o + t[j].h){ sec = t[j]; top0 = t[j].o; hh = t[j].h; break; } } }
       if(!sec) return;
-      rvAnc = {id:sec.id, p:(y - top0) / Math.max(1, sec.offsetHeight)};
+      rvAnc = {id:sec.id, p:(y - top0) / Math.max(1, hh)};
     }
-    /* v674 これはスクロールのたびに `section[id]` を引き直し、節ごとに `offsetHeight` を読んでいた。
-       直前に位置の書き込みが走っているので、そのたびに**組み直しが強制**される（iPad の実機で 16 秒の
-       スクロール中に 971ms、毎コマ 2.8ms）。覚えておきたいのは「向きを変える直前にどこを読んでいたか」
-       だけなので、**250ms ごと＋指を離して 120ms 後**に覚える形にした。止まれば必ず最新になる */
-    function rvKeep(){
-      clearTimeout(rvKeep.tail); rvKeep.tail = setTimeout(rvMark, 120);   /* 送り終わったら必ず覚え直す */
-      var t = Date.now(); if(rvRaf || t - (rvKeep.t || 0) < 250) return; rvKeep.t = t;
-      rvRaf = requestAnimationFrame(function(){ rvRaf = 0; rvMark(); });
-    }
+    /* v677 表を持ったので、毎コマ覚えても紙面を触らない（間引きをやめ、v674 前の呼び方に戻す） */
+    function rvKeep(){ if(rvRaf) return; rvRaf = requestAnimationFrame(function(){ rvRaf = 0; rvMark(); }); }
     var rvUn = 0;
-    window.addEventListener('resize', function(){ rvLock = 1; clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800); }, {passive:true});   /* 画面の作り直しが始まったら、その間の位置は覚えない（向きの合図より先に scroll が来ることがある） */
+    window.addEventListener('resize', function(){ rvLock = 1; rvTab = null; clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; rvTab = null; }, 2800); }, {passive:true});   /* v677 組み直したら表も作り直す */   /* 画面の作り直しが始まったら、その間の位置は覚えない（向きの合図より先に scroll が来ることがある） */
 
     window.addEventListener('scroll', rvKeep, {passive:true});
-    setTimeout(rvKeep, 1200);
+    setTimeout(function(){ rvTab = null; rvKeep(); }, 1200);
+    setTimeout(function(){ rvTab = null; }, 3000); setTimeout(function(){ rvTab = null; }, 6000);   /* v677 絵と字が入り終わって丈が動くので、少し置いて作り直す */
+    window.addEventListener('load', function(){ rvTab = null; });
+    setInterval(function(){ rvTab = null; }, 2000);   /* v677 日英の切り替えや絵の読み込みで丈が変わるので、2 秒ごとに作り直す（作り直すのは次に送ったときの一度だけ） */
     function rvPut(){ if(!rvAnc) return; var s0 = document.getElementById(rvAnc.id); if(!s0) return;
       var y0 = Math.round(langDocTop(s0) + rvAnc.p * s0.offsetHeight);
       if(Math.abs(y0 - window.scrollY) > 2) window.scrollTo({top:y0, behavior:'instant'});   /* html は scroll-behavior:smooth。ふつうに呼ぶと滑る途中で次の呼び出しに上書きされ、途中で止まる */ }
     function rvReflow(){
-      rvLock = 1;
+      rvLock = 1; rvTab = null;
       requestAnimationFrame(function(){ requestAnimationFrame(rvPut); });
       setTimeout(rvPut, 140); setTimeout(rvPut, 380); setTimeout(rvPut, 760); setTimeout(rvPut, 1200); setTimeout(rvPut, 1800); setTimeout(rvPut, 2500);
       clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800);
