@@ -4929,3 +4929,9 @@
         字数の少ない “All of me.” は 30px まで膨らみ、行送り 1.9 のぶん銘の塊が 128 → 153px になっていた。
         字の大きさは合わせたまま、英語のときだけ行送りを詰める（JS 側は言語が確定する前に走ることがあるので CSS で） */
   html[lang="en"] .ft-tag{line-height:1.14}
+
+  html.pcview.phone #ch7b .p[data-at],html.pcview.phone #ch7c .p[data-at]{font-size:15.5px; line-height:1.82}
+  /* 本文を MESSAGE と同じ大きさにすると塊が 652px になり、スマホの画面（591px、帯が出ていれば 432px）に
+     収まらない。見出しと、その下のあきだけを詰めて場所を作る（本文は本人のご指定どおり触らない） */
+  html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{font-size:40px; margin-bottom:.55em}
+  html.pcview.phone[lang="en"] #ch7b .solopin .sub,html.pcview.phone[lang="en"] #ch7c .solopin .sub{font-size:34px; margin-bottom:.5em}
