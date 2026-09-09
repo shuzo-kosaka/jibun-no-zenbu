@@ -4898,3 +4898,5 @@
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:0 0 -22px -22px}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:0 -22px -22px 0}
   .gm-sheet .gm-mock .gm-mk1{max-width:100%}
+
+  .gm-stage{transition:width .45s cubic-bezier(.2,.7,.2,1), aspect-ratio .45s cubic-bezier(.2,.7,.2,1)}

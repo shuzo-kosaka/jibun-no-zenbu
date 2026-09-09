@@ -6001,10 +6001,14 @@
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
         mockPush();   /* v633 動かす前の姿を控える（⌘Z で戻せる） */
-        if(!rz && e.altKey){   /* v633 Option を押しながら引くと複製（Illustrator と同じ） */
+        if(!rz && e.altKey){
+          /* v637 Option を押しながら引くと複製（Illustrator と同じ）。
+             **写しをその場に残し、掴んだほうを動かす。** 以前は掴んだ要素を指す変数（el）を
+             写しに書き換えていたが、el は `mockArm` の引数で**この札の全ての操作が共有している**ため、
+             以後その札を掴むたび写しが選ばれ、元が動かせなくなっていた（本人）。 */
           var _c = el.cloneNode(true); _c.classList.add('gm-clone'); _c.classList.remove('sel', 'grab'); _c.__armed = false; _c.__pid = null;
-          el.parentNode.appendChild(_c); mockArm(_c); mockSel(_c);
-          el = _c; b = el.getBoundingClientRect();
+          var _rzs = _c.querySelectorAll(':scope > .gm-rz'); Array.prototype.forEach.call(_rzs, function(x){ x.parentNode.removeChild(x); });
+          el.parentNode.insertBefore(_c, el); mockArm(_c);
         }
         /* v620 見出しには `-0.12em` の微調整（transform）がかかっている。位置を**見た目の矩形**から
            書き戻していたので、掴んで離すたびにその分だけ上へ積み重なっていた（本人：二回掴むと上へ逃げる）。
