@@ -5494,7 +5494,9 @@
         var avail = c.getBoundingClientRect().width - 2, fs = parseFloat(getComputedStyle(dd).fontSize);
         if(nat > 0 && avail > 0) best = Math.min(best, fs * avail / nat);
       });
-      if(isFinite(best)) d.style.setProperty('--cmpfs', Math.max(26, Math.min(132, best)).toFixed(1) + 'px');   /* v653 上限 64 → 132 */
+      if(isFinite(best)) d.style.setProperty('--cmpfs', Math.max(26, Math.min(38, best)).toFixed(1) + 'px');   /* v653 上限 64 → 132。v658 三倍は大きすぎた（本人）ので 38px まで */
+      /* v658 札（あなた／私／解釈の違い）を、％を除いた**数字の中心**へ。平均の画面と同じやり方 */
+      Array.prototype.forEach.call(d.children, function(c){ numOn(c.querySelector('dt'), c.querySelector('dd')); });
     }
     /* v653 平均の画面で、数値の上の札（あなた／わたし・日本／西洋／差）が「％まで含めた」中心に
        乗っていた（本人）。**数字の部分だけ**の中心へ寄せる。％の幅の半分ぶん左へ動かすのと同じことだが、
@@ -5754,7 +5756,7 @@
       ['「あなた」「私」「解釈の違い」の％は、何の数字ですか？', 'What do “you”, “me” and “difference” mean?',
        '「あなた」と「私」は、線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から測ります。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
        '“You” and “me” give line positions from the left or top edge, with the picture’s width and height each set to 100. “Difference” is 《your value minus mine》. A + means your line sits farther right or lower; a − means farther left or higher.'],
-      ['線の位置が違ったら、間違いですか？', 'If the lines differ, is one of them wrong?',
+      ['私と線の位置が違ったら、間違いですか？', 'If my line and yours differ, is one of them wrong?',
        'いいえ、《正解はありません》。同じ絵で、いちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
        'No. 《There is no right answer》. We are comparing where you and I see the largest mass begin, and where its weight sits, in the same picture. A gap is a difference in reading, not a mistake.'],
       ['なぜ、一枚に四本だけ引くのですか？', 'Why only four lines per picture?',
@@ -5769,16 +5771,16 @@
       ['薄い破線は、何の線ですか？', 'What are the faint dashed lines?',
        '測っている間は、私が同じ絵に引いた線です。平均の画面では、《サイトのグリッドから三本》を補っています。「サイトのグリッドと重ねる」を押すと、破線が七本すべてに切り替わります。',
        'While you measure, they are the lines I drew on the same picture. On the average screen I add 《three lines from the site’s grid》. “Compare with the site’s grid” switches them to all seven.'],
-      ['保存した一枚には、何が入っていますか？', 'What is in the saved image?',
-       '《あなたの平均四本（朱の実線）と、サイトの七本（薄い破線）》を重ねた画像です。絵や数字は入りません。紙面に文字や図版を置くときの目安として使えます。',
-       'It lays 《your four average lines (solid red) over the seven lines of this site (faint dashed)》. The pictures and numbers are left out. You can use it as a guide when placing text and images on a page.'],
+      ['保存した画像は、何に使えますか？', 'What can I use the saved image for?',
+       '紙面に《文字や図版を置くときの目安》として使えます。写るのは、あなたの平均四本（朱の実線）と、サイトの七本（薄い破線）だけ。絵や数字は入りません。',
+       'You can use it as 《a guide for placing text and images》 on a page. It holds only your four average lines (solid red) and the seven lines of this site (faint dashed). The pictures and the numbers are left out.'],
       ['線の位置は、感覚で決めているのですか？', 'Do you choose the line positions by eye?',
        'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、十九点すべてを同じ手順で測り、《同じ名前の線どうし》を比べています。なぜそこに引いたかも、絵ごとに書いています。',
        'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
       ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
        'はい、選ぶ絵によって平均は変わります。主な形と余白を同じ手順で測れることを条件に、日本の絵十二点と西洋の絵七点を選びました。《この十九点で見えた違い》として比べています。',
        'Yes, the averages change with the pictures chosen. I chose twelve Japanese and seven Western pictures whose main forms and empty space I could measure by the same method. The differences describe 《this set of nineteen》.'],
-      ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
+      ['なぜ、実物の写真を使わないのですか？', 'Why not use photographs of the originals?',
        '形と余白の置かれ方を見やすくするため、細部を省いて、どの絵も同じ手順で描き起こしています。ここで測っているのは《描き起こした絵》で、原画そのものではありません。',
        'I leave out the detail and redraw every picture by the same method, so that the placing of form and empty space is easier to see. What you measure here is 《the redrawn picture》, not the original work.'],
       ['この比率は、どこで使われていますか？', 'Where are these ratios used?',
