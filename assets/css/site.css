@@ -4940,3 +4940,11 @@
   html[lang="en"] .ft-tag{line-height:1.14}
 
   html.pcview.phone #ch7c .solopin{min-height:420vh}
+
+  @supports (height:100dvh){
+    html.pcview.phone #ch7b .solopin .stick,html.pcview.phone #ch7c .solopin .stick{min-height:100dvh}
+  }
+  html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{font-size:44px}
+  html.pcview.phone #ch7b .p[data-at],html.pcview.phone #ch7c .p[data-at]{font-size:13px; line-height:1.6; margin-bottom:.7em}
+  /* 見出しと本文のあいだが 1.2em（44px の見出しで 53px）あった。帯が出ているときは、ここが効く */
+  html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{margin-bottom:.5em}
