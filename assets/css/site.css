@@ -4928,3 +4928,13 @@
   html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{font-size:15px}
   @media (max-height:760px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:15px} }
   @media (max-height:640px){ #ch7b .p[data-at],#ch7c .p[data-at]{font-size:14px} }
+
+  #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(608px, 84vw)}                                  /* 16px × 38 字 */
+  @media (max-height:760px){ #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(570px, 84vw)} }      /* 15px × 38 字 */
+  @media (max-height:640px){ #ch7b .solopin .sq,#ch7c .solopin .sq{width:min(684px, 84vw)}        /* 指の横持ちは丈が足りない */
+    #ch7b .stick,#ch7c .stick{padding:1vh 0}
+    html[lang="en"] #ch7b .p[data-at],html[lang="en"] #ch7c .p[data-at]{line-height:1.56} }
+  /* ③ 英語のフッターだけ 236／240px と高かった。標語（.ft-tag）は名前の右端に合わせて字を大きくする作りで、
+        字数の少ない “All of me.” は 30px まで膨らみ、行送り 1.9 のぶん銘の塊が 128 → 153px になっていた。
+        字の大きさは合わせたまま、英語のときだけ行送りを詰める（JS 側は言語が確定する前に走ることがあるので CSS で） */
+  html[lang="en"] .ft-tag{line-height:1.14}

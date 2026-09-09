@@ -2034,7 +2034,7 @@
     return sv;
   }
   var caSeal = document.querySelector('#ch7c .ca-seal');
-  /* v641 指の画面は送りが短く、本文が出そろう（およそ .55）すぐあとに .67 で判が押され、
+  /* v641 指の画面は送りが短く、本文が出そろう（.43）すぐあとに .67 で判が押され、
      本文が薄れて読み終える前に消えていた（本人）。指のときだけ、判を後ろへ送る */
   if(caSeal && document.documentElement.classList.contains('handheld')) caSeal.setAttribute('data-at', '.88');
   function renderThanks(){ if(!caSeal) return; while(caSeal.firstChild) caSeal.removeChild(caSeal.firstChild); caSeal.appendChild(thanksSeal()); }
