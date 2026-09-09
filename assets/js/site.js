@@ -5855,7 +5855,9 @@
       var b = picks[bi], body = '', CATSEC = '';
       /* v475: 見せる順を決め直した（本人）。まず何をするか（操作）→ いま測っている絵 → 畳んだ節（目的・分類・線の役割・コツ・Q&A） */
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
-      var PURSEC = sec(L('研究の目的', 'What I am looking for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('《日本の絵に繰り返し現れる比率》を探しています。ただ、それだけを測っても、その比率が日本の絵に特有かどうかは分かりません。そこで西洋の絵も同じものさしで測り、結果を比べています。なお、この遊びは研究の工程そのものではありません。《その測り方の一部を、三枚の絵で試せるようにした版》です。', 'I am looking for 《proportions that recur across Japanese pictures》. If I measured only those, I could not tell whether the proportions were characteristic of them. So I measure Western pictures with the same ruler and compare the results. This game is not the research procedure itself: 《you can try part of that method on three pictures》.')) + '</p>' + '</div>';
+      /* v659 見出しは「研究の目的」だったが、中身は研究の目的そのものではなく**この遊びの目的**だった（本人）。
+         名前を替え、遊びのことの側へ移し、文も遊びの話から始める形にした */
+      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《三枚の絵で試していただくための遊び》です。研究では、日本の絵に繰り返し現れる比率を探していて、それが日本の絵に特有かどうかを確かめるために、西洋の絵も同じものさしで測っています。ここで試せるのは、その一部です。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, and I measure Western ones with the same ruler to see whether those proportions are particular to them. What you try here is part of that method.')) + '</p>' + '</div>';
       if(introOn){
         body += '<p class="gm-info-k">' + L('この遊びについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では、《その始まりと重心の位置を、絵の端からの％で測ります》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
           sec(L('四本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
@@ -5870,8 +5872,9 @@
       }
       /* v501: 問いが一列に並んで雑然としていた（本人）。遊びのことと、調べのことに分けて括る */
       var qsec = function(a, b2){ return QA.slice(a, b2).map(function(q){ return sec(L(q[0], q[1])) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + body_(L(q[2], q[3])) + '</p></div>'; }).join(''); };
-      body += '<p class="gm-info-g">' + L('遊びのこと', 'About the game') + '</p>' + qsec(0, 3) +
-        '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + PURSEC + CATSEC + qsec(3, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
+      /* v659 遊びのこと＝1〜7（目的の節を先頭に）、研究のこと＝8〜11。以前は 3 問目で切っていた */
+      body += '<p class="gm-info-g">' + L('遊びのこと', 'About the game') + '</p>' + PURSEC + qsec(0, 7) +
+        '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + CATSEC + qsec(7, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
       infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
