@@ -4655,6 +4655,17 @@
       ['密度差と空間の抜け', 'Density contrast and open space', '濃い所と薄い所の差と、何も描かない抜けで奥行きをつくる構図。', 'Depth comes from the contrast of dense and sparse, and from the untouched open space.'],
       ['垂直反復と高低差', 'Vertical repetition and height', '縦の要素の繰り返しと高さの差で画面を立たせる構図。', 'Vertical elements repeat at different heights and hold the picture upright.']
     ];
+    /* v656 研究で引く七種類の基準線（名称）。遊びで引くのは先頭の二つ（よことたてで四本）。
+       名前は本編の凡例（B 機能名称）と同じ並び。本人：使っていない線も全部出す */
+    var RLINES = [
+      ['主塊開始線', 'Main-mass start', 1],
+      ['主塊重心線', 'Main-mass centre', 1],
+      ['余白開始線', 'Void start', 0],
+      ['前景境界線', 'Foreground boundary', 0],
+      ['遠景開口線', 'Distant-view opening', 0],
+      ['副次要素境界線', 'Secondary-element boundary', 0],
+      ['密度転換線', 'Density shift', 0]
+    ];
     function catDef(name){ for(var i = 0; i < CATS.length; i++){ if(CATS[i][0] === name) return CATS[i]; } return null; }
     function isecHTML(sx){
       var hj = sx.ja[0].split('|'), he = sx.en[0].split('|');
@@ -5513,7 +5524,7 @@
     }
     function cmpRender(t, b, p, a, d){
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir, t.dire) + '</small></b></p>' +
-        '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('わたし', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
+        '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
         (first ? '<p class="gm-note">' + L('絵の幅と高さをそれぞれ 100 として、線の位置を％で示します。', 'Line positions are shown as percentages, with the picture\'s width and height each set to 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('絵をもう一度押すと、次の線。', 'Click the picture again for the next line.')) + '</p>' : '');
       cmpFit(); requestAnimationFrame(cmpFit);
@@ -5666,7 +5677,7 @@
         '<p class="gm-note">' + body(L('盤面の数字は、あなたの四本で分けた《段の幅》です。横も縦も、足すと 100 になります。線そのものの位置は、下の「四本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
-        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：わたしが補った残り', 'faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
+        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：私', 'faint dashed: me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
         sec(L('四本の平均', 'The four averages'), true) + '<div class="gm-catx gm-secx"><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
@@ -5689,6 +5700,14 @@
           '<p class="gm-note gm-jwend">' + body(L('《近さは、正解を示すものではありません》。測る三枚や線の引き方によって、結果は変わります。',
             '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
+        '<div class="gm-sev">' + sec(L('研究で引く七本と、七つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
+          '<p class="gm-note">' + body(L('私の研究では、どの作品にも同じ七種類の線を引き、同じ七つの見方で構図を捉えます。この遊びで引いていただいたのは、《そのうち二種類》 ── よことたてで一本ずつ、合わせて四本です。',
+            'In my research I draw the same seven kinds of line on every work, and read every composition through the same seven views. This game asked for 《two of those kinds》 — one horizontal and one vertical each, four lines in all.')) + '</p>' +
+          '<p class="gm-info-s">' + L('基準線の名称（七つ）', 'The seven reference lines') + '</p>' +
+          '<ul class="gm-nlist">' + RLINES.map(function(r){ return '<li' + (r[2] ? ' class="on"' : '') + '><b>' + esc(L(r[0], r[1])) + '</b>' + (r[2] ? '<em>' + L('この遊びで引いた線', 'drawn in this game') + '</em>' : '') + '</li>'; }).join('') + '</ul>' +
+          '<p class="gm-info-s">' + L('分析カテゴリ（七つ）', 'The seven categories') + '</p>' +
+          '<ul class="gm-nlist gm-nlist2">' + CATS.map(function(c){ return '<li><b>' + esc(L(c[0], c[1])) + '</b><span>' + esc(L(c[2], c[3])) + '</span></li>'; }).join('') + '</ul>' +
+          '</div></div>' +
         '<div class="gm-media" role="group" aria-label="' + L('枠を替える', 'Change the frame') + '"><span>' + L('同じ％を、別の枠に。同じパーセントを別の枠に表示できます。', 'The same % in another frame — see how the ratios sit in a different shape.') + '</span>' +
           '<button type="button" data-ar="screen" aria-pressed="true">' + L('この画面', 'this screen') + '</button><button type="button" data-ar="0.707" aria-pressed="false">A4</button><button type="button" data-ar="1" aria-pressed="false">' + L('正方形', 'square') + '</button></div>';
       bindSecs(resEl);

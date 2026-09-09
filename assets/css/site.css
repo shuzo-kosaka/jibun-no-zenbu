@@ -4949,3 +4949,19 @@
   html:not(.phone) .gm-cmp > div:nth-child(2),
   html:not(.phone) .gm-cmp > div:last-child{justify-self:stretch}
   html:not(.phone) .gm-cmp dd{font-size:var(--cmpfs, 30px); line-height:1.02; white-space:nowrap}
+
+  /* 研究の七本と七つの見方の一覧（平均の画面） */
+  .gm-nlist{list-style:none; margin:.2em 0 1.1em; padding:0; display:grid; gap:5px}
+  .gm-nlist li{display:flex; align-items:baseline; gap:8px; padding:5px 0 5px 12px; border-left:2px solid var(--line);
+    font-family:var(--sans); font-size:12.5px; line-height:1.5}
+  .gm-nlist li.on{border-left-color:var(--acc)}
+  .gm-nlist li b{font-weight:700; white-space:nowrap}
+  .gm-nlist li em{font-style:normal; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; color:var(--acc); white-space:nowrap}
+  .gm-nlist2 li{display:grid; gap:1px}
+  .gm-nlist2 li span{font-size:11.5px; line-height:1.65; opacity:.72}
+  html.phone .gm-nlist li{font-size:12px}
+
+  #top .lines s{display:block}
+  html.grid #top .lines s{visibility:visible}
+  html:not(.grid) #top .lines s{opacity:0 !important; visibility:hidden;
+    transition:opacity .5s var(--ease) .1s, visibility 0s linear .62s}
