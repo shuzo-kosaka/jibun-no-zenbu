@@ -4935,3 +4935,12 @@
      収まらない。見出しと、その下のあきだけを詰めて場所を作る（本文は本人のご指定どおり触らない） */
   html.pcview.phone #ch7b .solopin .sub,html.pcview.phone #ch7c .solopin .sub{font-size:40px; margin-bottom:.55em}
   html.pcview.phone[lang="en"] #ch7b .solopin .sub,html.pcview.phone[lang="en"] #ch7c .solopin .sub{font-size:34px; margin-bottom:.5em}
+
+  .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-4px -18px -18px -4px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-4px -4px -18px -18px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-18px -18px -4px -4px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-18px -4px -4px -18px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.nw::before{inset:-5px -26px -26px -5px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.ne::before{inset:-5px -5px -26px -26px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.sw::before{inset:-26px -26px -5px -5px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz.se::before{inset:-26px -5px -5px -26px}

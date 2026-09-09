@@ -6044,6 +6044,11 @@
     }
     function mockArm(el){
       if(el.__armed) return; el.__armed = true;
+      /* v648① 「戻す」で本文の行数が戻らなかった（見張り係）。`mockReset` は style を外したあと
+         `mk2Lines(el)` を丈なしで呼ぶが、丈は行数で決まるので**いまの行数を確定するだけ**だった。
+         最初の行数を属性に控えておく（`mockRestore` の innerHTML 往復でも生き残る） */
+      if(el.classList.contains('gm-mk2') && !el.hasAttribute('data-n0'))
+        el.setAttribute('data-n0', el.querySelectorAll('i:not(.gm-rz)').length);
       el.classList.add('gm-drag'); el.setAttribute('tabindex', '0');
       el.setAttribute('role', 'group');
       el.setAttribute('aria-roledescription', L('置いたもの', 'block'));
@@ -6080,8 +6085,12 @@
         /* v620 見出しには `-0.12em` の微調整（transform）がかかっている。位置を**見た目の矩形**から
            書き戻していたので、掴んで離すたびにその分だけ上へ積み重なっていた（本人：二回掴むと上へ逃げる）。
            以後は**組みの座標**（offsetLeft／offsetTop）を起点に、指の移動ぶんだけ足す。 */
-        el.style.margin = '0'; el.style.transition = 'none';   /* 遷移が効いていると、外した直後の矩形が古いままで写しが空振りする */
-        var _pre = el.getBoundingClientRect(); el.classList.add('moved'); var _post = el.getBoundingClientRect();
+        el.style.transition = 'none';   /* 遷移が効いていると、外した直後の矩形が古いままで写しが空振りする */
+        /* v648② 本文（.gm-mk2）だけ `margin-top:18px` を持っている。余白を外した**後**に `_pre` を
+           測っていたので、その 18px の消失を誰も拾えず、掴んだ瞬間に上へ跳んでいた（見張り係）。
+           先に測ってから外す。以後の補正（offsetTop + (_pre.top - _post.top)）が余白ぶんも吸収する */
+        var _pre = el.getBoundingClientRect();
+        el.style.margin = '0'; el.classList.add('moved'); var _post = el.getBoundingClientRect();
         if(!el.classList.contains('gm-mk1') && (Math.abs(_post.width - _pre.width) > .5 || Math.abs(_post.height - _pre.height) > .5)){
           /* v639 見出しは丈が字の大きさで決まるので、丈を書き写すと食い違いが積み重なり、
              掴むたび少しずつ上がっていた（本人）。見出しは写さない */
@@ -6240,7 +6249,9 @@
       var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
       mockPush();
       mock.querySelectorAll('.gm-clone').forEach(function(el){ el.parentNode.removeChild(el); });
-      mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab', 'snapon', 'moved'); el.removeAttribute('style'); mk2Lines(el); });
+      mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab', 'snapon', 'moved'); el.removeAttribute('style');
+        var _n0 = parseFloat(el.getAttribute('data-n0'));   /* v648① 最初の行数へ戻す */
+        mk2Lines(el, _n0 > 0 ? _n0 * MK2LH : undefined); });
       mockSel(null);
     }
     function mockDrag(){
@@ -6302,6 +6313,7 @@
              丸は動かさずに離せば click が出て開く */
           if(!tool.classList.contains('mini') && !(e.target.closest && e.target.closest('b'))) return;
           e.preventDefault();
+          tool.__moved = false;   /* v648③ 掴むたびに旗を下ろす（時刻のほうで「直後かどうか」を見る） */
           var t = tool.getBoundingClientRect(), sh = sheetEl.getBoundingClientRect();
           var ox = e.clientX - t.left, oy = e.clientY - t.top;
           tool.classList.add('grab');
@@ -6310,6 +6322,7 @@
             /* v634 わずかな震えで「動かした」と見なされ、丸を押しても開かないことがあった（本人）。
                4px 動くまでは動かしたことにしない */
             if(!tool.__moved && Math.abs(ev.clientX - dx0) < 4 && Math.abs(ev.clientY - dy0) < 4) return;
+            tool.__movedAt = Date.now();   /* v648③ 旗は時刻で見る（下記） */
             var x = Math.max(0, Math.min(sh.width - t.width, ev.clientX - ox - sh.left));
             var y = Math.max(0, Math.min(sh.height - t.height, ev.clientY - oy - sh.top));
             tool.__moved = true;
@@ -6320,14 +6333,17 @@
             /* v641 指では畳めない／開けないことがあった（本人：スマホで置いて試すが格納できない）。
                pointerdown で preventDefault しているぶん、iOS では click が出ないことがある。
                動かさずに離したら、その場で畳む／開く。click 側とは 500ms の見張りで二重に働かないようにする */
-            if(ev && ev.type === 'pointerup' && !tool.__moved && document.documentElement.classList.contains('handheld')){ tool.__foldAt = Date.now(); mockFold(); } };
+            if(ev && ev.type === 'pointerup' && Date.now() - (tool.__movedAt || 0) > 400 && document.documentElement.classList.contains('handheld')){ tool.__foldAt = Date.now(); mockFold(); } };
           document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
         };
         grip.addEventListener('pointerdown', onDown);
         tool.addEventListener('pointerdown', function(e){ if(tool.classList.contains('mini')) onDown(e); });
       })();
       tool.addEventListener('click', function(e){
-        if(tool.__moved){ tool.__moved = false; return; }   /* v630 動かした直後の click は無視（丸を引き回すと開いてしまっていた） */
+        /* v648③ 旗（__moved）を click で落としていたが、指の端末では `preventDefault` のせいで
+           click が来ないことがあり、**旗が立ったまま固まって道具の列ごと使えなくなっていた**（見張り係）。
+           時刻で見張る形に変える（動かし終えて 400ms 経てば、また押せる） */
+        if(Date.now() - (tool.__movedAt || 0) < 400) return;
         var b = e.target.closest && e.target.closest('button'); if(!b) return;
         var sr = b.getAttribute('data-sar');
         if(sr){   /* v627 紙面の枠を替える */
