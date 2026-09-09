@@ -548,7 +548,15 @@
       if(!sec) return;
       rvAnc = {id:sec.id, p:(y - top0) / Math.max(1, sec.offsetHeight)};
     }
-    function rvKeep(){ if(rvRaf) return; rvRaf = requestAnimationFrame(function(){ rvRaf = 0; rvMark(); }); }
+    /* v674 これはスクロールのたびに `section[id]` を引き直し、節ごとに `offsetHeight` を読んでいた。
+       直前に位置の書き込みが走っているので、そのたびに**組み直しが強制**される（iPad の実機で 16 秒の
+       スクロール中に 971ms、毎コマ 2.8ms）。覚えておきたいのは「向きを変える直前にどこを読んでいたか」
+       だけなので、**250ms ごと＋指を離して 120ms 後**に覚える形にした。止まれば必ず最新になる */
+    function rvKeep(){
+      clearTimeout(rvKeep.tail); rvKeep.tail = setTimeout(rvMark, 120);   /* 送り終わったら必ず覚え直す */
+      var t = Date.now(); if(rvRaf || t - (rvKeep.t || 0) < 250) return; rvKeep.t = t;
+      rvRaf = requestAnimationFrame(function(){ rvRaf = 0; rvMark(); });
+    }
     var rvUn = 0;
     window.addEventListener('resize', function(){ rvLock = 1; clearTimeout(rvUn); rvUn = setTimeout(function(){ rvLock = 0; }, 2800); }, {passive:true});   /* 画面の作り直しが始まったら、その間の位置は覚えない（向きの合図より先に scroll が来ることがある） */
 
@@ -918,9 +926,19 @@
     if(hwPlayed && !hwDone){ var msec = document.getElementById('message');
       if(msec){ var mr = msec.getBoundingClientRect(), mt = mr.height - vh();
         hwHold = mt > 0 ? ((-mr.top) / mt) < .12 : true; } }   /* v348: 見出しの来るところまで。ここを越えたら、ふつうの順に任せる（以前は .34 まで抑えていて、見出しと本文が一度に出ていた） */
+    var _vh = vh();
     pins.forEach(function(pin){
-      var r = pin.getBoundingClientRect(); var total = r.height - vh();
+      var r = pin.getBoundingClientRect(); var total = r.height - _vh;
       var p = (-r.top) / total; p = Math.max(0, Math.min(1, p));
+      /* v674 pin は四つあり、そのうち画面に出ているのはたいてい一つ。外に出た pin は p が 0 か 1 に
+         張り付いたままなので、**進みが前と同じで画面の外なら何もしない**（iPad の実機で 346ms → 約四分の一）。
+         見え方は同じ（最後に当てた状態がそのまま残る） */
+      var _vis = r.bottom > -1 && r.top < _vh + 1;
+      /* v675 画面から外れた**最初の一巡は必ず通す**。ここで `dgOn` のような「見えているか」で決まる旗を
+         下ろしているので、外れた瞬間に飛ばすと図の回転が回りっぱなしになる（実測：ch6・ch7 の中央値が
+         17ms → 45〜51ms に落ちていた） */
+      if(!_vis && pin.__lastVis === false && pin.__lastP === p) return;
+      pin.__lastP = p; pin.__lastVis = _vis;
       pin.querySelectorAll('[data-at]').forEach(function(el){ var at = parseFloat(el.getAttribute('data-at')), off = el.getAttribute('data-off');
         /* v344: data-athw のものは、手書きが描き終わった時点でも出す（スクロールしなくても次へ進む） */
         var on = (p >= at) && (off === null || p < parseFloat(off));
@@ -1738,10 +1756,18 @@
     if(window.__chFps){ window.__chFps.forEach(function(f){ var r = f.getBoundingClientRect(); fpList.push({el:f, y:r.top + r.height / 2 + sy}); }); }
     if(window.__wkFps){ window.__wkFps.forEach(function(f){ var r = f.getBoundingClientRect(); fpList.push({el:f, y:r.top + r.height / 2 + sy}); }); }
   }
+  /* v674 足跡は 163 個ある。毎コマ全部に `classList.toggle` を掛けていたので、値が同じでも
+     そのたびに字面の作り直しが走っていた（iPad の実機で 662ms、毎コマ 1.9ms）。
+     **前と同じなら何もしない**／**変わった足跡だけ触る**の二段にした。見た目は同じ */
   function fpUpdate(){
     if(!fpList.length) return;
     var front = window.scrollY + vh() * .66, gone = Math.round(fpFade * fpMainN);   /* the oldest prints of the main trail fade first as the diagram comes up; the bridge's walk only follows the scroll */
-    fpList.forEach(function(o, i){ o.el.classList.toggle('on', (i >= gone || i >= fpMainN) && o.y < front); });
+    if(front === fpUpdate.f && gone === fpUpdate.g) return;
+    fpUpdate.f = front; fpUpdate.g = gone;
+    for(var i = 0; i < fpList.length; i++){
+      var o = fpList[i], on = (i >= gone || i >= fpMainN) && o.y < front;
+      if(o.on !== on){ o.on = on; o.el.classList.toggle('on', on); }
+    }
   }
 
   /* the bridge: the walk resumes below the diagram — down the same rail, a gentle bend past the heading, and on toward CHECKPOINT 01 */
