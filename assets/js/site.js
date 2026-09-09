@@ -5542,7 +5542,10 @@
     function numHead(){
       if(!resEl) return;
       var av = resEl.querySelector('.gm-avg'), h = av && av.querySelector('.gm-avgh'), r1 = av && av.querySelector('li:not(.gm-avgh)');
-      if(h && r1){ numOn(h.querySelector('em'), r1.querySelector('em')); numOn(h.querySelector('small'), r1.querySelector('small')); }
+      /* v671 「私」の札だけ寄っていなかった（パトロール係：−8.4px）。行の中の `small` は
+         `<em>31<small class="gm-pc">%</small></em>` の％が文書順で先に来るので、`querySelector('small')`
+         がそれを拾い、数字が無いまま戻していた。直下の子だけを見る */
+      if(h && r1){ numOn(h.querySelector(':scope > em'), r1.querySelector(':scope > em')); numOn(h.querySelector(':scope > small'), r1.querySelector(':scope > small')); }
       /* v669 表の見出し（あなた／私／違い、日本／西洋／差）も数字の中心へ。
          測り終わりの画面の表（.gm-tb）が漏れていた（本人：計り終わりの札が数値の中央に乗っていない） */
       resEl.querySelectorAll('table').forEach(function(jt){
