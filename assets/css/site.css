@@ -4965,3 +4965,13 @@
   html.grid #top .lines s{visibility:visible}
   html:not(.grid) #top .lines s{opacity:0 !important; visibility:hidden;
     transition:opacity .5s var(--ease) .1s, visibility 0s linear .62s}
+
+  html:not(.handheld) .chtrail,
+  html:not(.handheld) .wktrail,
+  html:not(.handheld) .mtrail,
+  html:not(.handheld) .illo,
+  html:not(.handheld) .route,
+  html:not(.handheld) .br-svg,
+  html:not(.handheld) .dg-svg,
+  html:not(.handheld) .mp-svg{will-change:transform}
+  html:not(.handheld) #ch6 .chtrail{will-change:auto}   /* ここだけ 15.4Mpx。焼き付けない */
