@@ -4841,3 +4841,23 @@
   .gm-intro .gm-idots{left:max(4vw, calc(env(safe-area-inset-left, 0px) + 30px)) !important}
   .gm-obs small{padding:3px 6px 3px 15px}
   html.phone .gm-obs small{padding:3px 5px 3px 14px}
+
+  /* 掴む所：四隅とも同じ正方形 */
+  .gm-sheet .gm-mock .gm-drag .gm-rz{width:9px; height:9px; border:1.5px solid var(--acc); background:var(--paper, #F2F1EC); box-sizing:border-box}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se{right:-5px; bottom:-5px; top:auto; left:auto; cursor:nwse-resize; z-index:3}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne{right:-5px; top:-5px; bottom:auto; left:auto; cursor:nesw-resize; z-index:2}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw{left:-5px; bottom:-5px; top:auto; right:auto; cursor:nesw-resize; z-index:2}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.nw{left:-5px; top:-5px; bottom:auto; right:auto; cursor:nwse-resize; z-index:2}
+  /* 点線は箱にぴったり。ずれていたので、本文だけ中身に沿って見えていた */
+  .gm-sheet .gm-mock .gm-drag.sel{outline:1px dashed var(--acc); outline-offset:0}
+  /* 道具の列：両端は半円、一行に */
+  .gm-stool{border-radius:999px; flex-wrap:nowrap; max-width:none; padding:6px 10px;
+    transition:width .3s var(--ease), height .3s var(--ease), border-radius .3s var(--ease), padding .3s var(--ease); overflow:hidden}
+  .gm-stool button{white-space:nowrap; flex:0 0 auto}
+  .gm-stool .gm-sar{flex:0 0 auto}
+  .gm-stool.mini{border-radius:50%; padding:0; overflow:hidden}
+  /* 枠を替えると送って現れる */
+  .gm-sheet .gm-sgrid,.gm-sheet .gm-mock{transition:width .42s var(--ease), height .42s var(--ease), left .42s var(--ease), top .42s var(--ease)}
+  .gm-sheet.arfix .gm-sgrid{outline:1px solid rgba(30,28,26,.34)}
+  /* 見出しの右の余白を詰める */
+  .gm-sheet .gm-mock .gm-mk1.gm-drag{padding:2px 2px 2px 6px}

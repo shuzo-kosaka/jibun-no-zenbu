@@ -4406,7 +4406,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -5878,6 +5878,18 @@
        ・押して選ぶと、複製・削除ができる。道具の列から新しく足すこともできる。
        ・置き直した位置は inline の left/top/width/height で持ち、骨格を切り替えるか「戻す」で元へ返る。 */
     var MOCKK = {mk1:['見出し', 'title'], mk3:['図版', 'figure'], mk2:['本文', 'text']};
+    /* v633 取り消し（⌘Z）とやり直し（⌘⇧Z）。紙面の中身をそのまま控えて戻す */
+    var mockHist = [], mockFut = [];
+    function mockHost(){ return sheetEl && sheetEl.querySelector('.gm-mock'); }
+    function mockPush(){ var m = mockHost(); if(!m) return; mockHist.push(m.innerHTML); if(mockHist.length > 60) mockHist.shift(); mockFut.length = 0; mockTools(); }
+    function mockRestore(html){ var m = mockHost(); if(!m) return; m.innerHTML = html;
+      m.querySelectorAll('.gm-drag').forEach(function(e){ e.__armed = false; e.__pid = null; mockArm(e); });
+      mockSel(m.querySelector('.gm-drag.sel')); mockTools(); }
+    function mockUndo(){ var m = mockHost(); if(!m || !mockHist.length) return; mockFut.push(m.innerHTML); mockRestore(mockHist.pop()); }
+    function mockRedo(){ var m = mockHost(); if(!m || !mockFut.length) return; mockHist.push(m.innerHTML); mockRestore(mockFut.pop()); }
+    function mockTools(){ var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
+      var u = t.querySelector('[data-act="undo"]'), r = t.querySelector('[data-act="redo"]');
+      if(u) u.disabled = !mockHist.length; if(r) r.disabled = !mockFut.length; }
     function mockEls(){ var m = sheetEl && sheetEl.querySelector('.gm-mock'); return m ? Array.prototype.slice.call(m.querySelectorAll('.gm-drag')) : []; }
     function mockSel(el){
       mockEls().forEach(function(x){ x.classList.toggle('sel', x === el); });
@@ -5986,6 +5998,12 @@
         var p = mockPct(el, mock), r = p.r, b = p.b;
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
+        mockPush();   /* v633 動かす前の姿を控える（⌘Z で戻せる） */
+        if(!rz && e.altKey){   /* v633 Option を押しながら引くと複製（Illustrator と同じ） */
+          var _c = el.cloneNode(true); _c.classList.add('gm-clone'); _c.classList.remove('sel', 'grab'); _c.__armed = false; _c.__pid = null;
+          el.parentNode.appendChild(_c); mockArm(_c); mockSel(_c);
+          el = _c; b = el.getBoundingClientRect();
+        }
         /* v620 見出しには `-0.12em` の微調整（transform）がかかっている。位置を**見た目の矩形**から
            書き戻していたので、掴んで離すたびにその分だけ上へ積み重なっていた（本人：二回掴むと上へ逃げる）。
            以後は**組みの座標**（offsetLeft／offsetTop）を起点に、指の移動ぶんだけ足す。 */
@@ -6018,7 +6036,14 @@
             var sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d;   /* 下端を線に乗せる */
             snapMark('v', sx ? sx.at : null); snapMark('h', sy ? sy.at : null);
             el.style.width = wp.toFixed(2) + '%';
-            if(el.classList.contains('gm-mk1')) mk1Fit(el);
+            if(el.classList.contains('gm-mk1')){
+              mk1Fit(el);
+              if(mN){   /* v633 上の辺を掴んだときは下の辺を固定する。字の大きさで丈が変わるので、
+                           そのままだと見出しごと動いて見えた（本人：左上と右上で挙動が違う） */
+                var _nb = el.getBoundingClientRect();
+                el.style.top = ((bt + b.height - _nb.height) / r.height * 100).toFixed(2) + '%';
+              }
+            }
             else { el.style.height = hp.toFixed(2) + '%'; mk2Lines(el); }
           } else {
             var x = Math.max(0, Math.min(r.width - b.width, sl + (ev.clientX - downX)));
@@ -6102,6 +6127,7 @@
     function mockAdd(kind){
       var mock = sheetEl.querySelector('.gm-mock'); if(!mock) return;
       var base = mock.querySelector('.gm-' + kind); if(!base) return;
+      mockPush();
       var hid = base.classList.contains('gone'), d0 = base.style.display;
       if(hid) base.style.display = '';
       var same = mock.querySelectorAll('.gm-' + kind + '.gm-drag'), from = same.length ? same[same.length - 1] : base;
@@ -6115,6 +6141,7 @@
     }
     function mockDup(){
       var el = sheetEl.querySelector('.gm-mock .gm-drag.sel'); if(!el) return;
+      mockPush();
       var mock = el.parentNode, c = el.cloneNode(true); c.classList.add('gm-clone'); c.classList.remove('sel', 'grab'); c.__armed = false;
       c.querySelectorAll(':scope > .gm-rz').forEach(function(x){ x.parentNode.removeChild(x); });   /* v629 同上 */
       mock.appendChild(c); mockArm(c); mockPlace(c, el); mk2Lines(c); mockSel(c);
@@ -6122,11 +6149,13 @@
     }
     function mockDel(){
       var el = sheetEl.querySelector('.gm-mock .gm-drag.sel'); if(!el) return;
+      mockPush();
       if(!el.classList.contains('gm-clone')){ el.classList.add('gone'); el.style.display = 'none'; mockSel(null); return; }   /* もとの三つは消さずに伏せる（戻せる） */
       el.parentNode.removeChild(el); mockSel(null);
     }
     function mockReset(){
       var mock = sheetEl && sheetEl.querySelector('.gm-mock'); if(!mock) return;
+      mockPush();
       mock.querySelectorAll('.gm-clone').forEach(function(el){ el.parentNode.removeChild(el); });
       mock.querySelectorAll('.gm-drag').forEach(function(el){ el.classList.remove('gone', 'sel', 'grab', 'snapon', 'moved'); el.removeAttribute('style'); mk2Lines(el); });
       mockSel(null);
@@ -6141,6 +6170,16 @@
         var t = e.target;
         if(t && t.closest && (t.closest('.gm-drag') || t.closest('.gm-stool') || t.closest('.gm-shd'))) return;
         mockSel(null);
+      });
+      /* v633 紙面を開いているあいだの鍵盤。⌘Z で取り消し、⌘⇧Z でやり直し、Delete で選んだものを消す（本人） */
+      document.addEventListener('keydown', function(e){
+        if(!gm.classList.contains('sheeton')) return;
+        var ae = document.activeElement, typing = ae && (/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) || ae.isContentEditable);
+        if(typing) return;
+        var meta = e.metaKey || e.ctrlKey;
+        if(meta && (e.key === 'z' || e.key === 'Z')){ e.preventDefault(); if(e.shiftKey) mockRedo(); else mockUndo(); return; }
+        if(meta && (e.key === 'y' || e.key === 'Y')){ e.preventDefault(); mockRedo(); return; }
+        if((e.key === 'Delete' || e.key === 'Backspace') && sheetEl.querySelector('.gm-mock .gm-drag.sel')){ e.preventDefault(); mockDel(); return; }
       });
       var tool = sheetEl.querySelector('.gm-stool'); if(!tool) return;
       /* v620 ＋の札は、押しても足せるし、**そのまま引き出しても**足せる（本人）。
@@ -6211,7 +6250,9 @@
         if(a){ if(Date.now() - (b.__spawned || 0) > 400) mockAdd(a);   /* v629 鍵盤（Enter／Space）でも足せる。指で足した直後は二重に足さない */
           return; }
         var k = b.getAttribute('data-act');
-        if(k === 'fold'){ tool.classList.toggle('mini'); mockText(); return; }   /* v630 丸に畳む／開く（本人） */
+        if(k === 'fold'){ mockFold(); return; }   /* v630 丸に畳む／開く（本人） */
+        if(k === 'undo'){ mockUndo(); return; }
+        if(k === 'redo'){ mockRedo(); return; }
         if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
     }
@@ -6226,15 +6267,32 @@
       rst:'<path d="M4.5 9.5h11a5 5 0 010 10H9"/><path d="M8.5 5.5l-4 4 4 4"/>',
       /* v630 畳む／開く。畳んだときは「置いて試す」道具そのものの絵（枠と＋） */
       fold:'<path d="M15.5 5.5l-7 6.5 7 6.5"/>',
+      undo:'<path d="M9 6.5L4.5 11 9 15.5"/><path d="M4.5 11h9a5.5 5.5 0 010 11H9"/>',
+      redo:'<path d="M15 6.5L19.5 11 15 15.5"/><path d="M19.5 11h-9a5.5 5.5 0 000 11H15"/>',
       open:'<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 8.5v7M8.5 12h7"/>'
     };
     function mockIcon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + MOCKI[k] + '</svg>'; }
+    /* v633 開くときは横へ伸び、畳むときは縮んで丸くなる（本人）。幅は auto では送れないので実寸で */
+    function mockFold(){
+      var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
+      var mini = t.classList.contains('mini'), w0 = t.getBoundingClientRect().width;
+      if(mini){
+        t.classList.remove('mini'); mockText();
+        t.style.width = w0 + 'px'; void t.offsetWidth;
+        t.style.width = t.scrollWidth + 'px';
+        setTimeout(function(){ if(!t.classList.contains('mini')) t.style.width = ''; }, 340);
+      } else {
+        t.style.width = w0 + 'px'; void t.offsetWidth;
+        t.classList.add('mini'); mockText(); t.style.width = '';
+      }
+    }
     function mockText(){
       var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
       t.querySelector('b').textContent = L('置いて試す', 'try a layout');
       t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
         b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
-      var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset'], fold:['畳む', 'fold']};
+      var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset'], fold:['畳む', 'fold'],
+               undo:['取り消す', 'undo'], redo:['やり直す', 'redo']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
       var fd = t.querySelector('.gm-sfold');
