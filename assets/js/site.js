@@ -5166,7 +5166,7 @@
                                 en:'You will draw 《four lines》 on this picture.'},
       {k:['step'],              ja:'%sの帯に、《いま何本目か》が出ます。',
                                 en:'The band %s shows 《which line you are on》.'},
-      {k:['tip'],               ja:'探すところは、《この一行》に書いてあります。',
+      {k:['tip'],               ja:'探すところは、《ここ》に書いてあります。',
                                 en:'《This line》 says what to look for.'}
     ];
     /* 「右の帯に」の「右」は、案内文から見た朱の帯の向きで決める
@@ -5421,7 +5421,7 @@
       /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この一本について', 'ABOUT THIS LINE') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむ遊びです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
+        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この差について', 'ABOUT THIS GAP') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむ遊びです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
         lite(once);
         /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
            盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */
@@ -5453,11 +5453,27 @@
         setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); if(tie.parentNode) tie.parentNode.removeChild(tie); }, 8200); }
       first = false; setTimeout(reveal, 80);
     }
+    /* v639 比べる欄の数値を、枠からはみ出さない範囲でできるだけ大きく（本人：PC のみ）。
+       三つの列で同じ大きさにそろえたいので、いちばん厳しい列に合わせる */
+    function cmpFit(){
+      var d = resEl && resEl.querySelector('.gm-cmp');
+      if(!d || document.documentElement.classList.contains('handheld')){ if(d) d.style.removeProperty('--cmpfs'); return; }
+      var cols = Array.prototype.slice.call(d.children), best = Infinity;
+      cols.forEach(function(c){
+        var dd = c.querySelector('dd'); if(!dd) return;
+        var w0 = dd.style.width; dd.style.width = 'max-content';
+        var nat = dd.getBoundingClientRect().width; dd.style.width = w0;
+        var avail = c.getBoundingClientRect().width - 2, fs = parseFloat(getComputedStyle(dd).fontSize);
+        if(nat > 0 && avail > 0) best = Math.min(best, fs * avail / nat);
+      });
+      if(isFinite(best)) d.style.setProperty('--cmpfs', Math.max(26, Math.min(64, best)).toFixed(1) + 'px');
+    }
     function cmpRender(t, b, p, a, d){
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix(t.n, t.ne, t.k === 'y1' || t.k === 'x1' ? '開始' : '重心') + '<small>' + L(t.dir, t.dire) + '</small></b></p>' +
         '<dl class="gm-cmp"><div><dt>' + L('あなた', 'you') + '</dt><dd>' + p + PC + '</dd></div><div><dt>' + L('私', 'me') + '</dt><dd>' + a + PC + '</dd></div><div><dt>' + L('解釈の違い', 'difference') + '</dt><dd>' + sg(d) + PC + '</dd></div></dl>' +
         '<p class="gm-why">' + body(L(b.why[ti], b.whye[ti])) + '</p>' +
         (first ? '<p class="gm-note">' + L('絵の幅と高さをそれぞれ 100 として、線の位置を％で示します。', 'Line positions are shown as percentages, with the picture\'s width and height each set to 100.') + '<br>' + (ptype === 'touch' ? L('絵を押すと、次の線。', 'Tap the picture for the next line.') : L('絵をもう一度押すと、次の線。', 'Click the picture again for the next line.')) + '</p>' : '');
+      cmpFit(); requestAnimationFrame(cmpFit);
       goEl.innerHTML = ''; btn(ti < LINES.length - 1 ? L('次の線', 'Next line') : L('測り終える', 'Finish this picture'), nextTurn, 'go'); btn(L('引き直す', 'Redo this line'), redo);   /* 四本目のあとは線ではなく記録へ進むので、名前を変える */
     }
     /* 狭い画面では結果の下のボタンが欄の外に隠れる。決まった直後に、欄だけを静かに送って見せる（文書は動かさない） */
@@ -5606,8 +5622,8 @@
         '<p class="gm-note">' + body(L('盤面の数字は、あなたの四本で分けた《段の幅》です。横も縦も、足すと 100 になります。線そのものの位置は、下の「四本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
-        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の四本：あなた', 'four solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線の三本：私が補った残り', 'three faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線の七本：このサイトのグリッド<small>桜を主題とした三点から起こしました</small>', 'seven faint dashed: this site’s grid<small>drawn from three pictures on the cherry-blossom theme</small>') + '</b></p>' +
-        sec(L('四本の平均', 'The four averages')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
+        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：わたしが補った残り', 'faint dashed: the rest, filled in by me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
+        sec(L('四本の平均', 'The four averages'), true) + '<div class="gm-catx gm-secx"><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
              日本と西洋の平均の見出しの下へ移す */
@@ -5744,7 +5760,7 @@
           } });   /* v487: 開閉を滑らかに（本人） */
       });
     }
-    function sec(t){ return '<button type="button" class="gm-catq gm-secq" aria-expanded="false"><span>' + t + '</span><i></i></button>'; }   /* v394: i の札の節は畳んで、押すと開く（分析カテゴリと同じ作法） */
+    function sec(t, open){ return '<button type="button" class="gm-catq gm-secq" aria-expanded="' + (open ? 'true' : 'false') + '"><span>' + t + '</span><i></i></button>'; }   /* v639 開いた状態でも出せる（本人：四本の平均は最初から開く） */   /* v394: i の札の節は畳んで、押すと開く（分析カテゴリと同じ作法） */
     function body_(t){ return body(t); }
     function info(){
       if(!infoEl){
@@ -6047,7 +6063,9 @@
            以後は**組みの座標**（offsetLeft／offsetTop）を起点に、指の移動ぶんだけ足す。 */
         el.style.margin = '0'; el.style.transition = 'none';   /* 遷移が効いていると、外した直後の矩形が古いままで写しが空振りする */
         var _pre = el.getBoundingClientRect(); el.classList.add('moved'); var _post = el.getBoundingClientRect();
-        if(Math.abs(_post.width - _pre.width) > .5 || Math.abs(_post.height - _pre.height) > .5){
+        if(!el.classList.contains('gm-mk1') && (Math.abs(_post.width - _pre.width) > .5 || Math.abs(_post.height - _pre.height) > .5)){
+          /* v639 見出しは丈が字の大きさで決まるので、丈を書き写すと食い違いが積み重なり、
+             掴むたび少しずつ上がっていた（本人）。見出しは写さない */
           /* v636 `moved` を付けると `.tight` の下限（min-width／min-height）が外れ、
              押しただけで箱が潰れていた（本人）。付ける前の寸法を写しておく */
           el.style.width = (_pre.width / r.width * 100).toFixed(2) + '%';

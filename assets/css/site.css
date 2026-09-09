@@ -4903,3 +4903,8 @@
 
   .gm-intro .gm-ihow{height:32px; min-height:0; padding:0 10px; border-radius:14px; border:1px solid rgba(30,28,26,.35);
     font-size:11.5px; letter-spacing:.06em; line-height:30px; display:inline-flex; align-items:center}
+
+  html:not(.handheld) .gm-cmp dd{font-size:var(--cmpfs, 30px); line-height:1.1; white-space:nowrap}
+  html:not(.handheld) .gm-cmp{gap:12px; margin-bottom:1.35em}
+  html:not(.handheld) .gm-cmp dt{font-size:11.5px; margin-bottom:2px}
+  html:not(.handheld) .gm-why{margin-top:.55em; line-height:1.95}
