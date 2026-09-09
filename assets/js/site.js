@@ -4406,7 +4406,9 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button></div>' +
+          '<div class="gm-stool" role="group"><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="rst"></button>' +
+            /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
+            '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
       document.body.appendChild(gm);
       stage = gm.querySelector('.gm-stage'); picEl = gm.querySelector('.gm-pic'); linesEl = gm.querySelector('.gm-lines');
@@ -5596,7 +5598,7 @@
         var v = b.getAttribute('data-ar'); stage.style.setProperty('--ar', v === 'screen' ? (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3) : v);
       }); });
       goEl.innerHTML = ''; goEl.classList.add('hold'); try{ goEl.inert = true; }catch(x){}   /* v484: 伏せている間はキーボードでも触れない（流れ係） */
-      btn(L('画面いっぱいに表示', 'Show full screen'), function(){ sheet(avg); }, 'go');
+      btn(L('レイアウトしてみる', 'Try a layout'), function(){ sheet(avg); }, 'go');   /* v627 名前を変えた（本人） */
       var ovb = btn(L('このサイトのグリッドと重ねる', 'Compare with this site’s grid'), overlay); if(ovb) ovb.__ov = true;
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の三枚を測る', 'Measure three more'), start);
@@ -5669,7 +5671,7 @@
       if(q) q.setAttribute('aria-expanded', 'false');
       if(rm || document.documentElement.classList.contains('phone')){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); return; }
       x.classList.add('anim'); x.style.height = x.scrollHeight + 'px'; void x.offsetHeight; x.style.height = '0px';
-      setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 200);
+      setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim'); }, 270);   /* v627 高さの補間は .26s。200ms で隠すと**閉じ切る手前で消えて**一瞬引っかかって見えた（本人） */
     }
     function secOnly(root, q){
       if(!root) return;
@@ -5962,7 +5964,7 @@
         el.setAttribute('aria-label', L(_k[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', _k[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); })();
       if(!el.querySelector('.gm-rz')){
         /* v620 つまみを三つに。右下＝両方、右端＝幅だけ、下端＝丈だけ（本人：本文の大きさが変えられない） */
-        ['se', 'ne', 'sw'].forEach(function(k){ if(k === 'sw' && el.classList.contains('gm-mk1')) return;
+        ['nw', 'ne', 'sw', 'se'].forEach(function(k){
           var rz = document.createElement('i'); rz.className = 'gm-rz ' + k; el.appendChild(rz); });
       }
       el.addEventListener('pointerdown', function(e){
@@ -5970,7 +5972,11 @@
         if(el.__pid != null) return;
         el.__pid = e.pointerId;
         var mock = el.parentNode, _t = e.target, rz = !!(_t && _t.classList && _t.classList.contains('gm-rz'));
-        var rzW = rz && !_t.classList.contains('sw'), rzH = rz && !_t.classList.contains('ne');   /* 右上＝幅だけ、左下＝丈だけ、右下＝両方 */
+        /* v627 四隅のどこからでも大きさを変えられる。動くのは掴んだ角に接する二辺
+           （e＝右／w＝左／s＝下／n＝上）。本人：四つの角に L の金具を、枠の点線に沿って */
+        var _k = rz ? (_t.className || '').replace('gm-rz', '').trim() : '';   /* nw / ne / sw / se */
+        var mE = _k.indexOf('e') >= 0, mW = _k.indexOf('w') >= 0;
+        var mS = _k.indexOf('s') >= 0, mN = _k.indexOf('n') >= 0;
         var p = mockPct(el, mock), r = p.r, b = p.b;
         var ox = e.clientX - b.left, oy = e.clientY - b.top, downX = e.clientX, downY = e.clientY;   /* v608 つまみは掴んだ点からの差分で。絶対座標だと掴んだ瞬間に 3px 縮んでいた（見張り係） */
         e.preventDefault(); e.stopPropagation(); mockSel(el);
@@ -5991,9 +5997,16 @@
         var move = function(ev){
           el.style.transition = 'none'; el.style.margin = '0';
           if(rz){
-            var w = rzW ? Math.max(12, Math.min(r.width - (b.left - r.left), b.width + (ev.clientX - downX))) : b.width;
-            var h = rzH ? Math.max(10, Math.min(r.height - (b.top - r.top), b.height + (ev.clientY - downY))) : b.height;   /* v621 下限は「掴める最低限」だけ（本人：ある大きさより小さくできない） */
-            var l0 = (b.left - r.left) / r.width * 100, t0 = (b.top - r.top) / r.height * 100;
+            var dx = ev.clientX - downX, dy = ev.clientY - downY;
+            var bl = b.left - r.left, bt = b.top - r.top;
+            var w = b.width, h = b.height, nl = bl, nt = bt;   /* v621 下限は「掴める最低限」だけ（本人：ある大きさより小さくできない） */
+            if(mE) w = Math.max(12, Math.min(r.width - bl, b.width + dx));
+            if(mW){ w = Math.max(12, Math.min(bl + b.width, b.width - dx)); nl = bl + b.width - w; }
+            if(mS) h = Math.max(10, Math.min(r.height - bt, b.height + dy));
+            if(mN){ h = Math.max(10, Math.min(bt + b.height, b.height - dy)); nt = bt + b.height - h; }
+            el.style.left = (nl / r.width * 100).toFixed(2) + '%';
+            el.style.top = (nt / r.height * 100).toFixed(2) + '%';
+            var l0 = nl / r.width * 100, t0 = nt / r.height * 100;
             var wp = w / r.width * 100, hp = h / r.height * 100;
             var sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d;   /* 右端を線に乗せる */
             var sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d;   /* 下端を線に乗せる */
@@ -6069,7 +6082,7 @@
       var nat = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       el.style.width = _w0;
       var fs = parseFloat(getComputedStyle(el).fontSize);
-      if(nat > 0) el.style.fontSize = Math.max(12, Math.min(240, fs * w / nat)).toFixed(2) + 'px';
+      if(nat > 0) el.style.fontSize = Math.max(10, Math.min(400, fs * w / nat)).toFixed(2) + 'px';   /* v627 240 で頭打ちになり、そこから先は枠だけ横に伸びていた（本人） */
     }
     function mockKind(el){ return el.classList.contains('gm-mk1') ? 'mk1' : el.classList.contains('gm-mk3') ? 'mk3' : 'mk2'; }
     function mockPlace(el, from){   /* 元から少しずらして置く（重ねたままだと増えたのが分からない） */
@@ -6171,6 +6184,14 @@
       })();
       tool.addEventListener('click', function(e){
         var b = e.target.closest && e.target.closest('button'); if(!b) return;
+        var sr = b.getAttribute('data-sar');
+        if(sr){   /* v627 紙面の枠を替える */
+          tool.querySelectorAll('[data-sar]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+          sheetEl.classList.toggle('arfix', sr !== 'screen');
+          if(sr !== 'screen') sheetEl.style.setProperty('--sar', sr);
+          mockReset();
+          return;
+        }
         var a = b.getAttribute('data-add');
         if(a) return;   /* v620 足すのは pointerdown 側の役目（引き出しと共通） */
         var k = b.getAttribute('data-act');
@@ -6196,6 +6217,10 @@
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], rst:['戻す', 'reset']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
+      var sar = t.querySelector('.gm-sar'); if(sar){
+        sar.querySelector('em').textContent = L('枠', 'frame');
+        sar.querySelector('[data-sar="screen"]').textContent = L('この画面', 'screen');
+        sar.querySelector('[data-sar="1"]').textContent = L('正方形', 'square'); }
       sheetEl.querySelectorAll('.gm-mock .gm-drag').forEach(function(e){ var kk = MOCKK[mockKind(e)];
         e.setAttribute('aria-roledescription', L('置いたもの', 'block'));
         e.setAttribute('aria-label', L(kk[0] + '。矢印キーで動かす、＋と−で大きさ、⌘Dで複製、Deleteで削除', kk[1] + '. Arrow keys to move, + and - to resize, Cmd+D to duplicate, Delete to remove')); });
@@ -6217,7 +6242,7 @@
       mockDrag(); mockReset();   /* v600 つまんで動かす仕掛けを張り、置き直した位置は開くたびに戻す */
       gm.classList.add('sheeton'); sheetEl.setAttribute('aria-hidden', 'false'); try{ sheetEl.inert = false; }catch(x){}
       setTimeout(function(){ mock.classList.add('land'); }, rm ? 0 : 360);   /* 見出し→図版→本文が線へ着地する（合計 500ms） */
-      setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('画面いっぱいに表示 \u00b7 APPLIED \u00b7 ', 'VIEW GRID FULL SCREEN \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
+      setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('レイアウトしてみる \u00b7 APPLIED \u00b7 ', 'TRY A LAYOUT \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
       setTimeout(function(){ sheetEl.querySelector('.gm-sx').focus({preventScroll:true}); }, 240);
     }
     function sheetText(){   /* v511 紙面の文字だけを組み直す。言語を切り替えたときにも呼ぶ（説明文と見出しだけ前の言語で残っていた：流れ係） */

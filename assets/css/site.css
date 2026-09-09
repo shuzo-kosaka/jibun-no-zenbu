@@ -4620,7 +4620,7 @@
   .gm-sheet .gm-mock .gm-mk1.gm-drag{padding:2px 6px; margin-left:0}
   .gm-sheet .gm-mock .gm-mk2.gm-drag{overflow:hidden}
   .gm-sheet .gm-mock .gm-mk3.gm-drag{box-sizing:border-box}
-  .gm-sheet .gm-mock .gm-clone{opacity:1 !important; transform:none !important}
+  .gm-sheet .gm-mock .gm-clone:not(.spawn){opacity:1 !important; transform:none !important}   /* v627 引き出しているあいだ（.spawn）は縮めたいので外す。ここの !important が効いていて、縮む演出が出ていなかった（本人） */
 
   /* 中心軸（緑の破線）。日本の絵の平均と同じ緑 */
   .gm-sheet .gm-sgrid .gm-ln.mid{--acc:#2F8F5B; opacity:.5}
@@ -4749,10 +4749,15 @@
 
   .gm-sheet .gm-mock .gm-drag .gm-rz{position:absolute; width:14px; height:14px; opacity:0; pointer-events:auto}
   .gm-sheet .gm-mock .gm-drag .gm-rz::before{content:''; position:absolute; inset:-13px}
-  /* v621 掴む所は**角**に（本人）。右下＝両方、右上＝幅だけ、左下＝丈だけ。どれも L の字 */
-  .gm-sheet .gm-mock .gm-drag .gm-rz.se{right:-5px; bottom:-5px; border-right:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:nwse-resize}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.ne{right:-5px; top:-5px; border-right:2px solid var(--acc); border-top:2px solid var(--acc); cursor:ew-resize}
-  .gm-sheet .gm-mock .gm-drag .gm-rz.sw{left:-5px; bottom:-5px; border-left:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:ns-resize}
+  /* v627 掴む所は**四隅**に。枠の点線にぴったり沿わせる（本人）。どの角からでも大きさを変えられる */
+  .gm-sheet .gm-mock .gm-drag .gm-rz{width:13px; height:13px}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.se{right:-1px; bottom:-1px; border-right:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:nwse-resize; z-index:3}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.ne{right:-1px; top:-1px; border-right:2px solid var(--acc); border-top:2px solid var(--acc); cursor:nesw-resize; z-index:2}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.sw{left:-1px; bottom:-1px; border-left:2px solid var(--acc); border-bottom:2px solid var(--acc); cursor:nesw-resize; z-index:2}
+  .gm-sheet .gm-mock .gm-drag .gm-rz.nw{left:-1px; top:-1px; border-left:2px solid var(--acc); border-top:2px solid var(--acc); cursor:nwse-resize; z-index:2}
+  /* 小さくしたときに当たりが重なって右下が掴めなくなるので、狭いときは当たりを絞る */
+  .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-11px}
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-15px}
   .gm-sheet .gm-mock .gm-drag:hover .gm-rz,.gm-sheet .gm-mock .gm-drag.sel .gm-rz{opacity:.75}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz{opacity:.6}
   html.phone .gm-sheet .gm-mock .gm-drag .gm-rz::before{inset:-18px}
@@ -4789,3 +4794,22 @@
   @media (max-height:640px){ .gm-isec .gm-ick.gm-iqa{margin-top:.9em; font-size:12px} }
 
   @media (max-height:640px){ .gm-intro .gm-idots{top:50% !important} }
+
+  .gm-stool .gm-sar{display:inline-flex; align-items:center; gap:6px; margin-left:8px; padding-left:10px; border-left:1px solid var(--line)}
+  .gm-stool .gm-sar em{font-style:normal; font-family:var(--mono); font-size:10px; letter-spacing:.14em; opacity:.55}
+  .gm-stool .gm-sar button[aria-pressed="true"]{background:var(--acc); border-color:var(--acc); color:#FBF7F2}
+  /* 枠を替えると、紙面の中身がその比の枠に収まる */
+  .gm-sheet.arfix .gm-sgrid,.gm-sheet.arfix .gm-mock{
+    inset:auto; left:50%; top:50%; transform:translate(-50%, -50%);
+    width:min(88%, calc(76vh * var(--sar, 1))); height:min(76vh, calc(88vw / var(--sar, 1)))}
+  .gm-sheet.arfix .gm-sgrid{outline:1px solid var(--line); outline-offset:0}
+  .gm-sheet.arfix .gm-scap{display:none}
+  /* スキップは、消えるときも現れるときも送る */
+  .gm-intro .gm-iskip{transition:opacity .32s var(--ease), visibility 0s, background .2s, color .2s, border-color .2s}
+  .gm-intro.end .gm-iskip{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .32s var(--ease), visibility 0s linear .32s}
+
+  .gm-cmp > div{display:grid; justify-items:center; align-content:start; text-align:center}
+  .gm-cmp > div:first-child{justify-self:start; text-align:center}
+  .gm-cmp > div:nth-child(2){justify-self:center}
+  .gm-cmp > div:last-child{justify-self:end}
+  .gm-cmp dt,.gm-cmp dd{text-align:center}
