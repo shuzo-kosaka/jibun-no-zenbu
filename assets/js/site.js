@@ -5677,7 +5677,7 @@
         '<p class="gm-note">' + body(L('盤面の数字は、あなたの四本で分けた《段の幅》です。横も縦も、足すと 100 になります。線そのものの位置は、下の「四本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
-        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：私', 'faint dashed: me') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
+        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
         sec(L('四本の平均', 'The four averages'), true) + '<div class="gm-catx gm-secx"><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
@@ -5743,31 +5743,47 @@
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
     /* インフォメーション：いま測っている絵の情報、四本の線の役割、遊び方。どの場面からでも開ける（小坂さんの指示） */
     var infoEl = null, infoWantCat = false, infoWantHow = false;
+    /* v657 十問を書き直した（本人の指示で Fable 5.1 が起草、Opus 5 が実装と突き合わせ、
+       ChatGPT（GPT-6 Astra・思考量 最大）がサイトを実際に遊んで詰めた）。
+       直した中身：①差の向き（あなた−私）と ＋／− の意味 ②盤面の％は「朱の四本で区切った幅と高さ」
+       ③「七本のうち四本」は種類と本数が混ざる ④十二本→四本の作り方が無かった（新設）
+       ⑤薄い破線は「サイトのグリッドから補った三本」 ⑥「十九点すべてと選んだ理由を示す」頁は無い
+       ⑦保存する一枚は「あなたの四本＋サイトの七本」で、二人の解釈の差そのものではない。
+       並びは「遊びのこと（1〜7）→ 研究のこと（8〜11）」。 */
     var QA = [
-      ['この％は、何と比べた数字ですか？', 'What is this percentage comparing?',
-       '《あなたの線と、私が同じ絵に引いた線の位置の差》です。よこの線は絵の高さ、たての線は絵の幅をそれぞれ 100 として、その差を示します。数字が大きいほど、二本の位置が離れています。',
-       'It is 《the gap between your line and the one I drew on the same picture》. For horizontal lines the height of the picture is 100, for vertical lines the width. A larger number means the two lines sit farther apart.'],
-      ['保存した一枚は、何に使えますか？', 'What can I do with the saved image?',
-       'あなたが引いた四本の平均と、三点から起こしたこのサイトのグリッドが重ねてあります。紙面を組むときの目安として使えますし、《私との解釈の違いをそのまま持ち帰る一枚》にもなります。',
-       'It carries the average of your four lines with the grid taken from the three pictures laid over it. You can use it as a guide when laying out a page, or simply 《keep it as a record of where our readings differed》.'],
-      ['二本の線が違うと、どちらかが間違いですか？', 'If the two lines differ, is one of them wrong?',
-       '《これは正解を当てるものではありません》。あなたと私が、主な形の始まりや重心をどこに見たかを比べ、同じ絵から生まれる解釈の違いを数で見ています。',
-       '《There is no correct line to guess》. The numbers compare where you and I see the main form begin and where its visual centre falls: two readings of one picture.'],
-      ['なぜ、全部の線を引かないのですか？', 'Why not draw all the lines?',
-       '私が普段している測り方を、二分ほどで試していただきたくて、《七本のうち四本に絞りました》。残りの三本は、絵ごとの差が小さいため、最後に薄い破線で重ねます。',
-       'I wanted you to try the way I actually measure, in about two minutes, so 《I kept four of the seven lines》. The other three vary little from picture to picture, so they appear at the end as faint dashed lines.'],
-      ['基準線も、結局は主観ではありませんか？', 'Aren\u2019t the reference lines subjective after all?',
-       '線を引く判断は私がしています。《主観を消すのではなく》、七つの観点と線の置き方を全作品で同じ手順にそろえ、同じものさしで取った座標どうしを比べています。',
-       'I place the lines myself. The aim is 《not to erase judgement but to keep the viewpoints and the method the same across every work》, and to compare coordinates taken with one measure.'],
-      ['作品の選び方に、偏りはありませんか？', 'Is there a bias in how the works were chosen?',
-       '私が選ぶ以上、選び方そのものが研究の条件になります。そこで、主な形と余白を同じ手順で記録できることを共通の条件にし、《十九点すべてと選んだ理由を示しています》。',
-       'Since I choose them, the selection is itself a condition of the study. The shared rule is that the main form and the empty space can be recorded by the same method; 《all nineteen works and the reasons are shown》.'],
-      ['絵は実物ではなく、描き起こしたものですね。', 'The pictures are redrawn, not reproductions. Why?',
-       '複製の写真は、撮り方によって色も切り取りも違います。《同じ手順で描き起こすことで、測る条件をそろえました》。色や筆致を落として形と余白だけを残しているのも、比率を見るためです。',
-       'Reproductions differ in colour and cropping from one photograph to the next. 《Redrawing them by one method keeps the conditions of measurement the same》. Colour and brushwork are dropped so that only form and empty space remain, which is what the ratios are about.'],
-      ['この比率は、どこで使われていますか？', 'Where are these ratios actually used?',
-       '《このサイトで使っています》。画面を均等に割るのではなく、絵から取り出した線に合わせて、文字と絵と余白の位置や間隔を決めています。',
-       '《On this site》. Instead of dividing the screen evenly, the text, pictures and empty space follow the lines drawn from the paintings.']
+      ['「あなた」「私」「解釈の違い」の％は、何の数字ですか？', 'What do “you”, “me” and “difference” mean?',
+       '「あなた」と「私」は、線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から測ります。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
+       '“You” and “me” give line positions from the left or top edge, with the picture’s width and height each set to 100. “Difference” is 《your value minus mine》. A + means your line sits farther right or lower; a − means farther left or higher.'],
+      ['線の位置が違ったら、間違いですか？', 'If the lines differ, is one of them wrong?',
+       'いいえ、《正解はありません》。同じ絵で、いちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
+       'No. 《There is no right answer》. We are comparing where you and I see the largest mass begin, and where its weight sits, in the same picture. A gap is a difference in reading, not a mistake.'],
+      ['なぜ、一枚に四本だけ引くのですか？', 'Why only four lines per picture?',
+       '二分ほどで試せるように、七種類ある線のうち二種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の、《始まりと重心》です。よことたてで一本ずつ引くので、一枚に四本になります。',
+       'To let you try it in about two minutes, I kept two of the seven kinds of line: on the largest mass in the picture, 《where it begins and where its weight sits》. One horizontal and one vertical for each makes four per picture.'],
+      ['十二本が、どうして四本になるのですか？', 'How do twelve lines become four?',
+       '同じ名前で同じ向きの線どうしを、三枚ぶん集めて平均します。たとえば主塊開始線のよこなら、三枚の％を足して三で割る。《これを四組ぶん》するので、平均の線は四本です。',
+       'Lines with the same name and the same direction are averaged across the three pictures — for the horizontal main-form start, I add the three percentages and divide by three. 《Four groups, four average lines》.'],
+      ['平均の画面の％は、何を表していますか？', 'What do the percentages on the final board mean?',
+       '《朱の四本で区切った幅や高さ》を表しています。薄い破線は区切りに数えず、横も縦も合計 100 になります。線そのものの位置は「四本の平均」に出しています。',
+       'They show 《the widths and heights marked out by your four red lines》. The faint dashed lines do not count as divisions, and the values add up to 100 across and down. The positions of the lines themselves are listed under “The four averages”.'],
+      ['薄い破線は、何の線ですか？', 'What are the faint dashed lines?',
+       '測っている間は、私が同じ絵に引いた線です。平均の画面では、《サイトのグリッドから三本》を補っています。「サイトのグリッドと重ねる」を押すと、破線が七本すべてに切り替わります。',
+       'While you measure, they are the lines I drew on the same picture. On the average screen I add 《three lines from the site’s grid》. “Compare with the site’s grid” switches them to all seven.'],
+      ['保存した一枚には、何が入っていますか？', 'What is in the saved image?',
+       '《あなたの平均四本（朱の実線）と、サイトの七本（薄い破線）》を重ねた画像です。絵や数字は入りません。紙面に文字や図版を置くときの目安として使えます。',
+       'It lays 《your four average lines (solid red) over the seven lines of this site (faint dashed)》. The pictures and numbers are left out. You can use it as a guide when placing text and images on a page.'],
+      ['線の位置は、感覚で決めているのですか？', 'Do you choose the line positions by eye?',
+       'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、十九点すべてを同じ手順で測り、《同じ名前の線どうし》を比べています。なぜそこに引いたかも、絵ごとに書いています。',
+       'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
+      ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
+       'はい、選ぶ絵によって平均は変わります。主な形と余白を同じ手順で測れることを条件に、日本の絵十二点と西洋の絵七点を選びました。《この十九点で見えた違い》として比べています。',
+       'Yes, the averages change with the pictures chosen. I chose twelve Japanese and seven Western pictures whose main forms and empty space I could measure by the same method. The differences describe 《this set of nineteen》.'],
+      ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
+       '形と余白の置かれ方を見やすくするため、細部を省いて、どの絵も同じ手順で描き起こしています。ここで測っているのは《描き起こした絵》で、原画そのものではありません。',
+       'I leave out the detail and redraw every picture by the same method, so that the placing of form and empty space is easier to see. What you measure here is 《the redrawn picture》, not the original work.'],
+      ['この比率は、どこで使われていますか？', 'Where are these ratios used?',
+       '《このサイトの文字や図版の配置》に使っています。研究から起こした七本の線を手がかりに、そろえる位置や余白を決めました。「レイアウトしてみる」では、あなたの線でも配置を試せます。',
+       'I use them for 《the layout of text and images on this site》. The seven lines from my research guide the alignments and the spacing. In “Try a layout” you can arrange things on your own lines instead.']
     ];
     function qaBuild(){
       var host = gm.querySelector('.gm-qa'); if(!host) return;
