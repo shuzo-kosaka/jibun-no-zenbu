@@ -5373,8 +5373,10 @@
     function turn(){
       setTimeout(function(){ if(stage && state === 'trace') stage.classList.toggle('narrow', stage.getBoundingClientRect().width < 330); }, 520);   /* v411: 狭い盤面（縦長の絵）では問いを一行に */
       var lead2 = gm.querySelector('.gm-lead2');
-      if(lead2){ if(bi === 0 && ti === 0){ lead2.hidden = false; lead2.className = 'gm-lead2 gm-res';   /* v489: 下と同じ組みの規則が当たるように */ lead2.innerHTML = '<p class="gm-ask gm-lead"><b>' + mix('絵から、ものさしを取り出す。', 'Turn a picture into a ruler.', 'ものさし') + '</b>' + L('一枚に四本ずつ線を引き、三枚の平均を出します。', 'Draw four lines on each picture; the three are then averaged.') + '</p>' + '<p class="gm-leadhow">' + L('絵を押して、そのまま動かします。離したところに線が引かれます。', 'Press the picture and drag; the line is placed where you release.') + '</p>';   /* v489: 下にあった組みのよいほうを、そのまま上へ（本人）。文節で割る処理は通さない */ }
-        else if(!lead2.hidden){ lead2.className = 'gm-lead2 gm-res bye'; setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); } }   /* v477: 何をする遊びかを、いちばん先に目につく所へ（本人） */
+      /* v663 一枚目の頭に出していた三行 ──「絵から、ものさしを取り出す。」「一枚に四本ずつ線を引き、
+         三枚の平均を出します。」「絵を押して、そのまま動かします。離したところに線が引かれます。」── は
+         出さない（本人）。何をする遊びかは案内と手引きで伝わっているため */
+      if(lead2 && !lead2.hidden){ lead2.className = 'gm-lead2 gm-res bye'; setTimeout(function(){ lead2.hidden = true; lead2.classList.remove('bye'); }, 420); }
       if(bi === 0 && ti === 0 && !demoDone){ setTimeout(function(){ if(tutOn) return;   /* 手引きの最中は出さない。tutEnd から始める */ demoOn(); demoFit(); setTimeout(demoFit, 400); }, 1150); } else demoOff();   /* v462: 盤面が見えてから手本を始める（動き係：一巡目が途中から見えていた） */
       var t = LINES[ti], b = picks[bi];
       state = 'trace'; live = -1; down = false; lensOff();   /* v536 前の手番の丸を持ち越さない */
