@@ -4442,7 +4442,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="num" aria-pressed="true"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><button type="button" data-act="num" aria-pressed="true"></button>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -6481,7 +6481,7 @@
           return; }
         if(k === 'undo'){ mockUndo(); return; }
         if(k === 'redo'){ mockRedo(); return; }
-        if(k === 'dup') mockDup(); else if(k === 'del') mockDel();
+        if(k === 'dup') mockDup(); else if(k === 'del') mockDel(); else if(k === 'rst') mockReset();
       });
     }
     /* v603 道具の絵。Illustrator の道具箱と同じ約束で、線だけの 24 角（文字は T、画像は山と丸、
@@ -6532,7 +6532,7 @@
       t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
         b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], fold:['畳む', 'fold'],
-               undo:['取り消す', 'undo'], redo:['やり直す', 'redo'], num:['数値', 'numbers']};
+               undo:['取り消す', 'undo'], redo:['やり直す', 'redo'], rst:['リセット', 'reset'], num:['数値', 'numbers']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
       var fd = t.querySelector('.gm-sfold');
