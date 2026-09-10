@@ -4668,7 +4668,6 @@
   /* ⑥ たての線の札を、頭のボタンの帯の下へ逃がす */
   .gm-sheet .gm-sgrid .gm-ln.v:not(.mine):not(.fixed) b{top:calc(var(--hdh, 60px) + 14px)}   /* v619 .mine は 3895 行で bottom に留めてある。top を足すと上下が同時に決まり、札が縦に伸びて**黒い帯**になっていた（本人） */
 
-  #seq text.ct.sum{fill:var(--acc)}
 
   html.phone .lines .bv s,html.phone #seq .page .bv s{top:calc(var(--y1) + 34px)}
 
