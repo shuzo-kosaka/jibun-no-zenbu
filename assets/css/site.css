@@ -5069,3 +5069,12 @@
   html.rm .gm-lines .gm-bd.v b,html.rm .gm-lines .gm-bd.h b{animation:none}
 
   .gm-conf{position:absolute; left:0; top:0; z-index:9; pointer-events:none}
+
+  html.handheld .gm-stool button{min-height:44px}
+  html.handheld .gm-stool.mini{width:52px; height:52px}
+  @media (max-width:1360px){
+    .gm-sheet .gm-stool{gap:5px; padding:5px 9px}
+    .gm-sheet .gm-stool button{padding-left:9px; padding-right:9px; gap:5px}
+    .gm-sheet .gm-stool .gm-sar{margin-left:6px; padding-left:7px; gap:5px}
+  }
+  .gm-seal.center.park.bye svg{animation:gmSealBye var(--sb, .3s) var(--ease) forwards}
