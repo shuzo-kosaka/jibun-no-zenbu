@@ -5599,11 +5599,23 @@
     /* 見出し行の、題字とボタンのあいだの空き。案内文は三段とも同じここに置く
        （読み手が毎回そこを探さずに済む）。PC で 678×68、iPhone 横持ちで 560×120 空く */
     function tutFree(){
-      var hd = gm.querySelector('.gm-hd'), a = gm.querySelector('.gm-ttl'),
-          b = gm.querySelector('.gm-i') || gm.querySelector('.gm-x');
-      if(!hd || !a || !b) return null;
-      var h = hd.getBoundingClientRect(), ar = a.getBoundingClientRect(), br = b.getBoundingClientRect();
-      var x = ar.right + 40, w = br.left - 24 - x;
+      var hd = gm.querySelector('.gm-hd'), a = gm.querySelector('.gm-ttl');
+      if(!hd || !a) return null;
+      var h = hd.getBoundingClientRect(), ar = a.getBoundingClientRect();
+      /* v729 空きの右の端は、見出し行に**いま載っているもの**のいちばん左で決める。
+         紙面では「あなたのグリッド／このサイトのグリッド／戻る」の帯（.gm-shd）が見出し行に入るので、
+         それを数えないと案内文がその上に重なる（本人：スマホで釦と被って読みづらい。
+         実測 iPhone：段 1 で「あなたのグリッド」と 126×45px、段 2 で 126×24px 重なっていた）。 */
+      var right = null;
+      ['.gm-shd', '.gm-i', '.gm-x'].forEach(function(sel){
+        var e = gm.querySelector(sel); if(!e) return;
+        var r = e.getBoundingClientRect();
+        if(!(r.width > 0 && r.height > 0)) return;
+        if(r.left <= ar.right) return;                 /* 題字より左のものは数えない */
+        if(right === null || r.left < right) right = r.left;
+      });
+      if(right === null) return null;
+      var x = ar.right + 40, w = right - 24 - x;
       return (w >= 330 && h.height > 30) ? [x, h.top, w, h.height] : null;
     }
     function tutStart(){

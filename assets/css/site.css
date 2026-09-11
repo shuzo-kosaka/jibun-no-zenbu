@@ -5094,3 +5094,7 @@
 
   /* 英語の「日本と西洋の平均」の表で、一列目が 10px 切れて「…」になっていた（見張りの掃引）。英語だけ折り返す */
   html[lang="en"] .gm-tb td:first-child{white-space:normal; overflow:visible; text-overflow:clip; line-height:1.35}
+
+  html.handheld .gm-stool.mini{overflow:visible}
+  html.handheld .gm-stool.mini .gm-sfold{position:relative}
+  html.handheld .gm-stool.mini .gm-sfold::before{content:""; position:absolute; inset:-14px; border-radius:50%}
