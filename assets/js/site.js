@@ -5592,7 +5592,25 @@
       tutNum(say.querySelector('b'), i, tutList.length);
       var w = tutWay();
       /* v709 手引きの文の中の「｜」は改行にする（`<br>` を直に書くと body() が字として出す：本人） */
-      say.querySelector('.gmt-t').innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1]))).replace(/｜/g, '<br>');
+      var _tt = say.querySelector('.gmt-t');
+      _tt.innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1]))).replace(/｜/g, '<br>');
+      /* v719 混植の組みは一字ずつ `inline-block` の `<i>` に入れるので、その中に入った `<br>` は**改行にならない**
+         （本人：「あなたのグリッドと」で改行してほしいのに、そこで折れずに字送りのまま流れていた）。
+         `<br>` だけを抱えた `<i>` は、`<br>` そのものに置き換えて外へ出す */
+      _tt.querySelectorAll('i').forEach(function(x){
+        if(x.children.length === 1 && x.firstElementChild.tagName === 'BR' && !x.textContent.trim())
+          x.parentNode.replaceChild(x.firstElementChild, x);
+      });
+      /* 文節の包み（`.ph` も `inline-block`）の**末尾**に残ると、そこで折れたうえに次の文節も折り返され、
+         一行ぶん余計に空く。包みの外へ出しきる */
+      _tt.querySelectorAll('br').forEach(function(b){
+        for(var n = 0; n < 4 && b.parentNode !== _tt; n++){
+          var _p = b.parentNode;
+          if(_p.lastChild === b) _p.parentNode.insertBefore(b, _p.nextSibling);
+          else if(_p.firstChild === b) _p.parentNode.insertBefore(b, _p);
+          else break;
+        }
+      });
       say.classList.remove('in'); void say.offsetWidth; say.classList.add('in');   /* 移動はしない。薄く現れるだけ */
       lite(say);   /* 朱の下線を、本編と同じ間で引く */
       var nx = say.querySelector('.gmt-nx');
