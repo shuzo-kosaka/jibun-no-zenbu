@@ -5265,8 +5265,8 @@
     var STUTS = [
       {k:['smock'],  ja:'あなたの《4本の線》に合わせて、見出し・図版・本文が置いてあります。',
                      en:'A heading, an image and body text are set against your 《four lines》.'},
-      {k:['stool'],  ja:'道具から《見出し・図版・本文》を足して、つまんで動かせます。',
-                     en:'Add a 《heading, image or body text》 from the tools, then drag them where you like.'},
+      {k:['stool'],  ja:'ここから《見出し・図版・本文》を足して、つまんで動かせます。',
+                     en:'Add a 《heading, image or body text》 from here, then drag them where you like.'},
       {k:['swk'],    ja:'《あなたのグリッド》と《このサイトのグリッド》を、切り替えて見比べられます。',
                      en:'Switch between 《your grid》 and 《this site’s grid》 to compare the two.'}
     ];
