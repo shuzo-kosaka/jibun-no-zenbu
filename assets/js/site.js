@@ -3600,10 +3600,10 @@
     function L(ja, en){ return document.documentElement.lang === 'en' ? en : ja; }
     /* 四本の機能線。k は盤面の答えの鍵、ax は線の向き（v＝たての線＝X の値）。q の %s には盤面ごとの対象（obj）が入る */
     var LINES = [
-      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
-      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
-      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
-      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
+      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'横', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
+      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'縦', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
+      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'横', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
+      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'縦', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
     ];
     var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
     var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
@@ -4668,7 +4668,7 @@
     var ISECS_ALL = [   /* 案内四面＋選択一面（Sol 第 11 ラウンドの構成）。v393 からは選ぶ一面だけを出す（小坂さんの指示）。iPhone は帯を畳むための起こし一面を前に置く */
       {at:0,   big:'4本',   ja:['3枚の絵に、4本ずつ。',   '1枚に4本ずつ、3枚で12本の線を引きます。2分ほどで、あなたの平均グリッドができます。'],
                           en:['Four lines on each of three pictures.', 'You draw four lines on each picture, twelve in all. In about two minutes, your average grid is ready.']},
-      {at:.22, big:'主塊',   ja:['主塊を、見つける。',       '私は、絵の中でいちばん大きなまとまりを主塊と呼びます。その始まりと重心に、よこ・たての線を1本ずつ引きます。'],
+      {at:.22, big:'主塊',   ja:['主塊を、見つける。',       '私は、絵の中でいちばん大きなまとまりを主塊と呼びます。その始まりと重心に、縦横の線を1本ずつ引きます。'],
                           en:['Find the main mass.',        'I call the largest mass in a picture the main mass. You draw one line across and one down where it begins, and again at its centre of weight.']},
       {at:.44, big:'位置',   ja:['絵の端から、位置を測る。', '線を引くと、私が同じ絵に引いた線が破線で現れます。絵の幅と高さを 100 として、あなたと私の位置と差を百分率で比べます。'],
                           en:['Measure from the edge.',     'When you set a line, mine appears dashed on the same picture. With the width and height as 100, your position, mine, and the difference are read in percent.']},
@@ -5791,7 +5791,7 @@
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
         '<p class="gm-thanks">' + body(L('12本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
         /* v610 盤面に出るのは位置ではなく段の幅なので、その断りを一行だけ置く */
-        '<p class="gm-note">' + body(L('盤面の数字は、あなたの4本で分けた《段の幅》です。横も縦も、足すと 100 になります。線そのものの位置は、下の「4本の平均」に出しています。',
+        '<p class="gm-note">' + body(L('盤面の数字は、あなたの4本で分けた《段の幅》です。縦横それぞれ、足すと 100 になります。線そのものの位置は、下の「4本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱色の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
@@ -5818,7 +5818,7 @@
             '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
         '<div class="gm-sev">' + sec(L('研究で引く7本と、7つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
-          '<p class="gm-note">' + body(L('私の研究では、どの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── よことたてで1本ずつ、合わせて4本です。',
+          '<p class="gm-note">' + body(L('私の研究では、どの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── 縦横で1本ずつ、合わせて4本です。',
             'In my research I draw the same seven kinds of line on every subject I measure, and read every composition through the same seven views. This game asked for 《two of those kinds》 — one horizontal and one vertical each, four lines in all.')) + '</p>' +
           '<p class="gm-info-s">' + L('基準線の名称（7つ）', 'The seven reference lines') + '</p>' +
           '<ul class="gm-nlist">' + RLINES.map(function(r){ return '<li' + (r[2] ? ' class="on"' : '') + '><b>' + esc(L(r[0], r[1])) + '</b>' + (r[2] ? '<em>' + L('このゲームで引いた線', 'drawn in this game') + '</em>' : '') + '</li>'; }).join('') + '</ul>' +
@@ -5881,7 +5881,7 @@
        '同じ名前で同じ向きの線同士を、3枚分まとめて平均します。たとえば主塊開始線の横なら、3枚の％を足して3で割る。《これを4組繰り返す》ので、平均の線は4本です。',
        'Lines with the same name and the same direction are averaged across the three pictures — for the horizontal main-form start, I add the three percentages and divide by three. 《Four groups, four average lines》.'],
       ['平均の画面の％は、何を表していますか？', 'What do the percentages on the final board mean?',
-       '《朱色の4本で区切った幅や高さ》を表しています。薄い破線は区切りに数えず、横も縦も合計 100 になります。線そのものの位置は「4本の平均」に出しています。',
+       '《朱色の4本で区切った幅や高さ》を表しています。薄い破線は区切りに数えず、縦横それぞれ合計 100 になります。線そのものの位置は「4本の平均」に出しています。',
        'They show 《the widths and heights marked out by your four red lines》. The faint dashed lines do not count as divisions, and the values add up to 100 across and down. The positions of the lines themselves are listed under “The four averages”.'],
       ['薄い破線は、何の線ですか？', 'What are the faint dashed lines?',
        '測っている間は、私が同じ絵に引いた線です。平均の画面では《サイトのグリッドの3本》で、あなたの4本と合わせるとグリッドの形になります。「サイトのグリッドと重ねる」を押すと、破線は7本すべてになります。',

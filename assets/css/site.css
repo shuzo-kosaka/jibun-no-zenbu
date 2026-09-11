@@ -4993,3 +4993,7 @@
   .gm-sheet .gm-sgrid{transition:opacity .3s var(--ease)}
   .gm-sheet.nogrid .gm-sgrid{opacity:0; pointer-events:none}
   html.rm .gm-sheet .gm-sgrid{transition:none}
+
+  .gm .gm-side mark,.gm .gm-info mark{background-position:0 calc(100% - 2px)}
+
+  #seqlist{will-change:transform}
