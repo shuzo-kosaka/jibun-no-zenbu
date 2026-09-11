@@ -4967,10 +4967,8 @@
                                : L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average');
       if(!lg) return;
       var old = lg.querySelector('.gm-lgjw'); if(old) old.parentNode.removeChild(old);
-      if(!on) return;
-      var e = el('b', 'gm-lgjw');
-      e.innerHTML = '<i class="jw ' + (cat === 'jp' ? 'we' : 'jp') + '"></i>' + esc(L(cat === 'jp' ? '青い破線の4本：西洋の絵の平均' : '緑の破線の4本：日本の絵の平均', cat === 'jp' ? 'four blue dashed: the Western average' : 'four green dashed: the Japanese average'));
-      lg.appendChild(e);
+      /* v710 重ねているあいだ凡例に足していた「緑の破線の4本：日本の絵の平均」の一行は出さない（本人）。
+         線を重ねる仕掛けはそのまま。釦の札（「外す」「重ねる」）も上でこれまでどおり替える */
     }
     function jwOverlay(){
       var b = resEl.querySelector('.gm-jwb'); if(!b) return; var on = b.getAttribute('aria-pressed') === 'true'; b.setAttribute('aria-pressed', on ? 'false' : 'true');
