@@ -5078,3 +5078,19 @@
     .gm-sheet .gm-stool .gm-sar{margin-left:6px; padding-left:7px; gap:5px}
   }
   .gm-seal.center.park.bye svg{animation:gmSealBye var(--sb, .3s) var(--ease) forwards}
+
+  html.phone .gm-res .gm-avg li.gm-avgh em{font-size:10px; letter-spacing:.08em}
+
+  @keyframes gmovV{from{clip-path:inset(0 -24px 100% -24px)} to{clip-path:inset(0 -24px 0 -24px)}}
+  @keyframes gmovH{from{clip-path:inset(-24px 100% -24px 0)} to{clip-path:inset(-24px 0 -24px 0)}}
+  @keyframes gmovVo{from{clip-path:inset(0 -24px 0 -24px)} to{clip-path:inset(0 -24px 100% -24px)}}
+  @keyframes gmovHo{from{clip-path:inset(-24px 0 -24px 0)} to{clip-path:inset(-24px 100% -24px 0)}}
+  .gm-lines .gm-ln.mine.ov.v{animation:gmovV .55s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.h{animation:gmovH .55s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.out.v{animation:gmovVo .45s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.out.h{animation:gmovHo .45s var(--ease) both}
+  html.rm .gm-lines .gm-ln.mine.ov.v,html.rm .gm-lines .gm-ln.mine.ov.h{animation:none}
+  html.rm .gm-lines .gm-ln.mine.ov.out.v,html.rm .gm-lines .gm-ln.mine.ov.out.h{animation:none; opacity:0}
+
+  /* 英語の「日本と西洋の平均」の表で、一列目が 10px 切れて「…」になっていた（見張りの掃引）。英語だけ折り返す */
+  html[lang="en"] .gm-tb td:first-child{white-space:normal; overflow:visible; text-overflow:clip; line-height:1.35}

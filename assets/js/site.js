@@ -4586,14 +4586,15 @@
         var g = cv.getContext('2d'); if(!g){ cv.parentNode.removeChild(cv); return; }
         g.scale(dpr, dpr);
         var COL = ['#E84518', '#E84518', '#1C1B19', '#F2F1EC', '#E8E6DF', '#C9C6BC'];
-        var N = Math.max(54, Math.min(130, Math.round(W / 11))), ps = [];
+        /* v728 もっと勢いよく（本人）。数を倍に、速さと紙片の大きさも上げる */
+        var N = Math.max(110, Math.min(240, Math.round(W / 6))), ps = [];
         for(var i = 0; i < N; i++){
-          var lf = (i % 2 === 0), sp = 13 + Math.random() * 14;
-          var an = (lf ? -0.66 : Math.PI + 0.66) + (Math.random() - .5) * .52;
-          ps.push({x: lf ? -10 : W + 10, y: H * (.52 + Math.random() * .34),
+          var lf = (i % 2 === 0), sp = 19 + Math.random() * 20;
+          var an = (lf ? -0.62 : Math.PI + 0.62) + (Math.random() - .5) * .62;
+          ps.push({x: lf ? -14 : W + 14, y: H * (.54 + Math.random() * .34),
                    vx: Math.cos(an) * sp, vy: Math.sin(an) * sp,
-                   w: 5 + Math.random() * 6, h: 3 + Math.random() * 4,
-                   a: Math.random() * 6.28, av: (Math.random() - .5) * .46,
+                   w: 6 + Math.random() * 9, h: 4 + Math.random() * 5,
+                   a: Math.random() * 6.28, av: (Math.random() - .5) * .5,
                    c: COL[(Math.random() * COL.length) | 0]});
         }
         var t0 = performance.now();
@@ -6122,7 +6123,7 @@
         /* v610 段の幅の札。あなたが引いた四本で分けた段——横は x1・x3 で三段、縦は y1・y2 で三段。どちらも合計 100。
            補った三本（28・83・71）はこのサイトのグリッドの位置なので、幅の計算には入れない（入れると出どころの違う数が混ざる） */
         mkBands(linesEl, 'v', [avg.x1, avg.x3], 'you', 0); mkBands(linesEl, 'h', [avg.y1, avg.y2], 'you', .28); }, rm ? 60 : 4300);
-      setTimeout(function(){ if(state === 'avg') confetti(); }, rm ? 0 : 4450);   /* v723 平均が出たところで紙吹雪 */
+      setTimeout(function(){ if(state === 'avg') confetti(); }, rm ? 0 : 4960);   /* v728 判が押されるのと同じ間で紙吹雪（本人） */
       setTimeout(function(){ var n = resEl.querySelector('.gm-seven'); if(n) n.classList.add('on'); if(state === 'avg'){ seal('YOUR GRID', '平均', stage, 'center'); cring(L('あなたの平均グリッド \u00b7 YOUR GRID \u00b7 ', 'YOUR AVERAGE GRID \u00b7 YOUR GRID \u00b7 ')); var th = resEl.querySelector('.gm-thanks'); if(th) th.classList.add('on'); trayEl.classList.add('pulse'); setTimeout(function(){ trayEl.classList.remove('pulse'); }, 500); } }, rm ? 100 : 4900);
       setTimeout(function(){ goEl.classList.add('on'); try{ goEl.inert = false; }catch(x){} focusBtn(); revealRes(); }, rm ? 150 : 3900);   /* v496: 終点で 5.7 秒何もできなかった（細部係②）。骨格が描き終わる時刻に寄せる */
       lastAvg = {avg:avg, kav:kav, diff:diff, per:per}; avgRender(avg, kav, diff, per);
@@ -6153,8 +6154,8 @@
           '<p class="gm-note">' + body(L(cat === 'jp' ? '西洋の絵の平均を、青い破線で盤面に重ねられます。日本の絵の平均は、表で見比べてください。' : '日本の絵の平均を、緑の破線で盤面に重ねられます。西洋の絵の平均は、表で見比べてください。',
             cat === 'jp' ? 'You can overlay the Western average on the board as blue dashed lines. For the Japanese average, read the table.' : 'You can overlay the Japanese average on the board as green dashed lines. For the Western average, read the table.')) + '</p>' +
           '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button>' +
-          '<p class="gm-note gm-jwend">' + body(L('《近さは、正解を示すものではありません》。測る3枚や線の引き方によって、結果は変わります。',
-            '《Being close does not mean being right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
+          '<p class="gm-note gm-jwend">' + body(L('《あなたの平均が日本と西洋のどちらに近いかは、正解を示すものではありません》。測る3枚や線の引き方によって、結果は変わります。',
+            '《Whether your average lands nearer the Japanese or the Western one does not make it right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
         '<div class="gm-sev">' + sec(L('研究で引く7本と、7つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + body(L('私の研究では、どの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── 縦横で1本ずつ、合わせて4本です。',
@@ -6177,14 +6178,16 @@
       btn(L('レイアウトしてみる', 'Try a layout'), function(){ sheet(avg); }, 'go');   /* v627 名前を変えた（本人） */
       var ovb = btn(L('サイトのグリッドと重ねる', 'Compare with the site’s grid'), overlay); if(ovb){ ovb.__ov = true; ovText(ovb, false); }
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
-      btn(L('別の3枚を測る', 'Measure three more'), start);
+      /* v727 選んだ側で三枚を測ったら、次は**反対側**へ（本人）。釦の名前も、次に何が出るかを言う */
+      btn(cat === 'jp' ? L('西洋の絵を3枚測る', 'Measure three Western') : cat === 'we' ? L('日本の絵を3枚測る', 'Measure three Japanese') : L('別の3枚を測る', 'Measure three more'),
+          function(){ if(cat === 'jp') cat = 'we'; else if(cat === 'we') cat = 'jp'; start(); });
       btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1, true); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
     }
     /* v721 スマホでは「サイトのグリッドと重ねる」の最後の一字だけが二行目に落ちていた（本人）。
        「サイトのグリッドと／重ねる」で折る（英語は最後の空きで折る）。他の媒体は一行のまま */
     function ovText(b, on){
       var t = on ? L('サイトのグリッドを外す', 'Hide the site\u2019s grid') : L('サイトのグリッドと重ねる', 'Compare with the site\u2019s grid');
-      if(document.documentElement.classList.contains('phone')){
+      {
         var cut = on ? 'サイトのグリッドを' : 'サイトのグリッドと';
         if(t.indexOf(cut) === 0){ b.innerHTML = esc(cut) + '<br>' + esc(t.slice(cut.length)); return; }
         var sp = t.lastIndexOf(' ');
