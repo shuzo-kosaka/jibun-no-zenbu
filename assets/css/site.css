@@ -5140,3 +5140,8 @@
   @media (max-height:560px){
     .gm-intro .gm-isecs{top:calc(50% + 30px); transform:translateY(-50%) scale(.93)}
   }
+
+  html.rm #message .body .p{opacity:0 !important}
+  html.rm #message .body .p.in{opacity:1 !important}
+
+  html[lang="en"] #top .mean .mc{white-space:pre-wrap}   /* pre でも同じ組みになるが、pre-wrap なら空白での改行の機会も残る */

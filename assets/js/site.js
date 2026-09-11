@@ -435,15 +435,18 @@
     /* 途中で縦にしたときの案内は、最初のお願いとは別の文にする（サイトの調子でひとつ笑いを） */
     var RECOPY = {
       ja: {
+        /* v741: いちばん最初に出る一枚。これまで HTML に直書きで、英語に切り替えても日本語のままだった（見張り係） */
+        first:{small:'スマートフォン・タブレットでご覧の方へ', b:'横に持ち替えて、<br>お楽しみください。', big:'横|楽', note:'このサイトは、横長の画面に合わせて制作しています。'},
         rot:  {small:'おっと、縦持ちになったようです。', b:'首を横にする前に、<br>端末を横に。', big:'首|端末', note:'できれば、横持ちでお楽しみください。'},
         mail: {small:'いただいたご連絡は、ありがたく拝読いたします。', b:'この続きは、<br>横向きでどうぞ。', big:'続き|横向き', note:'細かな点までご覧いただき、ありがとうございます。'}
       },
       en: {
+        first:{small:'A note for readers on a phone or tablet', b:'Turn your device sideways<br>and enjoy the site.', big:'sideways|enjoy', note:'This site is made for a landscape screen.'},
         rot:  {small:'Oops — it seems we are in portrait.', b:'Before you tilt your head,<br>tilt the phone.', big:'head|phone', note:'If you can, enjoy it in landscape.'},
         mail: {small:'Anything you send, I will read with care.', b:'The rest of it<br>is best in landscape.', big:'rest|landscape', note:'Thank you for looking this closely.'}
       }
     };
-    var recopied = '', rvKind = 'rot';   /* v289: メールを閉じた直後だけ、お礼の文面（mail）。ふつうの回転は元の文面（rot） */
+    var recopied = '', rvKind = 'first';   /* v289: メールを閉じた直後だけ、お礼の文面（mail）。ふつうの回転は元の文面（rot） */   /* v741: 最初の一枚は first。英語でも訳が出るように、辞書から組み直す */
     function recopy(){
       var kind = rvKind, lang = (typeof curLang !== 'undefined' ? curLang : 'ja');
       if(recopied === kind + lang) return; recopied = kind + lang;
@@ -451,9 +454,12 @@
       var sm = rv.querySelector('small'), b = rv.querySelector('b.rtl'), w = b && b.querySelector('.w'), note = rv.querySelector('.rnote');
       if(sm) sm.textContent = c.small;
       if(note) note.textContent = c.note;
-      if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); b.classList.add('rv2'); if(typeof mixedSubs === 'function') mixedSubs(!en); }
-      rv.classList.add('rvscene');   /* 途中からは、その章の地色で */
+      if(w){ w.innerHTML = c.b; b.setAttribute('data-big', c.big); if(kind !== 'first') b.classList.add('rv2'); if(typeof mixedSubs === 'function') mixedSubs(!en); }
+      if(kind !== 'first') rv.classList.add('rvscene');   /* 途中からは、その章の地色で。最初の一枚は朱のまま */
     }
+    /* v741: 最初の一枚も辞書から組む。言語を変えたら組み直す（setLang から呼ばれる） */
+    recopy();
+    window.__rvRelang = function(){ recopied = ''; recopy(); };
     /* 案内が出ているあいだは下の紙面を動かさない（指・ホイール・キー） */
     function rvBlock(e){ if(!rv.classList.contains('gone')) e.preventDefault(); }
     window.addEventListener('touchmove', rvBlock, {passive:false});
@@ -3470,6 +3476,7 @@
     document.querySelectorAll('.lang button').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-lang') === lang ? 'true' : 'false'); });
     if(curSec && curSec.getAttribute('data-year')){ curY = ''; setYear(curSec.getAttribute('data-year')); }
     if(window.__renderThanks) window.__renderThanks();   /* the closing seal is drawn text, so it is redrawn in the other language */   /* the year box's word follows the language */
+    if(window.__rvRelang) window.__rvRelang();   /* v741: 横持ちのお願いも、その場で訳し直す */
     document.documentElement.lang = lang; body.classList.toggle('en', en); curHd = null; chapUpdate();
     if(!quiet) typeEls(changed);
     document.querySelectorAll('.sr li .st, #mseals li .st').forEach(function(st){ while(st.firstChild) st.removeChild(st.firstChild); });
@@ -6213,7 +6220,7 @@
       var ovb = btn(L('サイトのグリッドと重ねる', 'Compare with the site’s grid'), overlay); if(ovb){ ovb.__ov = true; ovText(ovb, false); }
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       /* v727 選んだ側で三枚を測ったら、次は**反対側**へ（本人）。釦の名前も、次に何が出るかを言う */
-      btn(cat === 'jp' ? L('西洋の絵を3枚測る', 'Measure three Western') : cat === 'we' ? L('日本の絵を3枚測る', 'Measure three Japanese') : L('別の3枚を測る', 'Measure three more'),
+      btn(cat === 'jp' ? L('西洋の絵を3枚測る', 'Measure three Western paintings') : cat === 'we' ? L('日本の絵を3枚測る', 'Measure three Japanese paintings') : L('別の3枚を測る', 'Measure three more'),
           function(){ if(cat === 'jp') cat = 'we'; else if(cat === 'we') cat = 'jp'; start(); });
       btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1, true); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
     }
