@@ -5145,3 +5145,5 @@
   html.rm #message .body .p.in{opacity:1 !important}
 
   html[lang="en"] #top .mean .mc{white-space:pre-wrap}   /* pre でも同じ組みになるが、pre-wrap なら空白での改行の機会も残る */
+
+  html.pcview.phone .hd .chap .k{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
