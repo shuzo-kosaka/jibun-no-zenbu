@@ -5147,3 +5147,9 @@
   html[lang="en"] #top .mean .mc{white-space:pre-wrap}   /* pre でも同じ組みになるが、pre-wrap なら空白での改行の機会も残る */
 
   html.pcview.phone .hd .chap .k{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+  html[lang="en"] .gm-mode{right:36px; left:auto; transform:none}
+  /* 保険：あとで箱の作りが変わっても、紙面のつまみのなぞりが拡大に化けないように */
+  html.handheld .gm-sheet .gm-mock .gm-drag .gm-rz{touch-action:none}
+
+  section[data-scene="ink"] .p .xl, section[data-scene="night"] .p .xl{text-decoration-thickness:1.5px}
