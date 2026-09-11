@@ -5108,8 +5108,11 @@
   /* v734: 本文の中から外のページへ出る場所。本人の指示で「本文中の文字をクリックするだけ。
      その他の表記は要らない」ので、下線も矢印も足さない。地の文と同じ見た目のまま、
      指を乗せたときだけ朱に変わり、押せることが分かる。 */
-  .p .xl, .body .xl{color:inherit; text-decoration:none; cursor:pointer; transition:color .25s var(--ease)}
-  .p .xl:hover, .body .xl:hover{color:var(--acc)}
+  .p .xl, .body .xl{color:inherit; cursor:pointer;
+    text-decoration:underline; text-decoration-color:var(--acc); text-decoration-thickness:1px;
+    text-underline-offset:.26em; text-decoration-skip-ink:auto;
+    transition:color .25s var(--ease), text-decoration-color .25s var(--ease), text-decoration-thickness .25s var(--ease)}
+  .p .xl:hover, .body .xl:hover{color:var(--acc); text-decoration-thickness:2px}
   .p .xl:focus-visible, .body .xl:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-radius:2px}
 
   @media (max-height:760px){
