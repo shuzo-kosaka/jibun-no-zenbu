@@ -5050,3 +5050,22 @@
   .gm-stage .gm-seal.center.on::before{opacity:1}
   .gm-stage .gm-seal.center.on.bye::before{opacity:0; transition-duration:var(--sb, .3s)}
   html.rm .gm-stage .gm-seal.center::before{transition:none}
+
+  .gm-lines .gm-ln.mine.ov.h{animation:gmdrawh .5s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.v{animation:gmdrawv .5s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.out.h{animation:gmundrawh .42s var(--ease) both}
+  .gm-lines .gm-ln.mine.ov.out.v{animation:gmundrawv .42s var(--ease) both}
+  html.rm .gm-lines .gm-ln.mine.ov.h,html.rm .gm-lines .gm-ln.mine.ov.v{animation:none}
+  html.rm .gm-lines .gm-ln.mine.ov.out.h,html.rm .gm-lines .gm-ln.mine.ov.out.v{animation:none; opacity:0}
+
+  html.phone .gm-go button,html.phone .gm-btns button{line-height:1.35; height:auto; min-height:44px; padding-top:9px; padding-bottom:9px}
+
+  @keyframes gmBdInV{from{opacity:0; transform:translateX(-50%) translateY(-5px) scale(.88)}
+                       to{opacity:1; transform:translateX(-50%) translateY(0) scale(1)}}
+  @keyframes gmBdInH{from{opacity:0; transform:translateY(-50%) translateX(-5px) scale(.88)}
+                       to{opacity:1; transform:translateY(-50%) translateX(0) scale(1)}}
+  .gm-lines .gm-bd.v b{animation:gmBdInV .44s var(--ease) both}
+  .gm-lines .gm-bd.h b{animation:gmBdInH .44s var(--ease) both}
+  html.rm .gm-lines .gm-bd.v b,html.rm .gm-lines .gm-bd.h b{animation:none}
+
+  .gm-conf{position:absolute; left:0; top:0; z-index:9; pointer-events:none}

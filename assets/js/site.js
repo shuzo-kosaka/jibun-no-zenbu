@@ -4103,15 +4103,15 @@
     "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
     "q": [
       "いちばん濃い松のてっぺんはどこだろう",
-      "左の松林が始まるのは、左右のどこからだろう",
-      "左の松林の重さの中心は、どの高さだろう",
-      "左の松林の重さの中心は、左右のどこだろう"
+      "濃いほうの松林が始まるのは、左右のどこからだろう",
+      "濃いほうの松林の重さの中心は、どの高さだろう",
+      "濃いほうの松林の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the top of the darkest pine?",
-      "From where, left to right, does the left grove begin?",
-      "At what height is the centre of weight of the left grove?",
-      "Where, left to right, is the centre of weight of the left grove?"
+      "From where, left to right, does the darker grove begin?",
+      "At what height is the centre of weight of the darker grove?",
+      "Where, left to right, is the centre of weight of the darker grove?"
     ]
   },
   {
@@ -4380,14 +4380,14 @@
     "q": [
       "白い布の弧のいちばん高いところはどこだろう",
       "黒い雲が始まるのは、左右のどこからだろう",
-      "右の風神の重さの中心は、どの高さだろう",
-      "右の風神の重さの中心は、左右のどこだろう"
+      "風神の重さの中心は、どの高さだろう",
+      "風神の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the arc of white cloth?",
       "From where, left to right, does the dark cloud begin?",
-      "At what height is the centre of weight of the wind god on the right?",
-      "Where, left to right, is the centre of weight of the wind god on the right?"
+      "At what height is the centre of weight of the wind god?",
+      "Where, left to right, is the centre of weight of the wind god?"
     ]
   },
   {
@@ -4425,15 +4425,15 @@
     "obje": "left cluster",
     "q": [
       "いちばん高い花はどこだろう",
-      "左の花群が始まるのは、左右のどこからだろう",
-      "左の花群の重さの中心は、どの高さだろう",
-      "左の花群の重さの中心は、左右のどこだろう"
+      "花群が始まるのは、左右のどこからだろう",
+      "花群の重さの中心は、どの高さだろう",
+      "花群の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the tallest flower?",
-      "From where, left to right, does the left cluster begin?",
-      "At what height is the centre of weight of the left cluster?",
-      "Where, left to right, is the centre of weight of the left cluster?"
+      "From where, left to right, does the cluster begin?",
+      "At what height is the centre of weight of the cluster?",
+      "Where, left to right, is the centre of weight of the cluster?"
     ]
   },
   {
@@ -4567,13 +4567,67 @@
       out.push({mid:(prev + 100) / 2, w:100 - prev});
       return out;
     }
-    function mkBands(host, ax, vals, cls){
+    /* v723 平均グリッドが出たところで、画面の両端からクラッカーの紙吹雪（本人）。
+       紙・朱・墨の紙片を左右の縁から撃ち出し、重さで落として消す。二秒ほどで自分から片づく。
+       動きを減らす設定（html.rm）では出さない。描くのは canvas 一枚だけなので、盤面の組みには触らない */
+    var confT = 0;
+    function confetti(){
+      if(rm || !gm) return;
+      try{
+        var host = gm.querySelector('.gm-in') || gm;
+        var old = host.querySelector('.gm-conf'); if(old && old.parentNode) old.parentNode.removeChild(old);
+        var W = host.clientWidth || gm.clientWidth, H = host.clientHeight || gm.clientHeight;
+        if(!(W > 0 && H > 0)) return;
+        var dpr = Math.min(2, window.devicePixelRatio || 1);
+        var cv = el('canvas', 'gm-conf'); cv.setAttribute('aria-hidden', 'true');
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        cv.style.width = W + 'px'; cv.style.height = H + 'px';
+        host.appendChild(cv);
+        var g = cv.getContext('2d'); if(!g){ cv.parentNode.removeChild(cv); return; }
+        g.scale(dpr, dpr);
+        var COL = ['#E84518', '#E84518', '#1C1B19', '#F2F1EC', '#E8E6DF', '#C9C6BC'];
+        var N = Math.max(54, Math.min(130, Math.round(W / 11))), ps = [];
+        for(var i = 0; i < N; i++){
+          var lf = (i % 2 === 0), sp = 13 + Math.random() * 14;
+          var an = (lf ? -0.66 : Math.PI + 0.66) + (Math.random() - .5) * .52;
+          ps.push({x: lf ? -10 : W + 10, y: H * (.52 + Math.random() * .34),
+                   vx: Math.cos(an) * sp, vy: Math.sin(an) * sp,
+                   w: 5 + Math.random() * 6, h: 3 + Math.random() * 4,
+                   a: Math.random() * 6.28, av: (Math.random() - .5) * .46,
+                   c: COL[(Math.random() * COL.length) | 0]});
+        }
+        var t0 = performance.now();
+        cancelAnimationFrame(confT);
+        (function step(){
+          var t = performance.now() - t0;
+          g.clearRect(0, 0, W, H);
+          var live = 0;
+          for(var k = 0; k < ps.length; k++){
+            var p = ps[k];
+            p.vy += .62; p.vx *= .992; p.vy *= .994; p.x += p.vx; p.y += p.vy; p.a += p.av;
+            if(p.y > H + 40 || p.x < -60 || p.x > W + 60) continue;
+            live++;
+            var al = t > 1400 ? Math.max(0, 1 - (t - 1400) / 700) : 1;
+            g.save(); g.globalAlpha = al * .92; g.translate(p.x, p.y); g.rotate(p.a);
+            g.fillStyle = p.c; g.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.max(.25, Math.cos(p.a * .8)));
+            g.restore();
+          }
+          if(live && t < 2400) confT = requestAnimationFrame(step);
+          else { g.clearRect(0, 0, W, H); if(cv.parentNode) cv.parentNode.removeChild(cv); }
+        })();
+      }catch(e){}
+    }
+    function mkBands(host, ax, vals, cls, d0){
       return bands(vals).map(function(b, i){
         /* 狭い段（二本をほとんど同じ所に引いた場合）は札が隣と重なるので、一回り小さくして一段ずらす。
            札は間引かない——間引くと、見えている数字の合計が 100 にならなくなる */
         var d = el('i', 'gm-bd ' + ax + (cls ? ' ' + cls : '') + (b.w < 6 ? ' tiny' + (i % 2 ? ' alt' : '') : ''));
         d.style[ax === 'v' ? 'left' : 'top'] = b.mid.toFixed(2) + '%';
-        var t = el('b'); t.textContent = Math.round(b.w) + '%'; d.appendChild(t);
+        var t = el('b'); t.textContent = Math.round(b.w) + '%';
+        /* v722 平均の画面で、段の幅の札がいっせいに出ていた（本人：ばっと出る）。
+           線が引き終わった順に、左（上）から一つずつ浮かび上がる */
+        if(d0 != null && !rm) t.style.animationDelay = (d0 + i * .09).toFixed(2) + 's';
+        d.appendChild(t);
         host.appendChild(d); return d;
       });
     }
@@ -5662,9 +5716,25 @@
           win = [wx, wy, ww, wh];
         }
       }
+      /* v720 窓のある段から窓のない段へ移るとき（紙面の手引き 2→3）、
+         ・窓まわりの板を**その場で消す**と、上の板が窓の下から登りきるまで画面の上端に全幅の明るい帯が出る（v715 で見つけた癖）
+         ・かといって**遅らせて畳む**と、残った窓の板が**新しい穴を削り**、明るい箱がいったん潰れてから広がる
+           （本人・画面収録。実測：PC 302×53 →0.47 秒後に 302×64、iPhone 159×65 →302×65）
+         → 上の板の**上の辺だけ**を、遷移を切って先に画面の外へ飛ばす。下の辺（＝穴の上の縁）はいまの位置のまま
+           なので動きは途切れず、窓の帯はこの板が最初のコマから覆う。窓の板はその場で畳んでよい。 */
+      var _tEl = tutEl.querySelector('.gmt-p.t');
+      if(!win && wl && wl.offsetWidth > 0){
+        var _cb = _tEl.getBoundingClientRect();
+        if(_cb.height > 0 && _cb.top > -OV + 1){
+          _tEl.style.transition = 'none';
+          tutSet(_tEl, [-OV, -OV, W + OV * 2, _cb.top + _cb.height + OV]);
+          void _tEl.offsetWidth;
+          _tEl.style.transition = '';
+        }
+      }
       /* ここから板を置く。四枚とも同じひと呼吸で書くので、遷移は必ず足並みがそろう */
-      tutSet(tutEl.querySelector('.gmt-p.t'), win ? [-OV, win[1] + win[3], W + OV * 2, y - win[1] - win[3]]
-                                                  : [-OV, -OV, W + OV * 2, y + OV]);
+      tutSet(_tEl, win ? [-OV, win[1] + win[3], W + OV * 2, y - win[1] - win[3]]
+                       : [-OV, -OV, W + OV * 2, y + OV]);
       tutSet(tutEl.querySelector('.gmt-p.b'), [-OV, b, W + OV * 2, H - b + OV]);
       tutSet(tutEl.querySelector('.gmt-p.l'), [-OV, y - 1, x + OV, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
       tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r + OV, open[3] + 2]);
@@ -5688,17 +5758,9 @@
         tutSet(tutEl.querySelector('.gmt-c.w.br'), [qx + qw - wr2, qy + qh - wr2, wr2 + 1, wr2 + 1]);
       }
       if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
-        /* v715 窓のある段から窓のない段へ移るとき、窓まわりの板（`transition:none`）を**その場で消して**いた。
-           一方、上の板（.t）は窓の下から画面の外まで 0.42 秒かけて登るので、そのあいだ画面の上端に
-           **全幅の明るい帯**が出ていた（見張り係の実測：PC 日本語 55px・英語 66px、iPhone 日本語 87px・
-           英語 111px。2〜5 コマ＝7〜28ms。五媒体・日英の七通りすべてで再現）。
-           → 窓まわりの板はそのまま残し、.t が登りきってから畳む。こうすると窓は「上へ閉じていく」
-             動きになり、明るいのは窓の幅のままで、全幅に広がらない。 */
         clearTimeout(tutWT);
-        tutWT = setTimeout(function(){ if(!tutEl) return;
-          tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
-          tutEl.querySelectorAll('.gmt-c.w').forEach(function(cw){ tutSet(cw, [0, 0, 0, 0]); });
-        }, rm ? 0 : 470);
+        tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
+        tutEl.querySelectorAll('.gmt-c.w').forEach(function(cw){ tutSet(cw, [0, 0, 0, 0]); });
         say.classList.add('dim'); say.classList.add('ts2');
         var bw = Math.max(300, Math.min(560, open[2]));
         say.style.width = bw + 'px';
@@ -6035,7 +6097,11 @@
       LINES.forEach(function(t){ var s = 0, m = 0; res.forEach(function(r, k){ s += r[t.k]; m += picks[k].a[t.k]; per.push({i:k, t:t, d:r[t.k] - picks[k].a[t.k]}); }); avg[t.k] = Math.round(s / 3); kav[t.k] = Math.round(m / 3); diff[t.k] = (s - m) / 3; });
       state = 'avg'; cardEl.hidden = true; if(tipEl) tipEl.classList.add('hid');   /* v468: 測り終えた画面に前の問いを残さない */ hideLive(); clearDim(); helpOff(); demoOff(); sealOff(true); unturn();   /* v667 指の手本も片づける */ tbFit(); if(listEl) listEl.hidden = true; mode(L('集める', 'gather'));
       picEl.classList.add('swap'); linesEl.innerHTML = ''; stage.classList.remove('narrow');
-      setTimeout(function(){ stage.style.transition = 'none'; stage.style.setProperty('--ar', (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3)); stage.classList.add('blank'); picEl.innerHTML = ''; picEl.classList.remove('swap'); void stage.offsetWidth; requestAnimationFrame(function(){ stage.style.transition = ''; }); }, rm ? 0 : 220);   /* v408: 幅だけ遷移して小箱が出る一瞬を無くす（細部係） */   /* 絵が薄れてから、白い盤面に目盛りが並ぶ */
+      /* v724 三枚目のあと、盤面が**絵の形から画面の形へ跳ねて**いた（本人：挙動が不安定）。
+         v408 で遷移を切ったのは、当時は幅だけが遷移して aspect-ratio が跳ね、一瞬「小箱」が出たため。
+         いまは `.gm-stage` の遷移に aspect-ratio も入っている（0.45 秒・同じ緩急）ので、**切らずに morph させる**。
+         絵が薄れたあと、盤面が絵の形から画面の形へ開いていく——これが平均グリッドの入場になる。 */
+      setTimeout(function(){ stage.style.setProperty('--ar', (window.innerWidth / Math.max(1, window.innerHeight)).toFixed(3)); stage.classList.add('blank'); picEl.innerHTML = ''; picEl.classList.remove('swap'); }, rm ? 0 : 220);   /* 絵が薄れてから、白い盤面に目盛りが並ぶ */
       /* 目盛り→平均線。動きは left/top の transition（線は細く、集まったら平均線だけ濃く） */
       var ticks = [];
       LINES.forEach(function(t, n){
@@ -6055,7 +6121,8 @@
       setTimeout(function(){ linesEl.classList.add('fixed');
         /* v610 段の幅の札。あなたが引いた四本で分けた段——横は x1・x3 で三段、縦は y1・y2 で三段。どちらも合計 100。
            補った三本（28・83・71）はこのサイトのグリッドの位置なので、幅の計算には入れない（入れると出どころの違う数が混ざる） */
-        mkBands(linesEl, 'v', [avg.x1, avg.x3], 'you'); mkBands(linesEl, 'h', [avg.y1, avg.y2], 'you'); }, rm ? 60 : 4300);
+        mkBands(linesEl, 'v', [avg.x1, avg.x3], 'you', 0); mkBands(linesEl, 'h', [avg.y1, avg.y2], 'you', .28); }, rm ? 60 : 4300);
+      setTimeout(function(){ if(state === 'avg') confetti(); }, rm ? 0 : 4450);   /* v723 平均が出たところで紙吹雪 */
       setTimeout(function(){ var n = resEl.querySelector('.gm-seven'); if(n) n.classList.add('on'); if(state === 'avg'){ seal('YOUR GRID', '平均', stage, 'center'); cring(L('あなたの平均グリッド \u00b7 YOUR GRID \u00b7 ', 'YOUR AVERAGE GRID \u00b7 YOUR GRID \u00b7 ')); var th = resEl.querySelector('.gm-thanks'); if(th) th.classList.add('on'); trayEl.classList.add('pulse'); setTimeout(function(){ trayEl.classList.remove('pulse'); }, 500); } }, rm ? 100 : 4900);
       setTimeout(function(){ goEl.classList.add('on'); try{ goEl.inert = false; }catch(x){} focusBtn(); revealRes(); }, rm ? 150 : 3900);   /* v496: 終点で 5.7 秒何もできなかった（細部係②）。骨格が描き終わる時刻に寄せる */
       lastAvg = {avg:avg, kav:kav, diff:diff, per:per}; avgRender(avg, kav, diff, per);
@@ -6076,8 +6143,8 @@
           '<p class="gm-cmph">' + L('日本の絵と西洋の絵、それぞれの平均を、あなたの4本と見比べられます。',
           'The Japanese and the Western averages can each be compared with your four lines.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
-            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点について、あなたが引いたのと同じ4本の位置を、1本ずつ平均しています。あなたが計測した3枚も、この中に含まれます。',
-              'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one. The three you measured are among them.')); })() + '</p>' +
+            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点について、あなたが引いたのと同じ4本の位置を1本ずつ平均しており、あなたが計測した3枚もこの中に含まれます。',
+              'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one, and the three you measured are among them.')); })() + '</p>' +
           '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて、見比べられるようにしました。',
             'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
           jwTable() +
@@ -6108,36 +6175,47 @@
       }); });
       goEl.innerHTML = ''; goEl.classList.add('hold'); try{ goEl.inert = true; }catch(x){}   /* v484: 伏せている間はキーボードでも触れない（流れ係） */
       btn(L('レイアウトしてみる', 'Try a layout'), function(){ sheet(avg); }, 'go');   /* v627 名前を変えた（本人） */
-      var ovb = btn(L('サイトのグリッドと重ねる', 'Compare with the site’s grid'), overlay); if(ovb) ovb.__ov = true;
+      var ovb = btn(L('サイトのグリッドと重ねる', 'Compare with the site’s grid'), overlay); if(ovb){ ovb.__ov = true; ovText(ovb, false); }
       btn(L('ものさしを保存', 'Save the ruler'), function(){ takeaway(avg); });
       btn(L('別の3枚を測る', 'Measure three more'), start);
       btn(L('研究の手順へ', 'To the research steps'), function(){ close(); var go = function(){ if(window.__goStep) window.__goStep(1, true); else if(typeof skipTo === 'function') skipTo('#ch6'); }; setTimeout(go, 780); setTimeout(go, 1060); })   /* v535 閉じるときの履歴の戻し（640ms）が送りを打ち消していた。Safari で手順に着かず頭へ戻っていた（挙動係） */   /* v434: 手順の頭（01）へ（本人） */;   /* v398: 手順 08 の位置へ直接（__goStep）。二段の移動をやめる */
+    }
+    /* v721 スマホでは「サイトのグリッドと重ねる」の最後の一字だけが二行目に落ちていた（本人）。
+       「サイトのグリッドと／重ねる」で折る（英語は最後の空きで折る）。他の媒体は一行のまま */
+    function ovText(b, on){
+      var t = on ? L('サイトのグリッドを外す', 'Hide the site\u2019s grid') : L('サイトのグリッドと重ねる', 'Compare with the site\u2019s grid');
+      if(document.documentElement.classList.contains('phone')){
+        var cut = on ? 'サイトのグリッドを' : 'サイトのグリッドと';
+        if(t.indexOf(cut) === 0){ b.innerHTML = esc(cut) + '<br>' + esc(t.slice(cut.length)); return; }
+        var sp = t.lastIndexOf(' ');
+        if(sp > 0){ b.innerHTML = esc(t.slice(0, sp)) + '<br>' + esc(t.slice(sp + 1)); return; }
+      }
+      b.textContent = t;
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */
       var l7 = resEl && resEl.querySelector('.gm-lg7');
       if(l7) l7.hidden = !on;   /* v712 押す前は破線そのものが無いので、凡例も出さない */
-      if(goEl) goEl.querySelectorAll('button').forEach(function(b){
-        if(b.__ov) b.textContent = on ? L('サイトのグリッドを外す', 'Hide the site’s grid') : L('サイトのグリッドと重ねる', 'Compare with the site’s grid'); });
+      if(goEl) goEl.querySelectorAll('button').forEach(function(b){ if(b.__ov) ovText(b, on); });
       if(linesEl) linesEl.classList.toggle('ovl', !!on);   /* 補った三本は隠す（七本と二重に引かれていた） */
     }
     function overlay(){
       var on = linesEl.querySelector('.mine:not(.out)');
       if(on){
-        /* v712 外すときは、その場で消えていた（本人：動きが不自然）。引いた順の逆から一本ずつ引っ込める */
+        /* v721 一本ずつ「ぽん、ぽん」と出し入れするのではなく、**七本が同時に、それぞれの端へ引っ込む**（本人）。
+           引くときと同じ端（よこは左、たては上）へ戻るので、出てきた方へ退場する形になる */
         var outs = Array.prototype.slice.call(linesEl.querySelectorAll('.mine'));
-        outs.forEach(function(x, i){ x.classList.add('out'); if(!rm) x.style.animationDelay = ((outs.length - 1 - i) * .045).toFixed(3) + 's'; });
+        outs.forEach(function(x){ x.classList.add('out'); x.style.animationDelay = ''; });
         ovLabel(false);
-        setTimeout(function(){ outs.forEach(function(x){ if(x.parentNode) x.parentNode.removeChild(x); }); }, rm ? 0 : 300 + outs.length * 45);
+        setTimeout(function(){ outs.forEach(function(x){ if(x.parentNode) x.parentNode.removeChild(x); }); }, rm ? 0 : 460);
         return;
       }
       /* v610 重ねるのは形を見比べるため。ここに位置の％を出すと、盤面の段の幅と出どころの違う数字が並ぶので、線だけを重ねる */
-      /* v712 七本が同時に出ていたので、たて（左→右）・よこ（上→下）の順に一本ずつ引く。
-         トップの格子が引かれる順と同じで、見ていて何が起きたか分かる */
+      /* v721 七本は**同時に、それぞれの端から伸びて**くる（本人）。よこは左の縁から右へ、たては上の縁から下へ。 */
       var seq = [];
       GRID.v.slice().sort(function(a, q){ return a - q; }).forEach(function(v){ seq.push(['v', v]); });
       GRID.h.slice().sort(function(a, q){ return a - q; }).forEach(function(v){ seq.push(['h', v]); });
-      seq.forEach(function(q, i){ var e = mkLine(linesEl, q[0], q[1], 'mine'); if(!rm) e.style.animationDelay = (.06 + i * .055).toFixed(3) + 's'; });
+      seq.forEach(function(q){ mkLine(linesEl, q[0], q[1], 'mine ov'); });
       ovLabel(true);
       /* v600 ここに足していた一文は、凡例の「薄い破線の七本：このサイトのグリッド」の中へ移した（本人） */
     }
