@@ -4989,3 +4989,7 @@
   .gm-take img.swap{opacity:.28}
   html.rm .gm-take img{transition:none}
   html.rm .gm-take img.swap{opacity:1}
+
+  .gm-sheet .gm-sgrid{transition:opacity .3s var(--ease)}
+  .gm-sheet.nogrid .gm-sgrid{opacity:0; pointer-events:none}
+  html.rm .gm-sheet .gm-sgrid{transition:none}

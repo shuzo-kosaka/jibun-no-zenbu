@@ -4502,7 +4502,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><button type="button" data-act="num" aria-pressed="true"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><button type="button" data-act="grid" aria-pressed="true"></button><button type="button" data-act="num" aria-pressed="true"></button>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -5267,8 +5267,8 @@
                      en:'A heading, an image and body text are set against your 《four lines》.'},
       {k:['stool'],  ja:'ここから《見出し・図版・本文》を足して、つまんで動かせます。',
                      en:'Add a 《heading, image or body text》 from here, then drag them where you like.'},
-      {k:['swk'],    ja:'《あなたのグリッド》と《このサイトのグリッド》を、切り替えて見比べられます。',
-                     en:'Switch between 《your grid》 and 《this site’s grid》 to compare the two.'}
+      {k:['swk'],    ja:'あなたのグリッドとこのサイトのグリッドを、切り替えて見比べられます。',
+                     en:'Switch between your grid and this site’s grid to compare the two.'}
     ];
     var tutList = null, tutKind = '';
     var TUTS = [
@@ -6581,6 +6581,10 @@
           return; }
         var k = b.getAttribute('data-act');
         if(k === 'fold'){ if(Date.now() - (tool.__foldAt || 0) > 500) mockFold(); return; }   /* v630 丸に畳む／開く（本人）。v641 指で畳んだ直後の click では二度目を打たない */
+        if(k === 'grid'){   /* v696 グリッドそのものを出し入れする（本人）。線も札もまとめて伏せる */
+          var goff = sheetEl.classList.toggle('nogrid');
+          b.setAttribute('aria-pressed', goff ? 'false' : 'true');
+          return; }
         if(k === 'num'){   /* v634 出ている％と「中心」の札を、まとめて出し入れする（本人） */
           var on = sheetEl.classList.toggle('nonum');
           b.setAttribute('aria-pressed', on ? 'false' : 'true');
@@ -6599,6 +6603,7 @@
       dup:'<rect x="3.5" y="3.5" width="12" height="12" rx="1"/><rect x="8.5" y="8.5" width="12" height="12" rx="1"/>',
       del:'<path d="M4 6.5h16M9.5 6.5V3.5h5v3M6.5 6.5l1 14h9l1-14M10 10v7M14 10v7"/>',
       rst:'<path d="M4.5 9.5h11a5 5 0 010 10H9"/><path d="M8.5 5.5l-4 4 4 4"/>',
+      grid:'<rect x="3.5" y="3.5" width="17" height="17" rx=".5"/><path d="M9.2 3.5v17M15 3.5v17M3.5 9.2h17M3.5 15h17"/>',
       /* v630 畳む／開く。畳んだときは「置いて試す」道具そのものの絵（枠と＋） */
       fold:'<path d="M15.5 5.5l-7 6.5 7 6.5"/>',
       undo:'<path d="M9 6.5L4.5 11 9 15.5"/><path d="M4.5 11h9a5.5 5.5 0 010 11H9"/>',
@@ -6638,7 +6643,7 @@
       t.querySelectorAll('[data-add]').forEach(function(b){ var g = b.getAttribute('data-add'), k = MOCKK[g];
         b.innerHTML = mockIcon(g) + '<span>＋' + L(k[0], k[1]) + '</span>'; });
       var m = {dup:['複製', 'duplicate'], del:['削除', 'delete'], fold:['畳む', 'fold'],
-               undo:['取り消す', 'undo'], redo:['やり直す', 'redo'], rst:['リセット', 'reset'], num:['数値', 'numbers']};
+               undo:['取り消す', 'undo'], redo:['やり直す', 'redo'], rst:['リセット', 'reset'], grid:['グリッド', 'grid'], num:['数値', 'numbers']};
       t.querySelectorAll('[data-act]').forEach(function(b){ var g = b.getAttribute('data-act'), k = m[g];
         b.innerHTML = mockIcon(g) + '<span>' + L(k[0], k[1]) + '</span>'; });
       var fd = t.querySelector('.gm-sfold');
@@ -6667,6 +6672,7 @@
       sheetEl.style.setProperty('--sx1', avg.x1 + '%');   /* v394: 注記は X1（あなたの主塊開始線）から、Y3（71％）の下の帯に置く */
       sheetText();
       sheetGrid('you');
+      sheetEl.classList.remove('nogrid');   /* v696 開くときはグリッドを出した状態から */
       var mock = sheetEl.querySelector('.gm-mock'); mock.classList.remove('land'); void mock.offsetWidth;
       mockDrag(); mockReset();   /* v600 つまんで動かす仕掛けを張り、置き直した位置は開くたびに戻す */
       gm.classList.add('sheeton'); sheetEl.setAttribute('aria-hidden', 'false'); try{ sheetEl.inert = false; }catch(x){}
