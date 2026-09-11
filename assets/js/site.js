@@ -6198,14 +6198,19 @@
     /* v721 スマホでは「サイトのグリッドと重ねる」の最後の一字だけが二行目に落ちていた（本人）。
        「サイトのグリッドと／重ねる」で折る（英語は最後の空きで折る）。他の媒体は一行のまま */
     function ovText(b, on){
+      /* v732 折り目は「入れても背が高くならないとき」だけ入れる。いつも入れていたので、
+         狭い英語（1280×720・iPad 横）で「Compare with the ／ site's ／ grid」と三行になり、
+         釦だけ 73px と隣（56px）より 17px 高くなっていた。押して名前が変わると 56px に戻るので、
+         押すたび列の高さが動いていた（見張り係の実測）。 */
       var t = on ? L('サイトのグリッドを外す', 'Hide the site\u2019s grid') : L('サイトのグリッドと重ねる', 'Compare with the site\u2019s grid');
-      {
-        var cut = on ? 'サイトのグリッドを' : 'サイトのグリッドと';
-        if(t.indexOf(cut) === 0){ b.innerHTML = esc(cut) + '<br>' + esc(t.slice(cut.length)); return; }
-        var sp = t.lastIndexOf(' ');
-        if(sp > 0){ b.innerHTML = esc(t.slice(0, sp)) + '<br>' + esc(t.slice(sp + 1)); return; }
-      }
+      var cut = on ? 'サイトのグリッドを' : 'サイトのグリッドと', a = null, c = null;
+      if(t.indexOf(cut) === 0){ a = cut; c = t.slice(cut.length); }
+      else { var sp = t.lastIndexOf(' '); if(sp > 0){ a = t.slice(0, sp); c = t.slice(sp + 1); } }
       b.textContent = t;
+      if(!a) return;
+      var h0 = b.offsetHeight;
+      b.innerHTML = esc(a) + '<br>' + esc(c);
+      if(b.offsetHeight > h0) b.textContent = t;   /* 折って背が高くなるなら折らない */
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */

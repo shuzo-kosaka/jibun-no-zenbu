@@ -5098,3 +5098,9 @@
   html.handheld .gm-stool.mini{overflow:visible}
   html.handheld .gm-stool.mini .gm-sfold{position:relative}
   html.handheld .gm-stool.mini .gm-sfold::before{content:""; position:absolute; inset:-14px; border-radius:50%}
+
+  @keyframes gmmineH{from{clip-path:inset(-200px 100% -200px 0)} to{clip-path:inset(-200px -200px -200px 0)}}
+  @keyframes gmmineV{from{clip-path:inset(0 -200px 100% -200px)} to{clip-path:inset(0 -200px -200px -200px)}}
+  .gm-lines .gm-ln.mine:not(.ov).h{animation:gmmineH .30s var(--ease) .12s both}
+  .gm-lines .gm-ln.mine:not(.ov).v{animation:gmmineV .30s var(--ease) .12s both}
+  html.rm .gm-lines .gm-ln.mine:not(.ov).h,html.rm .gm-lines .gm-ln.mine:not(.ov).v{animation:none}
