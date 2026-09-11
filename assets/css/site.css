@@ -4997,3 +4997,9 @@
   .gm .gm-side mark,.gm .gm-info mark{background-position:0 calc(100% - 2px)}
 
   #seqlist{will-change:transform}
+
+  .gm-res .gm-avg li em{font-size:19px; letter-spacing:-.01em}
+  html.phone .gm-res .gm-avg li em{font-size:18px}
+  .gm-res .gm-avg li.gm-avgh em{font-size:10px; letter-spacing:.08em}
+
+  .gm-sheet .gm-mock{z-index:3}

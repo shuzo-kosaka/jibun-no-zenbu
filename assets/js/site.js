@@ -3600,10 +3600,10 @@
     function L(ja, en){ return document.documentElement.lang === 'en' ? en : ja; }
     /* 四本の機能線。k は盤面の答えの鍵、ax は線の向き（v＝たての線＝X の値）。q の %s には盤面ごとの対象（obj）が入る */
     var LINES = [
-      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'横', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
-      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'縦', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
-      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'横', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
-      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'縦', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
+      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
+      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
+      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
+      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
     ];
     var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
     var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
@@ -5495,8 +5495,8 @@
                      en:'A heading, an image and body text are set against your 《four lines》.'},
       {k:['stool'],  ja:'ここから《見出し・図版・本文》を足して、つまんで動かせます。',
                      en:'Add a 《heading, image or body text》 from here, then drag them where you like.'},
-      {k:['swk'],    ja:'あなたのグリッドとこのサイトのグリッドを、切り替えて見比べられます。',
-                     en:'Switch between your grid and this site’s grid to compare the two.'}
+      {k:['swk'],    ja:'あなたのグリッドと<br>このサイトのグリッドを、切り替えて見比べられます。',
+                     en:'Switch between your grid<br>and this site’s grid to compare the two.'}
     ];
     var tutList = null, tutKind = '';
     var TUTS = [
@@ -5612,10 +5612,14 @@
       open = [open[0] - 10, open[1] - 10, open[2] + 20, open[3] + 20];
       var W = window.innerWidth, H = window.innerHeight;
       var x = open[0], y = open[1], r = open[0] + open[2], b = open[1] + open[3];
-      tutSet(tutEl.querySelector('.gmt-p.t'), [0, 0, W, y]);
-      tutSet(tutEl.querySelector('.gmt-p.b'), [0, b, W, H - b]);
-      tutSet(tutEl.querySelector('.gmt-p.l'), [0, y - 1, x, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
-      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r, open[3] + 2]);
+      /* v706 幕が動いている最中に、画面の縁との間へ明るい筋が出ていた（本人：手引き・紙面の手引きとも）。
+         板の「位置」と「丈」は別々に補間されるので、その差がわずかでも縁に隙間が開く。
+         穴に接する辺はそのままに、**外側だけを画面の外まで大きく伸ばす**。穴の形は変わらず、隙間は原理的に開かない。 */
+      var OV = 400;
+      tutSet(tutEl.querySelector('.gmt-p.t'), [-OV, -OV, W + OV * 2, y + OV]);
+      tutSet(tutEl.querySelector('.gmt-p.b'), [-OV, b, W + OV * 2, H - b + OV]);
+      tutSet(tutEl.querySelector('.gmt-p.l'), [-OV, y - 1, x + OV, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
+      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r + OV, open[3] + 2]);
       var cr = Math.max(4, Math.min(9, Math.round(Math.min(open[2], open[3]) * .02)));   /* v541 丸めすぎだったので緩やかに（本人）。18px → 9px 上限 */
       tutEl.style.setProperty('--gmt-r', cr + 'px');
       tutSet(tutEl.querySelector('.gmt-c.tl'), [x - 1, y - 1, cr + 1, cr + 1]);   /* v544 角も外へ 1px。丸の中心は動かないので、丸みはそのまま */
@@ -6034,11 +6038,11 @@
               'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one. The three you measured are among them.')); })() + '</p>' +
           '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて、見比べられるようにしました。',
             'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
-          '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「4本の平均」に出たあなたの％と、《この表の同じ線の％を見比べてください》。どちらも線の位置です。',
-            'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions: compare them.')) + '</p>' +
+          '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「4本の平均」に出たあなたの％と、《この表の同じ線の％》は、どちらも線の位置です。見比べてみてください。',
+            'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions — compare them.')) + '</p>' +
           jwTable() +
-          '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値です。《あなたと私の解釈の違いとは別です》。',
-            'The “diff” column is the Japanese average subtracted from the Western one. 《It is not the difference between your reading and mine》.')) + '</p>' +
+          '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。',
+            'The “diff” column is the Japanese average subtracted from the Western one, and 《is not the difference between your reading and mine》.')) + '</p>' +
           '<p class="gm-note">' + body(L(cat === 'jp' ? '西洋の絵の平均を、青い破線で盤面に重ねられます。日本の絵の平均は、表で見比べてください。' : '日本の絵の平均を、緑の破線で盤面に重ねられます。西洋の絵の平均は、表で見比べてください。',
             cat === 'jp' ? 'You can overlay the Western average on the board as blue dashed lines. For the Japanese average, read the table.' : 'You can overlay the Japanese average on the board as green dashed lines. For the Western average, read the table.')) + '</p>' +
           '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button>' +
