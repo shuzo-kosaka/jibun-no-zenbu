@@ -3856,32 +3856,32 @@
                             "x3": 52
                       },
                       "why": [
-                            "桶の環の上端。環そのものが主塊。",
-                            "環の左端。",
+                            "桶のいちばん上。桶そのものが主塊。",
+                            "桶の左の端。",
                             "職人が入る分、重心はやや下。",
-                            "環はほぼ中央。富士は環の中の右寄りに。"
+                            "桶はほぼ中央。富士は桶の中の右寄りに。"
                       ],
                       "whye": [
-                            "The top of the barrel's ring: the ring itself is the mass",
-                            "The left of the ring",
+                            "The top of the barrel: the barrel itself is the mass",
+                            "The left of the barrel",
                             "With the cooper inside, the weight sits a little low",
-                            "The ring is near the centre; Fuji sits inside it, to the right"
+                            "The barrel is near the centre; Fuji sits inside it, to the right"
                       ],
-                      "obj": "桶の環",
-                      "obje": "barrel ring",
+                      "obj": "桶",
+                      "obje": "barrel",
                       "note": "葛飾北斎『冨嶽三十六景』の「尾州不二見原」、1831 年ごろ。桶職人が大きな桶の胴を削る手前の場面と、桶の輪の中に小さく収まる富士。丸い枠で遠くの山を切り取る「見立て」の構図で、近くの人の営みと遠くの山を一枚に重ねています。",
                       "notee": "Hokusai’s Fujimigahara in Owari Province, Thirty-six Views, around 1831. A cooper shaves the inside of a huge barrel, and Fuji appears small through the barrel’s hoop. The round frame that crops the distant mountain layers everyday work in the foreground onto the far view.",
                       "q": [
-                            "桶の環のいちばん上は、どの高さだろう",
-                            "桶の環の左の端は、左右のどこだろう",
-                            "桶の環の重さの中心は、どの高さだろう",
-                            "桶の環の重さの中心は、左右のどこだろう"
+                            "桶のいちばん上は、どの高さだろう",
+                            "桶の左の端は、左右のどこだろう",
+                            "桶の重さの中心は、どの高さだろう",
+                            "桶の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
-                            "How high is the top of the barrel ring?",
-                            "Where, left to right, is the left edge of the ring?",
-                            "At what height is the centre of weight of the barrel ring?",
-                            "Where, left to right, is the centre of weight of the barrel ring?"
+                            "How high is the top of the barrel?",
+                            "Where, left to right, is the left edge of the barrel?",
+                            "At what height is the centre of weight of the barrel?",
+                            "Where, left to right, is the centre of weight of the barrel?"
                       ]
                 },
                 {
@@ -3948,7 +3948,7 @@
                             "x3": 30
                       },
                       "why": [
-                            "波頭のいちばん上。",
+                            "波のいちばん高いところ。",
                             "波は左の縁から入る。",
                             "爪のような波頭と胴を合わせて、重心は中ほど。",
                             "大波は左に寄る。富士は右の余白に。"
@@ -3964,7 +3964,7 @@
                       "note": "葛飾北斎『冨嶽三十六景』の一図、1831 年ごろ。手前で砕ける大波が画面を覆い、遠くに小さな富士が見えます。当時輸入されたばかりのベロ藍を使い、波の曲線が富士を包み込むように配されています。西洋の遠近法を学んだ北斎が、近景と遠景の大きさの逆転で奥行きをつくった図です。",
                       "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far.",
                       "q": [
-                            "波頭のいちばん上は、どの高さだろう",
+                            "波がいちばん高いところは、どの高さだろう",
                             "大波は、左右のどこから画面に入るだろう",
                             "大波の重さの中心は、どの高さだろう",
                             "大波の重さの中心は、左右のどこだろう"
@@ -4148,7 +4148,7 @@
                       "note": "雪舟『秋冬山水図』の冬景、15 世紀後半、国宝。画面の中央を貫いて立ち上がる崖の輪郭線が有名で、上へ行くほど太く濃くなります。中国で学んだ水墨の骨法を、思い切った線で日本の画面に置き換えた一幅です。",
                       "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line.",
                       "q": [
-                            "崖の頂は、どの高さだろう",
+                            "崖のいちばん上は、どの高さだろう",
                             "崖の左の端は、左右のどこだろう",
                             "崖の重さの中心は、どの高さだろう",
                             "崖の重さの中心は、左右のどこだろう"
@@ -4224,7 +4224,7 @@
                             "x3": 60
                       },
                       "why": [
-                            "髷の上端。人物の塊はここから。",
+                            "髪のいちばん上。人物の塊はここから。",
                             "左の袖の張り出し。",
                             "頭は上、着物の量は下。重心は中ほどより下。",
                             "顔は左を向くが、身体の量は右へ。重心はやや右。"
@@ -4240,7 +4240,7 @@
                       "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘が、ガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
                       "notee": "From Kitagawa Utamaro's series of large-head portraits, Ten Physiognomies of Women, c. 1792. A young woman in a checked kimono blows a glass toy called a poppin. Against a mica ground the figure sits large, slightly right of centre; the sleeve pattern and the black hair make the mass.",
                       "q": [
-                            "髷のいちばん上は、どの高さだろう",
+                            "髪のいちばん上は、どの高さだろう",
                             "左の袖がいちばん張り出すのは、左右のどこだろう",
                             "人物の重さの中心は、どの高さだろう",
                             "人物の重さの中心は、左右のどこだろう"
