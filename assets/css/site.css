@@ -5136,3 +5136,7 @@
   html.handheld .gm-sheet .gm-mock .gm-drag{touch-action:none}
 
   body:has(.gmt) .cur .cc, body:has(.gmt) .cur .cv, body:has(.gmt) .cur .chh{opacity:0 !important; transition:opacity .22s var(--ease)}
+
+  @media (max-height:560px){
+    .gm-intro .gm-isecs{top:calc(50% + 30px); transform:translateY(-50%) scale(.93)}
+  }
