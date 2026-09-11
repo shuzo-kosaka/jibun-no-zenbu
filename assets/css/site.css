@@ -5015,3 +5015,8 @@
 
   .gm-res .gm-avg li small{align-self:baseline}
   .gm-res .gm-avg li{align-items:baseline}
+
+  html:not(.grid) #top.gone .lines s{opacity:1 !important; visibility:hidden;
+    transition:opacity .5s var(--ease) 0s, visibility 0s linear 2.9s}
+  html:not(.grid) #top:not(.gone) .lines s{opacity:0 !important; visibility:hidden;
+    transition:opacity 1.6s var(--ease) 0s, visibility 0s linear 1.6s}
