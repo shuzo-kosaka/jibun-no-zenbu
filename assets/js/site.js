@@ -6170,7 +6170,7 @@
             '《Whether your average lands nearer the Japanese or the Western one does not make it right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
         '<div class="gm-sev">' + sec(L('研究で引く7本と、7つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
-          '<p class="gm-note">' + body(L('私の研究では、どの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── 縦横で1本ずつ、合わせて4本です。',
+          '<p class="gm-note">' + body(L('私の研究ではどの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── 縦横で1本ずつ、合わせて4本です。',
             'In my research I draw the same seven kinds of line on every subject I measure, and read every composition through the same seven views. This game asked for 《two of those kinds》 — one horizontal and one vertical each, four lines in all.')) + '</p>' +
           '<p class="gm-info-s">' + L('基準線の名称（7つ）', 'The seven reference lines') + '</p>' +
           '<ul class="gm-nlist">' + RLINES.map(function(r){ return '<li' + (r[2] ? ' class="on"' : '') + '><b>' + esc(L(r[0], r[1])) + '</b>' + (r[2] ? '<em>' + L('このゲームで引いた線', 'drawn in this game') + '</em>' : '') + '</li>'; }).join('') + '</ul>' +
@@ -6254,7 +6254,7 @@
        '「あなた」と「私」は線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から計測します。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
        '“You” and “me” give line positions from the left or top edge, with the picture’s width and height each set to 100. “Difference” is 《your value minus mine》. A + means your line sits farther right or lower; a − means farther left or higher.'],
       ['私と線の位置が違ったら、間違いですか？', 'If my line and yours differ, is one of them wrong?',
-       'いいえ、《正解はありません》。同じ絵で、いちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
+       'いいえ、《正解はありません》。同じ絵でいちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
        'No. 《There is no right answer》. We are comparing where you and I see the largest mass begin, and where its weight sits, in the same picture. A gap is a difference in reading, not a mistake.'],
       ['なぜ、1枚に4本だけ引くのですか？', 'Why only four lines per picture?',
        '2分ほどで試せるように、7種類ある線のうち2種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の《始まりと重心》です。横と縦で1本ずつ引くので、1枚に4本になります。',
