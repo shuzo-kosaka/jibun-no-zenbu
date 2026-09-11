@@ -5615,19 +5615,14 @@
          板の「位置」と「丈」は別々に補間されるので、その差がわずかでも縁に隙間が開く。
          穴に接する辺はそのままに、**外側だけを画面の外まで大きく伸ばす**。穴の形は変わらず、隙間は原理的に開かない。 */
       var OV = 400;
-      tutSet(tutEl.querySelector('.gmt-p.t'), [-OV, -OV, W + OV * 2, y + OV]);
-      tutSet(tutEl.querySelector('.gmt-p.b'), [-OV, b, W + OV * 2, H - b + OV]);
-      tutSet(tutEl.querySelector('.gmt-p.l'), [-OV, y - 1, x + OV, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
-      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r + OV, open[3] + 2]);
-      var cr = Math.max(4, Math.min(9, Math.round(Math.min(open[2], open[3]) * .02)));   /* v541 丸めすぎだったので緩やかに（本人）。18px → 9px 上限 */
-      tutEl.style.setProperty('--gmt-r', cr + 'px');
-      tutSet(tutEl.querySelector('.gmt-c.tl'), [x - 1, y - 1, cr + 1, cr + 1]);   /* v544 角も外へ 1px。丸の中心は動かないので、丸みはそのまま */
-      tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y - 1, cr + 1, cr + 1]);
-      tutSet(tutEl.querySelector('.gmt-c.bl'), [x - 1, b - cr, cr + 1, cr + 1]);
-      tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr + 1, cr + 1]);
+      /* v712 上の板（.t）だけを**二度書き**していた。一度目（穴の上ぜんぶ）と二度目（窓の下だけ）の
+         あいだで案内文の幅を測る＝組み直しが起きるので、一度目の値で遷移が走り出し、
+         二度目で行き先だけ差し替わる。結果、上の板が他の板より**一拍おくれて**動き、
+         穴の上の辺に 1〜7px の明るい筋が出ていた（遊びの手引き・段 1。幾何で数えて四媒体 14 件）。
+         → 窓の寸法を**先に**決め、板は**一度だけ**置く。窓まわりの板も外側を画面の外へ逃がす。 */
       /* 案内文の置き場。見出し行の空きに三段とも固定し、そこの幕を開けて（窓を切って）、
          文は本物の紙の上に置く。窓は三段とも左端と高さを同じにし、幅だけ文に合わせる */
-      var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null;
+      var say = tutEl.querySelector('.gmt-say'), f = tutFree(), put = null, win = null;
       var wt = tutEl.querySelector('.gmt-p.wt'), wl = tutEl.querySelector('.gmt-p.wl'),
           wr = tutEl.querySelector('.gmt-p.wr');
       say.classList.remove('ts2', 'dim');
@@ -5645,17 +5640,32 @@
         var wx = f[0] - 22, ww = Math.min(say.offsetWidth + 48, Math.max(80, f[0] + f[2] + 14 - wx));
         if(wy + wh <= y - 4){          /* 窓が絵の穴に掛からないときだけ、窓を切る */
           put = [f[0], wy + Math.round((wh - say.offsetHeight) / 2)];
-          tutSet(wt, [0, 0, W, wy]);
-          tutSet(wl, [0, wy - 1, wx, wh + 2]);
-          tutSet(wr, [wx + ww, wy - 1, W - wx - ww, wh + 2]);
-          tutSet(tutEl.querySelector('.gmt-p.t'), [0, wy + wh, W, y - wy - wh]);   /* 元の板は窓の下だけ受け持つ */
-          var wr2 = Math.max(3, Math.min(7, Math.round(Math.min(ww, wh) * .05)));   /* v541 窓の角の丸み。絵の穴と同じ気配で、少し控えめに */
-          tutEl.style.setProperty('--gmt-wr', wr2 + 'px');
-          tutSet(tutEl.querySelector('.gmt-c.w.tl'), [wx - 1, wy - 1, wr2 + 1, wr2 + 1]);
-          tutSet(tutEl.querySelector('.gmt-c.w.tr'), [wx + ww - wr2, wy - 1, wr2 + 1, wr2 + 1]);
-          tutSet(tutEl.querySelector('.gmt-c.w.bl'), [wx - 1, wy + wh - wr2, wr2 + 1, wr2 + 1]);
-          tutSet(tutEl.querySelector('.gmt-c.w.br'), [wx + ww - wr2, wy + wh - wr2, wr2 + 1, wr2 + 1]);
+          win = [wx, wy, ww, wh];
         }
+      }
+      /* ここから板を置く。四枚とも同じひと呼吸で書くので、遷移は必ず足並みがそろう */
+      tutSet(tutEl.querySelector('.gmt-p.t'), win ? [-OV, win[1] + win[3], W + OV * 2, y - win[1] - win[3]]
+                                                  : [-OV, -OV, W + OV * 2, y + OV]);
+      tutSet(tutEl.querySelector('.gmt-p.b'), [-OV, b, W + OV * 2, H - b + OV]);
+      tutSet(tutEl.querySelector('.gmt-p.l'), [-OV, y - 1, x + OV, open[3] + 2]);   /* v544 上下へ 1px 伸ばして、上下の板と重ねる（穴の外側なので絵には掛からない） */
+      tutSet(tutEl.querySelector('.gmt-p.r'), [r, y - 1, W - r + OV, open[3] + 2]);
+      var cr = Math.max(4, Math.min(9, Math.round(Math.min(open[2], open[3]) * .02)));   /* v541 丸めすぎだったので緩やかに（本人）。18px → 9px 上限 */
+      tutEl.style.setProperty('--gmt-r', cr + 'px');
+      tutSet(tutEl.querySelector('.gmt-c.tl'), [x - 1, y - 1, cr + 1, cr + 1]);   /* v544 角も外へ 1px。丸の中心は動かないので、丸みはそのまま */
+      tutSet(tutEl.querySelector('.gmt-c.tr'), [r - cr, y - 1, cr + 1, cr + 1]);
+      tutSet(tutEl.querySelector('.gmt-c.bl'), [x - 1, b - cr, cr + 1, cr + 1]);
+      tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr + 1, cr + 1]);
+      if(win){
+        var qx = win[0], qy = win[1], qw = win[2], qh = win[3];
+        tutSet(wt, [-OV, -OV, W + OV * 2, qy + OV]);
+        tutSet(wl, [-OV, qy - 1, qx + OV, qh + 2]);
+        tutSet(wr, [qx + qw, qy - 1, W - qx - qw + OV, qh + 2]);
+        var wr2 = Math.max(3, Math.min(7, Math.round(Math.min(qw, qh) * .05)));   /* v541 窓の角の丸み。絵の穴と同じ気配で、少し控えめに */
+        tutEl.style.setProperty('--gmt-wr', wr2 + 'px');
+        tutSet(tutEl.querySelector('.gmt-c.w.tl'), [qx - 1, qy - 1, wr2 + 1, wr2 + 1]);
+        tutSet(tutEl.querySelector('.gmt-c.w.tr'), [qx + qw - wr2, qy - 1, wr2 + 1, wr2 + 1]);
+        tutSet(tutEl.querySelector('.gmt-c.w.bl'), [qx - 1, qy + qh - wr2, wr2 + 1, wr2 + 1]);
+        tutSet(tutEl.querySelector('.gmt-c.w.br'), [qx + qw - wr2, qy + qh - wr2, wr2 + 1, wr2 + 1]);
       }
       if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
         tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
@@ -6009,7 +6019,11 @@
       setTimeout(function(){ if(state === 'avg') mode(L('平均', 'average')); }, rm ? 0 : 4300);
       var step = rm ? 0 : 1;
       setTimeout(function(){ ticks.forEach(function(x, i){ x.el.style.transitionDelay = (.35 + Math.floor(i / 3) * .95) + 's'; x.el.style[x.el.classList.contains('v') ? 'left' : 'top'] = x.to + '%'; }); linesEl.classList.add('gathered'); }, 120 * step);
-      setTimeout(function(){ FIXED.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'fixed'); }); FIXED.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'fixed'); }); linesEl.classList.add('fixed');
+      /* v712 「サイトのグリッドと重ねる」を押す前から薄い破線が出ていた（本人）。
+         これは不具合ではなく、あなたの4本に足りない三本（密度転換線・境界線・余白開始線）を
+         このサイトのグリッドから借りて、grid の形に見せていたもの。
+         ただし借りものだと分かりにくいので、**押したときだけ**七本を出す形にした（本人の言い直し）。 */
+      setTimeout(function(){ linesEl.classList.add('fixed');
         /* v610 段の幅の札。あなたが引いた四本で分けた段——横は x1・x3 で三段、縦は y1・y2 で三段。どちらも合計 100。
            補った三本（28・83・71）はこのサイトのグリッドの位置なので、幅の計算には入れない（入れると出どころの違う数が混ざる） */
         mkBands(linesEl, 'v', [avg.x1, avg.x3], 'you'); mkBands(linesEl, 'h', [avg.y1, avg.y2], 'you'); }, rm ? 60 : 4300);
@@ -6025,7 +6039,7 @@
         '<p class="gm-note">' + body(L('盤面の数字は、あなたの4本で分けた《段の幅》です。縦横それぞれ、足すと 100 になります。線そのものの位置は、下の「4本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
-        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱色の線：あなた', 'solid red: you') + '</b><b class="gm-lg3"><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
+        '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱色の線：あなた', 'solid red: you') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
         sec(L('4本の平均', 'The four averages'), true) + '<div class="gm-catx gm-secx"><ul class="gm-avg"><li class="gm-avgh"><b></b><span></span><em>' + L('あなた', 'you') + '</em><small>' + L('私', 'me') + '</small></li>' + LINES.map(function(t){ return '<li><b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' · ' + t.dire)) + '</b><span>' + res.map(function(r, k){ return 'ABC'[k] + ' ' + r[t.k]; }).join(' · ') + '</span><em>' + avg[t.k] + PC + '</em><small>' + kav[t.k] + '%</small></li>'; }).join('') + '</ul>' + '</div>' +
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
@@ -6072,18 +6086,30 @@
     }
     /* 骨格としての比較：あなたの骨格（4＋3）と、研究の固定グリッド（7本）を重ねる。読みの比較とは別のもの */
     function ovLabel(on){   /* v509 重ねているあいだは、凡例もボタンの名前も「外す」側に（数えられる場所なので数を合わせる） */
-      var l3 = resEl && resEl.querySelector('.gm-lg3'), l7 = resEl && resEl.querySelector('.gm-lg7');
-      if(l3) l3.hidden = !!on;
-      if(l7) l7.hidden = !on;
+      var l7 = resEl && resEl.querySelector('.gm-lg7');
+      if(l7) l7.hidden = !on;   /* v712 押す前は破線そのものが無いので、凡例も出さない */
       if(goEl) goEl.querySelectorAll('button').forEach(function(b){
         if(b.__ov) b.textContent = on ? L('サイトのグリッドを外す', 'Hide the site’s grid') : L('サイトのグリッドと重ねる', 'Compare with the site’s grid'); });
       if(linesEl) linesEl.classList.toggle('ovl', !!on);   /* 補った三本は隠す（七本と二重に引かれていた） */
     }
     function overlay(){
-      var on = linesEl.querySelector('.mine');
-      if(on){ linesEl.querySelectorAll('.mine').forEach(function(x){ x.parentNode.removeChild(x); }); ovLabel(false); return; }
+      var on = linesEl.querySelector('.mine:not(.out)');
+      if(on){
+        /* v712 外すときは、その場で消えていた（本人：動きが不自然）。引いた順の逆から一本ずつ引っ込める */
+        var outs = Array.prototype.slice.call(linesEl.querySelectorAll('.mine'));
+        outs.forEach(function(x, i){ x.classList.add('out'); if(!rm) x.style.animationDelay = ((outs.length - 1 - i) * .045).toFixed(3) + 's'; });
+        ovLabel(false);
+        setTimeout(function(){ outs.forEach(function(x){ if(x.parentNode) x.parentNode.removeChild(x); }); }, rm ? 0 : 300 + outs.length * 45);
+        return;
+      }
       /* v610 重ねるのは形を見比べるため。ここに位置の％を出すと、盤面の段の幅と出どころの違う数字が並ぶので、線だけを重ねる */
-      GRID.v.forEach(function(v){ mkLine(linesEl, 'v', v, 'mine'); }); GRID.h.forEach(function(v){ mkLine(linesEl, 'h', v, 'mine'); }); ovLabel(true);
+      /* v712 七本が同時に出ていたので、たて（左→右）・よこ（上→下）の順に一本ずつ引く。
+         トップの格子が引かれる順と同じで、見ていて何が起きたか分かる */
+      var seq = [];
+      GRID.v.slice().sort(function(a, q){ return a - q; }).forEach(function(v){ seq.push(['v', v]); });
+      GRID.h.slice().sort(function(a, q){ return a - q; }).forEach(function(v){ seq.push(['h', v]); });
+      seq.forEach(function(q, i){ var e = mkLine(linesEl, q[0], q[1], 'mine'); if(!rm) e.style.animationDelay = (.06 + i * .055).toFixed(3) + 's'; });
+      ovLabel(true);
       /* v600 ここに足していた一文は、凡例の「薄い破線の七本：このサイトのグリッド」の中へ移した（本人） */
     }
     /* C：持ち帰れる「あなたのものさし」——三枚の札と四本、X・Y の百分率、日付、判を一枚の PNG に */
@@ -6113,8 +6139,8 @@
        '《朱色の4本で区切った幅や高さ》を表しています。薄い破線は区切りに数えず、縦横それぞれ合計 100 になります。線そのものの位置は「4本の平均」に出しています。',
        'They show 《the widths and heights marked out by your four red lines》. The faint dashed lines do not count as divisions, and the values add up to 100 across and down. The positions of the lines themselves are listed under “The four averages”.'],
       ['薄い破線は、何の線ですか？', 'What are the faint dashed lines?',
-       '測っている間は、私が同じ絵に引いた線です。平均の画面では《サイトのグリッドの3本》で、あなたの4本と合わせるとグリッドの形になります。「サイトのグリッドと重ねる」を押すと、破線は7本すべてになります。',
-       'While you measure, they are the lines I drew on the same picture. On the average screen they are 《three lines from the site’s grid》, which together with your four make a complete grid. “Compare with the site’s grid” turns them into all seven.'],
+       '測っている間は、私が同じ絵に引いた線です。平均の画面では、「サイトのグリッドと重ねる」を押したときだけ出ます。そのときの破線は《このサイトのグリッド7本》で、あなたの4本と見比べられます。',
+       'While you measure, they are the lines I drew on the same picture. On the average screen they appear only when you press “Compare with the site’s grid”: they are then 《the seven lines of this site’s grid》, there to be set against your four.'],
       ['保存した画像は、何に使えますか？', 'What can I use the saved image for?',
        '紙面に《文字や図版を置くときの目安》として使えます。写るのは、あなたの平均4本（朱色の実線）と、サイトの7本（薄い破線）だけ。絵や数字は入りません。',
        'You can use it as 《a guide for placing text and images》 on a page. It holds only your four average lines (solid red) and the seven lines of this site (faint dashed). The pictures and the numbers are left out.'],
@@ -6292,6 +6318,11 @@
         gm.appendChild(takeEl);
       }
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a'), sealBox = takeEl.querySelector('.gm-takeseal');
+      /* v712 判が、紙が出きる前に押されていた（本人：もう少し遅らせてほしい）。
+         紙は 0.16 秒待って 0.5 秒かけて起き上がる。開いた直後だけ、その後に一拍おいて押す。
+         形や種類を押し替えたときは、いままでどおりすぐ押す（待たされると鈍く感じる）。 */
+      var sealD = takeEl.classList.contains('on') ? .18 : .96;
+      setTimeout(function(){ sealD = .18; }, 1500);
       /* v525 判は画像に焼き込まず、見本の上に重ねるだけ（本人）。質感は本編の判と同じ（kakuSvg の feTurbulence） */
       /* v694 古い箱から新しい箱へ、縮尺で繋ぐ（どの順に押しても同じ動き）。
          幅・丈は画像の実寸で決まるので遷移では動かない。描き終わった箱を測ってから、
@@ -6321,7 +6352,7 @@
         var w = im.clientWidth, h = im.clientHeight; if(!w || !h) return;
         var sz = Math.max(76, Math.round(Math.min(w, h) * 0.34));
         sealBox.style.width = sz + 'px'; sealBox.style.height = sz + 'px';
-        if(!rm){ sealBox.style.animation = 'none'; void sealBox.offsetWidth; sealBox.style.animation = ''; }
+        if(!rm){ sealBox.style.animation = 'none'; void sealBox.offsetWidth; sealBox.style.animation = ''; sealBox.style.animationDelay = sealD + 's'; }
       }
       takeEl.querySelector('.gm-take-h b').textContent = '';   /* v522 見出しは置かない（本人＋ChatGPT）。右肩の欧文が題として働く */
       takeEl.querySelector('.gm-take-h em').textContent = 'YOUR RULER  ·  ' + ymd.replace(/-/g, '.');
@@ -6407,26 +6438,15 @@
       try{ return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? SNAP_COARSE : SNAP_FINE; }catch(e){ return SNAP_FINE; }
     }
     function snapLines(ax, r){
+      /* v712 v608 では「近すぎる候補は真ん中の一本にまとめる」ことで、二本のあいだに置けるようにした。
+         ところがそのせいで、**線そのものではなく二本の中間**に吸い寄せられるようになっていた（本人）。
+         → まとめるのはやめ、同じ位置の重複だけを落とす。受け持ちの幅は snapTo で一本ずつ狭める。 */
       var a = (ax === 'v' ? GRID.v : GRID.h).slice(); a.push(50);
       if(sheetAvg) a.push(ax === 'v' ? sheetAvg.x1 : sheetAvg.y1, ax === 'v' ? sheetAvg.x3 : sheetAvg.y2);
-      /* v608 あなたの線とこのサイトの線が近いと、二つの吸着の帯が重なって**あいだに置けなく**なる
-         （58％ と 59％ が 14px しか離れていない、という実例：見張り係）。
-         許容の二倍より近い候補は、真ん中の一本にまとめる */
-      if(r){
-        var span = ax === 'v' ? r.width : r.height;
-        if(span > 0){
-          var tol = snapPx() / span * 100 * 2, out = [], run;
-          a.sort(function(x, y){ return x - y; });
-          run = [a[0]];
-          for(var i = 1; i < a.length; i++){
-            if(a[i] - run[run.length - 1] < tol) run.push(a[i]);
-            else { out.push(run.reduce(function(q, w2){ return q + w2; }, 0) / run.length); run = [a[i]]; }
-          }
-          out.push(run.reduce(function(q, w2){ return q + w2; }, 0) / run.length);
-          return out;
-        }
-      }
-      return a;
+      a.sort(function(x, y){ return x - y; });
+      var out = [];
+      for(var i = 0; i < a.length; i++){ if(!out.length || a[i] - out[out.length - 1] > .05) out.push(a[i]); }
+      return out;
     }
     function snapMark(ax, v){
       if(!sheetEl) return;
@@ -6440,8 +6460,17 @@
     function snapTo(v, w, ax, r){   /* v＝いまの位置（％）、w＝大きさ（％）。左端・中心・右端のどれかが線に乗るように */
       var span = ax === 'v' ? r.width : r.height; if(!(span > 0)) return null;
       var tol = snapPx() / span * 100, best = null, cand = snapLines(ax, r);
+      /* v712 線が近いときは、一本ずつの受け持ちを**隣との間合いの四割**までに狭める。
+         こうすると近いほうの線にきちんと乗り（中間には寄らない）、
+         二本のちょうど真ん中には**吸着の効かない空き**が残るので、あいだにも置ける。 */
+      var tolAt = cand.map(function(L0, i){
+        var g = Infinity;
+        if(i > 0) g = Math.min(g, L0 - cand[i - 1]);
+        if(i < cand.length - 1) g = Math.min(g, cand[i + 1] - L0);
+        return (g === Infinity) ? tol : Math.min(tol, g * .4);
+      });
       [0, w / 2, w].forEach(function(o){
-        cand.forEach(function(L0){ var d = L0 - o - v; if(Math.abs(d) < tol && (!best || Math.abs(d) < Math.abs(best.d))) best = {d:d, at:L0}; });
+        cand.forEach(function(L0, i){ var d = L0 - o - v; if(Math.abs(d) < tolAt[i] && (!best || Math.abs(d) < Math.abs(best.d))) best = {d:d, at:L0}; });
       });
       return best;
     }
@@ -6553,6 +6582,16 @@
           el.style.top = ((el.offsetTop + (_pre.top - _post.top)) / r.height * 100).toFixed(2) + '%';
         }
         b = el.getBoundingClientRect();   /* v641 逃がしを外したあとの、いまの見た目の箱で測り直す */
+        /* v712 見出しの「丈＝上下の余白＋比×（幅−左右の余白）」を、掴んだ時点で採っておく
+           （字は line-height:1、余白は固定の px なので、この一次式でぴたりと合う） */
+        var mk1Pad = {w:0, h:0, k:0};
+        if(el.classList.contains('gm-mk1')){
+          var _cs1 = getComputedStyle(el);
+          mk1Pad.w = parseFloat(_cs1.paddingLeft) + parseFloat(_cs1.paddingRight);
+          mk1Pad.h = parseFloat(_cs1.paddingTop) + parseFloat(_cs1.paddingBottom);
+          var _cw = b.width - mk1Pad.w;
+          mk1Pad.k = _cw > 0 ? (b.height - mk1Pad.h) / _cw : 0;
+        }
         if(mock.lastElementChild !== el) mock.appendChild(el);
         el.classList.add('grab'); mock.classList.add('dragging');
         try{ el.setPointerCapture(e.pointerId); }catch(x){}
@@ -6571,18 +6610,61 @@
             /* v635 動く辺だけを線に乗せる。いままで右端と下端しか見ていなかったので、
                左上・右上・左下の角では上や左が吸い寄らなかった（本人） */
             var sx = null, sy = null;
+            if(el.classList.contains('gm-mk1')){
+              /* v712 見出しは丈が字の大きさで決まる（幅だけを見て組み直す）ので、
+                 下へ引いてもグリッドに吸い付かなかった（本人：図版や本文と同じようにしてほしい）。
+                 見出しは一行なので、丈は幅の一次式（丈＝上下の余白＋比×（幅−左右の余白））。
+                 横の吸着と縦の吸着を**画素で比べ**、寄せ幅の小さいほうへ、比のまま拡げ縮めする。 */
+              var _pw = mk1Pad.w, _ph = mk1Pad.h, _k = mk1Pad.k;
+              var axp = mW ? (bl + b.width) : bl;     /* 動かさないほうの縦の辺 */
+              var ayp = mN ? (bt + b.height) : bt;    /* 動かさないほうの横の辺 */
+              /* 角を掴んだ指の動きは、**強く動いたほうの向き**で読む。横へ引いても下へ引いても、
+                 見出しは比のまま大きくなる（いままでは横しか見ていなかったので、下へ引いても何も起きなかった）。
+                 対角線に落とす手もあるが、見出しは横長なので下へ引いたときの効きが弱すぎた（実測：200px 引いて 7% ）。 */
+              var _kx = (mE ? 1 : -1) * dx / b.width, _ky = (mS ? 1 : -1) * dy / b.height;
+              var _t = Math.abs(_kx) >= Math.abs(_ky) ? _kx : _ky;
+              var wpx = Math.max(12, b.width * (1 + _t)), cand = [];
+              if(mE) wpx = Math.min(wpx, r.width - bl); else wpx = Math.min(wpx, bl + b.width);
+              if(_k > 0){
+                var _cap = (mS ? (r.height - bt) : (bt + b.height));
+                wpx = Math.min(wpx, (_cap - _ph) / _k + _pw);
+              }
+              wpx = Math.max(12, wpx);
+              var _ex = mE ? (axp + wpx) : (axp - wpx);
+              var _s1 = snapTo(_ex / r.width * 100, 0, 'v', r);
+              if(_s1) cand.push({d:(mE ? 1 : -1) * _s1.d / 100 * r.width, v:_s1, h:null});
+              if(_k > 0){
+                var _hh = _ph + _k * Math.max(0, wpx - _pw);
+                var _ey = mS ? (ayp + _hh) : (ayp - _hh);
+                var _s2 = snapTo(_ey / r.height * 100, 0, 'h', r);
+                if(_s2) cand.push({d:(mS ? 1 : -1) * _s2.d / 100 * r.height / _k, v:null, h:_s2});
+              }
+              if(cand.length){
+                cand.sort(function(q, z){ return Math.abs(q.d) - Math.abs(z.d); });
+                wpx = Math.max(12, wpx + cand[0].d); sx = cand[0].v; sy = cand[0].h;
+              }
+              var _h2 = _ph + _k * Math.max(0, wpx - _pw);
+              wp = wpx / r.width * 100; hp = _h2 / r.height * 100;
+              l0 = (mW ? (axp - wpx) : axp) / r.width * 100;
+              t0 = (mN ? (ayp - _h2) : ayp) / r.height * 100;
+            } else {
             if(mE){ sx = snapTo(l0 + wp, 0, 'v', r); if(sx) wp += sx.d; }
             if(mW){ sx = snapTo(l0, 0, 'v', r); if(sx){ l0 += sx.d; wp -= sx.d; } }
             if(mS){ sy = snapTo(t0 + hp, 0, 'h', r); if(sy) hp += sy.d; }
             if(mN){ sy = snapTo(t0, 0, 'h', r); if(sy){ t0 += sy.d; hp -= sy.d; } }
+            }
             wp = Math.max(.6, wp); hp = Math.max(.6, hp);
             snapMark('v', sx ? sx.at : null); snapMark('h', sy ? sy.at : null);
             el.style.width = wp.toFixed(2) + '%';
             if(el.classList.contains('gm-mk1')){
               mk1Fit(el);
+              var _nb = el.getBoundingClientRect();
+              /* v712 組み上がった実寸から比を採り直す。字の大きさは 0.01px 刻みで丸めるので、
+                 予測との差が 1〜2px 残っていた（実測：下端が線から 0.08〜0.23% ずれる）。
+                 次の一手からはこの実寸の比で読むので、線にぴたりと乗る */
+              if(_nb.width > mk1Pad.w + 1) mk1Pad.k = (_nb.height - mk1Pad.h) / (_nb.width - mk1Pad.w);
               if(mN){   /* v633 上の辺を掴んだときは下の辺を固定する。字の大きさで丈が変わるので、
                            そのままだと見出しごと動いて見えた（本人：左上と右上で挙動が違う） */
-                var _nb = el.getBoundingClientRect();
                 t0 = (bt + b.height - _nb.height) / r.height * 100;
               }
             }

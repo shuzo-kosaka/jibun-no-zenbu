@@ -5020,3 +5020,9 @@
     transition:opacity .5s var(--ease) 0s, visibility 0s linear 2.9s}
   html:not(.grid) #top:not(.gone) .lines s{opacity:0 !important; visibility:hidden;
     transition:opacity 1.6s var(--ease) 0s, visibility 0s linear 1.6s}
+
+  @keyframes gmundrawh{from{clip-path:inset(-24px 0 -24px 0)} to{clip-path:inset(-24px 100% -24px 0)}}
+  @keyframes gmundrawv{from{clip-path:inset(0 -24px 0 -24px)} to{clip-path:inset(0 -24px 100% -24px)}}
+  .gm-lines .gm-ln.mine.out.h{animation:gmundrawh .28s var(--ease) both}
+  .gm-lines .gm-ln.mine.out.v{animation:gmundrawv .28s var(--ease) both}
+  html.rm .gm-lines .gm-ln.mine.out.h,html.rm .gm-lines .gm-ln.mine.out.v{animation:none; opacity:0}
