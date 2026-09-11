@@ -5026,3 +5026,27 @@
   .gm-lines .gm-ln.mine.out.h{animation:gmundrawh .28s var(--ease) both}
   .gm-lines .gm-ln.mine.out.v{animation:gmundrawv .28s var(--ease) both}
   html.rm .gm-lines .gm-ln.mine.out.h,html.rm .gm-lines .gm-ln.mine.out.v{animation:none; opacity:0}
+
+  html.handheld .gm-stool{gap:4px; padding:5px 8px;
+    max-width:calc(100vw - max(4vw, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px)) - 44px)}
+  html.handheld .gm-stool button{font-size:11px; padding-left:8px; padding-right:8px; gap:5px}
+  html.handheld .gm-stool button svg{width:13px; height:13px}
+  html.handheld .gm-stool b{font-size:9.5px; padding:0 3px 0 1px; margin-right:4px}
+  html.handheld .gm-stool .gm-sar{margin-left:5px; padding-left:6px; gap:4px}
+  html.handheld .gm-stool .gm-sar em{font-size:9.5px}
+
+  html.phone .gm-sheet .gm-mock .gm-drag .gm-rz{opacity:0}
+  html.phone .gm-sheet .gm-mock .gm-drag.sel .gm-rz{opacity:.75}
+
+  /* ％ は `<small class="gm-pc">` が入れ子になっているので、`.gm-obs small` だと**中の％にも札が付く**。
+     外側だけを札にして、％は札の中の小さな字に戻す */
+  .gm-obs > small{display:inline-flex; align-items:baseline; justify-content:center; letter-spacing:0; padding:3px 10px}
+  .gm-obs > small .gm-pc{display:inline; background:none; padding:0; margin-left:1.5px; font-size:.7em; line-height:inherit}
+  html.phone .gm-obs > small{font-size:20px; padding:3px 11px}
+  html.phone .gm-obs > small .gm-pc{display:inline; background:none; padding:0; margin-left:1.5px; font-size:.7em}
+
+  .gm-stage .gm-seal.center::before{content:""; position:absolute; inset:6%; background:rgba(242,241,236,.92);
+    border-radius:10%; opacity:0; transform:rotate(-9deg); transition:opacity .25s var(--ease)}
+  .gm-stage .gm-seal.center.on::before{opacity:1}
+  .gm-stage .gm-seal.center.on.bye::before{opacity:0; transition-duration:var(--sb, .3s)}
+  html.rm .gm-stage .gm-seal.center::before{transition:none}
