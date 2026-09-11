@@ -5003,3 +5003,12 @@
   .gm-res .gm-avg li.gm-avgh em{font-size:10px; letter-spacing:.08em}
 
   .gm-sheet .gm-mock{z-index:3}
+
+  .gm-sheet .gm-stool{transition:left .38s var(--ease), top .38s var(--ease)}
+  .gm-sheet .gm-stool.grab{transition:none}
+  html.rm .gm-sheet .gm-stool{transition:none}
+  .gm-sheet .gm-mock .gm-drag{transition:transform .22s var(--ease), opacity .22s var(--ease),
+    left .42s var(--ease), top .42s var(--ease), width .42s var(--ease), height .42s var(--ease)}
+  .gm-sheet .gm-mock.dragging .gm-drag,.gm-sheet .gm-mock.dragging .gm-drag.grab{transition:none}
+  html.rm .gm-sheet .gm-mock .gm-drag{transition:none}
+  .gm-sheet.arfix.nogrid .gm-mock{outline:1px solid rgba(30,28,26,.34)}
