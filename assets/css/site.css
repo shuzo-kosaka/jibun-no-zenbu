@@ -4974,3 +4974,13 @@
   html:not(.handheld) .dg-svg,
   html:not(.handheld) .mp-svg{will-change:transform}
   html:not(.handheld) #ch6 .chtrail{will-change:auto}   /* ここだけ 15.4Mpx。焼き付けない */
+
+  /* v690 案内の二面目：図と説明の塊が、見出しと「測り方とQ&A」の案内の**あいだで下に寄っていた**（本人）。
+     上の空きは見出しの margin-bottom（1.1em＝66px の字で 72.6px）、下は案内の margin-top（1.5em＝19.5px）で
+     73px 対 20px。**上下を同じ値**にして、塊を真ん中に置く（塊の丈は変えないので、面の高さもほぼそのまま）。 */
+  .gm-isec.gm-iinfo{--igap:46px}
+  .gm-isec.gm-iinfo > b{margin-bottom:0}
+  .gm-isec.gm-iinfo .gm-ilist{margin-top:var(--igap)}
+  .gm-isec.gm-iinfo .gm-ick.gm-iqa{margin-top:var(--igap)}
+  @media (max-width:1280px){ .gm-isec.gm-iinfo{--igap:40px} }
+  html.phone .gm-isec.gm-iinfo{--igap:30px}

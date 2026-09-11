@@ -30,10 +30,10 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" id="themec" content="#E84518">
 <style>body{margin:0;font-size:14px;font-family:system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
-<link rel="stylesheet" href="assets/css/site.css?v=af544fe7">
-<script src="assets/js/i18n.js?v=12bfd273" defer></script>
+<link rel="stylesheet" href="assets/css/site.css?v=e41257a6">
+<script src="assets/js/i18n.js?v=f1bda396" defer></script>
 <script src="assets/js/matter.min.js?v=d79ceded" defer></script>
-<script src="assets/js/site.js?v=a5c9b02e" defer></script>
+<script src="assets/js/site.js?v=39fa9d5e" defer></script>
 </head>
 <body>
 <!--
@@ -704,7 +704,7 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
           <div class="lg-row lg-col">
             <div class="lg-l"><b>A</b><strong>線種と表示方法</strong><span>図の上で、どう描くか</span></div>
             <ul class="lg-a">
-              <li><i class="s s-yellow"></i><b>外郭基準線</b><span>作品のふち。位置を％で読む物差し</span></li>
+              <li><i class="s s-yellow"></i><b>外郭基準線</b><span>測定対象のふち。位置を％で読む物差し</span></li>
               <li><i class="s s-red"></i><b>直交構成抽出線</b><span>境界・重心・余白・密度の位置</span></li>
               <li><i class="s s-green"></i><b>画面中心軸</b><span>50%の位置。偏りを見る</span></li>
               <li><i class="s s-blue"></i><b>傾斜構成抽出線</b><span>斜めの流れ。補助情報</span></li>
@@ -718,7 +718,7 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
             <ul class="lg-b"><li>主塊開始線</li><li>主塊重心線</li><li>余白開始線</li><li>前景境界線</li><li>遠景開口線</li><li>副次要素境界線</li><li>密度転換線</li></ul>
           </div>
           <div class="lg-row lg-col">
-            <div class="lg-l"><b>C</b><strong>分析カテゴリ</strong><span>作品全体を、どんな構図として捉えるか</span></div>
+            <div class="lg-l"><b>C</b><strong>分析カテゴリ</strong><span>測定対象の全体を、どんな構図として捉えるか</span></div>
             <ul class="lg-c"><li>主塊と余白面</li><li>対置と中間領域</li><li>密度差と空間の抜け</li><li>前景フレームと奥行き</li><li>反復と変奏</li><li>水平分節と上下構成</li><li>垂直反復と高低差</li></ul>
           </div>
         </div>
@@ -728,11 +728,11 @@ h.className+=" handheld pcview"+(phone?" phone":" tablet");})();</script>
         <ol id="seqlist">
           <li><b>01</b><strong>対象を選ぶ</strong><span>たとえば、A・B・Cという三つの日本画があるとします。時代も作者も違いますが、同じ主題を描いた作品を、同じものさしで見ていきます。</span></li>
           <li><b>02</b><strong>解釈する</strong><span>測る前に、まず読み解きます。どこに主塊があり、どこから余白が始まり、どこで密度が変わるのか。先行研究と自分の目を重ねて、その作品が置かれた背景まで理解を深めていきます。</span></li>
-          <li><b>03</b><strong>凡例を作る</strong><span>線を引く前に、ルールを決めます。凡例は三層です。図の上でどう表示するか（線種）、なぜその線を引いたのか（機能名称）、作品全体をどんな構図として捉えるか（分析カテゴリ）。</span></li>
+          <li><b>03</b><strong>凡例を作る</strong><span>線を引く前に、ルールを決めます。凡例は三層です。図の上でどう表示するか（線種）、なぜその線を引いたのか（機能名称）、測定対象の全体をどんな構図として捉えるか（分析カテゴリ）。</span></li>
           <li><b>04</b><strong>線を引く</strong><span>凡例に従って、解釈した境界を水平と垂直の線に置き換えます。主塊の始まり、重心、余白の始まり、密度の転換を、一本ずつ根拠を添えて引いていきます。</span></li>
-          <li><b>05</b><strong>測る</strong><span>作品のふちを物差しにして、線で分けた各段が「横幅の何％」「高さの何％」を占めるかを読み取ります。読み取った値は、小数点以下を落として整数にそろえ、横も縦も足すと 100％になるようにします。自分の「なんとなく」を数字として取り出していく作業です。</span></li>
-          <li><b>06</b><strong>対応させる</strong><span>三作品の線を、X1やY1という並び順の番号ではなく、「主塊開始線」「主塊重心線」といった機能名称で結びます。同じ役割の線どうしを、色ごとに重ねて見ます。</span></li>
-          <li><b>07</b><strong>平均をとる</strong><span>共通する機能線の平均位置から、ひとつの平均グリッドをつくります。現段階の値は、横が 12％……、縦が 14％……。線で分けた各段の幅の比で、どちらも合計 100％です。</span></li>
+          <li><b>05</b><strong>測る</strong><span>測定対象のふちを物差しにして、線で分けた各段が「横幅の何％」「高さの何％」を占めるかを読み取ります。読み取った値は、小数点以下を落として整数にそろえ、縦横それぞれを足すと 100％になるようにします。自分の「なんとなく」を数字として取り出していく作業です。</span></li>
+          <li><b>06</b><strong>対応させる</strong><span>三つの測定対象の線を、X1やY1という並び順の番号ではなく、「主塊開始線」「主塊重心線」といった機能名称で結びます。同じ役割の線同士を、色ごとに重ねて見ます。</span></li>
+          <li><b>07</b><strong>平均をとる</strong><span>共通する機能線の平均位置から、ひとつの平均グリッドをつくります。この3枚の日本の絵における値は、横が 12％……、縦が 14％……となりました。線で分けた各段の幅の比で、どちらも合計 100％です。</span></li>
           <li><b>08</b><strong>紙面と画面へ</strong><span>比率を、文字を置ける実寸に起こします。紙の判型でも、画面の幅でも、同じ比率のまま引き直せる。測定対象から取り出したものさしが、そのまま組版の骨格になります。</span></li>
         </ol>
         <div class="tip">CLICK · 番号を押すとその段階へ</div>

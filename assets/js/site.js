@@ -4682,16 +4682,14 @@
       var info = {k:4, at:.36, html:true, info:true, big:'ゲーム', ja:['3枚の絵に線を引くゲーム。', LJ], en:['A game: draw lines on three pictures.', LE]};
       /* v425: 三面目。何のために測るのかを先に言ってから、絵を選んでもらう（本人の指示） */
       var PJ = '<p class="gm-ipur">' + body('線を引き終えたら、あなたの平均グリッドで《見出しや図版、本文の配置》を試せます。') + '</p>' +
-        '<p class="gm-ipur">' + body('選んだ方の絵から、《3枚が無作為に選ばれます》。それを計測します。操作はどちらも同じです。') + '</p>' +
+        '<p class="gm-ipur">' + body('絵は日本と西洋を合わせて' + BOARDS.length + '枚。選んだ方から《3枚が無作為に選ばれ、それを計測します》。操作はどちらも同じです。') + '</p>' +
         '<p class="gm-ick">測る絵を選んでください</p>';
       var PE = '<p class="gm-ipur">' + body('Once the lines are drawn, you can use your average grid to 《try placing headings, images and body text》.') + '</p>' +
-        '<p class="gm-ipur">' + body('《Three pictures are drawn at random》 from the group you choose, and you measure those. The controls are the same for both.') + '</p>' +
+        '<p class="gm-ipur">' + body('There are ' + BOARDS.length + ' pictures in all, Japanese and Western. 《Three from the group you choose are drawn at random》 and measured. The controls are the same for both.') + '</p>' +
         '<p class="gm-ick">Choose the pictures</p>';
       var RJ = '<p class="gm-ipur">' + body('3枚に引いた12本の位置を、《同じ名前・同じ向きごとに平均》します。いちばん大きなまとまりの始まりと重心を示す4本が、あなたの平均グリッドになります。') + '</p>' +
-        '<p class="gm-ipur">' + body('日本の絵と西洋の絵を、同じやり方で私が計測しました。') + '</p>' +
         '';   /* v624 「測り方とQ&A」への案内は、四つの手順のすぐ下へ移した（本人） */
       var RE = '<p class="gm-ipur">' + body('I average the positions of your twelve lines, 《grouped by name and orientation》. The four lines that come out mark where the largest form begins and where its weight sits: your average grid.') + '</p>' +
-        '<p class="gm-ipur">' + body('I measured the Japanese and the Western pictures myself, by the same method.') + '</p>' +
         '';
       var brief = {k:4, at:.68, html:true, big:'平均', ja:['線を引いて、平均を出す。', RJ], en:['Draw the lines, then take the average.', RE]};
       var choice = {k:4, at:1, html:true, choice:true, big:'グリッド', ja:['平均グリッドを、使ってみよう。', PJ], en:['Put your average grid to work.', PE]};
@@ -5772,13 +5770,13 @@
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
              日本と西洋の平均の見出しの下へ移す */
-          '<p class="gm-cmph">' + L('日本の絵と西洋の絵を、同じやり方で私が計測しました。それぞれの平均を、あなたの4本と見比べられます。',
-          'I measured the Japanese and the Western pictures by the same method. You can compare each average with your four lines.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
+          '<p class="gm-cmph">' + L('日本の絵と西洋の絵、それぞれの平均を、あなたの4本と見比べられます。',
+          'The Japanese and the Western averages can each be compared with your four lines.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
-            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点を、《このゲームのために》私が計測しました。あなたが引いたのと同じ4本の位置を、1本ずつ平均しています。あなたが計測した3枚も、この中に含まれます。',
-              'I measured ' + nj + ' Japanese and ' + nw + ' Western pictures 《for this game》. For each, I averaged the position of the same four lines you drew. The three you measured are among them.')); })() + '</p>' +
-          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。このゲームのために同じやり方で計測して、並べて見られるようにしました。',
-            'How do the ratios that recur in Japanese pictures 《come out in Western ones》? For this game I measured them the same way, so the two can sit side by side.')) + '</p>' +
+            return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点について、あなたが引いたのと同じ4本の位置を、1本ずつ平均しています。あなたが計測した3枚も、この中に含まれます。',
+              'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one. The three you measured are among them.')); })() + '</p>' +
+          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて、見比べられるようにしました。',
+            'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
           '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「4本の平均」に出たあなたの％と、《この表の同じ線の％を見比べてください》。どちらも線の位置です。',
             'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions: compare them.')) + '</p>' +
           jwTable() +
@@ -5866,7 +5864,7 @@
        'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、19点すべてを同じ手順で計測し、《同じ名前の線同士》を比べています。なぜそこに引いたかも、絵ごとに書いています。',
        'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
       ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
-       'はい、選ぶ絵によって平均は変わります。《このゲームのために、日本の絵12点と西洋の絵7点》を私が計測しました。どちらも、主な形と余白を同じ手順で計測できることを条件に選んでいます。',
+       'はい、選ぶ絵によって平均は変わります。絵は《日本の絵12点と西洋の絵7点》から選ばれます。どちらも、主な形と余白を同じ手順で計測できることを条件にしています。',
        'Yes, the averages change with the pictures chosen. 《For this game I measured twelve Japanese and seven Western pictures》. For both, the rule was that the main form and the empty space could be measured by the same method.'],
       ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
        '写真の複製は、撮り方で色も切り取り方も変わります。それでは計測の条件が揃いません。そこで《どの絵も同じ手順で描き起こし》、細部を省いて、形と余白の置かれ方が見えるようにしました。計測しているのは描き起こした絵で、原画そのものではありません。',
@@ -5945,7 +5943,7 @@
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
       /* v659 見出しは「研究の目的」だったが、中身は研究の目的そのものではなく**この遊びの目的**だった（本人）。
          名前を替え、遊びのことの側へ移し、文も遊びの話から始める形にした */
-      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《3枚の絵で試していただくためのゲーム》です。研究では、日本の絵に繰り返し現れる比率を探しています。このゲームでは、日本の絵と西洋の絵を私が同じものさしで計測して、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures. For this game I measured both the Japanese and the Western pictures with the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
+      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《3枚の絵で試していただくためのゲーム》です。研究では、日本の絵や建築、庭園に繰り返し現れる比率を探しています。このゲームでは、日本の絵と西洋の絵を同じものさしで並べ、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, architecture and gardens. For this game the Japanese and the Western pictures are set side by side on the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
       if(introOn){
         body += '<p class="gm-info-k">' + L('このゲームについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では、《その始まりと重心の位置を、絵の端からの％で計測します》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
           sec(L('4本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
