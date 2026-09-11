@@ -5126,3 +5126,13 @@
      実測：送り幅 62px → 46px になり、いちばん上の「皆さまへ」の札がヘッダーの
      「小坂脩蔵」の下端（約 82px）より 13px 下で止まる＝重なり 0。 */
   html.pcview.phone .menu-in{padding-bottom:40px}
+
+  /* v737: 指の端末では、遊びと紙面の上で**二度叩きの拡大**を止める（線を引く面なので、なぞりが拡大に化ける）。
+     二本指の拡大は残す——読みづらいときに要るため。 */
+  html.handheld .gm, html.handheld .gm *, html.handheld .gmt, html.handheld .gmt *{touch-action:manipulation}
+  /* もともと `none` だったなぞりの面と、紙面のつまみは、そのまま `none` に戻す
+     （上の一行が `.gm *` で効いてしまうため）。紙面そのもの（`.gm-sheet`）と道具の列は触らない——ここは指で送れる必要がある。 */
+  html.handheld .gm-stage, html.handheld .gm-pic, html.handheld .gm-lines{touch-action:none}
+  html.handheld .gm-sheet .gm-mock .gm-drag{touch-action:none}
+
+  body:has(.gmt) .cur .cc, body:has(.gmt) .cur .cv, body:has(.gmt) .cur .chh{opacity:0 !important; transition:opacity .22s var(--ease)}

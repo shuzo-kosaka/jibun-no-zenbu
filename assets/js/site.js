@@ -2473,6 +2473,28 @@
   document.addEventListener('contextmenu', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
   document.addEventListener('dragstart', function(e){ if(e.target.closest && e.target.closest(PIC)) e.preventDefault(); });
 
+  /* v737: 拡大して戻したときに、ヘッダーや紙面の帯が崩れたまま残らないようにする。
+     iOS Safari は拡大中 innerWidth/innerHeight に「見えている分」を返すので、その最中の組み直しは
+     狭い画面のつもりで並べてしまう。しかも等倍へ戻っても window の resize は飛ばない。
+     → visualViewport を見張り、等倍へ戻った瞬間に自分で resize を投げて、全員に組み直させる。 */
+  (function(){
+    var vv = window.visualViewport; if(!vv) return;
+    var H = document.documentElement, t, was = 1;
+    function sc(){ return vv.scale || 1; }
+    function pass(){
+      var z = sc() > 1.01;
+      H.classList.toggle('vzoom', z);
+      if(z){ was = sc(); return; }
+      if(was <= 1.01) return;           /* もともと等倍なら何もしない */
+      was = 1;
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 280);
+    }
+    function soon(){ clearTimeout(t); t = setTimeout(pass, 170); }
+    vv.addEventListener('resize', soon, {passive:true});
+    vv.addEventListener('scroll', soon, {passive:true});
+  })();
+
   /* v158: the header's own height, so the menu can show exactly that much of itself before it runs */
   (function(){
     var hd = document.querySelector('.hd');
