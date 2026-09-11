@@ -3608,653 +3608,881 @@
     var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
     var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
     var BOARDS = /*BOARDS*/[
-          {
-                "id": "massaki",
-                "img": "assets/img/BOARD_01.webp",
-                "jp": true,
-                "ar": 0.667,
-                "t": "広重『隅田川水神の森真崎』",
-                "te": "Hiroshige, Suijin Grove at Massaki",
-                "src": "構図：歌川広重『名所江戸百景 隅田川水神の森真崎』（1856）",
-                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Suijin Shrine and Massaki on the Sumida River (1856)",
-                "cat": "前景フレームと奥行き",
-                "cate": "Foreground frame and depth",
-                "a": {
-                      "y1": 2,
-                      "x1": 1,
-                      "y2": 28,
-                      "x3": 58
+                {
+                      "id": "massaki",
+                      "img": "assets/img/BOARD_01.webp",
+                      "jp": true,
+                      "ar": 0.667,
+                      "t": "広重『隅田川水神の森真崎』",
+                      "te": "Hiroshige, Suijin Grove at Massaki",
+                      "src": "構図：歌川広重『名所江戸百景 隅田川水神の森真崎』（1856）",
+                      "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Suijin Shrine and Massaki on the Sumida River (1856)",
+                      "cat": "前景フレームと奥行き",
+                      "cate": "Foreground frame and depth",
+                      "a": {
+                            "y1": 2,
+                            "x1": 1,
+                            "y2": 28,
+                            "x3": 58
+                      },
+                      "why": [
+                            "花の枝は上の縁から入る。",
+                            "左の縁のすぐ内側。花はここから。",
+                            "花と幹の塊は上に厚い。重心は上寄り。",
+                            "右の幹が重い。重心は中央より右。"
+                      ],
+                      "whye": [
+                            "The blossom branch enters from the top edge",
+                            "Just inside the left edge, where the blossoms start",
+                            "Blossoms and trunk are thick above: the weight sits high",
+                            "The trunk on the right is heavy: the weight sits right of centre"
+                      ],
+                      "obj": "花の枝と幹",
+                      "obje": "blossom branch and trunk",
+                      "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに、手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
+                      "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject.",
+                      "q": [
+                            "花の枝は、どの高さから画面に入るだろう",
+                            "花の枝は、左右のどこから画面に入るだろう",
+                            "花の枝と幹の重さの中心は、どの高さだろう",
+                            "花の枝と幹の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "At what height does the blossom branch enter the picture?",
+                            "From where, left to right, does the blossom branch enter?",
+                            "At what height is the centre of weight of the blossom branch and trunk?",
+                            "Where, left to right, is the centre of weight of the blossom branch and trunk?"
+                      ]
                 },
-                "why": [
-                      "花の枝は上の縁から入る。",
-                      "左の縁のすぐ内側。花はここから。",
-                      "花と幹の塊は上に厚い。重心は上寄り。",
-                      "右の幹が重い。重心は中央より右。"
-                ],
-                "whye": [
-                      "The blossom branch enters from the top edge",
-                      "Just inside the left edge, where the blossoms start",
-                      "Blossoms and trunk are thick above: the weight sits high",
-                      "The trunk on the right is heavy: the weight sits right of centre"
-                ],
-                "obj": "花の枝と幹",
-                "obje": "blossom branch and trunk",
-                "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに、手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
-                "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject."
-          },
-          {
-                "id": "fuji",
-                "img": "assets/img/BOARD_02.webp",
-                "jp": true,
-                "ar": 1.5,
-                "t": "北斎『凱風快晴』",
-                "te": "Hokusai, Fine Wind, Clear Morning",
-                "src": "構図：葛飾北斎『冨嶽三十六景 凱風快晴』（1831 頃）",
-                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fine Wind, Clear Morning (c. 1831)",
-                "cat": "主塊と余白面",
-                "cate": "Mass and void",
-                "a": {
-                      "y1": 14,
-                      "x1": 30,
-                      "y2": 55,
-                      "x3": 68
+                {
+                      "id": "fuji",
+                      "img": "assets/img/BOARD_02.webp",
+                      "jp": true,
+                      "ar": 1.5,
+                      "t": "北斎『凱風快晴』",
+                      "te": "Hokusai, Fine Wind, Clear Morning",
+                      "src": "構図：葛飾北斎『冨嶽三十六景 凱風快晴』（1831 頃）",
+                      "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fine Wind, Clear Morning (c. 1831)",
+                      "cat": "主塊と余白面",
+                      "cate": "Mass and void",
+                      "a": {
+                            "y1": 14,
+                            "x1": 30,
+                            "y2": 55,
+                            "x3": 68
+                      },
+                      "why": [
+                            "山頂。主塊はここから始まる。",
+                            "山裾が林に消える左端。",
+                            "下へ広がる三角。重心は下寄り。",
+                            "裾は左へ長く、右で切れる。重心は中央より右。"
+                      ],
+                      "whye": [
+                            "The summit: the mass begins here",
+                            "The left end, where the slope sinks into the forest",
+                            "A triangle widening downward: the weight sits low",
+                            "The skirt runs long to the left and is cut on the right: the weight sits right of centre"
+                      ],
+                      "obj": "山",
+                      "obje": "mountain",
+                      "note": "葛飾北斎『冨嶽三十六景』の一図で、1831 年ごろの錦絵です。夏の終わりから初秋の早朝、南風が晴れを呼ぶ朝の富士が赤く染まる一瞬を描きました。山だけで画面の大半を占め、空はベロ藍のぼかし、雲は横に流れる筋雲だけ。形を思い切って省いた構図の代表です。",
+                      "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, printed around 1831. It catches the moment on a clear late-summer dawn when a south wind turns the mountain red. The mountain alone fills most of the sheet; the sky is a gradation of Prussian blue, the clouds mere streaks. A landmark of radical simplification.",
+                      "q": [
+                            "山の頂上は、どの高さだろう",
+                            "山裾が林に消える左の端は、左右のどこだろう",
+                            "山の重さの中心は、どの高さだろう",
+                            "山の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the summit of the mountain?",
+                            "Where, left to right, does the foot of the mountain vanish into the trees?",
+                            "At what height is the centre of weight of the mountain?",
+                            "Where, left to right, is the centre of weight of the mountain?"
+                      ]
                 },
-                "why": [
-                      "山頂。主塊はここから始まる。",
-                      "山裾が林に消える左端。",
-                      "下へ広がる三角。重心は下寄り。",
-                      "裾は左へ長く、右で切れる。重心は中央より右。"
-                ],
-                "whye": [
-                      "The summit: the mass begins here",
-                      "The left end, where the slope sinks into the forest",
-                      "A triangle widening downward: the weight sits low",
-                      "The skirt runs long to the left and is cut on the right: the weight sits right of centre"
-                ],
-                "obj": "山",
-                "obje": "mountain",
-                "note": "葛飾北斎『冨嶽三十六景』の一図で、1831 年ごろの錦絵です。夏の終わりから初秋の早朝、南風が晴れを呼ぶ朝の富士が赤く染まる一瞬を描きました。山だけで画面の大半を占め、空はベロ藍のぼかし、雲は横に流れる筋雲だけ。形を思い切って省いた構図の代表です。",
-                "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, printed around 1831. It catches the moment on a clear late-summer dawn when a south wind turns the mountain red. The mountain alone fills most of the sheet; the sky is a gradation of Prussian blue, the clouds mere streaks. A landmark of radical simplification."
-          },
-          {
-                "id": "milkmaid",
-                "img": "assets/img/BOARD_05.webp",
-                "jp": false,
-                "ar": 0.875,
-                "t": "フェルメール『牛乳を注ぐ女』",
-                "te": "Vermeer, The Milkmaid",
-                "src": "構図：ヨハネス・フェルメール『牛乳を注ぐ女』（1658 頃）",
-                "srce": "After Johannes Vermeer, The Milkmaid (c. 1658)",
-                "cat": "主塊と余白面",
-                "cate": "Mass and void",
-                "a": {
-                      "y1": 14,
-                      "x1": 29,
-                      "y2": 55,
-                      "x3": 60
+                {
+                      "id": "milkmaid",
+                      "img": "assets/img/BOARD_05.webp",
+                      "jp": false,
+                      "ar": 0.875,
+                      "t": "フェルメール『牛乳を注ぐ女』",
+                      "te": "Vermeer, The Milkmaid",
+                      "src": "構図：ヨハネス・フェルメール『牛乳を注ぐ女』（1658 頃）",
+                      "srce": "After Johannes Vermeer, The Milkmaid (c. 1658)",
+                      "cat": "主塊と余白面",
+                      "cate": "Mass and void",
+                      "a": {
+                            "y1": 14,
+                            "x1": 29,
+                            "y2": 55,
+                            "x3": 60
+                      },
+                      "why": [
+                            "頭巾のいちばん上。",
+                            "肘の左端。人物はここから。",
+                            "裳が重い。重心は下寄り。",
+                            "窓と壁のあいだ。重心はやや右。"
+                      ],
+                      "whye": [
+                            "The top of the cap",
+                            "The left of the elbow, where the figure begins",
+                            "The skirt is heavy: the weight sits low",
+                            "Between window and wall: the weight sits a little right"
+                      ],
+                      "obj": "人物",
+                      "obje": "figure",
+                      "note": "ヨハネス・フェルメール『牛乳を注ぐ女』、1658 年ごろ、油彩。45×41cm の小さな画面に、左の窓からの光、テーブルの静物、注がれる牛乳の一筋。光を点で置く技法で、パンや壁の質感を描いています。生活の一瞬を静かに止めた作です。",
+                      "notee": "Johannes Vermeer’s The Milkmaid, around 1658, oil on canvas. Within a small 45 by 41 cm panel: light from the left window, a still life on the table, a thin stream of milk. Dots of light render the bread and the wall. A quiet moment of ordinary life held still.",
+                      "q": [
+                            "頭巾のいちばん上は、どの高さだろう",
+                            "肘の左の端は、左右のどこだろう",
+                            "人物の重さの中心は、どの高さだろう",
+                            "人物の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the cap?",
+                            "Where, left to right, is the left edge of the elbow?",
+                            "At what height is the centre of weight of the figure?",
+                            "Where, left to right, is the centre of weight of the figure?"
+                      ]
                 },
-                "why": [
-                      "頭巾のいちばん上。",
-                      "肘の左端。人物はここから。",
-                      "裳が重い。重心は下寄り。",
-                      "窓と壁のあいだ。重心はやや右。"
-                ],
-                "whye": [
-                      "The top of the cap",
-                      "The left of the elbow, where the figure begins",
-                      "The skirt is heavy: the weight sits low",
-                      "Between window and wall: the weight sits a little right"
-                ],
-                "obj": "人物",
-                "obje": "figure",
-                "note": "ヨハネス・フェルメール『牛乳を注ぐ女』、1658 年ごろ、油彩。45×41cm の小さな画面に、左の窓からの光、テーブルの静物、注がれる牛乳の一筋。光を点で置く技法で、パンや壁の質感を描いています。生活の一瞬を静かに止めた作です。",
-                "notee": "Johannes Vermeer’s The Milkmaid, around 1658, oil on canvas. Within a small 45 by 41 cm panel: light from the left window, a still life on the table, a thin stream of milk. Dots of light render the bread and the wall. A quiet moment of ordinary life held still."
-          },
-          {
-                "id": "wanderer",
-                "img": "assets/img/BOARD_06.webp",
-                "jp": false,
-                "ar": 0.75,
-                "t": "フリードリヒ『雲海の上の旅人』",
-                "te": "Friedrich, Wanderer above the Sea of Fog",
-                "src": "構図：カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』（1818 頃）",
-                "srce": "After Caspar David Friedrich, Wanderer above the Sea of Fog (c. 1818)",
-                "cat": "前景フレームと奥行き",
-                "cate": "Foreground frame and depth",
-                "a": {
-                      "y1": 12,
-                      "x1": 4,
-                      "y2": 70,
-                      "x3": 50
+                {
+                      "id": "wanderer",
+                      "img": "assets/img/BOARD_06.webp",
+                      "jp": false,
+                      "ar": 0.75,
+                      "t": "フリードリヒ『雲海の上の旅人』",
+                      "te": "Friedrich, Wanderer above the Sea of Fog",
+                      "src": "構図：カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』（1818 頃）",
+                      "srce": "After Caspar David Friedrich, Wanderer above the Sea of Fog (c. 1818)",
+                      "cat": "前景フレームと奥行き",
+                      "cate": "Foreground frame and depth",
+                      "a": {
+                            "y1": 12,
+                            "x1": 4,
+                            "y2": 70,
+                            "x3": 50
+                      },
+                      "why": [
+                            "頭のいちばん上。",
+                            "人物と足元の岩をひとつの塊と解釈する。岩は左の縁近くから。",
+                            "岩の重さで、重心は下へ。",
+                            "ほぼ中央。人物の軸そのもの。"
+                      ],
+                      "whye": [
+                            "The top of the head",
+                            "Figure and rock read as one mass: the rock starts near the left edge",
+                            "The rock pulls the weight down",
+                            "Almost centred: the figure's own axis"
+                      ],
+                      "obj": "人と岩",
+                      "obje": "figure and rock",
+                      "note": "カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』、1818 年ごろ、油彩。後ろ姿の人物を画面の中心に立たせ、その向こうに霧の海と山を広げます。見る人が人物と同じ視線になるこの「後ろ姿」は、ドイツ・ロマン主義を代表する構図です。",
+                      "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism.",
+                      "q": [
+                            "頭のいちばん上は、どの高さだろう",
+                            "足元の岩の左の端は、左右のどこだろう",
+                            "人と岩の重さの中心は、どの高さだろう",
+                            "人と岩の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the head?",
+                            "Where, left to right, is the left edge of the rock underfoot?",
+                            "At what height is the centre of weight of the figure and rock?",
+                            "Where, left to right, is the centre of weight of the figure and rock?"
+                      ]
                 },
-                "why": [
-                      "頭のいちばん上。",
-                      "人物と足元の岩をひとつの塊と解釈する。岩は左の縁近くから。",
-                      "岩の重さで、重心は下へ。",
-                      "ほぼ中央。人物の軸そのもの。"
-                ],
-                "whye": [
-                      "The top of the head",
-                      "Figure and rock read as one mass: the rock starts near the left edge",
-                      "The rock pulls the weight down",
-                      "Almost centred: the figure's own axis"
-                ],
-                "obj": "人と岩",
-                "obje": "figure and rock",
-                "note": "カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』、1818 年ごろ、油彩。後ろ姿の人物を画面の中心に立たせ、その向こうに霧の海と山を広げます。見る人が人物と同じ視線になるこの「後ろ姿」は、ドイツ・ロマン主義を代表する構図です。",
-                "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism."
-          },
-          {
-                "id": "gleaners",
-                "img": "assets/img/BOARD_07.webp",
-                "jp": false,
-                "ar": 1.333,
-                "t": "ミレー『落穂拾い』",
-                "te": "Millet, The Gleaners",
-                "src": "構図：ジャン＝フランソワ・ミレー『落穂拾い』（1857）",
-                "srce": "After Jean-François Millet, The Gleaners (1857)",
-                "cat": "反復と変奏",
-                "cate": "Repetition and variation",
-                "a": {
-                      "y1": 28,
-                      "x1": 14,
-                      "y2": 60,
-                      "x3": 50
+                {
+                      "id": "gleaners",
+                      "img": "assets/img/BOARD_07.webp",
+                      "jp": false,
+                      "ar": 1.333,
+                      "t": "ミレー『落穂拾い』",
+                      "te": "Millet, The Gleaners",
+                      "src": "構図：ジャン＝フランソワ・ミレー『落穂拾い』（1857）",
+                      "srce": "After Jean-François Millet, The Gleaners (1857)",
+                      "cat": "反復と変奏",
+                      "cate": "Repetition and variation",
+                      "a": {
+                            "y1": 28,
+                            "x1": 14,
+                            "y2": 60,
+                            "x3": 50
+                      },
+                      "why": [
+                            "いちばん高い頭。",
+                            "左の人物の帽子。三人の塊はここから。",
+                            "かがんだ姿は下に重い。",
+                            "三人の真ん中。"
+                      ],
+                      "whye": [
+                            "The highest head",
+                            "The left figure's hat, where the three begin",
+                            "Bent figures are heavy below",
+                            "The middle of the three"
+                      ],
+                      "obj": "三人",
+                      "obje": "three figures",
+                      "note": "ジャン＝フランソワ・ミレー『落穂拾い』、1857 年、油彩。刈り入れ後の畑で落穂を拾う三人の女性を、地平線を高く取って手前に大きく描きます。遠くの豊かな収穫と手前の労働の対比が、発表当時は農民を描く政治的な絵として論争になりました。",
+                      "notee": "Jean-François Millet’s The Gleaners, 1857, oil. Three women gather leftover grain after the harvest, drawn large against a high horizon. The abundant harvest in the distance against the labor in front caused controversy at the time as a political picture of the peasantry.",
+                      "q": [
+                            "いちばん高い頭は、どの高さだろう",
+                            "左の人の帽子は、左右のどこだろう",
+                            "三人の重さの中心は、どの高さだろう",
+                            "三人の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the highest head?",
+                            "Where, left to right, is the cap of the figure on the left?",
+                            "At what height is the centre of weight of the three figures?",
+                            "Where, left to right, is the centre of weight of the three figures?"
+                      ]
                 },
-                "why": [
-                      "いちばん高い頭。",
-                      "左の人物の帽子。三人の塊はここから。",
-                      "かがんだ姿は下に重い。",
-                      "三人の真ん中。"
-                ],
-                "whye": [
-                      "The highest head",
-                      "The left figure's hat, where the three begin",
-                      "Bent figures are heavy below",
-                      "The middle of the three"
-                ],
-                "obj": "三人",
-                "obje": "three figures",
-                "note": "ジャン＝フランソワ・ミレー『落穂拾い』、1857 年、油彩。刈り入れ後の畑で落穂を拾う三人の女性を、地平線を高く取って手前に大きく描きます。遠くの豊かな収穫と手前の労働の対比が、発表当時は農民を描く政治的な絵として論争になりました。",
-                "notee": "Jean-François Millet’s The Gleaners, 1857, oil. Three women gather leftover grain after the harvest, drawn large against a high horizon. The abundant harvest in the distance against the labor in front caused controversy at the time as a political picture of the peasantry."
-          },
-          {
-                "id": "barrel",
-                "img": "assets/img/BOARD_08.webp",
-                "jp": true,
-                "ar": 1.5,
-                "t": "北斎『尾州不二見原』",
-                "te": "Hokusai, Fujimigahara in Owari",
-                "src": "構図：葛飾北斎『冨嶽三十六景 尾州不二見原』（1831 頃）",
-                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fujimigahara in Owari Province (c. 1831)",
-                "cat": "前景フレームと奥行き",
-                "cate": "Foreground frame and depth",
-                "a": {
-                      "y1": 20,
-                      "x1": 28,
-                      "y2": 57,
-                      "x3": 52
+                {
+                      "id": "barrel",
+                      "img": "assets/img/BOARD_08.webp",
+                      "jp": true,
+                      "ar": 1.5,
+                      "t": "北斎『尾州不二見原』",
+                      "te": "Hokusai, Fujimigahara in Owari",
+                      "src": "構図：葛飾北斎『冨嶽三十六景 尾州不二見原』（1831 頃）",
+                      "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Fujimigahara in Owari Province (c. 1831)",
+                      "cat": "前景フレームと奥行き",
+                      "cate": "Foreground frame and depth",
+                      "a": {
+                            "y1": 20,
+                            "x1": 28,
+                            "y2": 57,
+                            "x3": 52
+                      },
+                      "why": [
+                            "桶の環の上端。環そのものが主塊。",
+                            "環の左端。",
+                            "職人が入る分、重心はやや下。",
+                            "環はほぼ中央。富士は環の中の右寄りに。"
+                      ],
+                      "whye": [
+                            "The top of the barrel's ring: the ring itself is the mass",
+                            "The left of the ring",
+                            "With the cooper inside, the weight sits a little low",
+                            "The ring is near the centre; Fuji sits inside it, to the right"
+                      ],
+                      "obj": "桶の環",
+                      "obje": "barrel ring",
+                      "note": "葛飾北斎『冨嶽三十六景』の「尾州不二見原」、1831 年ごろ。桶職人が大きな桶の胴を削る手前の場面と、桶の輪の中に小さく収まる富士。丸い枠で遠くの山を切り取る「見立て」の構図で、近くの人の営みと遠くの山を一枚に重ねています。",
+                      "notee": "Hokusai’s Fujimigahara in Owari Province, Thirty-six Views, around 1831. A cooper shaves the inside of a huge barrel, and Fuji appears small through the barrel’s hoop. The round frame that crops the distant mountain layers everyday work in the foreground onto the far view.",
+                      "q": [
+                            "桶の環のいちばん上は、どの高さだろう",
+                            "桶の環の左の端は、左右のどこだろう",
+                            "桶の環の重さの中心は、どの高さだろう",
+                            "桶の環の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the barrel ring?",
+                            "Where, left to right, is the left edge of the ring?",
+                            "At what height is the centre of weight of the barrel ring?",
+                            "Where, left to right, is the centre of weight of the barrel ring?"
+                      ]
                 },
-                "why": [
-                      "桶の環の上端。環そのものが主塊。",
-                      "環の左端。",
-                      "職人が入る分、重心はやや下。",
-                      "環はほぼ中央。富士は環の中の右寄りに。"
-                ],
-                "whye": [
-                      "The top of the barrel's ring: the ring itself is the mass",
-                      "The left of the ring",
-                      "With the cooper inside, the weight sits a little low",
-                      "The ring is near the centre; Fuji sits inside it, to the right"
-                ],
-                "obj": "桶の環",
-                "obje": "barrel ring",
-                "note": "葛飾北斎『冨嶽三十六景』の「尾州不二見原」、1831 年ごろ。桶職人が大きな桶の胴を削る手前の場面と、桶の輪の中に小さく収まる富士。丸い枠で遠くの山を切り取る「見立て」の構図で、近くの人の営みと遠くの山を一枚に重ねています。",
-                "notee": "Hokusai’s Fujimigahara in Owari Province, Thirty-six Views, around 1831. A cooper shaves the inside of a huge barrel, and Fuji appears small through the barrel’s hoop. The round frame that crops the distant mountain layers everyday work in the foreground onto the far view."
-          },
-          {
-                "id": "kiss",
-                "img": "assets/img/BOARD_11.webp",
-                "jp": false,
-                "ar": 1.0,
-                "t": "クリムト『接吻』",
-                "te": "Klimt, The Kiss",
-                "src": "構図：グスタフ・クリムト『接吻』（1908）",
-                "srce": "After Gustav Klimt, The Kiss (1908)",
-                "cat": "主塊と余白面",
-                "cate": "Mass and void",
-                "a": {
-                      "y1": 2,
-                      "x1": 27,
-                      "y2": 45,
-                      "x3": 50
+                {
+                      "id": "kiss",
+                      "img": "assets/img/BOARD_11.webp",
+                      "jp": false,
+                      "ar": 1.0,
+                      "t": "クリムト『接吻』",
+                      "te": "Klimt, The Kiss",
+                      "src": "構図：グスタフ・クリムト『接吻』（1908）",
+                      "srce": "After Gustav Klimt, The Kiss (1908)",
+                      "cat": "主塊と余白面",
+                      "cate": "Mass and void",
+                      "a": {
+                            "y1": 2,
+                            "x1": 27,
+                            "y2": 45,
+                            "x3": 50
+                      },
+                      "why": [
+                            "頭のいちばん上。",
+                            "抱き合う二人をひとつの塊と解釈する。その左端。",
+                            "上から下まで、ほぼ一様な柱。重心は中央。",
+                            "中央の柱。重心も中央。"
+                      ],
+                      "whye": [
+                            "The top of the heads",
+                            "The two figures read as one mass: its left edge",
+                            "A near-uniform column from top to bottom: the weight is central",
+                            "A central column: the weight, too, is central"
+                      ],
+                      "obj": "二人",
+                      "obje": "two figures",
+                      "note": "グスタフ・クリムト『接吻』、1907〜08 年、油彩に金箔。ほぼ正方形の画面の中で、抱き合う二人が一つの金の塊になり、足元だけに花の草地が見えます。ウィーン分離派の装飾性と、人物をひとつの面に溶かす構図が特徴です。",
+                      "notee": "Gustav Klimt’s The Kiss, 1907–08, oil and gold leaf. On an almost square canvas the embracing couple fuse into a single golden mass, with a flowered meadow only at their feet. It shows the ornament of the Vienna Secession and a composition that melts figures into one plane.",
+                      "q": [
+                            "頭のいちばん上は、どの高さだろう",
+                            "抱き合う二人の左の端は、左右のどこだろう",
+                            "二人の重さの中心は、どの高さだろう",
+                            "二人の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the head?",
+                            "Where, left to right, is the left edge of the embracing pair?",
+                            "At what height is the centre of weight of the two figures?",
+                            "Where, left to right, is the centre of weight of the two figures?"
+                      ]
                 },
-                "why": [
-                      "頭のいちばん上。",
-                      "抱き合う二人をひとつの塊と解釈する。その左端。",
-                      "上から下まで、ほぼ一様な柱。重心は中央。",
-                      "中央の柱。重心も中央。"
-                ],
-                "whye": [
-                      "The top of the heads",
-                      "The two figures read as one mass: its left edge",
-                      "A near-uniform column from top to bottom: the weight is central",
-                      "A central column: the weight, too, is central"
-                ],
-                "obj": "二人",
-                "obje": "two figures",
-                "note": "グスタフ・クリムト『接吻』、1907〜08 年、油彩に金箔。ほぼ正方形の画面の中で、抱き合う二人が一つの金の塊になり、足元だけに花の草地が見えます。ウィーン分離派の装飾性と、人物をひとつの面に溶かす構図が特徴です。",
-                "notee": "Gustav Klimt’s The Kiss, 1907–08, oil and gold leaf. On an almost square canvas the embracing couple fuse into a single golden mass, with a flowered meadow only at their feet. It shows the ornament of the Vienna Secession and a composition that melts figures into one plane."
-          },
-          {
-                "id": "wave",
-                "img": "assets/img/BOARD_13.webp",
-                "jp": true,
-                "ar": 1.5,
-                "t": "北斎『神奈川沖浪裏』",
-                "te": "Hokusai, Under the Wave off Kanagawa",
-                "src": "構図：葛飾北斎『冨嶽三十六景 神奈川沖浪裏』（1831 頃）",
-                "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Under the Wave off Kanagawa (c. 1831)",
-                "cat": "対置と中間領域",
-                "cate": "Opposition and the space between",
-                "a": {
-                      "y1": 6,
-                      "x1": 1,
-                      "y2": 45,
-                      "x3": 30
+                {
+                      "id": "wave",
+                      "img": "assets/img/BOARD_13.webp",
+                      "jp": true,
+                      "ar": 1.5,
+                      "t": "北斎『神奈川沖浪裏』",
+                      "te": "Hokusai, Under the Wave off Kanagawa",
+                      "src": "構図：葛飾北斎『冨嶽三十六景 神奈川沖浪裏』（1831 頃）",
+                      "srce": "After Katsushika Hokusai, Thirty-six Views of Mount Fuji: Under the Wave off Kanagawa (c. 1831)",
+                      "cat": "対置と中間領域",
+                      "cate": "Opposition and the space between",
+                      "a": {
+                            "y1": 6,
+                            "x1": 1,
+                            "y2": 45,
+                            "x3": 30
+                      },
+                      "why": [
+                            "波頭のいちばん上。",
+                            "波は左の縁から入る。",
+                            "爪のような波頭と胴を合わせて、重心は中ほど。",
+                            "大波は左に寄る。富士は右の余白に。"
+                      ],
+                      "whye": [
+                            "The top of the crest",
+                            "The wave enters from the left edge",
+                            "Crest and body together: the weight sits mid-height",
+                            "The great wave leans left; Fuji sits in the void on the right"
+                      ],
+                      "obj": "大波",
+                      "obje": "great wave",
+                      "note": "葛飾北斎『冨嶽三十六景』の一図、1831 年ごろ。手前で砕ける大波が画面を覆い、遠くに小さな富士が見えます。当時輸入されたばかりのベロ藍を使い、波の曲線が富士を包み込むように配されています。西洋の遠近法を学んだ北斎が、近景と遠景の大きさの逆転で奥行きをつくった図です。",
+                      "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far.",
+                      "q": [
+                            "波頭のいちばん上は、どの高さだろう",
+                            "大波は、左右のどこから画面に入るだろう",
+                            "大波の重さの中心は、どの高さだろう",
+                            "大波の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the crest of the wave?",
+                            "From where, left to right, does the great wave enter?",
+                            "At what height is the centre of weight of the great wave?",
+                            "Where, left to right, is the centre of weight of the great wave?"
+                      ]
                 },
-                "why": [
-                      "波頭のいちばん上。",
-                      "波は左の縁から入る。",
-                      "爪のような波頭と胴を合わせて、重心は中ほど。",
-                      "大波は左に寄る。富士は右の余白に。"
-                ],
-                "whye": [
-                      "The top of the crest",
-                      "The wave enters from the left edge",
-                      "Crest and body together: the weight sits mid-height",
-                      "The great wave leans left; Fuji sits in the void on the right"
-                ],
-                "obj": "大波",
-                "obje": "great wave",
-                "note": "葛飾北斎『冨嶽三十六景』の一図、1831 年ごろ。手前で砕ける大波が画面を覆い、遠くに小さな富士が見えます。当時輸入されたばかりのベロ藍を使い、波の曲線が富士を包み込むように配されています。西洋の遠近法を学んだ北斎が、近景と遠景の大きさの逆転で奥行きをつくった図です。",
-                "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far."
-          },
-          {
-                "id": "ohashi",
-                "img": "assets/img/BOARD_14.webp",
-                "jp": true,
-                "ar": 0.667,
-                "t": "広重『大はしあたけの夕立』",
-                "te": "Hiroshige, Sudden Shower over Shin-Ōhashi Bridge",
-                "src": "構図：歌川広重『名所江戸百景 大はしあたけの夕立』（1857）",
-                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Sudden Shower over Shin-Ōhashi Bridge and Atake (1857)",
-                "cat": "水平分節と上下構成",
-                "cate": "Horizontal division, upper and lower",
-                "a": {
-                      "y1": 50,
-                      "x1": 1,
-                      "y2": 70,
-                      "x3": 52
+                {
+                      "id": "ohashi",
+                      "img": "assets/img/BOARD_14.webp",
+                      "jp": true,
+                      "ar": 0.667,
+                      "t": "広重『大はしあたけの夕立』",
+                      "te": "Hiroshige, Sudden Shower over Shin-Ōhashi Bridge",
+                      "src": "構図：歌川広重『名所江戸百景 大はしあたけの夕立』（1857）",
+                      "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Sudden Shower over Shin-Ōhashi Bridge and Atake (1857)",
+                      "cat": "水平分節と上下構成",
+                      "cate": "Horizontal division, upper and lower",
+                      "a": {
+                            "y1": 50,
+                            "x1": 1,
+                            "y2": 70,
+                            "x3": 52
+                      },
+                      "why": [
+                            "橋の右端の高さ。主塊＝橋はここから。",
+                            "橋は左の縁から入る。",
+                            "橋桁と杭を含めると、重さは下にある。",
+                            "橋の中ほど。人の群れもここに集まる。"
+                      ],
+                      "whye": [
+                            "The height of the bridge's right end: the mass, the bridge, begins here",
+                            "The bridge enters from the left edge",
+                            "With the deck and piles, the weight sits low",
+                            "The middle of the bridge, where the figures gather"
+                      ],
+                      "obj": "橋",
+                      "obje": "bridge",
+                      "note": "歌川広重『名所江戸百景』の「大はしあたけの夕立」、1857 年。夕立に打たれて橋を渡る人々を、細い雨の線と暗い空で描きます。橋を斜めに置き、対岸の安宅を薄く沈めた大胆な構図で、のちにゴッホが油彩で模写したことでも知られます。",
+                      "notee": "Hiroshige’s Sudden Shower over Shin-Ōhashi Bridge and Atake, One Hundred Famous Views of Edo, 1857. People cross the bridge under thin lines of rain and a dark sky. The bridge cuts diagonally while the far bank sinks into mist, a bold layout that van Gogh later copied in oil.",
+                      "q": [
+                            "橋の右の端は、どの高さだろう",
+                            "橋は、左右のどこから画面に入るだろう",
+                            "橋の重さの中心は、どの高さだろう",
+                            "橋の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "At what height is the right end of the bridge?",
+                            "From where, left to right, does the bridge enter?",
+                            "At what height is the centre of weight of the bridge?",
+                            "Where, left to right, is the centre of weight of the bridge?"
+                      ]
                 },
-                "why": [
-                      "橋の右端の高さ。主塊＝橋はここから。",
-                      "橋は左の縁から入る。",
-                      "橋桁と杭を含めると、重さは下にある。",
-                      "橋の中ほど。人の群れもここに集まる。"
-                ],
-                "whye": [
-                      "The height of the bridge's right end: the mass, the bridge, begins here",
-                      "The bridge enters from the left edge",
-                      "With the deck and piles, the weight sits low",
-                      "The middle of the bridge, where the figures gather"
-                ],
-                "obj": "橋",
-                "obje": "bridge",
-                "note": "歌川広重『名所江戸百景』の「大はしあたけの夕立」、1857 年。夕立に打たれて橋を渡る人々を、細い雨の線と暗い空で描きます。橋を斜めに置き、対岸の安宅を薄く沈めた大胆な構図で、のちにゴッホが油彩で模写したことでも知られます。",
-                "notee": "Hiroshige’s Sudden Shower over Shin-Ōhashi Bridge and Atake, One Hundred Famous Views of Edo, 1857. People cross the bridge under thin lines of rain and a dark sky. The bridge cuts diagonally while the far bank sinks into mist, a bold layout that van Gogh later copied in oil."
-          },
-          {
-                "id": "kameido",
-                "img": "assets/img/BOARD_15.webp",
-                "jp": true,
-                "ar": 0.667,
-                "t": "広重『亀戸梅屋舗』",
-                "te": "Hiroshige, Plum Garden at Kameido",
-                "src": "構図：歌川広重『名所江戸百景 亀戸梅屋舗』（1857）",
-                "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Plum Garden at Kameido (1857)",
-                "cat": "前景フレームと奥行き",
-                "cate": "Foreground frame and depth",
-                "a": {
-                      "y1": 1,
-                      "x1": 1,
-                      "y2": 60,
-                      "x3": 45
+                {
+                      "id": "kameido",
+                      "img": "assets/img/BOARD_15.webp",
+                      "jp": true,
+                      "ar": 0.667,
+                      "t": "広重『亀戸梅屋舗』",
+                      "te": "Hiroshige, Plum Garden at Kameido",
+                      "src": "構図：歌川広重『名所江戸百景 亀戸梅屋舗』（1857）",
+                      "srce": "After Utagawa Hiroshige, One Hundred Famous Views of Edo: Plum Garden at Kameido (1857)",
+                      "cat": "前景フレームと奥行き",
+                      "cate": "Foreground frame and depth",
+                      "a": {
+                            "y1": 1,
+                            "x1": 1,
+                            "y2": 60,
+                            "x3": 45
+                      },
+                      "why": [
+                            "幹は上の縁から入る。",
+                            "左下の縁から。幹はここから。",
+                            "幹は下で太い。重心は下寄り。",
+                            "斜めに走る幹の中ほど。やや左。"
+                      ],
+                      "whye": [
+                            "The trunk enters from the top edge",
+                            "From the lower-left edge, where the trunk begins",
+                            "The trunk is thick below: the weight sits low",
+                            "The middle of the diagonal trunk, a little left"
+                      ],
+                      "obj": "幹",
+                      "obje": "trunk",
+                      "note": "歌川広重『名所江戸百景』の「亀戸梅屋舗」、1857 年。臥龍梅と呼ばれた名木の幹を画面いっぱいに置き、枝の隙間から梅園と人々をのぞかせます。地平の赤い空と幹の黒の対比が強く、これもゴッホが模写した図です。",
+                      "notee": "Hiroshige’s Plum Garden at Kameido, One Hundred Famous Views of Edo, 1857. The trunk of the famous “reclining dragon” plum fills the sheet, and the garden and visitors peek through the branches. The red horizon sky against the black trunk is another image van Gogh copied.",
+                      "q": [
+                            "幹は、どの高さから画面に入るだろう",
+                            "幹は、左右のどこから画面に入るだろう",
+                            "幹の重さの中心は、どの高さだろう",
+                            "幹の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "At what height does the trunk enter the picture?",
+                            "From where, left to right, does the trunk enter?",
+                            "At what height is the centre of weight of the trunk?",
+                            "Where, left to right, is the centre of weight of the trunk?"
+                      ]
                 },
-                "why": [
-                      "幹は上の縁から入る。",
-                      "左下の縁から。幹はここから。",
-                      "幹は下で太い。重心は下寄り。",
-                      "斜めに走る幹の中ほど。やや左。"
-                ],
-                "whye": [
-                      "The trunk enters from the top edge",
-                      "From the lower-left edge, where the trunk begins",
-                      "The trunk is thick below: the weight sits low",
-                      "The middle of the diagonal trunk, a little left"
-                ],
-                "obj": "幹",
-                "obje": "trunk",
-                "note": "歌川広重『名所江戸百景』の「亀戸梅屋舗」、1857 年。臥龍梅と呼ばれた名木の幹を画面いっぱいに置き、枝の隙間から梅園と人々をのぞかせます。地平の赤い空と幹の黒の対比が強く、これもゴッホが模写した図です。",
-                "notee": "Hiroshige’s Plum Garden at Kameido, One Hundred Famous Views of Edo, 1857. The trunk of the famous “reclining dragon” plum fills the sheet, and the garden and visitors peek through the branches. The red horizon sky against the black trunk is another image van Gogh copied."
-          },
-          {
-                "id": "pines",
-                "img": "assets/img/BOARD_17.webp",
-                "jp": true,
-                "ar": 2.344,
-                "t": "等伯『松林図屏風』",
-                "te": "Tōhaku, Pine Trees",
-                "src": "構図：長谷川等伯『松林図屏風』左隻（16世紀末）",
-                "srce": "After Hasegawa Tōhaku, Pine Trees, left-hand screen (late 16th century)",
-                "cat": "密度差と空間の抜け",
-                "cate": "Density contrast and open space",
-                "a": {
-                      "y1": 20,
-                      "x1": 14,
-                      "y2": 58,
-                      "x3": 29
+                {
+                      "id": "pines",
+                      "img": "assets/img/BOARD_17.webp",
+                      "jp": true,
+                      "ar": 2.344,
+                      "t": "等伯『松林図屏風』",
+                      "te": "Tōhaku, Pine Trees",
+                      "src": "構図：長谷川等伯『松林図屏風』左隻（16世紀末）",
+                      "srce": "After Hasegawa Tōhaku, Pine Trees, left-hand screen (late 16th century)",
+                      "cat": "密度差と空間の抜け",
+                      "cate": "Density contrast and open space",
+                      "a": {
+                            "y1": 20,
+                            "x1": 14,
+                            "y2": 58,
+                            "x3": 29
+                      },
+                      "why": [
+                            "いちばん濃い松のてっぺん。",
+                            "左の松林の左端。主塊はここから。",
+                            "幹は下へ伸びる。重心はやや下。",
+                            "左の群れの中心。右の群れは薄く、余白をはさむ。"
+                      ],
+                      "whye": [
+                            "The top of the darkest pine",
+                            "The left edge of the left grove: the mass begins here",
+                            "Trunks run down: the weight sits a little low",
+                            "The centre of the left grove; the right one is faint, across the void"
+                      ],
+                      "obj": "左の松林",
+                      "obje": "left grove",
+                      "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に、霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
+                      "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
+                      "q": [
+                            "いちばん濃い松のてっぺんは、どの高さだろう",
+                            "左の松林の左の端は、左右のどこだろう",
+                            "左の松林の重さの中心は、どの高さだろう",
+                            "左の松林の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the darkest pine?",
+                            "Where, left to right, is the left edge of the grove?",
+                            "At what height is the centre of weight of the left grove?",
+                            "Where, left to right, is the centre of weight of the left grove?"
+                      ]
                 },
-                "why": [
-                      "いちばん濃い松のてっぺん。",
-                      "左の松林の左端。主塊はここから。",
-                      "幹は下へ伸びる。重心はやや下。",
-                      "左の群れの中心。右の群れは薄く、余白をはさむ。"
-                ],
-                "whye": [
-                      "The top of the darkest pine",
-                      "The left edge of the left grove: the mass begins here",
-                      "Trunks run down: the weight sits a little low",
-                      "The centre of the left grove; the right one is faint, across the void"
-                ],
-                "obj": "左の松林",
-                "obje": "left grove",
-                "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に、霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
-                "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between."
-          },
-          {
-                "id": "sesshu",
-                "img": "assets/img/BOARD_18.webp",
-                "jp": true,
-                "ar": 0.5,
-                "t": "雪舟『秋冬山水図（冬）』",
-                "te": "Sesshū, Winter Landscape",
-                "src": "構図：雪舟等楊『秋冬山水図』冬景（15世紀後半）",
-                "srce": "After Sesshū Tōyō, Autumn and Winter Landscapes: Winter (late 15th century)",
-                "cat": "垂直反復と高低差",
-                "cate": "Vertical repetition and height",
-                "a": {
-                      "y1": 12,
-                      "x1": 36,
-                      "y2": 55,
-                      "x3": 55
+                {
+                      "id": "sesshu",
+                      "img": "assets/img/BOARD_18.webp",
+                      "jp": true,
+                      "ar": 0.5,
+                      "t": "雪舟『秋冬山水図（冬）』",
+                      "te": "Sesshū, Winter Landscape",
+                      "src": "構図：雪舟等楊『秋冬山水図』冬景（15世紀後半）",
+                      "srce": "After Sesshū Tōyō, Autumn and Winter Landscapes: Winter (late 15th century)",
+                      "cat": "垂直反復と高低差",
+                      "cate": "Vertical repetition and height",
+                      "a": {
+                            "y1": 12,
+                            "x1": 36,
+                            "y2": 55,
+                            "x3": 55
+                      },
+                      "why": [
+                            "崖の頂。一本の線がここから落ちる。",
+                            "崖の塊の左端。",
+                            "岩は下へ積み上がる。重心はやや下。",
+                            "縦の線のすぐ右。重心もそこに。"
+                      ],
+                      "whye": [
+                            "The top of the cliff, where the single line drops from",
+                            "The left edge of the cliff mass",
+                            "Rocks pile up downward: the weight sits a little low",
+                            "Just right of the vertical line, and so is the weight"
+                      ],
+                      "obj": "崖",
+                      "obje": "cliff",
+                      "note": "雪舟『秋冬山水図』の冬景、15 世紀後半、国宝。画面の中央を貫いて立ち上がる崖の輪郭線が有名で、上へ行くほど太く濃くなります。中国で学んだ水墨の骨法を、思い切った線で日本の画面に置き換えた一幅です。",
+                      "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line.",
+                      "q": [
+                            "崖の頂は、どの高さだろう",
+                            "崖の左の端は、左右のどこだろう",
+                            "崖の重さの中心は、どの高さだろう",
+                            "崖の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the cliff?",
+                            "Where, left to right, is the left edge of the cliff?",
+                            "At what height is the centre of weight of the cliff?",
+                            "Where, left to right, is the centre of weight of the cliff?"
+                      ]
                 },
-                "why": [
-                      "崖の頂。一本の線がここから落ちる。",
-                      "崖の塊の左端。",
-                      "岩は下へ積み上がる。重心はやや下。",
-                      "縦の線のすぐ右。重心もそこに。"
-                ],
-                "whye": [
-                      "The top of the cliff, where the single line drops from",
-                      "The left edge of the cliff mass",
-                      "Rocks pile up downward: the weight sits a little low",
-                      "Just right of the vertical line, and so is the weight"
-                ],
-                "obj": "崖",
-                "obje": "cliff",
-                "note": "雪舟『秋冬山水図』の冬景、15 世紀後半、国宝。画面の中央を貫いて立ち上がる崖の輪郭線が有名で、上へ行くほど太く濃くなります。中国で学んだ水墨の骨法を、思い切った線で日本の画面に置き換えた一幅です。",
-                "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line."
-          },
-          {
-                "id": "kambara",
-                "img": "assets/img/BOARD_03.webp",
-                "jp": true,
-                "ar": 1.5,
-                "t": "広重『蒲原 夜之雪』",
-                "te": "Hiroshige, Kambara, Night Snow",
-                "src": "構図：歌川広重『東海道五十三次 蒲原 夜之雪』（1833 頃）",
-                "srce": "After Utagawa Hiroshige, Fifty-three Stations of the Tōkaidō: Kambara, Night Snow (c. 1833)",
-                "cat": "水平分節と上下構成",
-                "cate": "Horizontal division, upper and lower",
-                "a": {
-                      "y1": 38,
-                      "x1": 20,
-                      "y2": 58,
-                      "x3": 55
+                {
+                      "id": "kambara",
+                      "img": "assets/img/BOARD_03.webp",
+                      "jp": true,
+                      "ar": 1.5,
+                      "t": "広重『蒲原 夜之雪』",
+                      "te": "Hiroshige, Kambara, Night Snow",
+                      "src": "構図：歌川広重『東海道五十三次 蒲原 夜之雪』（1833 頃）",
+                      "srce": "After Utagawa Hiroshige, Fifty-three Stations of the Tōkaidō: Kambara, Night Snow (c. 1833)",
+                      "cat": "水平分節と上下構成",
+                      "cate": "Horizontal division, upper and lower",
+                      "a": {
+                            "y1": 38,
+                            "x1": 20,
+                            "y2": 58,
+                            "x3": 55
+                      },
+                      "why": [
+                            "いちばん高い屋根の上端。家並みはここから。",
+                            "左の家の左端。",
+                            "雪の屋根が重い。重心はやや下。",
+                            "家並みの中ほど。やや右。"
+                      ],
+                      "whye": [
+                            "The top of the highest roof: the row of houses begins here",
+                            "The left edge of the leftmost house",
+                            "Snowy roofs are heavy: the weight sits a little low",
+                            "The middle of the row, a little right"
+                      ],
+                      "obj": "家並み",
+                      "obje": "row of houses",
+                      "note": "歌川広重『東海道五十三次』の「蒲原 夜之雪」、1833〜34 年ごろ。雪の夜道を行く旅人を、ほぼ墨一色の階調で描きます。実際の蒲原は雪の少ない土地で、この静けさは広重の創作と言われます。人物の小ささと、山と空の広い余白が印象を決めています。",
+                      "notee": "Hiroshige’s Kambara, Night Snow from the Fifty-three Stations of the Tōkaidō, around 1833–34. Travelers walk a snowy road in near monochrome. Kambara rarely sees snow; the stillness is Hiroshige’s invention. The tiny figures and the broad emptiness of hills and sky set the mood.",
+                      "q": [
+                            "いちばん高い屋根の上は、どの高さだろう",
+                            "左の家の左の端は、左右のどこだろう",
+                            "家並みの重さの中心は、どの高さだろう",
+                            "家並みの重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the ridge of the tallest roof?",
+                            "Where, left to right, is the left edge of the first house?",
+                            "At what height is the centre of weight of the row of houses?",
+                            "Where, left to right, is the centre of weight of the row of houses?"
+                      ]
                 },
-                "why": [
-                      "いちばん高い屋根の上端。家並みはここから。",
-                      "左の家の左端。",
-                      "雪の屋根が重い。重心はやや下。",
-                      "家並みの中ほど。やや右。"
-                ],
-                "whye": [
-                      "The top of the highest roof: the row of houses begins here",
-                      "The left edge of the leftmost house",
-                      "Snowy roofs are heavy: the weight sits a little low",
-                      "The middle of the row, a little right"
-                ],
-                "obj": "家並み",
-                "obje": "row of houses",
-                "note": "歌川広重『東海道五十三次』の「蒲原 夜之雪」、1833〜34 年ごろ。雪の夜道を行く旅人を、ほぼ墨一色の階調で描きます。実際の蒲原は雪の少ない土地で、この静けさは広重の創作と言われます。人物の小ささと、山と空の広い余白が印象を決めています。",
-                "notee": "Hiroshige’s Kambara, Night Snow from the Fifty-three Stations of the Tōkaidō, around 1833–34. Travelers walk a snowy road in near monochrome. Kambara rarely sees snow; the stillness is Hiroshige’s invention. The tiny figures and the broad emptiness of hills and sky set the mood."
-          },
-          {
-                "id": "poppin",
-                "img": "assets/img/BOARD_04.webp",
-                "jp": true,
-                "ar": 0.667,
-                "t": "歌麿『ビードロを吹く娘』",
-                "te": "Utamaro, Young Woman Blowing a Poppin",
-                "src": "構図：喜多川歌麿『婦女人相十品 ポッピンを吹く娘』（1792 頃）",
-                "srce": "After Kitagawa Utamaro, Ten Physiognomies of Women: Young Woman Blowing a Glass Pipe (c. 1792)",
-                "cat": "主塊と余白面",
-                "cate": "Mass and void",
-                "a": {
-                      "y1": 10,
-                      "x1": 20,
-                      "y2": 58,
-                      "x3": 60
+                {
+                      "id": "poppin",
+                      "img": "assets/img/BOARD_04.webp",
+                      "jp": true,
+                      "ar": 0.667,
+                      "t": "歌麿『ビードロを吹く娘』",
+                      "te": "Utamaro, Young Woman Blowing a Poppin",
+                      "src": "構図：喜多川歌麿『婦女人相十品 ポッピンを吹く娘』（1792 頃）",
+                      "srce": "After Kitagawa Utamaro, Ten Physiognomies of Women: Young Woman Blowing a Glass Pipe (c. 1792)",
+                      "cat": "主塊と余白面",
+                      "cate": "Mass and void",
+                      "a": {
+                            "y1": 10,
+                            "x1": 20,
+                            "y2": 58,
+                            "x3": 60
+                      },
+                      "why": [
+                            "髷の上端。人物の塊はここから。",
+                            "左の袖の張り出し。",
+                            "頭は上、着物の量は下。重心は中ほどより下。",
+                            "顔は左を向くが、身体の量は右へ。重心はやや右。"
+                      ],
+                      "whye": [
+                            "Top of the hair: the figure's mass starts here",
+                            "The left sleeve's furthest reach",
+                            "Head above, the bulk of the kimono below: the weight sits below the middle",
+                            "The face turns left but the body's bulk goes right: the weight sits slightly right"
+                      ],
+                      "obj": "人物",
+                      "obje": "figure",
+                      "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘が、ガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
+                      "notee": "From Kitagawa Utamaro's series of large-head portraits, Ten Physiognomies of Women, c. 1792. A young woman in a checked kimono blows a glass toy called a poppin. Against a mica ground the figure sits large, slightly right of centre; the sleeve pattern and the black hair make the mass.",
+                      "q": [
+                            "髷のいちばん上は、どの高さだろう",
+                            "左の袖がいちばん張り出すのは、左右のどこだろう",
+                            "人物の重さの中心は、どの高さだろう",
+                            "人物の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the hair?",
+                            "Where, left to right, does the left sleeve reach out furthest?",
+                            "At what height is the centre of weight of the figure?",
+                            "Where, left to right, is the centre of weight of the figure?"
+                      ]
                 },
-                "why": [
-                      "髷の上端。人物の塊はここから。",
-                      "左の袖の張り出し。",
-                      "頭は上、着物の量は下。重心は中ほどより下。",
-                      "顔は左を向くが、身体の量は右へ。重心はやや右。"
-                ],
-                "whye": [
-                      "Top of the hair: the figure's mass starts here",
-                      "The left sleeve's furthest reach",
-                      "Head above, the bulk of the kimono below: the weight sits below the middle",
-                      "The face turns left but the body's bulk goes right: the weight sits slightly right"
-                ],
-                "obj": "人物",
-                "obje": "figure",
-                "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘が、ガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
-                "notee": "From Kitagawa Utamaro's series of large-head portraits, Ten Physiognomies of Women, c. 1792. A young woman in a checked kimono blows a glass toy called a poppin. Against a mica ground the figure sits large, slightly right of centre; the sleeve pattern and the black hair make the mass."
-          },
-          {
-                "id": "whistler",
-                "img": "assets/img/BOARD_09.webp",
-                "jp": false,
-                "ar": 1.126,
-                "t": "ホイッスラー『母の肖像』",
-                "te": "Whistler, Arrangement in Grey and Black No. 1",
-                "src": "構図：ジェームズ・マクニール・ホイッスラー『灰色と黒のアレンジメント 第1番（母の肖像）』（1871）",
-                "srce": "After James McNeill Whistler, Arrangement in Grey and Black No. 1 (1871)",
-                "cat": "対置と中間領域",
-                "cate": "Opposition and the space between",
-                "a": {
-                      "y1": 16,
-                      "x1": 34,
-                      "y2": 62,
-                      "x3": 62
+                {
+                      "id": "whistler",
+                      "img": "assets/img/BOARD_09.webp",
+                      "jp": false,
+                      "ar": 1.126,
+                      "t": "ホイッスラー『母の肖像』",
+                      "te": "Whistler, Arrangement in Grey and Black No. 1",
+                      "src": "構図：ジェームズ・マクニール・ホイッスラー『灰色と黒のアレンジメント 第1番（母の肖像）』（1871）",
+                      "srce": "After James McNeill Whistler, Arrangement in Grey and Black No. 1 (1871)",
+                      "cat": "対置と中間領域",
+                      "cate": "Opposition and the space between",
+                      "a": {
+                            "y1": 16,
+                            "x1": 34,
+                            "y2": 62,
+                            "x3": 62
+                      },
+                      "why": [
+                            "白い頭巾の上端。",
+                            "裾の左端。足台より右。",
+                            "黒い衣の量は下半分に。重心は下寄り。",
+                            "人物は右寄り、椅子の背で止まる。"
+                      ],
+                      "whye": [
+                            "Top of the white cap",
+                            "Left end of the skirt, right of the footstool",
+                            "The black dress bulks in the lower half: the weight sits low",
+                            "The figure sits right of centre, stopped by the chair back"
+                      ],
+                      "obj": "人物",
+                      "obje": "figure",
+                      "note": "ジェームズ・マクニール・ホイッスラーが 1871 年にロンドンで描いた油彩（オルセー美術館）。黒い服の母を横向きに座らせ、灰色の壁、黒いカーテン、額の矩形で画面を組みました。題名が示すとおり肖像というより色面の配置の絵で、人物は画面の右寄りに置かれています。",
+                      "notee": "Oil by James McNeill Whistler, painted in London in 1871 (Musee d'Orsay). His mother sits in profile in black against a grey wall, a black curtain and the rectangles of framed pictures. As the title says, it is an arrangement of tones more than a portrait, and the figure sits to the right.",
+                      "q": [
+                            "白い頭巾のいちばん上は、どの高さだろう",
+                            "裾の左の端は、左右のどこだろう",
+                            "人物の重さの中心は、どの高さだろう",
+                            "人物の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the white cap?",
+                            "Where, left to right, is the left edge of the hem?",
+                            "At what height is the centre of weight of the figure?",
+                            "Where, left to right, is the centre of weight of the figure?"
+                      ]
                 },
-                "why": [
-                      "白い頭巾の上端。",
-                      "裾の左端。足台より右。",
-                      "黒い衣の量は下半分に。重心は下寄り。",
-                      "人物は右寄り、椅子の背で止まる。"
-                ],
-                "whye": [
-                      "Top of the white cap",
-                      "Left end of the skirt, right of the footstool",
-                      "The black dress bulks in the lower half: the weight sits low",
-                      "The figure sits right of centre, stopped by the chair back"
-                ],
-                "obj": "人物",
-                "obje": "figure",
-                "note": "ジェームズ・マクニール・ホイッスラーが 1871 年にロンドンで描いた油彩（オルセー美術館）。黒い服の母を横向きに座らせ、灰色の壁、黒いカーテン、額の矩形で画面を組みました。題名が示すとおり肖像というより色面の配置の絵で、人物は画面の右寄りに置かれています。",
-                "notee": "Oil by James McNeill Whistler, painted in London in 1871 (Musee d'Orsay). His mother sits in profile in black against a grey wall, a black curtain and the rectangles of framed pictures. As the title says, it is an arrangement of tones more than a portrait, and the figure sits to the right."
-          },
-          {
-                "id": "scream",
-                "img": "assets/img/BOARD_10.webp",
-                "jp": false,
-                "ar": 0.8,
-                "t": "ムンク『叫び』",
-                "te": "Munch, The Scream",
-                "src": "構図：エドヴァルド・ムンク『叫び』（1893）",
-                "srce": "After Edvard Munch, The Scream (1893)",
-                "cat": "前景フレームと奥行き",
-                "cate": "Foreground frame and depth",
-                "a": {
-                      "y1": 56,
-                      "x1": 32,
-                      "y2": 80,
-                      "x3": 46
+                {
+                      "id": "scream",
+                      "img": "assets/img/BOARD_10.webp",
+                      "jp": false,
+                      "ar": 0.8,
+                      "t": "ムンク『叫び』",
+                      "te": "Munch, The Scream",
+                      "src": "構図：エドヴァルド・ムンク『叫び』（1893）",
+                      "srce": "After Edvard Munch, The Scream (1893)",
+                      "cat": "前景フレームと奥行き",
+                      "cate": "Foreground frame and depth",
+                      "a": {
+                            "y1": 56,
+                            "x1": 32,
+                            "y2": 80,
+                            "x3": 46
+                      },
+                      "why": [
+                            "頭の上端。人物はここから下に。",
+                            "身体の左端（手すりの手前）。",
+                            "頭は小さく、身体は下へ広がる。重心は下。",
+                            "人物は中央よりわずかに左。"
+                      ],
+                      "whye": [
+                            "Top of the head: the figure runs down from here",
+                            "Left edge of the body, in front of the railing",
+                            "Small head, body widening downward: the weight sits low",
+                            "The figure stands slightly left of centre"
+                      ],
+                      "obj": "人物",
+                      "obje": "figure",
+                      "note": "エドヴァルド・ムンクが 1893 年に描いた最初の『叫び』（オスロ国立美術館）。オスロ近郊の丘の道で夕焼けが血の色に変わったときの不安を、うねる線で描きました。左から右下へ走る手すりの対角線が奥行きを作り、前景の人物を画面の右下寄りに置きます。",
+                      "notee": "The first version of The Scream, painted by Edvard Munch in 1893 (National Museum, Oslo). On a hill path near Oslo the sunset turned blood red and he felt a scream through nature, drawn in waving lines. The railing runs from the left down to the lower right and makes the depth; the figure stands lower right.",
+                      "q": [
+                            "頭のいちばん上は、どの高さだろう",
+                            "身体の左の端は、左右のどこだろう",
+                            "人物の重さの中心は、どの高さだろう",
+                            "人物の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the head?",
+                            "Where, left to right, is the left edge of the body?",
+                            "At what height is the centre of weight of the figure?",
+                            "Where, left to right, is the centre of weight of the figure?"
+                      ]
                 },
-                "why": [
-                      "頭の上端。人物はここから下に。",
-                      "身体の左端（手すりの手前）。",
-                      "頭は小さく、身体は下へ広がる。重心は下。",
-                      "人物は中央よりわずかに左。"
-                ],
-                "whye": [
-                      "Top of the head: the figure runs down from here",
-                      "Left edge of the body, in front of the railing",
-                      "Small head, body widening downward: the weight sits low",
-                      "The figure stands slightly left of centre"
-                ],
-                "obj": "人物",
-                "obje": "figure",
-                "note": "エドヴァルド・ムンクが 1893 年に描いた最初の『叫び』（オスロ国立美術館）。オスロ近郊の丘の道で夕焼けが血の色に変わったときの不安を、うねる線で描きました。左から右下へ走る手すりの対角線が奥行きを作り、前景の人物を画面の右下寄りに置きます。",
-                "notee": "The first version of The Scream, painted by Edvard Munch in 1893 (National Museum, Oslo). On a hill path near Oslo the sunset turned blood red and he felt a scream through nature, drawn in waving lines. The railing runs from the left down to the lower right and makes the depth; the figure stands lower right."
-          },
-          {
-                "id": "fujinraijin",
-                "img": "assets/img/BOARD_12.webp",
-                "jp": true,
-                "ar": 2.381,
-                "t": "宗達『風神雷神図屏風』",
-                "te": "Sōtatsu, Wind God and Thunder God",
-                "src": "構図：俵屋宗達『風神雷神図屏風』（17世紀前半）",
-                "srce": "After Tawaraya Sōtatsu, Wind God and Thunder God (early 17th century)",
-                "cat": "対置と中間領域",
-                "cate": "Opposition and the space between",
-                "a": {
-                      "y1": 8,
-                      "x1": 63,
-                      "y2": 45,
-                      "x3": 80
+                {
+                      "id": "fujinraijin",
+                      "img": "assets/img/BOARD_12.webp",
+                      "jp": true,
+                      "ar": 2.381,
+                      "t": "宗達『風神雷神図屏風』",
+                      "te": "Sōtatsu, Wind God and Thunder God",
+                      "src": "構図：俵屋宗達『風神雷神図屏風』（17世紀前半）",
+                      "srce": "After Tawaraya Sōtatsu, Wind God and Thunder God (early 17th century)",
+                      "cat": "対置と中間領域",
+                      "cate": "Opposition and the space between",
+                      "a": {
+                            "y1": 8,
+                            "x1": 63,
+                            "y2": 45,
+                            "x3": 80
+                      },
+                      "why": [
+                            "白い布の弧の上端。風神の塊はここから。",
+                            "黒い雲の左端。金地はここまで。",
+                            "頭と胴が上寄り、雲が下に垂れる。重心はやや上。",
+                            "風神は右端に寄る。重心は 80 付近。"
+                      ],
+                      "whye": [
+                            "Top of the white cloth arc: the wind god's mass starts here",
+                            "Left edge of the black cloud; the gold ends here",
+                            "Head and torso sit high, the clouds hang below: the weight is slightly high",
+                            "The wind god is pushed to the right edge: the weight sits near 80"
+                      ],
+                      "obj": "右の風神",
+                      "obje": "wind god on the right",
+                      "note": "俵屋宗達が 17 世紀前半に描いた二曲一双の屏風で、建仁寺に伝わりました。金地の画面の左右の端に雷神と風神を寄せ、中央を大きく空けた構図です。二神は画面からはみ出すほど外側に置かれ、その間の何もない金地が緊張を生みます。のちに光琳、抱一が写した、琳派を象徴する一作です。",
+                      "notee": "A pair of two-panel screens by Tawaraya Sotatsu, painted in the early 17th century and handed down at Kennin-ji. The thunder god and the wind god are pushed to the far left and right of the gold ground, leaving the centre empty; the empty gold between them carries the tension. Korin and Hoitsu later copied it, and it stands for the Rinpa school.",
+                      "q": [
+                            "白い布の弧のいちばん上は、どの高さだろう",
+                            "黒い雲の左の端は、左右のどこだろう",
+                            "右の風神の重さの中心は、どの高さだろう",
+                            "右の風神の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top of the arc of white cloth?",
+                            "Where, left to right, is the left edge of the dark cloud?",
+                            "At what height is the centre of weight of the wind god on the right?",
+                            "Where, left to right, is the centre of weight of the wind god on the right?"
+                      ]
                 },
-                "why": [
-                      "白い布の弧の上端。風神の塊はここから。",
-                      "黒い雲の左端。金地はここまで。",
-                      "頭と胴が上寄り、雲が下に垂れる。重心はやや上。",
-                      "風神は右端に寄る。重心は 80 付近。"
-                ],
-                "whye": [
-                      "Top of the white cloth arc: the wind god's mass starts here",
-                      "Left edge of the black cloud; the gold ends here",
-                      "Head and torso sit high, the clouds hang below: the weight is slightly high",
-                      "The wind god is pushed to the right edge: the weight sits near 80"
-                ],
-                "obj": "右の風神",
-                "obje": "wind god on the right",
-                "note": "俵屋宗達が 17 世紀前半に描いた二曲一双の屏風で、建仁寺に伝わりました。金地の画面の左右の端に雷神と風神を寄せ、中央を大きく空けた構図です。二神は画面からはみ出すほど外側に置かれ、その間の何もない金地が緊張を生みます。のちに光琳、抱一が写した、琳派を象徴する一作です。",
-                "notee": "A pair of two-panel screens by Tawaraya Sotatsu, painted in the early 17th century and handed down at Kennin-ji. The thunder god and the wind god are pushed to the far left and right of the gold ground, leaving the centre empty; the empty gold between them carries the tension. Korin and Hoitsu later copied it, and it stands for the Rinpa school."
-          },
-          {
-                "id": "irises",
-                "img": "assets/img/BOARD_16.webp",
-                "jp": true,
-                "ar": 2.532,
-                "t": "光琳『燕子花図屏風』",
-                "te": "Kōrin, Irises",
-                "src": "構図：尾形光琳『燕子花図屏風』（18世紀初頭）",
-                "srce": "After Ogata Kōrin, Irises (early 18th century)",
-                "cat": "反復と変奏",
-                "cate": "Repetition and variation",
-                "a": {
-                      "y1": 8,
-                      "x1": 1,
-                      "y2": 48,
-                      "x3": 10
+                {
+                      "id": "irises",
+                      "img": "assets/img/BOARD_16.webp",
+                      "jp": true,
+                      "ar": 2.532,
+                      "t": "光琳『燕子花図屏風』",
+                      "te": "Kōrin, Irises",
+                      "src": "構図：尾形光琳『燕子花図屏風』（18世紀初頭）",
+                      "srce": "After Ogata Kōrin, Irises (early 18th century)",
+                      "cat": "反復と変奏",
+                      "cate": "Repetition and variation",
+                      "a": {
+                            "y1": 8,
+                            "x1": 1,
+                            "y2": 48,
+                            "x3": 10
+                      },
+                      "why": [
+                            "左の花群のいちばん高い花。",
+                            "花群は左端に接する。",
+                            "花は上半分、葉は下へ。重心は中ほど。",
+                            "左端の群れの中心。"
+                      ],
+                      "whye": [
+                            "The highest flower of the left cluster",
+                            "The cluster touches the left edge",
+                            "Flowers in the upper half, leaves running down: the weight sits mid-height",
+                            "The centre of the leftmost cluster"
+                      ],
+                      "note": "尾形光琳が 1701 年ごろに描いた六曲一双の屏風（根津美術館）。伊勢物語の八橋の段を、橋も水も描かず、金地に群青と緑青の燕子花だけで表しました。花群を左から右へ、高さを変えながら並べる反復が主題で、同じ形の型を繰り返し使ったとも言われます。",
+                      "notee": "A pair of six-panel screens by Ogata Korin, c. 1701 (Nezu Museum). The Yatsuhashi episode of the Tales of Ise is shown with no bridge and no water: only irises in ultramarine and malachite green on gold. The subject is repetition, clusters set left to right at changing heights, possibly with reused stencils.",
+                      "obj": "左の花群",
+                      "obje": "left cluster",
+                      "q": [
+                            "いちばん高い花は、どの高さだろう",
+                            "左の花群は、左右のどこから始まるだろう",
+                            "左の花群の重さの中心は、どの高さだろう",
+                            "左の花群の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the tallest flower?",
+                            "From where, left to right, does the left cluster begin?",
+                            "At what height is the centre of weight of the left cluster?",
+                            "Where, left to right, is the centre of weight of the left cluster?"
+                      ]
                 },
-                "why": [
-                      "左の花群のいちばん高い花。",
-                      "花群は左端に接する。",
-                      "花は上半分、葉は下へ。重心は中ほど。",
-                      "左端の群れの中心。"
-                ],
-                "whye": [
-                      "The highest flower of the left cluster",
-                      "The cluster touches the left edge",
-                      "Flowers in the upper half, leaves running down: the weight sits mid-height",
-                      "The centre of the leftmost cluster"
-                ],
-                "note": "尾形光琳が 1701 年ごろに描いた六曲一双の屏風（根津美術館）。伊勢物語の八橋の段を、橋も水も描かず、金地に群青と緑青の燕子花だけで表しました。花群を左から右へ、高さを変えながら並べる反復が主題で、同じ形の型を繰り返し使ったとも言われます。",
-                "notee": "A pair of six-panel screens by Ogata Korin, c. 1701 (Nezu Museum). The Yatsuhashi episode of the Tales of Ise is shown with no bridge and no water: only irises in ultramarine and malachite green on gold. The subject is repetition, clusters set left to right at changing heights, possibly with reused stencils.",
-                "obj": "左の花群",
-                "obje": "left cluster"
-          },
-          {
-                "id": "mondrian",
-                "img": "assets/img/BOARD_19.webp",
-                "jp": false,
-                "ar": 1.0,
-                "t": "モンドリアン『赤・青・黄のコンポジション』",
-                "te": "Mondrian, Composition II in Red, Blue, and Yellow",
-                "src": "構図：ピート・モンドリアン『赤・青・黄のコンポジション II』（1930）",
-                "srce": "After Piet Mondrian, Composition II in Red, Blue, and Yellow (1930)",
-                "cat": "主塊と余白面",
-                "cate": "Mass and void",
-                "a": {
-                      "y1": 1,
-                      "x1": 25,
-                      "y2": 33,
-                      "x3": 63
-                },
-                "why": [
-                      "赤い面は上辺から始まる。",
-                      "太い黒の縦線の右。赤はここから。",
-                      "赤は上三分の二を占める。重心はその中ほど。",
-                      "赤の左右の中心。右辺に接するぶん右寄り。"
-                ],
-                "whye": [
-                      "The red plane starts at the top edge",
-                      "Right of the thick black vertical: red begins here",
-                      "Red fills the upper two thirds: the weight sits in its middle",
-                      "The centre of the red, right of centre because it touches the right edge"
-                ],
-                "note": "ピート・モンドリアンが 1930 年に描いた油彩（チューリヒ美術館）。黒い直線で画面を割り、赤・青・黄の三原色と白だけで組む「新造形主義」の代表作です。大きな赤い面を右上に置き、小さな青と黄で釣り合いを取ります。",
-                "notee": "Oil on canvas by Piet Mondrian, 1930 (Kunsthaus Zurich). Black straight lines divide the plane, and only the three primaries and white fill it: the emblem of Neoplasticism. A large red plane sits top right, balanced by a small blue and a small yellow.",
-                "obj": "赤い面",
-                "obje": "red plane"
-          }
-    ]/*/BOARDS*/;
+                {
+                      "id": "mondrian",
+                      "img": "assets/img/BOARD_19.webp",
+                      "jp": false,
+                      "ar": 1.0,
+                      "t": "モンドリアン『赤・青・黄のコンポジション』",
+                      "te": "Mondrian, Composition II in Red, Blue, and Yellow",
+                      "src": "構図：ピート・モンドリアン『赤・青・黄のコンポジション II』（1930）",
+                      "srce": "After Piet Mondrian, Composition II in Red, Blue, and Yellow (1930)",
+                      "cat": "主塊と余白面",
+                      "cate": "Mass and void",
+                      "a": {
+                            "y1": 1,
+                            "x1": 25,
+                            "y2": 33,
+                            "x3": 63
+                      },
+                      "why": [
+                            "赤い面は上辺から始まる。",
+                            "太い黒の縦線の右。赤はここから。",
+                            "赤は上三分の二を占める。重心はその中ほど。",
+                            "赤の左右の中心。右辺に接するぶん右寄り。"
+                      ],
+                      "whye": [
+                            "The red plane starts at the top edge",
+                            "Right of the thick black vertical: red begins here",
+                            "Red fills the upper two thirds: the weight sits in its middle",
+                            "The centre of the red, right of centre because it touches the right edge"
+                      ],
+                      "note": "ピート・モンドリアンが 1930 年に描いた油彩（チューリヒ美術館）。黒い直線で画面を割り、赤・青・黄の三原色と白だけで組む「新造形主義」の代表作です。大きな赤い面を右上に置き、小さな青と黄で釣り合いを取ります。",
+                      "notee": "Oil on canvas by Piet Mondrian, 1930 (Kunsthaus Zurich). Black straight lines divide the plane, and only the three primaries and white fill it: the emblem of Neoplasticism. A large red plane sits top right, balanced by a small blue and a small yellow.",
+                      "obj": "赤い面",
+                      "obje": "red plane",
+                      "q": [
+                            "赤い面の上の縁は、どの高さだろう",
+                            "赤い面の左の縁は、左右のどこだろう",
+                            "赤い面の重さの中心は、どの高さだろう",
+                            "赤い面の重さの中心は、左右のどこだろう"
+                      ],
+                      "qe": [
+                            "How high is the top edge of the red plane?",
+                            "Where, left to right, is the left edge of the red plane?",
+                            "At what height is the centre of weight of the red plane?",
+                            "Where, left to right, is the centre of weight of the red plane?"
+                      ]
+                }
+          ]/*/BOARDS*/;
     var listEl = null, modeEl = null, lastAvg = null;
     var ORD = ['1枚目', '2枚目', '3枚目'], ORDE = ['first', 'second', 'third'], PC = '<small class="gm-pc">%</small>';   /* 数字はすべて外郭を 100 とした％ */
     var gm = null, stage, picEl, linesEl, liveEl, readEl, tipEl, stepEl, resEl, goEl, cardEl, sheetEl, dimEl, drv, drh, introEl, iscroll, introSeen = false, introOn = false;
@@ -6740,7 +6968,10 @@
     /* JA/EN が切り替わったら、見えている文を組み直す（案内・題・手番の欄） */
     function tipText(){   /* v556 問いの一行。trace() の中だけで書いていたので、比べる・測り終えた・平均の場面で言語を切り替えると前の言語のまま残っていた（本人・挙動係） */
       if(!tipEl) return; var t = LINES[ti], b = picks[bi]; if(!t || !b) return;
-      tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(L(t.q, t.qe).replace('%s', obj(b))) + '</span>';
+      /* v702 問いは板ごとに（本人：『山の上の端』では分かりにくい → 『山の頂上』）。
+         板に文があればそれを使い、無ければこれまでの型に対象の名を入れる */
+      var _q = (b.q && b.q[ti]) ? L(b.q[ti], (b.qe && b.qe[ti]) || b.q[ti]) : L(t.q, t.qe).replace('%s', obj(b));
+      tipEl.innerHTML = '<b>' + (ti + 1) + ' / ' + LINES.length + '</b><span>' + esc(_q) + '</span>';
     }
     function relang(){
       if(window.__seqSeal) window.__seqSeal();   /* v556 手順 08 の判は遊びの外にあるので、幕が閉じていても採り直す */
