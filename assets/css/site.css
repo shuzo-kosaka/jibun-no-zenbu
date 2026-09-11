@@ -5012,3 +5012,6 @@
   .gm-sheet .gm-mock.dragging .gm-drag,.gm-sheet .gm-mock.dragging .gm-drag.grab{transition:none}
   html.rm .gm-sheet .gm-mock .gm-drag{transition:none}
   .gm-sheet.arfix.nogrid .gm-mock{outline:1px solid rgba(30,28,26,.34)}
+
+  .gm-res .gm-avg li small{align-self:baseline}
+  .gm-res .gm-avg li{align-items:baseline}

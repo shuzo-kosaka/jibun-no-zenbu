@@ -5495,8 +5495,8 @@
                      en:'A heading, an image and body text are set against your 《four lines》.'},
       {k:['stool'],  ja:'ここから《見出し・図版・本文》を足して、つまんで動かせます。',
                      en:'Add a 《heading, image or body text》 from here, then drag them where you like.'},
-      {k:['swk'],    ja:'あなたのグリッドと<br>このサイトのグリッドを、切り替えて見比べられます。',
-                     en:'Switch between your grid<br>and this site’s grid to compare the two.'}
+      {k:['swk'],    ja:'あなたのグリッドと｜このサイトのグリッドを、切り替えて見比べられます。',
+                     en:'Switch between your grid｜and this site’s grid to compare the two.'}
     ];
     var tutList = null, tutKind = '';
     var TUTS = [
@@ -5593,7 +5593,8 @@
       var s = tutList[i], say = tutEl.querySelector('.gmt-say');
       tutNum(say.querySelector('b'), i, tutList.length);
       var w = tutWay();
-      say.querySelector('.gmt-t').innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1])));
+      /* v709 手引きの文の中の「｜」は改行にする（`<br>` を直に書くと body() が字として出す：本人） */
+      say.querySelector('.gmt-t').innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1]))).replace(/｜/g, '<br>');
       say.classList.remove('in'); void say.offsetWidth; say.classList.add('in');   /* 移動はしない。薄く現れるだけ */
       lite(say);   /* 朱の下線を、本編と同じ間で引く */
       var nx = say.querySelector('.gmt-nx');
@@ -6038,8 +6039,6 @@
               'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one. The three you measured are among them.')); })() + '</p>' +
           '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて、見比べられるようにしました。',
             'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
-          '<p class="gm-note gm-jwgo">' + body(L('ひとつ上の「4本の平均」に出たあなたの％と、《この表の同じ線の％》は、どちらも線の位置です。見比べてみてください。',
-            'Your percentages in “The four averages” above and 《the same lines in this table》 are both line positions — compare them.')) + '</p>' +
           jwTable() +
           '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。',
             'The “diff” column is the Japanese average subtracted from the Western one, and 《is not the difference between your reading and mine》.')) + '</p>' +
