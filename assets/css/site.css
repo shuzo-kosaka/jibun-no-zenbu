@@ -2943,7 +2943,7 @@
   .gm-card strong .ph{display:inline-block}
   .gm-ask b,.gm-card strong,.gm-obs,.gm-lead b,.gm-scap b{text-wrap:balance}
   /* スマホの案内：文書のスクロールで進める（Safari の帯を畳ませる）。案内の箱そのものは動かさない */
-  html.gmdoc,html.gmdoc body{overflow:visible !important}
+  html.gmdoc,html.gmdoc body{overflow-y:visible !important; overflow-x:clip !important}   /* v715 縦だけ解く。横のクリップまで外していたので、スマホで遊びを開くと 157px はみ出していた（見張り係） */
   /* v429: 案内は枠の中で送るので、文書を動かせる状態でも中は動く */
   /* 判：本編の感謝の印と同じ押し方（yayPress）。盤面の右下（落款）か中央、紙面の右下。退場は紙から離れるように */
   .gm-seal{position:absolute; z-index:7; pointer-events:none; width:min(32vh, 220px); height:min(32vh, 220px)}

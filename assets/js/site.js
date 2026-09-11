@@ -3600,8 +3600,8 @@
     function L(ja, en){ return document.documentElement.lang === 'en' ? en : ja; }
     /* 四本の機能線。k は盤面の答えの鍵、ax は線の向き（v＝たての線＝X の値）。q の %s には盤面ごとの対象（obj）が入る */
     var LINES = [
-      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの上の端は、どこだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
-      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの左の端は、どこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
+      {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sの上の端は、どの高さだろう', qe:'Where is the top edge of the %s?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
+      {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sの左の端は、左右のどこだろう', qe:'Where is the left edge of the %s?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
       {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
       {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
     ];
@@ -3626,14 +3626,14 @@
                             "x3": 58
                       },
                       "why": [
-                            "花の枝は上の縁から入る。",
-                            "左の縁のすぐ内側。花はここから。",
+                            "花の枝の上の端。上の縁に接する。",
+                            "花の枝の左の端。左の縁のすぐ内側。",
                             "花と幹の塊は上に厚い。重心は上寄り。",
                             "右の幹が重い。重心は中央より右。"
                       ],
                       "whye": [
-                            "The blossom branch enters from the top edge",
-                            "Just inside the left edge, where the blossoms start",
+                            "The top edge of the blossom branch, touching the frame",
+                            "The left edge of the blossom branch, just inside the frame",
                             "Blossoms and trunk are thick above: the weight sits high",
                             "The trunk on the right is heavy: the weight sits right of centre"
                       ],
@@ -3642,14 +3642,14 @@
                       "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに、手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
                       "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject.",
                       "q": [
-                            "花の枝は、どの高さから画面に入るだろう",
-                            "花の枝は、左右のどこから画面に入るだろう",
+                            "花の枝の上の端は、どの高さだろう",
+                            "花の枝の左の端は、左右のどこだろう",
                             "花の枝と幹の重さの中心は、どの高さだろう",
                             "花の枝と幹の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
-                            "At what height does the blossom branch enter the picture?",
-                            "From where, left to right, does the blossom branch enter?",
+                            "How high is the top edge of the blossom branch?",
+                            "Where, left to right, is the left edge of the blossom branch?",
                             "At what height is the centre of weight of the blossom branch and trunk?",
                             "Where, left to right, is the centre of weight of the blossom branch and trunk?"
                       ]
@@ -3827,13 +3827,13 @@
                       "notee": "Jean-François Millet’s The Gleaners, 1857, oil. Three women gather leftover grain after the harvest, drawn large against a high horizon. The abundant harvest in the distance against the labor in front caused controversy at the time as a political picture of the peasantry.",
                       "q": [
                             "いちばん高い頭は、どの高さだろう",
-                            "左の人の帽子は、左右のどこだろう",
+                            "左の人の帽子の左の端は、左右のどこだろう",
                             "三人の重さの中心は、どの高さだろう",
                             "三人の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
                             "How high is the highest head?",
-                            "Where, left to right, is the cap of the figure on the left?",
+                            "Where, left to right, is the left edge of the cap of the figure on the left?",
                             "At what height is the centre of weight of the three figures?",
                             "Where, left to right, is the centre of weight of the three figures?"
                       ]
@@ -3949,13 +3949,13 @@
                       },
                       "why": [
                             "波のいちばん高いところ。",
-                            "波は左の縁から入る。",
+                            "大波の左の端。左の縁に接する。",
                             "爪のような波頭と胴を合わせて、重心は中ほど。",
                             "大波は左に寄る。富士は右の余白に。"
                       ],
                       "whye": [
                             "The top of the crest",
-                            "The wave enters from the left edge",
+                            "The left edge of the great wave, touching the frame",
                             "Crest and body together: the weight sits mid-height",
                             "The great wave leans left; Fuji sits in the void on the right"
                       ],
@@ -3965,13 +3965,13 @@
                       "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far.",
                       "q": [
                             "波がいちばん高いところは、どの高さだろう",
-                            "大波は、左右のどこから画面に入るだろう",
+                            "大波の左の端は、左右のどこだろう",
                             "大波の重さの中心は、どの高さだろう",
                             "大波の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
                             "How high is the crest of the wave?",
-                            "From where, left to right, does the great wave enter?",
+                            "Where, left to right, is the left edge of the great wave?",
                             "At what height is the centre of weight of the great wave?",
                             "Where, left to right, is the centre of weight of the great wave?"
                       ]
@@ -3994,14 +3994,14 @@
                             "x3": 52
                       },
                       "why": [
-                            "橋の右端の高さ。主塊＝橋はここから。",
-                            "橋は左の縁から入る。",
+                            "橋がいちばん高い右の端。橋の塊はここから。",
+                            "橋の左の端。左の縁に接する。",
                             "橋桁と杭を含めると、重さは下にある。",
                             "橋の中ほど。人の群れもここに集まる。"
                       ],
                       "whye": [
-                            "The height of the bridge's right end: the mass, the bridge, begins here",
-                            "The bridge enters from the left edge",
+                            "The right end of the bridge, its highest point: the mass begins here",
+                            "The left edge of the bridge, touching the frame",
                             "With the deck and piles, the weight sits low",
                             "The middle of the bridge, where the figures gather"
                       ],
@@ -4010,14 +4010,14 @@
                       "note": "歌川広重『名所江戸百景』の「大はしあたけの夕立」、1857 年。夕立に打たれて橋を渡る人々を、細い雨の線と暗い空で描きます。橋を斜めに置き、対岸の安宅を薄く沈めた大胆な構図で、のちにゴッホが油彩で模写したことでも知られます。",
                       "notee": "Hiroshige’s Sudden Shower over Shin-Ōhashi Bridge and Atake, One Hundred Famous Views of Edo, 1857. People cross the bridge under thin lines of rain and a dark sky. The bridge cuts diagonally while the far bank sinks into mist, a bold layout that van Gogh later copied in oil.",
                       "q": [
-                            "橋の右の端は、どの高さだろう",
-                            "橋は、左右のどこから画面に入るだろう",
+                            "橋がいちばん高い右の端は、どの高さだろう",
+                            "橋の左の端は、左右のどこだろう",
                             "橋の重さの中心は、どの高さだろう",
                             "橋の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
-                            "At what height is the right end of the bridge?",
-                            "From where, left to right, does the bridge enter?",
+                            "How high is the right end of the bridge, its highest point?",
+                            "Where, left to right, is the left edge of the bridge?",
                             "At what height is the centre of weight of the bridge?",
                             "Where, left to right, is the centre of weight of the bridge?"
                       ]
@@ -4040,14 +4040,14 @@
                             "x3": 45
                       },
                       "why": [
-                            "幹は上の縁から入る。",
-                            "左下の縁から。幹はここから。",
+                            "幹の上の端。上の縁に接する。",
+                            "幹の左の端。左の縁に接する。",
                             "幹は下で太い。重心は下寄り。",
                             "斜めに走る幹の中ほど。やや左。"
                       ],
                       "whye": [
-                            "The trunk enters from the top edge",
-                            "From the lower-left edge, where the trunk begins",
+                            "The top edge of the trunk, touching the frame",
+                            "The left edge of the trunk, touching the frame",
                             "The trunk is thick below: the weight sits low",
                             "The middle of the diagonal trunk, a little left"
                       ],
@@ -4056,14 +4056,14 @@
                       "note": "歌川広重『名所江戸百景』の「亀戸梅屋舗」、1857 年。臥龍梅と呼ばれた名木の幹を画面いっぱいに置き、枝の隙間から梅園と人々をのぞかせます。地平の赤い空と幹の黒の対比が強く、これもゴッホが模写した図です。",
                       "notee": "Hiroshige’s Plum Garden at Kameido, One Hundred Famous Views of Edo, 1857. The trunk of the famous “reclining dragon” plum fills the sheet, and the garden and visitors peek through the branches. The red horizon sky against the black trunk is another image van Gogh copied.",
                       "q": [
-                            "幹は、どの高さから画面に入るだろう",
-                            "幹は、左右のどこから画面に入るだろう",
+                            "幹の上の端は、どの高さだろう",
+                            "幹の左の端は、左右のどこだろう",
                             "幹の重さの中心は、どの高さだろう",
                             "幹の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
-                            "At what height does the trunk enter the picture?",
-                            "From where, left to right, does the trunk enter?",
+                            "How high is the top edge of the trunk?",
+                            "Where, left to right, is the left edge of the trunk?",
                             "At what height is the centre of weight of the trunk?",
                             "Where, left to right, is the centre of weight of the trunk?"
                       ]
@@ -4132,7 +4132,7 @@
                             "x3": 55
                       },
                       "why": [
-                            "崖の頂。一本の線がここから落ちる。",
+                            "崖のいちばん上。一本の線がここから落ちる。",
                             "崖の塊の左端。",
                             "岩は下へ積み上がる。重心はやや下。",
                             "縦の線のすぐ右。重心もそこに。"
@@ -4425,13 +4425,13 @@
                       "obje": "left cluster",
                       "q": [
                             "いちばん高い花は、どの高さだろう",
-                            "左の花群は、左右のどこから始まるだろう",
+                            "左の花群の左の端は、左右のどこだろう",
                             "左の花群の重さの中心は、どの高さだろう",
                             "左の花群の重さの中心は、左右のどこだろう"
                       ],
                       "qe": [
                             "How high is the tallest flower?",
-                            "From where, left to right, does the left cluster begin?",
+                            "Where, left to right, is the left edge of the left cluster?",
                             "At what height is the centre of weight of the left cluster?",
                             "Where, left to right, is the centre of weight of the left cluster?"
                       ]
@@ -5603,6 +5603,7 @@
       tutFit();
       setTimeout(tutFit, 60);   /* 組み替えのあとの高さで置き直す */
     }
+    var tutWT = 0;   /* v715 窓まわりの板を畳む予約 */
     function tutFit(){
       if(!tutEl) return;
       var open = null;
@@ -5656,6 +5657,7 @@
       tutSet(tutEl.querySelector('.gmt-c.bl'), [x - 1, b - cr, cr + 1, cr + 1]);
       tutSet(tutEl.querySelector('.gmt-c.br'), [r - cr, b - cr, cr + 1, cr + 1]);
       if(win){
+        clearTimeout(tutWT);   /* v715 畳む予約が残っていたら取り消す（窓を作り直すので） */
         var qx = win[0], qy = win[1], qw = win[2], qh = win[3];
         tutSet(wt, [-OV, -OV, W + OV * 2, qy + OV]);
         tutSet(wl, [-OV, qy - 1, qx + OV, qh + 2]);
@@ -5668,8 +5670,17 @@
         tutSet(tutEl.querySelector('.gmt-c.w.br'), [qx + qw - wr2, qy + qh - wr2, wr2 + 1, wr2 + 1]);
       }
       if(!put){                        /* 見出し行に空きがないほど狭いとき。窓は作らず、幕の上に紙色で置く */
-        tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
-        tutEl.querySelectorAll('.gmt-c.w').forEach(function(cw){ tutSet(cw, [0, 0, 0, 0]); });
+        /* v715 窓のある段から窓のない段へ移るとき、窓まわりの板（`transition:none`）を**その場で消して**いた。
+           一方、上の板（.t）は窓の下から画面の外まで 0.42 秒かけて登るので、そのあいだ画面の上端に
+           **全幅の明るい帯**が出ていた（見張り係の実測：PC 日本語 55px・英語 66px、iPhone 日本語 87px・
+           英語 111px。2〜5 コマ＝7〜28ms。五媒体・日英の七通りすべてで再現）。
+           → 窓まわりの板はそのまま残し、.t が登りきってから畳む。こうすると窓は「上へ閉じていく」
+             動きになり、明るいのは窓の幅のままで、全幅に広がらない。 */
+        clearTimeout(tutWT);
+        tutWT = setTimeout(function(){ if(!tutEl) return;
+          tutSet(wt, [0, 0, 0, 0]); tutSet(wl, [0, 0, 0, 0]); tutSet(wr, [0, 0, 0, 0]);
+          tutEl.querySelectorAll('.gmt-c.w').forEach(function(cw){ tutSet(cw, [0, 0, 0, 0]); });
+        }, rm ? 0 : 470);
         say.classList.add('dim'); say.classList.add('ts2');
         var bw = Math.max(300, Math.min(560, open[2]));
         say.style.width = bw + 'px';
@@ -5689,7 +5700,7 @@
     }
     function tutEnd(){
       if(!tutOn) return;
-      tutOn = false; clearTimeout(tutT); tutSayH = 0;
+      tutOn = false; clearTimeout(tutT); clearTimeout(tutWT); tutSayH = 0;
       try{ localStorage.setItem('gm-tut', '1'); }catch(e){}
       window.removeEventListener('resize', tutFit);
       document.removeEventListener('keydown', tutKey, true);
