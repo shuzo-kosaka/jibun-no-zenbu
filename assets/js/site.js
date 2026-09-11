@@ -683,6 +683,13 @@
     }, {passive:true});
     /* a second copy of the hero's grid, masked to a soft circle around the cursor: the hidden grid shows faintly where the mouse is */
     (function(){ var tl = top.querySelector('.lines'); if(!tl) return; var pk = tl.cloneNode(true); window.__peek = pk; pk.classList.add('peek'); pk.setAttribute('aria-hidden', 'true'); var mesh = document.createElement('i'); mesh.className = 'mesh'; pk.insertBefore(mesh, pk.firstChild); top.appendChild(pk); })();
+    /* v693 紙面のつまみは `pointerdown` で `preventDefault` しているため、掴んでいる間は
+       互換のマウスイベント（mousemove）が出ない。カーソル演出は mousemove で位置を拾っていたので、
+       大きさを変えている間だけ十字が置き去りになっていた（本人）。位置は pointermove からも拾う。 */
+    window.addEventListener('pointermove', function(e){
+      if(e.pointerType === 'touch') return;
+      mx = e.clientX; my = e.clientY; cur.classList.add('on');
+    }, {passive:true});
     var c5 = document.getElementById('ch5pin');
     window.addEventListener('mousemove', function(e){ if(c5){ c5.style.setProperty('--sx', (e.clientX / window.innerWidth * 100).toFixed(1) + '%'); c5.style.setProperty('--sy', (e.clientY / vh() * 100).toFixed(1) + '%'); } }, {passive:true});
     window.addEventListener('scroll', function(){ var t = document.elementFromPoint(mx, my); var hov = t && t.closest ? t.closest('a, button, figure, .tl li, .sr li, #seqlist li, .lang, .gm-ttl, .gm-idots > *') : null; cur.classList.toggle('hov', !!hov); suckHold(t); }, {passive:true});
@@ -5253,6 +5260,17 @@
       a.textContent = ('0' + (i + 1)).slice(-2); s.textContent = '/'; z.textContent = ('0' + n).slice(-2);
       b.appendChild(a); b.appendChild(s); b.appendChild(z);
     }
+    /* v693 紙面（レイアウトしてみる）にも、一枚目と同じ形の手引きを出す（本人）。
+       見る所だけを明るく開けて、三段で伝える：①引いた4本が敷いてある ②道具で置いて動かせる ③二つのグリッドを見比べられる */
+    var STUTS = [
+      {k:['smock'],  ja:'あなたの《4本の線》に合わせて、見出し・図版・本文が置いてあります。',
+                     en:'A heading, an image and body text are set against your 《four lines》.'},
+      {k:['stool'],  ja:'道具から《見出し・図版・本文》を足して、つまんで動かせます。',
+                     en:'Add a 《heading, image or body text》 from the tools, then drag them where you like.'},
+      {k:['swk'],    ja:'《あなたのグリッド》と《このサイトのグリッド》を、切り替えて見比べられます。',
+                     en:'Switch between 《your grid》 and 《this site’s grid》 to compare the two.'}
+    ];
+    var tutList = null, tutKind = '';
     var TUTS = [
       {k:['stage'], ja:'この絵に、《4本の線》を引きます。',
                                 en:'You will draw 《four lines》 on this picture.'},
@@ -5275,6 +5293,13 @@
     }
     function tutSeen(){ return false; }   /* v531 一枚目の手引きは毎回出す（本人）。飛ばすには「手引きをとばす」か Esc */
     function tutBox(k){
+      if(k === 'smock'){   /* v693 紙面に置いてあるもの（見出し・図版・本文）をひとまとめに。
+                              `.gm-mock` は面いっぱいなので、それだと幕がどこも暗くならない */
+        var u = null, ds = sheetEl ? sheetEl.querySelectorAll('.gm-mock .gm-drag') : [];
+        Array.prototype.forEach.call(ds, function(x){ var b = x.getBoundingClientRect();
+          if(b.width > 2 && b.height > 2) u = tutUni(u, [b.left, b.top, b.width, b.height]); });
+        return u;
+      }
       var e = k === 'stage' ? stage : k === 'step' ? stepEl : k === 'tip' ? tipEl
             : gm.querySelector('.gm-' + k);   /* rt・rl は目盛り */
       if(!e) return null;
@@ -5302,6 +5327,7 @@
     }
     function tutStart(){
       if(!tutOn) return;
+      if(!tutList) tutList = TUTS;
       if(!gm || !stage || !stepEl || !tipEl){ tutOn = false; tutFlush(); return; }
       tutAt = 0;
       tutEl = el('div', 'gmt');
@@ -5321,7 +5347,7 @@
         e.preventDefault();   /* 幕の下へ押下を渡さない。iOS の引っぱりも止める */
         if(performance.now() - tutAtT < 420) return;   /* 段が変わった直後の押下は読まない */
         if(e.target && e.target.closest && e.target.closest('.gmt-skip')){ tutEnd(); return; }
-        if(tutAt < TUTS.length - 1) tutStep(tutAt + 1); else tutEnd();
+        if(tutAt < tutList.length - 1) tutStep(tutAt + 1); else tutEnd();
       }, {passive:false});
       window.addEventListener('resize', tutFit);
       document.addEventListener('keydown', tutKey, true);
@@ -5331,19 +5357,19 @@
     function tutKey(e){   /* v531 Esc で手引きを飛ばす。Enter・Space は次へ */
       if(!tutOn) return;
       if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); tutEnd(); return; }
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.stopPropagation(); if(tutAt < TUTS.length - 1) tutStep(tutAt + 1); else tutEnd(); }
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.stopPropagation(); if(tutAt < tutList.length - 1) tutStep(tutAt + 1); else tutEnd(); }
     }
     function tutStep(i){
       if(!tutEl) return;
       tutAt = i; tutAtT = performance.now();
-      var s = TUTS[i], say = tutEl.querySelector('.gmt-say');
-      tutNum(say.querySelector('b'), i, TUTS.length);
+      var s = tutList[i], say = tutEl.querySelector('.gmt-say');
+      tutNum(say.querySelector('b'), i, tutList.length);
       var w = tutWay();
       say.querySelector('.gmt-t').innerHTML = tutSay(L(s.ja.replace('%s', w[0]), s.en.replace('%s', w[1])));
       say.classList.remove('in'); void say.offsetWidth; say.classList.add('in');   /* 移動はしない。薄く現れるだけ */
       lite(say);   /* 朱の下線を、本編と同じ間で引く */
       var nx = say.querySelector('.gmt-nx');
-      nx.textContent = (i === TUTS.length - 1) ? L('押すと、始まります', 'Press to begin')
+      nx.textContent = (i === tutList.length - 1) ? (tutKind === 'sheet' ? L('押すと、閉じます', 'Press to close') : L('押すと、始まります', 'Press to begin'))
                                                : L('押して、次へ', 'Press for the next');
       nx.classList.remove('on'); clearTimeout(tutT);
       tutT = setTimeout(function(){ if(tutEl) nx.classList.add('on'); }, rm ? 0 : 1300);
@@ -5353,7 +5379,7 @@
     function tutFit(){
       if(!tutEl) return;
       var open = null;
-      TUTS[tutAt].k.forEach(function(k){ open = tutUni(open, tutBox(k)); });
+      tutList[tutAt].k.forEach(function(k){ open = tutUni(open, tutBox(k)); });
       if(!open){ tutEnd(); return; }
       open = [open[0] - 10, open[1] - 10, open[2] + 20, open[3] + 20];
       var W = window.innerWidth, H = window.innerHeight;
@@ -5414,6 +5440,7 @@
     }
     /* 止めておいた朱の帯と指の手本を、手引きのあとから始める */
     function tutFlush(){
+      if(tutKind === 'sheet') return;   /* v693 紙面の手引きのあとに、一枚目の指の手本を呼ばない */
       if(tutPend){ var p = tutPend; tutPend = null; help(p[0], p[1]); }
       if(bi === 0 && ti === 0 && !demoDone){
         setTimeout(function(){ demoOn(); demoFit(); setTimeout(demoFit, 400); }, rm ? 0 : 420);
@@ -5432,6 +5459,7 @@
         setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); }, rm ? 0 : 540);
       }
       tutFlush();
+      tutList = TUTS; tutKind = '';   /* v693 次に出すのは一枚目の手引き */
     }
     /* 「手引きをもう一度」を作るときの入口（次に遊びを開いたときに出ます） */
     window.__gmTutorAgain = function(){ try{ localStorage.removeItem('gm-tut'); }catch(e){} };
@@ -5718,8 +5746,9 @@
       var w = null; per.forEach(function(x){ if(!w || Math.abs(x.d) > Math.abs(w.d) + 1e-9) w = x; });
       var E = w ? Math.abs(w.d) : 0, out = '';
       function nm(t){ return L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')'); }
-      function dir(t, d){ return t.ax === 'h' ? (d > 0 ? L('下', 'below') : L('上', 'above')) : (d > 0 ? L('右', 'to the right of') : L('左', 'to the left of')); }
-      function dsz(t, d, bare){ var a = Math.abs(Math.round(d)), w = t.ax === 'h' ? (d > 0 ? L('下に', 'below') : L('上に', 'above')) : (d > 0 ? L('右に', 'right') : L('左に', 'left')); if(d === 0) return L('同じ', 'same'); return bare ? a + PC : L(w + ' ' + a + PC, a + PC + ' ' + w); }   /* v509 本文で向きを言ったあとの札は数字だけ（「下に」が二度続いていた） */   /* 「+14%」でなく「下に 14%」 */
+      /* v693 向きだけだと何の向きか掴みにくい（本人）。「下」→「下方向」と言い切る */
+      function dir(t, d){ return t.ax === 'h' ? (d > 0 ? L('下方向', 'below') : L('上方向', 'above')) : (d > 0 ? L('右方向', 'to the right of') : L('左方向', 'to the left of')); }
+      function dsz(t, d, bare){ var a = Math.abs(Math.round(d)), w = t.ax === 'h' ? (d > 0 ? L('下方向に', 'below') : L('上方向に', 'above')) : (d > 0 ? L('右方向に', 'right') : L('左方向に', 'left')); if(d === 0) return L('同じ', 'same'); return bare ? a + PC : L(w + ' ' + a + PC, a + PC + ' ' + w); }   /* v509 本文で向きを言ったあとの札は数字だけ（「下に」が二度続いていた） */   /* 「+14%」でなく「下に 14%」 */
       if(E < 4) out = '<p class="gm-obs">' + mix('3枚とも、私と近い位置に4本の線を引きました。', 'On all three pictures, your four lines were close to mine.', '近い') + '</p>';   /* v549 見出しと同じ混植に（本人） */
       else if(M >= 4){
         var t = LINES.filter(function(x){ return x.k === k; })[0], d = diff[k];
@@ -6035,6 +6064,19 @@
       }
       var im = takeEl.querySelector('img'), a = takeEl.querySelector('a'), sealBox = takeEl.querySelector('.gm-takeseal');
       /* v525 判は画像に焼き込まず、見本の上に重ねるだけ（本人）。質感は本編の判と同じ（kakuSvg の feTurbulence） */
+      /* v694 古い箱から新しい箱へ、縮尺で繋ぐ（どの順に押しても同じ動き）。
+         幅・丈は画像の実寸で決まるので遷移では動かない。描き終わった箱を測ってから、
+         そこへ「前の大きさから」寄せる。transform なので組み直しは起きない */
+      function takeMorph(b0){
+        if(rm || !b0 || !(b0.width > 4) || !im.animate) return;
+        var b1 = im.getBoundingClientRect(); if(!(b1.width > 4) || !(b1.height > 4)) return;
+        var sx = b0.width / b1.width, sy = b0.height / b1.height;
+        if(Math.abs(sx - 1) < .012 && Math.abs(sy - 1) < .012) return;
+        sx = Math.max(.2, Math.min(5, sx)); sy = Math.max(.2, Math.min(5, sy));
+        try{ im.animate([{transform:'scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')'},
+                         {transform:'none'}],
+                        {duration:460, easing:'cubic-bezier(.2,.8,.2,1)'}); }catch(x){}
+      }
       function takeSeal(){
         if(!sealBox) return;
         if(!sealBox.firstChild){
@@ -6076,12 +6118,18 @@
       function render(){
         opts(takeEl.querySelector('.gm-take-fr'), FRAMES, function(){ return takeAR; }, function(k){ takeAR = k; });
         opts(takeEl.querySelector('.gm-take-fm'), FMTS, function(){ return takeFmt; }, function(k){ takeFmt = k; });
+        var _b0 = im.getBoundingClientRect();   /* v694 押す直前の箱。新しい形が決まってから、そこへ滑らかに移す */
         var fmt = FMTS[0]; FMTS.forEach(function(f){ if(f.k === takeFmt) fmt = f; });
         var cv = drawTake(avg), name = 'monosashi-' + ymd + '-' + takeAR + (takeFmt === 'alpha' ? '-alpha' : '') + '.' + fmt.ext;
         a.download = name;
         im.style.aspectRatio = cv.width + ' / ' + cv.height;
         im.classList.toggle('alpha', takeFmt === 'alpha');
-        function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url; im.onload = function(){ im.onload = null; takeSeal(); }; im.src = url; a.href = url; takeEl.classList.add('on'); if(im.complete) takeSeal(); }
+        /* v694 枠や形式を替えたとき、見本が一瞬で別の形に飛んでいた（本人）。
+           新しい形へ箱を滑らかに移しながら、中身を薄く入れ替える（どの順に押しても同じ動き） */
+        function put(url){ if(takeUrl && takeUrl.indexOf('blob:') === 0) URL.revokeObjectURL(takeUrl); takeUrl = url;
+          im.onload = function(){ im.onload = null; takeMorph(_b0); takeSeal(); }; im.classList.add('swap');
+          im.src = url; a.href = url; takeEl.classList.add('on'); if(im.complete) takeSeal();
+          requestAnimationFrame(function(){ requestAnimationFrame(function(){ im.classList.remove('swap'); }); }); }
         function share(bl){ takeFile = null;
           try{ if(bl && window.File && navigator.canShare){ var f = new File([bl], name, {type:fmt.mime}); if(navigator.canShare({files:[f]})) takeFile = f; } }catch(e){}
           sb0.hidden = !takeFile; }
@@ -6625,6 +6673,13 @@
       setTimeout(function(){ mock.classList.add('land'); }, rm ? 0 : 360);   /* 見出し→図版→本文が線へ着地する（合計 500ms） */
       setTimeout(function(){ if(gm.classList.contains('sheeton')){ seal('APPLIED', '適用', sheetEl, 'corner'); cring(L('レイアウトしてみる \u00b7 APPLIED \u00b7 ', 'TRY A LAYOUT \u00b7 APPLIED \u00b7 ')); } }, rm ? 100 : 560);
       setTimeout(function(){ sheetEl.querySelector('.gm-sx').focus({preventScroll:true}); }, 240);
+      setTimeout(sheetTut, rm ? 0 : 1000);   /* v693 紙面の手引き（一度だけ）。着地の演出が終わってから */
+    }
+    var stutDone = false;
+    function sheetTut(){
+      if(stutDone || rm || tutOn || !gm.classList.contains('sheeton')) return;
+      if(!sheetEl || !sheetEl.querySelector('.gm-stool')) return;
+      stutDone = true; tutList = STUTS; tutKind = 'sheet'; tutOn = true; tutStart();
     }
     function sheetText(){   /* v511 紙面の文字だけを組み直す。言語を切り替えたときにも呼ぶ（説明文と見出しだけ前の言語で残っていた：流れ係） */
       var avg = sheetAvg; if(!sheetEl || !avg) return;

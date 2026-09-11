@@ -3569,7 +3569,7 @@
   @media (max-height:640px){ .gm-mseal{width:46px; height:46px; right:-4px; bottom:-14px} .gm-intro .gm-isec.gm-ititle b{font-size:clamp(48px, 8.5vw, 84px)} .gm-ilist{max-width:36em} .gm-ilist li{margin-bottom:.3em} }
   .gm-seal.tr{right:3%; top:3%} .gm-stage .gm-seal.tr::before{content:""; position:absolute; inset:6%; background:rgba(242,241,236,.9); border-radius:10%; opacity:0; transition:opacity .25s} .gm-stage .gm-seal.tr.on::before{opacity:1}
   /* v397 判の質感：Blink は kakuSvg の feTurbulence、WebKit（Safari・iOS）は本編と同じ紙目のマスク（生のフィルタは実機でほぼ見えない） */
-  html.is-webkit .gm-seal svg,html.is-webkit .gm-mseal,html.is-webkit .gm-seal.sheet svg{-webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
+  html.is-webkit .gm-seal svg,html.is-webkit .gm-mseal,html.is-webkit .gm-seal.sheet svg,html.is-webkit .gm-takeseal svg{-webkit-mask-image:url(../img/INKMASK.png); mask-image:url(../img/INKMASK.png); -webkit-mask-size:96px 96px; mask-size:96px 96px; -webkit-mask-repeat:repeat; mask-repeat:repeat}
   /* v398 二面目は色、題は紙。山形の送り。遊びの間の紙面の地は紙色で、端の引き戻しはしない */
   .gm-intro.s0 .gm-ichoice button:last-child{color:var(--ibg)} .gm-intro.s0 .gm-ichoice button:last-child:hover{background:#FBF7F2; color:#D33E14}
   .gm-ilist .ik rect{stroke:var(--ifg, #1C1B19); opacity:.6} .gm-ilist .ik .m{stroke:var(--ifg, #1C1B19)}
@@ -4984,3 +4984,8 @@
   .gm-isec.gm-iinfo .gm-ick.gm-iqa{margin-top:var(--igap)}
   @media (max-width:1280px){ .gm-isec.gm-iinfo{--igap:40px} }
   html.phone .gm-isec.gm-iinfo{--igap:30px}
+
+  .gm-take img{transition:aspect-ratio .46s var(--ease), max-height .46s var(--ease), opacity .3s var(--ease)}
+  .gm-take img.swap{opacity:.28}
+  html.rm .gm-take img{transition:none}
+  html.rm .gm-take img.swap{opacity:1}
