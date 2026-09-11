@@ -11,7 +11,7 @@
   var body = document.body, top = document.getElementById('top');
   /* 開発者ツールを開いてくださった方へ */
   try{
-    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n\n   このような制作の機会をいただき、ありがとうございます。\n   どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far.\n\n   Thank you for the opportunity to make it. Enjoy the rest of it. — Shuzo Kosaka',
+    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n\n   サイトはお楽しみいただけているでしょうか。\n   残りも楽しんでいただけますと幸いです。 — 小坂脩蔵\n\n   Thank you for looking this far.\n\n   I hope you are enjoying the site.\n   I hope you enjoy the rest of it as well. — Shuzo Kosaka',
       'display:inline-block; background:#E84518; color:#FBF7F2; font:700 14px/1 serif; padding:6px 7px; border-radius:50%; margin-right:6px', 'color:#1C1B19; font:13px/1.7 -apple-system, system-ui, sans-serif');
   }catch(e){}
 
@@ -3639,7 +3639,7 @@
     ],
     "obj": "花の枝と幹",
     "obje": "blossom branch and trunk",
-    "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに、手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
+    "note": "歌川広重『名所江戸百景』の一図、1856 年。料亭の窓越しに手前へ張り出した梅の枝と、隅田川と筑波山の遠景を重ねています。広重が晩年に多用した「近景を極端に大きく、遠景を小さく」の構図で、枝と川面の間の空きが画面の主役になっています。",
     "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject.",
     "q": [
       "花の枝が始まるのは、どの高さだろう",
@@ -3731,7 +3731,7 @@
     ],
     "obj": "人物",
     "obje": "figure",
-    "note": "ヨハネス・フェルメール『牛乳を注ぐ女』、1658 年ごろ、油彩。45×41cm の小さな画面に、左の窓からの光、テーブルの静物、注がれる牛乳の一筋。光を点で置く技法で、パンや壁の質感を描いています。生活の一瞬を静かに止めた作です。",
+    "note": "ヨハネス・フェルメール『牛乳を注ぐ女』、1658 年ごろ、油彩。45×41cm の小さな画面に、左の窓からの光、テーブルの静物、注がれる牛乳の一筋。光を点で置く技法でパンや壁の質感を描いています。生活の一瞬を静かに止めた作です。",
     "notee": "Johannes Vermeer’s The Milkmaid, around 1658, oil on canvas. Within a small 45 by 41 cm panel: light from the left window, a still life on the table, a thin stream of milk. Dots of light render the bread and the wall. A quiet moment of ordinary life held still.",
     "q": [
       "頭巾のいちばん高いところはどこだろう",
@@ -4099,7 +4099,7 @@
     ],
     "obj": "左の松林",
     "obje": "left grove",
-    "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に、霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
+    "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
     "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
     "q": [
       "いちばん濃い松のてっぺんはどこだろう",
@@ -4191,7 +4191,7 @@
     ],
     "obj": "家並み",
     "obje": "row of houses",
-    "note": "歌川広重『東海道五十三次』の「蒲原 夜之雪」、1833〜34 年ごろ。雪の夜道を行く旅人を、ほぼ墨一色の階調で描きます。実際の蒲原は雪の少ない土地で、この静けさは広重の創作と言われます。人物の小ささと、山と空の広い余白が印象を決めています。",
+    "note": "歌川広重『東海道五十三次』の「蒲原 夜之雪」、1833〜34 年ごろ。雪の夜道を行く旅人をほぼ墨一色の階調で描きます。実際の蒲原は雪の少ない土地で、この静けさは広重の創作と言われます。人物の小ささと、山と空の広い余白が印象を決めています。",
     "notee": "Hiroshige’s Kambara, Night Snow from the Fifty-three Stations of the Tōkaidō, around 1833–34. Travelers walk a snowy road in near monochrome. Kambara rarely sees snow; the stillness is Hiroshige’s invention. The tiny figures and the broad emptiness of hills and sky set the mood.",
     "q": [
       "いちばん高い屋根はどこだろう",
@@ -4237,7 +4237,7 @@
     ],
     "obj": "人物",
     "obje": "figure",
-    "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘が、ガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
+    "note": "喜多川歌麿が 1792 年ごろに出した大首絵の連作「婦女人相十品」の一図。市松模様の振袖を着た娘がガラスの玩具ポッピンを吹く一瞬を捉えました。雲母摺の背景に人物を画面の中央やや右に大きく置き、袖の模様と髪の黒が主塊を作ります。",
     "notee": "From Kitagawa Utamaro's series of large-head portraits, Ten Physiognomies of Women, c. 1792. A young woman in a checked kimono blows a glass toy called a poppin. Against a mica ground the figure sits large, slightly right of centre; the sleeve pattern and the black hair make the mass.",
     "q": [
       "髪のいちばん高いところはどこだろう",
@@ -4988,7 +4988,7 @@
     var cat = 'both';   /* 日本／西洋／両方（小坂さんの指示）。最後に二つの骨格の違いも見せる */
     /* 分析カテゴリ：研究で「作品全体をどんな構図として捉えるか」を七つに分けたもの。遊びでは各絵に一つ */
     var CATS = [
-      ['主塊と余白面', 'Mass and void', '1つの大きなまとまりと、その周りの余白の面で画面が決まる構図。', 'One large mass and the empty area around it decide the picture.'],
+      ['主塊と余白面', 'Mass and void', '1つの大きなまとまりとその周りの余白の面で画面が決まる構図。', 'One large mass and the empty area around it decide the picture.'],
       ['前景フレームと奥行き', 'Foreground frame and depth', '手前の大きなもの（枝・窓・人物）が枠になり、その向こうに遠景を見せる構図。', 'A large near object, a branch, a window, a figure, frames the far view behind it.'],
       ['対置と中間領域', 'Opposition and the middle ground', '2つのまとまりが向かい合い、そのあいだの空きが主役になる構図。', 'Two masses face each other and the gap between them becomes the subject.'],
       ['反復と変奏', 'Repetition and variation', '同じ形が繰り返され、少しずつ変わることでリズムが生まれる構図。', 'A shape repeats with small changes, and the changes make the rhythm.'],
@@ -5495,7 +5495,7 @@
       turn();
     }
     function cardRender(i){ var b = picks[i];
-      cardEl.innerHTML = '<b>' + 'ABC'[i] + '</b><strong>' + ttl(b) + '</strong><em>' + L('分析カテゴリ · ', 'Category · ') + esc(L(b.cat, b.cate)) + '<button type="button" class="gm-q gm-catq2" aria-label="' + L('分析カテゴリとは', 'What is a category') + '" title="' + L('分析カテゴリとは：研究で、測定対象の全体の構成を7つの観点で整理したもの。押すと説明が開きます。', 'The category: one of seven viewpoints from my research. Press to open the explanation.') + '">?</button></em><small>' + esc(L(b.src, b.srce)) + '</small>';
+      cardEl.innerHTML = '<b>' + 'ABC'[i] + '</b><strong>' + ttl(b) + '</strong><em>' + L('分析カテゴリ · ', 'Category · ') + esc(L(b.cat, b.cate)) + '<button type="button" class="gm-q gm-catq2" aria-label="' + L('分析カテゴリとは', 'What is a category') + '" title="' + L('分析カテゴリとは：研究で測定対象の全体の構成を7つの観点で整理したもの。押すと説明が開きます。', 'The category: one of seven viewpoints from my research. Press to open the explanation.') + '">?</button></em><small>' + esc(L(b.src, b.srce)) + '</small>';
       cardEl.querySelector('.gm-catq2').addEventListener('click', function(){ infoWantCat = true; info(); });   /* 「分析カテゴリって何？」に、その場で答える */
     }
     function obj(b){ return L(b.obj || '塊', b.obje || 'mass'); }
@@ -5888,7 +5888,7 @@
       /* v636 濃さ 0 の合図を出したあと、同じコマで中身を差し替えていたので、**新しい中身が一度暗く沈んで**見えた（本人：一度点滅する）。`resPre()` の繋ぎだけで足りる */
       cmpRender(t, b, p, a, d);
       if(first && !window.__gmSaidOnce){ window.__gmSaidOnce = true;   /* v449: 一本目の直後に一度だけ（Sol：採点だと思われる前に） */
-        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この差について', 'ABOUT THIS GAP') + '</i>' + body(L('この差が示すのは、正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむゲームです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
+        var once = el('p', 'gm-once'); once.innerHTML = '<i class="gm-oncek">' + L('この差について', 'ABOUT THIS GAP') + '</i>' + body(L('この差が示すのは正解・不正解ではなく、《私との解釈の違い》です。その違いを楽しむゲームです！', 'This difference is not about right or wrong. It shows 《how your reading differs from mine》. Enjoying that difference is the game!'));   /* v542 見せ方を本編に寄せる（本人）。要の語には本編と同じ朱の下線 */
         lite(once);
         /* v506: 列の段落の中に差し込むと、出入りで前後の文が歪に動く（本人）。
            盤面の上に浮かせ、あなたの線と私の線を結ぶ細い引き出しを添えて出す */
@@ -6143,9 +6143,9 @@
     function avgRender(avg, kav, diff, per){
       stepEl.textContent = L('3枚の平均をとる', 'Averaging the three');
       resPre(); resEl.innerHTML = '<p class="gm-ask"><b>' + mix('あなたの平均グリッド', 'Your average grid', '平均') + '</b></p>' +
-        '<p class="gm-thanks">' + body(L('12本から、あなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
+        '<p class="gm-thanks">' + body(L('12本からあなたの比率ができました。', 'From your twelve lines, your ratios are ready.')) + '</p>' +
         /* v610 盤面に出るのは位置ではなく段の幅なので、その断りを一行だけ置く */
-        '<p class="gm-note">' + body(L('盤面の数字は、あなたの4本で分けた《段の幅》です。縦横それぞれ、足すと 100 になります。線そのものの位置は、下の「4本の平均」に出しています。',
+        '<p class="gm-note">' + body(L('盤面の数字はあなたの4本で分けた《段の幅》です。縦横それぞれ足すと 100 になります。線そのものの位置は下の「4本の平均」に出しています。',
           'The numbers on the board are 《the width of each band》 your four lines divide the frame into; they add up to 100 across and down. The positions of the lines themselves are in “The four averages” below.')) + '</p>' +
         observe(diff, per) +
         '<p class="gm-legend gm-seven"><b><i class="you"></i>' + L('朱色の線：あなた', 'solid red: you') + '</b><b class="gm-lg7" hidden><i class="mine"></i>' + L('薄い破線：サイトのグリッド', 'faint dashed: the site’s grid') + '</b></p>' +
@@ -6153,15 +6153,15 @@
         '<div class="gm-jw">' + sec(L('日本と西洋の平均', 'Japan and the West')) +
           /* v600 この一文は「四本の平均」の真下にあったので、四本の平均についての説明に読めていた（本人）。
              日本と西洋の平均の見出しの下へ移す */
-          '<p class="gm-cmph">' + L('日本の絵と西洋の絵、それぞれの平均を、あなたの4本と見比べられます。',
+          '<p class="gm-cmph">' + L('日本の絵と西洋の絵、それぞれの平均をあなたの4本と見比べられます。',
           'The Japanese and the Western averages can each be compared with your four lines.') + '</p>' + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
             return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点について、あなたが引いたのと同じ4本の位置を1本ずつ平均しており、あなたが計測した3枚もこの中に含まれます。',
               'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one, and the three you measured are among them.')); })() + '</p>' +
-          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて、見比べられるようにしました。',
+          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて見比べられるようにしました。',
             'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
           jwTable() +
-          '<p class="gm-note">' + body(L('表の「差」は、西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。',
+          '<p class="gm-note">' + body(L('表の「差」は西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。',
             'The “diff” column is the Japanese average subtracted from the Western one, and 《is not the difference between your reading and mine》.')) + '</p>' +
           '<p class="gm-note">' + body(L(cat === 'jp' ? '西洋の絵の平均を、青い破線で盤面に重ねられます。日本の絵の平均は、表で見比べてください。' : '日本の絵の平均を、緑の破線で盤面に重ねられます。西洋の絵の平均は、表で見比べてください。',
             cat === 'jp' ? 'You can overlay the Western average on the board as blue dashed lines. For the Japanese average, read the table.' : 'You can overlay the Japanese average on the board as green dashed lines. For the Western average, read the table.')) + '</p>' +
@@ -6251,13 +6251,13 @@
        並びは「遊びのこと（1〜7）→ 研究のこと（8〜11）」。 */
     var QA = [
       ['「あなた」「私」「解釈の違い」の％は、何の数字ですか？', 'What do “you”, “me” and “difference” mean?',
-       '「あなた」と「私」は、線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から計測します。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
+       '「あなた」と「私」は線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から計測します。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
        '“You” and “me” give line positions from the left or top edge, with the picture’s width and height each set to 100. “Difference” is 《your value minus mine》. A + means your line sits farther right or lower; a − means farther left or higher.'],
       ['私と線の位置が違ったら、間違いですか？', 'If my line and yours differ, is one of them wrong?',
        'いいえ、《正解はありません》。同じ絵で、いちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
        'No. 《There is no right answer》. We are comparing where you and I see the largest mass begin, and where its weight sits, in the same picture. A gap is a difference in reading, not a mistake.'],
       ['なぜ、1枚に4本だけ引くのですか？', 'Why only four lines per picture?',
-       '2分ほどで試せるように、7種類ある線のうち2種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の、《始まりと重心》です。横と縦で1本ずつ引くので、1枚に4本になります。',
+       '2分ほどで試せるように、7種類ある線のうち2種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の《始まりと重心》です。横と縦で1本ずつ引くので、1枚に4本になります。',
        'To let you try it in about two minutes, I kept two of the seven kinds of line: on the largest mass in the picture, 《where it begins and where its weight sits》. One horizontal and one vertical for each makes four per picture.'],
       ['12本が、どうして4本になるのですか？', 'How do twelve lines become four?',
        '同じ名前で同じ向きの線同士を、3枚分まとめて平均します。たとえば主塊開始線の横なら、3枚の％を足して3で割る。《これを4組繰り返す》ので、平均の線は4本です。',
@@ -6266,22 +6266,22 @@
        '《朱色の4本で区切った幅や高さ》を表しています。薄い破線は区切りに数えず、縦横それぞれ合計 100 になります。線そのものの位置は「4本の平均」に出しています。',
        'They show 《the widths and heights marked out by your four red lines》. The faint dashed lines do not count as divisions, and the values add up to 100 across and down. The positions of the lines themselves are listed under “The four averages”.'],
       ['薄い破線は、何の線ですか？', 'What are the faint dashed lines?',
-       '測っている間は、私が同じ絵に引いた線です。平均の画面では、「サイトのグリッドと重ねる」を押したときだけ出ます。そのときの破線は《このサイトのグリッド7本》で、あなたの4本と見比べられます。',
+       '測っている間は私が同じ絵に引いた線です。平均の画面では「サイトのグリッドと重ねる」を押したときだけ出ます。そのときの破線は《このサイトのグリッド7本》で、あなたの4本と見比べられます。',
        'While you measure, they are the lines I drew on the same picture. On the average screen they appear only when you press “Compare with the site’s grid”: they are then 《the seven lines of this site’s grid》, there to be set against your four.'],
       ['保存した画像は、何に使えますか？', 'What can I use the saved image for?',
-       '紙面に《文字や図版を置くときの目安》として使えます。写るのは、あなたの平均4本（朱色の実線）と、サイトの7本（薄い破線）だけ。絵や数字は入りません。',
+       '紙面に《文字や図版を置くときの目安》として使えます。写るのはあなたの平均4本（朱色の実線）と、サイトの7本（薄い破線）だけ。絵や数字は入りません。',
        'You can use it as 《a guide for placing text and images》 on a page. It holds only your four average lines (solid red) and the seven lines of this site (faint dashed). The pictures and the numbers are left out.'],
       ['線の位置は、感覚で決めているのですか？', 'Do you choose the line positions by eye?',
-       'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、19点すべてを同じ手順で計測し、《同じ名前の線同士》を比べています。なぜそこに引いたかも、絵ごとに書いています。',
+       'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、19点すべてを同じ手順で計測し、《同じ名前の線同士》を比べています。なぜそこに引いたかも絵ごとに書いています。',
        'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
       ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
-       'はい、選ぶ絵によって平均は変わります。絵は《日本の絵12点と西洋の絵7点》から選ばれます。どちらも、主な形と余白を同じ手順で計測できることを条件にしています。',
+       'はい、選ぶ絵によって平均は変わります。絵は《日本の絵12点と西洋の絵7点》から選ばれます。どちらも主な形と余白を同じ手順で計測できることを条件にしています。',
        'Yes, the averages change with the pictures chosen. 《For this game I measured twelve Japanese and seven Western pictures》. For both, the rule was that the main form and the empty space could be measured by the same method.'],
       ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
-       '写真の複製は、撮り方で色も切り取り方も変わります。それでは計測の条件が揃いません。そこで《どの絵も同じ手順で描き起こし》、細部を省いて、形と余白の置かれ方が見えるようにしました。計測しているのは描き起こした絵で、原画そのものではありません。',
+       '写真の複製は撮り方で色も切り取り方も変わります。それでは計測の条件が揃いません。そこで《どの絵も同じ手順で描き起こし》、細部を省いて形と余白の置かれ方が見えるようにしました。計測しているのは描き起こした絵で、原画そのものではありません。',
        'Photographs of paintings differ in colour and in cropping, so the conditions of measuring would never match. I 《redraw every picture by the same method》 and leave out the detail, so that the placing of form and empty space can be seen. What you measure here is the redrawn picture, not the original work.'],
       ['この比率は、どこで使われていますか？', 'Where are these ratios used?',
-       '《このサイトの文字や図版の配置》に使っています。研究から起こした7本の線を手がかりに、揃える位置や余白を決めました。「レイアウトしてみる」では、あなたの線でも配置を試せます。',
+       '《このサイトの文字や図版の配置》に使っています。研究から起こした7本の線を手がかりに、揃える位置や余白を決めました。「レイアウトしてみる」ではあなたの線でも配置を試せます。',
        'I use them for 《the layout of text and images on this site》. The seven lines from my research guide the alignments and the spacing. In “Try a layout” you can arrange things on your own lines instead.']
     ];
     function qaBuild(){
@@ -6354,11 +6354,11 @@
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
       /* v659 見出しは「研究の目的」だったが、中身は研究の目的そのものではなく**この遊びの目的**だった（本人）。
          名前を替え、遊びのことの側へ移し、文も遊びの話から始める形にした */
-      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を、《3枚の絵で試していただくためのゲーム》です。研究では、日本の絵や建築、庭園に繰り返し現れる比率を探しています。このゲームでは、日本の絵と西洋の絵を同じものさしで並べ、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, architecture and gardens. For this game the Japanese and the Western pictures are set side by side on the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
+      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を《3枚の絵で試していただくためのゲーム》です。研究では日本の絵や建築、庭園に繰り返し現れる比率を探しています。このゲームでは日本の絵と西洋の絵を同じものさしで並べ、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, architecture and gardens. For this game the Japanese and the Western pictures are set side by side on the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
       if(introOn){
-        body += '<p class="gm-info-k">' + L('このゲームについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では、《その始まりと重心の位置を、絵の端からの％で計測します》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
+        body += '<p class="gm-info-k">' + L('このゲームについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では《その始まりと重心の位置を絵の端からの％で計測します》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
           sec(L('4本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
-          sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まず、いちばん大きなまとまりを1つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりは、まとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は、重さが釣り合うところ。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>';
+          sec(L('線を引くコツ', 'Tips for drawing')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l gm-three"><li><b>1</b><span>' + L('まずいちばん大きなまとまりを1つ決めます。', 'First decide on the single largest mass.') + '</span></li><li><b>2</b><span>' + L('始まりはまとまりの外側の縁。迷ったら少し外に。', 'The start is the outer edge of the mass; when in doubt, a little outside.') + '</span></li><li><b>3</b><span>' + L('重心は重さが釣り合うところ。中心より、濃い方へ寄せます。', 'The centre of weight is where the mass balances: lean toward the denser side, not the middle.') + '</span></li></ul></div>';
       } else if(b && state !== 'avg' && state !== 'idle'){
         body += '<p class="gm-info-k">' + L('いま測っている絵', 'The picture you are measuring') + '</p><h3>' + ttl(b) + '</h3>' +
           '<p class="gm-info-s">' + esc(L('構図の出典：', 'Composition diagram source: ')) + esc(L(b.src, b.srce).replace(/^構図：\s*/, '').replace(/^Composition:\s*/i, '')) + '</p>' + (b.note ? '<p class="gm-info-t gm-info-n">' + esc(L(b.note, b.notee)) + '</p>' : '') +
@@ -7139,7 +7139,7 @@
       /* v600 「あなたの四本／このサイトのグリッド」の数値と、その下の長い説明は、この画面には要らない（本人）。
          代わりに、つまんで動かせることだけを一行で伝える */
       sheetEl.querySelector('.gm-scap span').innerHTML = '';
-      sheetEl.querySelector('.gm-scap small').textContent = L('見出し・図版・本文は、つまんで動かせます。右下をつまむと大きさが変わります。押して選ぶと、複製や削除ができます。', 'Drag the title, the figure and the text. Pull the corner to resize. Select one to duplicate or delete it.');
+      sheetEl.querySelector('.gm-scap small').textContent = L('見出し・図版・本文はつまんで動かせます。右下をつまむと大きさが変わります。押して選ぶと複製や削除ができます。', 'Drag the title, the figure and the text. Pull the corner to resize. Select one to duplicate or delete it.');
       mockText();
     }
     /* v610 紙面の段の幅。中身が載っているグリッドのぶんだけ出す。
