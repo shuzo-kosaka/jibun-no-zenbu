@@ -3810,13 +3810,13 @@
     "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism.",
     "q": [
       "頭のいちばん高いところはどこだろう",
-      "人と岩が始まるのは、左右のどこからだろう",
+      "岩が始まるのは、左右のどこからだろう",
       "人と岩の重さの中心は、どの高さだろう",
       "人と岩の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the head?",
-      "From where, left to right, do the man and the rock begin?",
+      "From where, left to right, does the rock begin?",
       "At what height is the centre of weight of the figure and rock?",
       "Where, left to right, is the centre of weight of the figure and rock?"
     ]
