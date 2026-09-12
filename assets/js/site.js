@@ -3855,9 +3855,9 @@
     },
     "why": [
       "いちばん高い頭。",
-      "左の人物の帽子。三人の塊はここから。",
+      "左の人物の帽子。3人の塊はここから。",
       "かがんだ姿は下に重い。",
-      "三人の真ん中。"
+      "3人の真ん中。"
     ],
     "whye": [
       "The highest head",
@@ -3947,7 +3947,7 @@
     },
     "why": [
       "頭のいちばん上。",
-      "抱き合う二人をひとつの塊と解釈する。その左端。",
+      "抱き合う2人をひとつの塊と解釈する。その左端。",
       "上から下まで、ほぼ一様な柱。重心は中央。",
       "中央の柱。重心も中央。"
     ],
@@ -4176,13 +4176,13 @@
       "x3": 55
     },
     "why": [
-      "崖のいちばん上。一本の線がここから落ちる。",
+      "崖のいちばん上。ここから鋭い線が下へ走っている。",
       "崖の塊の左端。",
       "岩は下へ積み上がる。重心はやや下。",
       "縦の線のすぐ右。重心もそこに。"
     ],
     "whye": [
-      "The top of the cliff, where the single line drops from",
+      "The top of the cliff, where a sharp line runs down",
       "The left edge of the cliff mass",
       "Rocks pile up downward: the weight sits a little low",
       "Just right of the vertical line, and so is the weight"
