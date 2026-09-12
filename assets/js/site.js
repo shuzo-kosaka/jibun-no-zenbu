@@ -11,7 +11,7 @@
   var body = document.body, top = document.getElementById('top');
   /* 開発者ツールを開いてくださった方へ */
   try{
-    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n\n   サイトはお楽しみいただけているでしょうか。\n   残りも楽しんでいただけますと幸いです。 — 小坂脩蔵\n\n   Thank you for looking this far.\n\n   I hope you are enjoying the site.\n   I hope you enjoy the rest of it as well. — Shuzo Kosaka',
+    console.log('%c小%c ここまでご覧いただき、ありがとうございます。\n\n   地道な作業ではありましたが、AI を活用した Web 制作は自分自身初めてで、発見だらけの日々となりました。\n\n   このような制作の機会をいただき、ありがとうございます。\n   どうぞ最後までお楽しみください。 — 小坂脩蔵\n\n   Thank you for looking this far.\n\n   Patient work — and my first time building a site with AI, so it was full of discoveries.\n\n   Thank you for the opportunity to make it. Enjoy the rest of it. — Shuzo Kosaka',
       'display:inline-block; background:#E84518; color:#FBF7F2; font:700 14px/1 serif; padding:6px 7px; border-radius:50%; margin-right:6px', 'color:#1C1B19; font:13px/1.7 -apple-system, system-ui, sans-serif');
   }catch(e){}
 
