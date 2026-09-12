@@ -2628,7 +2628,13 @@
     try{ if(localStorage.getItem('kosaka-deskview') === '1') apply(true); }catch(e){}
     btn.addEventListener('click', function(){ apply(!document.documentElement.classList.contains('deskview')); });
   })();
-  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){ setTimeout(cpOpen, 420); return; } if(a.classList.contains('mgame')){ setTimeout(function(){ if(window.__gmOpen) window.__gmOpen(); }, 420); return; }   /* v356: 遊び */ setTimeout(function(){ skipTo(id); }, 350); }); });   /* v220: 5 秒スキップの札つき */   /* v85: the CONTACT card opens the contact page */
+  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var id = a.getAttribute('href'); setMenu(false); if(a.classList.contains('mcontact')){
+        /* v760: 遊びを開いたままメールの紙面を重ねると、二つの幕が同時に動いて挙動が乱れる（本人）。
+           遊びが開いているときは、まず遊びを閉じ、退場の演出（620ms）と履歴の戻し（640ms）が
+           終わってから開く。 */
+        if(document.documentElement.classList.contains('gmopen') && window.__gmClose){ window.__gmClose(); setTimeout(cpOpen, 820); }
+        else setTimeout(cpOpen, 420);
+        return; } if(a.classList.contains('mgame')){ setTimeout(function(){ if(window.__gmOpen) window.__gmOpen(); }, 420); return; }   /* v356: 遊び */ setTimeout(function(){ skipTo(id); }, 350); }); });   /* v220: 5 秒スキップの札つき */   /* v85: the CONTACT card opens the contact page */
   window.addEventListener('keydown', function(e){ if(e.key === 'Escape' && menu.classList.contains('open')) setMenu(false); });
 
   /* grid toggle */
@@ -6196,8 +6202,8 @@
           '<p class="gm-note">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
             return body(L('日本の絵 ' + nj + ' 点と西洋の絵 ' + nw + ' 点について、あなたが引いたのと同じ4本の位置を1本ずつ平均しており、あなたが計測した3枚もこの中に含まれます。',
               'For ' + nj + ' Japanese and ' + nw + ' Western pictures, the same four lines you drew are averaged one by one, and the three you measured are among them.')); })() + '</p>' +
-          '<p class="gm-note">' + body(L('日本の絵に繰り返し出る比率が、《西洋の絵ではどう出るのか》。同じやり方で並べて見比べられるようにしました。',
-            'How do the ratios that recur in Japanese pictures 《come out in Western ones》? The two are set side by side, by the same method.')) + '</p>' +
+          '<p class="gm-note">' + body(L('同じ手順で取り出した比率が、《日本の絵と西洋の絵でどう違うのか》。同じやり方で並べて見比べられるようにしました。',
+            'How do proportions read by the same procedure 《differ between Japanese and Western pictures》? The two are set side by side, by the same method.')) + '</p>' +
           jwTable() +
           '<p class="gm-note">' + body(L('表の「差」は西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。',
             'The “diff” column is the Japanese average subtracted from the Western one, and 《is not the difference between your reading and mine》.')) + '</p>' +
@@ -6392,7 +6398,7 @@
       if(!introOn) body += '<p class="gm-info-k gm-how">' + L('操作', 'HOW TO') + '</p><p class="gm-info-t gm-howline">' + body_(L('絵の上を押したまま動かし、離すと線が引かれます。', 'Press on the image, drag, and release to place a line.')) + '</p>';
       /* v659 見出しは「研究の目的」だったが、中身は研究の目的そのものではなく**この遊びの目的**だった（本人）。
          名前を替え、遊びのことの側へ移し、文も遊びの話から始める形にした */
-      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を《3枚の絵で試していただくためのゲーム》です。研究では日本の絵や建築、庭園に繰り返し現れる比率を探しています。このゲームでは日本の絵と西洋の絵を同じものさしで並べ、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I look for proportions that recur across Japanese pictures, architecture and gardens. For this game the Japanese and the Western pictures are set side by side on the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
+      var PURSEC = sec(L('このゲームの目的', 'What this game is for')) + '<div class="gm-catx gm-secx" hidden>' + '<p class="gm-info-t gm-info-pur">' + body_(L('私の測り方を《3枚の絵で試していただくためのゲーム》です。研究では日本の絵や建築、庭園から比率を取り出し、組版のグリッドに変換する手順を考えています。このゲームでは日本の絵と西洋の絵を同じものさしで並べ、見比べられるようにしました。', 'This game lets you 《try my way of measuring on three pictures》. In the research I am working out how to read proportions out of Japanese pictures, architecture and gardens and turn them into a typographic grid. For this game the Japanese and the Western pictures are set side by side on the same ruler, so that the two can be compared.')) + '</p>' + '</div>';
       if(introOn){
         body += '<p class="gm-info-k">' + L('このゲームについて', 'About this game') + '</p><h3>' + L('主塊とは', 'The main mass') + '</h3><p class="gm-info-t">' + body_(L('絵の中でいちばん大きなまとまりのことです。研究では《その始まりと重心の位置を絵の端からの％で計測します》。', 'The largest mass in a picture. My research reads 《where it begins and where its weight sits》, as percentages from the edges of the picture.')) + '</p>' +
           sec(L('4本の線の役割', 'What the four lines mean')) + '<div class="gm-catx gm-secx" hidden><ul class="gm-info-l">' + LINES.map(function(t){ return '<li>' + pict(t.k) + '<b>' + esc(L(t.n + '（' + t.dir + '）', t.ne + ' (' + t.dire + ')')) + '</b><span>' + esc(L(t.h, t.he)) + '</span></li>'; }).join('') + '</ul></div>' +
@@ -7296,6 +7302,7 @@
       }, wasIntro ? 120 : 0);
     });
     window.__gmOpen = open;
+    window.__gmClose = close;   /* v760: メニューから「メッセージを送る」を押したとき、遊びを先に閉じきるために要る */
     /* 研究の手順 08「紙面へ、画面へ」に来たら、左下に「遊ぶ」の判が押される（遊びへの二つめの入り口） */
     (function(){
       var sp = document.getElementById('seqplay'); if(!sp || typeof kakuSvg !== 'function') return;
