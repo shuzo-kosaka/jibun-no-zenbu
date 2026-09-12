@@ -5187,3 +5187,6 @@
   .gm-once.gm-onceb.gm-once-up.bye{transform:translate(-50%,-100%) translateY(-6px)}
   .gm-once.gm-onceb.gm-once-rt.bye{transform:translate(0,-50%) translateY(-6px)}
   .gm-once.gm-onceb.gm-once-lf.bye{transform:translate(-100%,-50%) translateY(-6px)}
+
+  /* v770: 洋数字と かな が直に触れるところへ、四分より狭い空きを（和欧間のアキ） */
+  .nq{margin-right:.07em}
