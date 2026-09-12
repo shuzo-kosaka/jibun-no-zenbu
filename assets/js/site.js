@@ -4799,7 +4799,7 @@
        取り残されていた（本人：盤面の動きに合わせて一緒に動いてほしい）。
        置き直しは px で書いているので、**盤面の寸法を見張って、変わるたびに measure し直す**。
        追いかけている間は遷移を切る（`snap`）ので、判は盤面とまったく同じ速さで動く。 */
-    var sealRO = null, sealParked = null;
+    var sealRO = null, sealParked = null, sealSW = 0, sealSH = 0;
     function sealPark(sp, snap){
       if(!sp || !sp.parentNode || !stage) return;
       var r = stage.getBoundingClientRect(), w = sp.offsetWidth, h = sp.offsetHeight, k = .5;
@@ -4807,9 +4807,17 @@
       var dx = r.width / 2 - w * k / 2 - Math.max(8, r.width * .02), dy = r.height / 2 - h * k / 2 - Math.max(8, r.height * .03);
       sp.classList.add('park'); sp.classList.toggle('snap', !!snap);
       sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(' + k + ')';
-      sealParked = sp;
+      sealParked = sp; sealSW = r.width; sealSH = r.height;
       if(!sealRO && window.ResizeObserver){
-        sealRO = new ResizeObserver(function(){ if(sealParked && sealParked.parentNode) sealPark(sealParked, true); });
+        /* v785 ResizeObserver は observe した直後に一度必ず呼ばれる。そのまま置き直すと
+           `snap`（遷移なし）が付いて、中央から右下へ寄る 0.75 秒の動きが一フレームで飛んでいた（本人）。
+           → **盤面の寸法が実際に変わったときだけ**置き直す。最初の一回はここで落ちる。 */
+        sealRO = new ResizeObserver(function(){
+          if(!sealParked || !sealParked.parentNode) return;
+          var b = stage.getBoundingClientRect();
+          if(Math.abs(b.width - sealSW) < .5 && Math.abs(b.height - sealSH) < .5) return;
+          sealPark(sealParked, true);
+        });
         try{ sealRO.observe(stage); }catch(x){}
       }
     }
