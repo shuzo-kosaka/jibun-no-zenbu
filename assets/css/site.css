@@ -5158,3 +5158,8 @@
   .ld.nm .name b,.ld.lift .name b,.ld.set .name b{visibility:visible}
 
   .wipe .ja{margin-left:-3px; margin-right:-3px; padding-left:3px; padding-right:3px}
+
+  body.opening .hd{opacity:1 !important}
+  body.opening .hd::before,body.opening .hd::after,body.opening .hd > *{opacity:0}
+  .hd::before,.hd::after{transition:opacity .9s var(--ease)}
+  .hd > *{transition:opacity .9s var(--ease)}
