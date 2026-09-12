@@ -4147,15 +4147,15 @@
     "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
     "q": [
       "いちばん濃い松のてっぺんはどこだろう",
-      "濃いほうの松林の左端はどこだろう",
-      "濃いほうの松林の重さの中心は、どの高さだろう",
-      "濃いほうの松林の重さの中心は、左右のどこだろう"
+      "松林の左端はどこだろう",
+      "松林の重さの中心は、どの高さだろう",
+      "松林の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the top of the darkest pine?",
-      "Where is the left edge of the darker grove?",
-      "At what height is the centre of weight of the darker grove?",
-      "Where, left to right, is the centre of weight of the darker grove?"
+      "Where is the left edge of the grove?",
+      "At what height is the centre of weight of the grove?",
+      "Where, left to right, is the centre of weight of the grove?"
     ]
   },
   {
