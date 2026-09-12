@@ -5449,7 +5449,12 @@
       if(!gm || gm.hidden || closing) return; closing = true; tutEnd();   /* v498: 二重に走ると退場の演出が飛ぶ（本人：× を押しても演出がない） */ state = 'idle'; down = false; introOn = false; introEl.hidden = true; sealOff(true); takeOff(); infoOff();
       if(phoneFree){ docOff(); document.documentElement.classList.remove('gmdoc'); phoneFree = false; } docMode = false; unlockDoc(); jumpTo(openY);   /* 紙面を、開く前の位置に戻す */
       siteInert(false);
-      if(histPushed){ histPushed = false; setTimeout(function(){ try{ history.back(); }catch(e){} }, 640); }   /* v498: 履歴の戻しは退場のあとで（先に戻すと popstate が閉じ直して演出が飛ぶ） */
+      if(histPushed){ histPushed = false; setTimeout(function(){
+        /* v760: 戻すまでの 640ms のあいだに**別の画面が開いていたら見送る**。
+           メニューから「メッセージを送る」を押すと、遊びが閉じたあとにメールの紙面が開くが、
+           ここで履歴を戻すとその紙面まで閉じてしまい、挙動が乱れて見えていた（本人）。 */
+        if(document.documentElement.classList.contains('cpopen')) return;
+        try{ history.back(); }catch(e){} }, 640); }   /* v498: 履歴の戻しは退場のあとで（先に戻すと popstate が閉じ直して演出が飛ぶ） */
       gm.classList.add('out');   /* v463: 本編へ戻るときの引き際（本人：戻る演出がなかった）。盤面 → 右の列 → 見出しの順に引いて、紙ごと持ち上がる */
       gm.classList.remove('on', 'sheeton'); document.documentElement.classList.remove('gminfo', 'gms0', 'gms1', 'gms2', 'gms3', 'gms4');   /* v444: 閉じたあとに印が残っていた（確認係） */
       sheetEl.setAttribute('aria-hidden', 'true'); try{ sheetEl.inert = true; }catch(x){} document.documentElement.classList.remove('gmopen', 'gms0', 'gms1', 'gms2', 'gms3'); clearTimeout(ibgT);
@@ -6297,12 +6302,12 @@
       ['「あなた」「私」「解釈の違い」の％は、何の数字ですか？', 'What do “you”, “me” and “difference” mean?',
        '「あなた」と「私」は線の位置です。絵の幅と高さをそれぞれ 100 として、左端・上端から計測します。「解釈の違い」は《あなたの値から私の値を引いた差》で、＋は右か下、−は左か上へのずれです。',
        '“You” and “me” give line positions from the left or top edge, with the picture’s width and height each set to 100. “Difference” is 《your value minus mine》. A + means your line sits farther right or lower; a − means farther left or higher.'],
-      ['私と線の位置が違ったら、間違いですか？', 'If my line and yours differ, is one of them wrong?',
+      ['私と線の位置が違ったら間違いですか？', 'If my line and yours differ, is one of them wrong?',
        'いいえ、《正解はありません》。同じ絵でいちばん大きなまとまりの始まりと重さの中心を、あなたと私がどこに見たかを比べています。違いは間違いではなく、解釈の違いです。',
        'No. 《There is no right answer》. We are comparing where you and I see the largest mass begin, and where its weight sits, in the same picture. A gap is a difference in reading, not a mistake.'],
       ['なぜ、1枚に4本だけ引くのですか？', 'Why only four lines per picture?',
-       '2分ほどで試せるように、7種類ある線のうち2種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の《始まりと重心》です。横と縦で1本ずつ引くので、1枚に4本になります。',
-       'To let you try it in about two minutes, I kept two of the seven kinds of line: on the largest mass in the picture, 《where it begins and where its weight sits》. One horizontal and one vertical for each makes four per picture.'],
+       '2分ほどで試せるように、7種類ある線のうち2種類に絞りました。絵の中でいちばん大きなまとまり（主塊）の《始まりと重心》で、横と縦で1本ずつ引くので、1枚に4本になります。',
+       'To let you try it in about two minutes, I kept two of the seven kinds of line: on the largest mass in the picture, 《where it begins and where its weight sits》 — one horizontal and one vertical for each, which makes four per picture.'],
       ['12本が、どうして4本になるのですか？', 'How do twelve lines become four?',
        '同じ名前で同じ向きの線同士を、3枚分まとめて平均します。たとえば主塊開始線の横なら、3枚の％を足して3で割る。《これを4組繰り返す》ので、平均の線は4本です。',
        'Lines with the same name and the same direction are averaged across the three pictures — for the horizontal main-form start, I add the three percentages and divide by three. 《Four groups, four average lines》.'],
@@ -6313,17 +6318,17 @@
        '測っている間は私が同じ絵に引いた線です。平均の画面では「サイトのグリッドと重ねる」を押したときだけ出ます。そのときの破線は《このサイトのグリッド7本》で、あなたの4本と見比べられます。',
        'While you measure, they are the lines I drew on the same picture. On the average screen they appear only when you press “Compare with the site’s grid”: they are then 《the seven lines of this site’s grid》, there to be set against your four.'],
       ['保存した画像は、何に使えますか？', 'What can I use the saved image for?',
-       '紙面に《文字や図版を置くときの目安》として使えます。写るのはあなたの平均4本（朱色の実線）と、サイトの7本（薄い破線）だけ。絵や数字は入りません。',
-       'You can use it as 《a guide for placing text and images》 on a page. It holds only your four average lines (solid red) and the seven lines of this site (faint dashed). The pictures and the numbers are left out.'],
-      ['線の位置は、感覚で決めているのですか？', 'Do you choose the line positions by eye?',
-       'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、19点すべてを同じ手順で計測し、《同じ名前の線同士》を比べています。なぜそこに引いたかも絵ごとに書いています。',
-       'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》. For each picture I also say why the line goes there.'],
+       '紙面に《文字や図版を置くときの目安》として使えます。写るのはあなたの平均4本（朱色の実線）と、サイトの7本（薄い破線）だけで、絵や数字は入りません。',
+       'You can use it as 《a guide for placing text and images》 on a page. It holds only your four average lines (solid red) and the seven lines of this site (faint dashed); the pictures and the numbers are left out.'],
       ['絵の選び方で、結果は変わりますか？', 'Would different pictures give different results?',
-       'はい、選ぶ絵によって平均は変わります。絵は《日本の絵12点と西洋の絵7点》から選ばれます。どちらも主な形と余白を同じ手順で計測できることを条件にしています。',
-       'Yes, the averages change with the pictures chosen. 《For this game I measured twelve Japanese and seven Western pictures》. For both, the rule was that the main form and the empty space could be measured by the same method.'],
+       'はい、選ぶ絵によって平均は変わります。絵は《日本の絵12点と西洋の絵7点》から選ばれ、どちらも主な形と余白を同じ手順で計測できることを条件にしています。',
+       'Yes, the averages change with the pictures chosen. 《For this game I measured twelve Japanese and seven Western pictures》, and for both the rule was that the main form and the empty space could be measured by the same method.'],
+      ['線の位置は、感覚で決めているのですか？', 'Do you choose the line positions by eye?',
+       'どこをまとまりや境目と見るかには、私の判断が入ります。ただ、19点すべてを同じ手順で計測し、《同じ名前の線同士》を比べていて、なぜそこに引いたかも絵ごとに書いています。引き方にはその人の解釈がそのまま残り、どこに比重や美しさを感じているかが比率として現れます。同じ手順を踏んでも、最後に出てくるグリッドには個性が出ると考えています。',
+       'My judgement shapes what I see as a main form or a boundary. But I measure all nineteen pictures by the same method and compare 《lines of the same name》, and for each picture I say why the line goes there. How the lines are drawn keeps the reader’s own reading: where weight and beauty are felt comes out as proportion. Even by the same method, the grid that comes out at the end has a character of its own.'],
       ['なぜ、絵を描き起こしているのですか？', 'Why are the pictures redrawn?',
-       '写真の複製は撮り方で色も切り取り方も変わります。それでは計測の条件が揃いません。そこで《どの絵も同じ手順で描き起こし》、細部を省いて形と余白の置かれ方が見えるようにしました。計測しているのは描き起こした絵で、原画そのものではありません。',
-       'Photographs of paintings differ in colour and in cropping, so the conditions of measuring would never match. I 《redraw every picture by the same method》 and leave out the detail, so that the placing of form and empty space can be seen. What you measure here is the redrawn picture, not the original work.'],
+       '写真の複製は撮り方で色も切り取り方も変わります。それでは計測の条件が揃わないと考えました。そこで《どの絵も同じ手順で描き起こし》、細部を省いて形と余白の置かれ方が見えるようにしました。今回はそのようにして描き起こした絵を計測しており、原画そのものではありません。',
+       'Photographs of paintings differ in colour and in cropping; I decided that would not give the same conditions for measuring. I 《redraw every picture by the same method》 and leave out the detail, so that the placing of form and empty space can be seen. What is measured here is the picture redrawn that way, not the original work.'],
       ['この比率は、どこで使われていますか？', 'Where are these ratios used?',
        '《このサイトの文字や図版の配置》に使っています。研究から起こした7本の線を手がかりに、揃える位置や余白を決めました。「レイアウトしてみる」ではあなたの線でも配置を試せます。',
        'I use them for 《the layout of text and images on this site》. The seven lines from my research guide the alignments and the spacing. In “Try a layout” you can arrange things on your own lines instead.']
@@ -6414,8 +6419,8 @@
       /* v501: 問いが一列に並んで雑然としていた（本人）。遊びのことと、調べのことに分けて括る */
       var qsec = function(a, b2){ return QA.slice(a, b2).map(function(q){ return sec(L(q[0], q[1])) + '<div class="gm-catx gm-secx" hidden><p class="gm-info-t">' + body_(L(q[2], q[3])) + '</p></div>'; }).join(''); };
       /* v659 遊びのこと＝1〜7（目的の節を先頭に）、研究のこと＝8〜11。以前は 3 問目で切っていた */
-      body += '<p class="gm-info-g">' + L('ゲームのこと', 'About the game') + '</p>' + PURSEC + qsec(0, 7) +
-        '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + CATSEC + qsec(7, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
+      body += '<p class="gm-info-g">' + L('ゲームのこと', 'About the game') + '</p>' + PURSEC + qsec(0, 8) +
+        '<p class="gm-info-g">' + L('研究のこと', 'About the study') + '</p>' + CATSEC + qsec(8, QA.length);   /* v471: 右の列にあった六問をここへ寄せた（本人：統合するなら上のメニュー側へ） */
       infoEl.querySelector('.gm-info-b').innerHTML = body; infoEl.querySelector('.gm-take-b button').textContent = L('閉じる', 'Close');
       var iin = infoEl.querySelector('.gm-info-in');
       infoEl.querySelectorAll('.gm-catq').forEach(function(q){ var x = q.nextElementSibling; if(!x || !x.classList.contains('gm-catx')) return;
