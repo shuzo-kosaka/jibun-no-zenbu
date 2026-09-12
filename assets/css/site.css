@@ -958,7 +958,7 @@
     #ch1pin text.en{font-size:34px} #ch1pin text.jp{font-size:22px} #ch1pin .dg-title .big{font-size:64px} #ch1pin text.eq{font-size:17px}
     #ch1pin .dg-ring{stroke-width:3.2}
   }
-  /* ---------- CHECKPOINT 05 · 休学の一年：点描の地図の上を、点線と飛行機がめぐり、バンコクに判が押される ---------- */
+  /* ---------- CHECKPOINT 05 · 休学の1年：点描の地図の上を、点線と飛行機がめぐり、バンコクに判が押される ---------- */
   #ch5map{display:block; padding:0}
   #ch5map .mp{position:sticky; top:0; height:100vh; display:block; overflow:hidden}
   #ch5map .mp-svg{position:absolute; left:0; top:50%; width:100vw; height:auto; transform:translateY(-46%); display:block; overflow:visible}
