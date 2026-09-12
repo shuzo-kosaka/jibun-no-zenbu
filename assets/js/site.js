@@ -3646,8 +3646,8 @@
     var LINES = [
       {k:'y1', ax:'h', n:'主塊開始線', ne:'Main mass start',    dir:'よこ', dire:'horizontal', q:'%sが始まるのは、どの高さだろう', qe:'At what height does the %s begin?', h:'大きなまとまり（主塊）が始まる、上の端。', he:'The upper edge where the main mass begins.'},
       {k:'x1', ax:'v', n:'主塊開始線', ne:'Main mass start',    dir:'たて', dire:'vertical',   q:'%sが始まるのは、左右のどこからだろう', qe:'From where, left to right, does the %s begin?', h:'同じまとまりが始まる、左の端。', he:'The left edge where the same mass begins.'},
-      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass center', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
-      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass center', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
+      {k:'y2', ax:'h', n:'主塊重心線', ne:'Main mass centre', dir:'よこ', dire:'horizontal', q:'%sの重さの中心は、どの高さだろう', qe:'At what height is the centre of weight of the %s?', h:'まとまりの重さが、上下で釣り合う高さ。', he:'The height where its weight balances.'},
+      {k:'x3', ax:'v', n:'主塊重心線', ne:'Main mass centre', dir:'たて', dire:'vertical',   q:'%sの重さの中心は、左右のどこだろう', qe:'Where, left to right, is the centre of weight of the %s?', h:'まとまりの重さが、左右で釣り合う位置。', he:'The point where its weight balances, left to right.'}
     ];
     var GRID = {v:[12, 28, 58, 83], h:[14, 32, 71]};    /* 研究の平均グリッド＝このサイトの骨格（--x1〜--x4・--y1〜--y3） */
     var FIXED = {v:[28, 83], h:[71]};                    /* そのうち遊びでは測らない三本（密度転換線・境界線・余白開始線） */
@@ -3822,7 +3822,7 @@
     "obj": "人と岩",
     "obje": "figure and rock",
     "note": "カスパー・ダーヴィト・フリードリヒ『雲海の上の旅人』、1818 年ごろ、油彩。後ろ姿の人物を画面の中心に立たせ、その向こうに霧の海と山を広げます。見る人が人物と同じ視線になるこの「後ろ姿」は、ドイツ・ロマン主義を代表する構図です。",
-    "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism.",
+    "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the centre, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism.",
     "q": [
       "頭のいちばん高いところはどこだろう",
       "岩の左端はどこだろう",
@@ -3901,13 +3901,13 @@
     },
     "why": [
       "桶のいちばん上。輪の頂点。",
-      "桶の左の端。",
+      "桶の左の端。輪がいちばん外へ張り出すところ。",
       "桶は画面の下寄りに大きく座る。重心はやや下。",
       "輪は左右に偏らない。重心はほぼ中央。"
     ],
     "whye": [
       "The top of the barrel, the crown of the ring",
-      "The left of the barrel",
+      "The left of the barrel, where the ring bulges furthest out",
       "The barrel sits low and large in the frame: the weight sits a little low",
       "The ring leans neither way: the weight sits near the middle"
     ],
@@ -4038,13 +4038,13 @@
       "x3": 52
     },
     "why": [
-      "橋の板のいちばん高いところ。",
+      "橋の板のいちばん高いところ。右の端で上がりきる。",
       "橋はここから。左の縁に接する。",
       "橋桁と杭で重心は下寄り。",
       "渡された橋のちょうど中ほど。"
     ],
     "whye": [
-      "The highest point of the bridge deck",
+      "The highest point of the bridge deck, where it tops out at the right end",
       "The bridge begins here, at the left edge",
       "Girders and piles put the weight low",
       "Right at the middle of the span"
@@ -4130,19 +4130,19 @@
       "x3": 29
     },
     "why": [
-      "いちばん濃い松のてっぺん。",
+      "いちばん濃い松のてっぺん。手前に立つ一本。",
       "濃いほうの松林の左端。いちばん左に垂れる枝の先。",
       "枝は上、幹は下。合わせて重心はやや下。",
       "濃いほうの松林の中ほど。画面では左寄り。"
     ],
     "whye": [
-      "The top of the darkest pine",
+      "The top of the darkest pine, the one standing nearest",
       "The left edge of the darker grove, the tip of the lowest branch",
       "Branches above, trunks below: together the weight sits a little low",
       "Mid-way through the darker grove, left of centre on the screen"
     ],
     "obj": "濃いほうの松林",
-    "obje": "the darker grove",
+    "obje": "darker grove",
     "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
     "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
     "q": [
@@ -4179,18 +4179,18 @@
       "崖のいちばん上。一本の線から始まっているように見える。",
       "崖の左端。先ほどの一本の線がそのまま境目。",
       "崖は下が厚く見える。重心はやや下。",
-      "右へ張り出す岩の分、重心は中ほどよりわずかに右。"
+      "崖が右へ張り出す分、重心は中ほどよりわずかに右。"
     ],
     "whye": [
       "The top of the cliff: it looks as though a single line starts here",
       "The left edge of the cliff: the line we just saw is the boundary",
       "The cliff looks thicker below: the weight sits a little low",
-      "The rock juts to the right: the weight sits just right of the middle"
+      "The cliff juts to the right: the weight sits just right of the middle"
     ],
     "obj": "崖",
     "obje": "cliff",
     "note": "雪舟『秋冬山水図』の冬景、15 世紀後半、国宝。画面の中央を貫いて立ち上がる崖の輪郭線が有名で、上へ行くほど太く濃くなります。中国で学んだ水墨の骨法を、思い切った線で日本の画面に置き換えた一幅です。",
-    "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line.",
+    "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the centre of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line.",
     "q": [
       "崖のいちばん高いところはどこだろう",
       "崖の左端はどこだろう",
@@ -4222,13 +4222,13 @@
       "x3": 55
     },
     "why": [
-      "いちばん高い屋根の上端。",
+      "いちばん高い屋根の上端。通りの奥にある大きな一軒。",
       "左の家の左端。",
       "雪の積もる屋根。重心はやや下。",
       "家並みの中ほど。やや右。"
     ],
     "whye": [
-      "The top of the highest roof",
+      "The top of the highest roof, the large house down the street",
       "The left edge of the leftmost house",
       "Roofs piled with snow: the weight sits a little low",
       "The middle of the row, a little right"
