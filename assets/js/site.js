@@ -864,7 +864,10 @@
   /* hero rotator */
   var rot = document.getElementById('rot'), rs = rot.querySelectorAll(':scope > span'), ri = 0;
   /* the rotating line is set like the title: kanji and katakana in gothic, hiragana in mincho */
-  function mixSet(el){ var t = el.textContent; el.textContent = ''; Array.from(t).forEach(function(ch){ var c = document.createElement('i'); c.className = /[\u3040-\u309F]/.test(ch) ? 'm' : (/[、。]/.test(ch) ? 'm pc' : 'g'); c.textContent = ch; el.appendChild(c); }); }
+  /* v777 混植の組み直しは一字ずつ <i> を作り直すので、v770 で本文に入れた <span class="nq">（数字の右の空き）は
+     ここでは消えてしまい、MESSAGE の見出しの「7つ」だけ和欧間のアキが入っていなかった（見張り係）。
+     → 組み直すときに、数字のすぐ後ろが かな なら、その字に .nqi を付けて同じ .07em を与える */
+  function mixSet(el){ var t = el.textContent; el.textContent = ''; var a = Array.from(t); a.forEach(function(ch, i){ var c = document.createElement('i'); c.className = /[\u3040-\u309F]/.test(ch) ? 'm' : (/[、。]/.test(ch) ? 'm pc' : 'g'); if(/[0-9]/.test(ch) && /[\u3040-\u30FF]/.test(a[i + 1] || '')) c.className += ' nqi'; c.textContent = ch; el.appendChild(c); }); }
   rs.forEach(mixSet);
   /* the left label too: 小坂脩蔵 / ポートフォリオ in gothic, の in mincho */
   document.querySelectorAll('#top .lbl b:not(.rj) .ln').forEach(mixSet);
