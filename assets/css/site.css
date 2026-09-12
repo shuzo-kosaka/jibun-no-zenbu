@@ -5190,3 +5190,6 @@
 
   /* v770: 洋数字と かな が直に触れるところへ、四分より狭い空きを（和欧間のアキ） */
   .nq{margin-right:.07em}
+
+  /* v772: 段の本文の中に入れ子になった包み（数字のアキなど）は、行の中に戻す */
+  #seq .steps li span .nq{display:inline; height:auto; overflow:visible; opacity:1; transition:none}
