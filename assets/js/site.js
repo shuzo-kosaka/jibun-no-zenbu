@@ -6413,7 +6413,11 @@
             setTimeout(function(){ x.hidden = true; x.style.height = ''; x.classList.remove('anim', 'shut'); }, 270);   /* v636 見出しを押して閉じる経路にも 270ms を（見張り係：ここだけ 200ms のままだった） */ }
           if(on && !rm) setTimeout(function(){ var top = q.offsetTop - 12; if(top > iin.scrollTop) iin.scrollTo({top: top, behavior: 'smooth'}); }, 280); });
       });   /* v487: 開閉を滑らかに（本人） */
-      var cq = infoEl.querySelector('.gm-catq:not(.gm-secq)'), cx = cq && cq.nextElementSibling;
+      /* v749: 絵の札の「?」から開いたときは、7つの分析カテゴリの節を**開いた状態で**出す（本人）。
+         これまでの `.gm-catq:not(.gm-secq)` は、`sec()` がすべての見出しに `gm-secq` も付けるようになった時点で
+         **何にも当たらなくなって**いた（＝節は閉じたまま出ていた）。中身の `ul.gm-cats` から辿り直す。 */
+      var _cul = infoEl.querySelector('.gm-cats'), cx = _cul ? _cul.closest('.gm-catx') : null, cq = cx ? cx.previousElementSibling : null;
+      while(cq && !cq.classList.contains('gm-catq')) cq = cq.previousElementSibling;
       if(infoWantCat && cq && cx){ cx.hidden = false; cq.setAttribute('aria-expanded', 'true'); setTimeout(function(){ iin.scrollTo({top: Math.max(0, cq.offsetTop - 12), behavior: rm ? 'auto' : 'smooth'}); }, 260); }
       document.documentElement.classList.add('gminfo');   /* v438: 札を開いている間は幕を見出し行の上まで（本編の帯だけ明るいままだった：本人） */
       void infoEl.offsetWidth; infoEl.classList.add('on'); lite(infoEl.querySelector('.gm-info-t'));   /* v507 いちばん上の一文だけ先に引く。節は開いたときに引く */ gm.querySelector('.gm-i').setAttribute('aria-expanded', 'true');   /* 作った直後でも出現の動き（薄→濃、下から 8px）が付くように一度描かせる */ var wc = infoWantCat; infoWantCat = false; setTimeout(function(){ if(!wc) infoEl.querySelector('.gm-take-b button').focus({preventScroll:true}); }, 240);
