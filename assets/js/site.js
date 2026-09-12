@@ -3671,14 +3671,14 @@
     },
     "why": [
       "花の枝はここから。上の縁に接する。",
-      "花の枝はここから。左の縁のすぐ内側。",
-      "花と幹の塊は上に厚い。重心は上寄り。",
+      "枝と幹の左端。画面の縁のすぐ内側。",
+      "花の枝と幹は上が重く見える。重心は上寄り。",
       "右の幹が重い。重心は中央より右。"
     ],
     "whye": [
       "The blossom branch begins here, touching the top of the frame",
-      "The blossom branch begins here, just inside the left edge",
-      "Blossoms and trunk are thick above: the weight sits high",
+      "The left edge of branch and trunk, just inside the frame",
+      "Blossoms and trunk look heavy above: the weight sits high",
       "The trunk on the right is heavy: the weight sits right of centre"
     ],
     "obj": "花の枝と幹",
@@ -3687,13 +3687,13 @@
     "notee": "From Hiroshige’s One Hundred Famous Views of Edo, 1856. Seen through a restaurant window, a plum branch thrusts into the foreground over the Sumida River and distant Mount Tsukuba. Hiroshige’s late device of an oversized near object against a tiny far view makes the gap between branch and water the real subject.",
     "q": [
       "花の枝が始まるのは、どの高さだろう",
-      "花の枝が始まるのは、左右のどこからだろう",
+      "花の枝と幹の左端はどこだろう",
       "花の枝と幹の重さの中心は、どの高さだろう",
       "花の枝と幹の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "At what height does the blossom branch begin?",
-      "From where, left to right, does the blossom branch begin?",
+      "Where is the left edge of the branch and trunk?",
       "At what height is the centre of weight of the blossom branch and trunk?",
       "Where, left to right, is the centre of weight of the blossom branch and trunk?"
     ]
@@ -3716,16 +3716,16 @@
       "x3": 68
     },
     "why": [
-      "山頂。主塊はここから始まる。",
+      "白い筋が集まる山頂。",
       "山裾が林に消える左端。",
-      "下へ広がる三角。重心は下寄り。",
-      "裾は左へ長く、右で切れる。重心は中央より右。"
+      "裾の広い山。重心は下寄り。",
+      "裾は左へ長く伸びる。それでも重心は中央より右。"
     ],
     "whye": [
-      "The summit: the mass begins here",
+      "The summit, where the white streaks meet",
       "The left end, where the slope sinks into the forest",
-      "A triangle widening downward: the weight sits low",
-      "The skirt runs long to the left and is cut on the right: the weight sits right of centre"
+      "A mountain with a broad skirt: the weight sits low",
+      "The skirt runs far to the left, yet the weight sits right of centre"
     ],
     "obj": "山",
     "obje": "mountain",
@@ -3733,13 +3733,13 @@
     "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, printed around 1831. It catches the moment on a clear late-summer dawn when a south wind turns the mountain red. The mountain alone fills most of the sheet; the sky is a gradation of Prussian blue, the clouds mere streaks. A landmark of radical simplification.",
     "q": [
       "山のいちばん高いところはどこだろう",
-      "山裾が林に消えるのは、左右のどこだろう",
+      "林に消える山裾の左端はどこだろう",
       "山の重さの中心は、どの高さだろう",
       "山の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the mountain?",
-      "Where, left to right, does the foot of the mountain vanish into the trees?",
+      "Where is the left end of the slope, where it sinks into the trees?",
       "At what height is the centre of weight of the mountain?",
       "Where, left to right, is the centre of weight of the mountain?"
     ]
@@ -3764,14 +3764,14 @@
     "why": [
       "頭巾のいちばん上。",
       "肘の左端。人物はここから。",
-      "裳が重い。重心は下寄り。",
-      "窓と壁のあいだ。重心はやや右。"
+      "前掛けと裾が重い。重心は下寄り。",
+      "人物は画面の右寄りに立つ。重心はやや右。"
     ],
     "whye": [
       "The top of the cap",
       "The left of the elbow, where the figure begins",
-      "The skirt is heavy: the weight sits low",
-      "Between window and wall: the weight sits a little right"
+      "Apron and skirt are heavy: the weight sits low",
+      "The figure stands right of centre: the weight sits a little right"
     ],
     "obj": "人物",
     "obje": "figure",
@@ -3779,13 +3779,13 @@
     "notee": "Johannes Vermeer’s The Milkmaid, around 1658, oil on canvas. Within a small 45 by 41 cm panel: light from the left window, a still life on the table, a thin stream of milk. Dots of light render the bread and the wall. A quiet moment of ordinary life held still.",
     "q": [
       "頭巾のいちばん高いところはどこだろう",
-      "人物が始まるのは、左右のどこからだろう",
+      "人物の左端はどこだろう",
       "人物の重さの中心は、どの高さだろう",
       "人物の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the cap?",
-      "From where, left to right, does the figure begin?",
+      "Where is the left edge of the figure?",
       "At what height is the centre of weight of the figure?",
       "Where, left to right, is the centre of weight of the figure?"
     ]
@@ -3809,15 +3809,15 @@
     },
     "why": [
       "頭のいちばん上。",
-      "人物と足元の岩をひとつの塊と解釈する。岩は左の縁近くから。",
-      "岩の重さで、重心は下へ。",
-      "ほぼ中央。人物の軸そのもの。"
+      "人と足元の岩がひとつの塊に見える。左端は岩の縁。",
+      "岩の重みで重心は下寄り。",
+      "岩を合わせても重心はほぼ中央。"
     ],
     "whye": [
       "The top of the head",
-      "Figure and rock read as one mass: the rock starts near the left edge",
-      "The rock pulls the weight down",
-      "Almost centred: the figure's own axis"
+      "Figure and rock read as one mass: the left edge is the rock's",
+      "The rock's weight keeps the centre low",
+      "Even counting the rock, the weight stays near the middle"
     ],
     "obj": "人と岩",
     "obje": "figure and rock",
@@ -3825,13 +3825,13 @@
     "notee": "Caspar David Friedrich’s Wanderer above the Sea of Fog, around 1818, oil. A figure seen from behind stands at the center, with a sea of fog and mountains beyond. This back view, which puts the viewer in the wanderer’s place, is the signature composition of German Romanticism.",
     "q": [
       "頭のいちばん高いところはどこだろう",
-      "岩が始まるのは、左右のどこからだろう",
+      "岩の左端はどこだろう",
       "人と岩の重さの中心は、どの高さだろう",
       "人と岩の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the head?",
-      "From where, left to right, does the rock begin?",
+      "Where is the left edge of the rock?",
       "At what height is the centre of weight of the figure and rock?",
       "Where, left to right, is the centre of weight of the figure and rock?"
     ]
@@ -3854,16 +3854,16 @@
       "x3": 50
     },
     "why": [
-      "いちばん高い頭。",
-      "左の人物の帽子。3人の塊はここから。",
-      "かがんだ姿は下に重い。",
-      "3人の真ん中。"
+      "右の人の頭。三人でいちばん高い。",
+      "左の人の帽子の縁。ここが三人の左端。",
+      "かがんだ姿は下が重い。重心は中ほどより下。",
+      "三人のちょうど真ん中。"
     ],
     "whye": [
-      "The highest head",
-      "The left figure's hat, where the three begin",
-      "Bent figures are heavy below",
-      "The middle of the three"
+      "The head on the right, the highest of the three",
+      "The rim of the left figure's cap: the left edge of the three",
+      "Stooping figures are heavy below: the weight sits under the middle",
+      "Right in the middle of the three"
     ],
     "obj": "三人",
     "obje": "three figures",
@@ -3871,13 +3871,13 @@
     "notee": "Jean-François Millet’s The Gleaners, 1857, oil. Three women gather leftover grain after the harvest, drawn large against a high horizon. The abundant harvest in the distance against the labor in front caused controversy at the time as a political picture of the peasantry.",
     "q": [
       "いちばん高い頭はどこだろう",
-      "三人が始まるのは、左右のどこからだろう",
+      "三人のまとまりの左端はどこだろう",
       "三人の重さの中心は、どの高さだろう",
       "三人の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest head?",
-      "From where, left to right, do the three figures begin?",
+      "Where is the left edge of the three figures together?",
       "At what height is the centre of weight of the three figures?",
       "Where, left to right, is the centre of weight of the three figures?"
     ]
@@ -3900,16 +3900,16 @@
       "x3": 52
     },
     "why": [
-      "桶のいちばん上。桶そのものが主塊。",
+      "桶のいちばん上。輪の頂点。",
       "桶の左の端。",
-      "職人が入る分、重心はやや下。",
-      "桶はほぼ中央。富士は桶の中の右寄りに。"
+      "輪の下半分に厚みが寄る。重心はやや下。",
+      "輪は左右に偏らない。重心はほぼ中央。"
     ],
     "whye": [
-      "The top of the barrel: the barrel itself is the mass",
+      "The top of the barrel, the crown of the ring",
       "The left of the barrel",
-      "With the cooper inside, the weight sits a little low",
-      "The barrel is near the centre; Fuji sits inside it, to the right"
+      "The lower half of the ring carries the bulk: the weight sits a little low",
+      "The ring leans neither way: the weight sits near the middle"
     ],
     "obj": "桶",
     "obje": "barrel",
@@ -3917,13 +3917,13 @@
     "notee": "Hokusai’s Fujimigahara in Owari Province, Thirty-six Views, around 1831. A cooper shaves the inside of a huge barrel, and Fuji appears small through the barrel’s hoop. The round frame that crops the distant mountain layers everyday work in the foreground onto the far view.",
     "q": [
       "桶のいちばん高いところはどこだろう",
-      "桶が始まるのは、左右のどこからだろう",
+      "桶の左端はどこだろう",
       "桶の重さの中心は、どの高さだろう",
       "桶の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the barrel?",
-      "From where, left to right, does the barrel begin?",
+      "Where is the left edge of the barrel?",
       "At what height is the centre of weight of the barrel?",
       "Where, left to right, is the centre of weight of the barrel?"
     ]
@@ -3947,15 +3947,15 @@
     },
     "why": [
       "頭のいちばん上。",
-      "抱き合う2人をひとつの塊と解釈する。その左端。",
-      "上から下まで、ほぼ一様な柱。重心は中央。",
-      "中央の柱。重心も中央。"
+      "抱き合う二人がひとつの塊に見える。その左端。",
+      "金色の衣は上から下まで細長い。重心は中ほど。",
+      "衣の幅は左右に等しい。重心は中央。"
     ],
     "whye": [
       "The top of the heads",
-      "The two figures read as one mass: its left edge",
-      "A near-uniform column from top to bottom: the weight is central",
-      "A central column: the weight, too, is central"
+      "The pair reads as one mass: this is its left edge",
+      "The gold robe is tall and narrow top to bottom: the weight sits mid-height",
+      "The robe spreads evenly either way: the weight sits at the centre"
     ],
     "obj": "二人",
     "obje": "two figures",
@@ -3963,13 +3963,13 @@
     "notee": "Gustav Klimt’s The Kiss, 1907–08, oil and gold leaf. On an almost square canvas the embracing couple fuse into a single golden mass, with a flowered meadow only at their feet. It shows the ornament of the Vienna Secession and a composition that melts figures into one plane.",
     "q": [
       "頭のいちばん高いところはどこだろう",
-      "抱き合う二人が始まるのは、左右のどこからだろう",
+      "抱き合う二人の左端はどこだろう",
       "二人の重さの中心は、どの高さだろう",
       "二人の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the head?",
-      "From where, left to right, does the embracing pair begin?",
+      "Where is the left edge of the embracing pair?",
       "At what height is the centre of weight of the two figures?",
       "Where, left to right, is the centre of weight of the two figures?"
     ]
@@ -3992,29 +3992,29 @@
       "x3": 30
     },
     "why": [
-      "波のいちばん高いところ。",
+      "大波のいちばん上。白い波頭の先。",
       "大波はここから。左の縁に接する。",
-      "爪のような波頭と胴を合わせて、重心は中ほど。",
-      "大波は左に寄る。富士は右の余白に。"
+      "反り返った波頭と胴を合わせて重心は中ほど。",
+      "大波は左へ寄る。重心も左寄り。"
     ],
     "whye": [
-      "The top of the crest",
+      "The top of the great wave, the tip of the white crest",
       "The great wave begins here, at the left edge",
-      "Crest and body together: the weight sits mid-height",
-      "The great wave leans left; Fuji sits in the void on the right"
+      "Curling crest and body together: the weight sits mid-height",
+      "The great wave gathers to the left: the weight sits left too"
     ],
     "obj": "大波",
     "obje": "great wave",
     "note": "葛飾北斎『冨嶽三十六景』の一図、1831 年ごろ。手前で砕ける大波が画面を覆い、遠くに小さな富士が見えます。当時輸入されたばかりのベロ藍を使い、波の曲線が富士を包み込むように配されています。西洋の遠近法を学んだ北斎が、近景と遠景の大きさの逆転で奥行きをつくった図です。",
     "notee": "From Hokusai’s Thirty-six Views of Mount Fuji, around 1831. A breaking wave dominates the sheet while Fuji sits small in the distance. Printed with newly imported Prussian blue, its curve seems to cradle the mountain. Hokusai, who had studied Western perspective, builds depth by reversing the scale of near and far.",
     "q": [
-      "波のいちばん高いところはどこだろう",
+      "大波のいちばん高いところはどこだろう",
       "大波が始まるのは、左右のどこからだろう",
       "大波の重さの中心は、どの高さだろう",
       "大波の重さの中心は、左右のどこだろう"
     ],
     "qe": [
-      "Where is the highest point of the wave?",
+      "Where is the highest point of the great wave?",
       "From where, left to right, does the great wave begin?",
       "At what height is the centre of weight of the great wave?",
       "Where, left to right, is the centre of weight of the great wave?"
@@ -4038,16 +4038,16 @@
       "x3": 52
     },
     "why": [
-      "橋のいちばん高いところ。右の端で、塊はここから。",
+      "橋の板のいちばん高いところ。",
       "橋はここから。左の縁に接する。",
-      "橋桁と杭を含めると、重さは下にある。",
-      "橋の中ほど。人の群れもここに集まる。"
+      "橋桁と杭で重心は下寄り。",
+      "渡された橋のちょうど中ほど。"
     ],
     "whye": [
-      "The highest point of the bridge, at its right end: the mass begins here",
+      "The highest point of the bridge deck",
       "The bridge begins here, at the left edge",
-      "With the deck and piles, the weight sits low",
-      "The middle of the bridge, where the figures gather"
+      "Girders and piles put the weight low",
+      "Right at the middle of the span"
     ],
     "obj": "橋",
     "obje": "bridge",
@@ -4086,13 +4086,13 @@
     "why": [
       "幹はここから。上の縁に接する。",
       "幹はここから。左の縁に接する。",
-      "幹は下で太い。重心は下寄り。",
+      "幹は下が太い。重心は下寄り。",
       "斜めに走る幹の中ほど。やや左。"
     ],
     "whye": [
       "The trunk begins here, touching the top of the frame",
       "The trunk begins here, at the left edge",
-      "The trunk is thick below: the weight sits low",
+      "The trunk is thicker below: the weight sits low",
       "The middle of the diagonal trunk, a little left"
     ],
     "obj": "幹",
@@ -4131,29 +4131,29 @@
     },
     "why": [
       "いちばん濃い松のてっぺん。",
-      "左の松林の左端。主塊はここから。",
-      "幹は下へ伸びる。重心はやや下。",
-      "左の群れの中心。右の群れは薄く、余白をはさむ。"
+      "濃いほうの松林の左端。いちばん左に垂れる枝の先。",
+      "枝は上、幹は下。合わせて重心はやや下。",
+      "濃いほうの松林の中ほど。画面では左寄り。"
     ],
     "whye": [
       "The top of the darkest pine",
-      "The left edge of the left grove: the mass begins here",
-      "Trunks run down: the weight sits a little low",
-      "The centre of the left grove; the right one is faint, across the void"
+      "The left edge of the darker grove, the tip of the lowest branch",
+      "Branches above, trunks below: together the weight sits a little low",
+      "Mid-way through the darker grove, left of centre on the screen"
     ],
-    "obj": "左の松林",
-    "obje": "left grove",
+    "obj": "濃いほうの松林",
+    "obje": "the darker grove",
     "note": "長谷川等伯『松林図屏風』、16 世紀末の水墨、国宝。六曲一双の屏風に霧の中の松林だけを描いています。濃い松と薄い松の距離、何も描かれていない紙の余白そのものが奥行きになっていて、日本の「間」を語るときに必ず挙げられる作です。",
     "notee": "Hasegawa Tōhaku’s Pine Trees, late sixteenth century, ink on paper, a National Treasure. Across a pair of six-panel screens there is nothing but pines in mist. The distance between dark and pale trees, and the untouched paper itself, become depth. It is the work most often cited for the Japanese sense of ma, the space between.",
     "q": [
       "いちばん濃い松のてっぺんはどこだろう",
-      "濃いほうの松林が始まるのは、左右のどこからだろう",
+      "濃いほうの松林の左端はどこだろう",
       "濃いほうの松林の重さの中心は、どの高さだろう",
       "濃いほうの松林の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the top of the darkest pine?",
-      "From where, left to right, does the darker grove begin?",
+      "Where is the left edge of the darker grove?",
       "At what height is the centre of weight of the darker grove?",
       "Where, left to right, is the centre of weight of the darker grove?"
     ]
@@ -4176,16 +4176,16 @@
       "x3": 55
     },
     "why": [
-      "崖のいちばん上。ここから鋭い線が下へ走っている。",
-      "崖の塊の左端。",
-      "岩は下へ積み上がる。重心はやや下。",
-      "縦の線のすぐ右。重心もそこに。"
+      "崖のいちばん上。一本の線から始まっているように見える。",
+      "崖の左端。あの一本の線がそのまま境目。",
+      "崖は下が厚く見える。重心はやや下。",
+      "右へ張り出す岩のぶん、重心は中ほどよりわずかに右。"
     ],
     "whye": [
-      "The top of the cliff, where a sharp line runs down",
-      "The left edge of the cliff mass",
-      "Rocks pile up downward: the weight sits a little low",
-      "Just right of the vertical line, and so is the weight"
+      "The top of the cliff: it looks as though a single line starts here",
+      "The left edge of the cliff: that single line is the boundary",
+      "The cliff looks thicker below: the weight sits a little low",
+      "The rock juts to the right: the weight sits just right of the middle"
     ],
     "obj": "崖",
     "obje": "cliff",
@@ -4193,13 +4193,13 @@
     "notee": "Sesshū’s Winter Landscape from Autumn and Winter Landscapes, late fifteenth century, a National Treasure. A cliff’s outline shoots up through the center of the sheet, growing thicker and darker as it rises. Sesshū turned the ink techniques he studied in China into a single decisive line.",
     "q": [
       "崖のいちばん高いところはどこだろう",
-      "崖が始まるのは、左右のどこからだろう",
+      "崖の左端はどこだろう",
       "崖の重さの中心は、どの高さだろう",
       "崖の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the cliff?",
-      "From where, left to right, does the cliff begin?",
+      "Where is the left edge of the cliff?",
       "At what height is the centre of weight of the cliff?",
       "Where, left to right, is the centre of weight of the cliff?"
     ]
@@ -4222,15 +4222,15 @@
       "x3": 55
     },
     "why": [
-      "いちばん高い屋根の上端。家並みはここから。",
+      "いちばん高い屋根の上端。",
       "左の家の左端。",
-      "雪の屋根が重い。重心はやや下。",
+      "雪の積もる屋根。重心はやや下。",
       "家並みの中ほど。やや右。"
     ],
     "whye": [
-      "The top of the highest roof: the row of houses begins here",
+      "The top of the highest roof",
       "The left edge of the leftmost house",
-      "Snowy roofs are heavy: the weight sits a little low",
+      "Roofs piled with snow: the weight sits a little low",
       "The middle of the row, a little right"
     ],
     "obj": "家並み",
@@ -4239,13 +4239,13 @@
     "notee": "Hiroshige’s Kambara, Night Snow from the Fifty-three Stations of the Tōkaidō, around 1833–34. Travelers walk a snowy road in near monochrome. Kambara rarely sees snow; the stillness is Hiroshige’s invention. The tiny figures and the broad emptiness of hills and sky set the mood.",
     "q": [
       "いちばん高い屋根はどこだろう",
-      "家並みが始まるのは、左右のどこからだろう",
+      "家並みの左端はどこだろう",
       "家並みの重さの中心は、どの高さだろう",
       "家並みの重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest roof?",
-      "From where, left to right, do the houses begin?",
+      "Where is the left edge of the row of houses?",
       "At what height is the centre of weight of the row of houses?",
       "Where, left to right, is the centre of weight of the row of houses?"
     ]
@@ -4268,16 +4268,16 @@
       "x3": 60
     },
     "why": [
-      "髪のいちばん上。人物の塊はここから。",
-      "左の袖の張り出し。",
-      "頭は上、着物の量は下。重心は中ほどより下。",
-      "顔は左を向くが、身体の量は右へ。重心はやや右。"
+      "結い上げた髪のいちばん上。",
+      "左の袖がいちばん外へ出るところ。",
+      "着物は下に広がる。重心は中ほどより下。",
+      "顔は左向き。身体は右へ広がる。重心はやや右。"
     ],
     "whye": [
-      "Top of the hair: the figure's mass starts here",
-      "The left sleeve's furthest reach",
-      "Head above, the bulk of the kimono below: the weight sits below the middle",
-      "The face turns left but the body's bulk goes right: the weight sits slightly right"
+      "The top of the piled-up hair",
+      "Where the left sleeve reaches furthest out",
+      "The kimono spreads below: the weight sits below the middle",
+      "The face turns left, the body spreads right: the weight sits slightly right"
     ],
     "obj": "人物",
     "obje": "figure",
@@ -4316,14 +4316,14 @@
     "why": [
       "白い頭巾の上端。",
       "裾の左端。足台より右。",
-      "黒い衣の量は下半分に。重心は下寄り。",
-      "人物は右寄り、椅子の背で止まる。"
+      "黒い服は下に広がる。重心は下寄り。",
+      "上体は右、裾は左。重心は右寄り。"
     ],
     "whye": [
       "Top of the white cap",
       "Left end of the skirt, right of the footstool",
-      "The black dress bulks in the lower half: the weight sits low",
-      "The figure sits right of centre, stopped by the chair back"
+      "The black dress spreads below: the weight sits low",
+      "The upper body sits right, the hem runs left: the weight sits right"
     ],
     "obj": "人物",
     "obje": "figure",
@@ -4331,13 +4331,13 @@
     "notee": "Oil by James McNeill Whistler, painted in London in 1871 (Musee d'Orsay). His mother sits in profile in black against a grey wall, a black curtain and the rectangles of framed pictures. As the title says, it is an arrangement of tones more than a portrait, and the figure sits to the right.",
     "q": [
       "白い頭巾のいちばん高いところはどこだろう",
-      "裾が始まるのは、左右のどこからだろう",
+      "裾の左端はどこだろう",
       "人物の重さの中心は、どの高さだろう",
       "人物の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the white cap?",
-      "From where, left to right, does the hem begin?",
+      "Where is the left edge of the hem?",
       "At what height is the centre of weight of the figure?",
       "Where, left to right, is the centre of weight of the figure?"
     ]
@@ -4360,16 +4360,16 @@
       "x3": 46
     },
     "why": [
-      "頭の上端。人物はここから下に。",
+      "両手で挟んだ頭の上端。",
       "身体の左端（手すりの手前）。",
       "頭は小さく、身体は下へ広がる。重心は下。",
-      "人物は中央よりわずかに左。"
+      "重心は中央よりわずかに左。"
     ],
     "whye": [
-      "Top of the head: the figure runs down from here",
+      "The top of the head, held between both hands",
       "Left edge of the body, in front of the railing",
       "Small head, body widening downward: the weight sits low",
-      "The figure stands slightly left of centre"
+      "The weight sits slightly left of centre"
     ],
     "obj": "人物",
     "obje": "figure",
@@ -4377,13 +4377,13 @@
     "notee": "The first version of The Scream, painted by Edvard Munch in 1893 (National Museum, Oslo). On a hill path near Oslo the sunset turned blood red and he felt a scream through nature, drawn in waving lines. The railing runs from the left down to the lower right and makes the depth; the figure stands lower right.",
     "q": [
       "頭のいちばん高いところはどこだろう",
-      "人物が始まるのは、左右のどこからだろう",
+      "人物の左端はどこだろう",
       "人物の重さの中心は、どの高さだろう",
       "人物の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the head?",
-      "From where, left to right, does the figure begin?",
+      "Where is the left edge of the figure?",
       "At what height is the centre of weight of the figure?",
       "Where, left to right, is the centre of weight of the figure?"
     ]
@@ -4406,16 +4406,16 @@
       "x3": 80
     },
     "why": [
-      "白い布の弧の上端。風神の塊はここから。",
-      "黒い雲の左端。金地はここまで。",
+      "風神がかつぐ白い布のいちばん上。",
+      "風神が乗る黒い雲の左端。",
       "頭と胴が上寄り、雲が下に垂れる。重心はやや上。",
-      "風神は右端に寄る。重心は 80 付近。"
+      "風神は右の端へ寄る。重心も右寄り。"
     ],
     "whye": [
-      "Top of the white cloth arc: the wind god's mass starts here",
-      "Left edge of the black cloud; the gold ends here",
+      "The top of the white cloth the wind god carries",
+      "The left edge of the dark cloud the wind god rides",
       "Head and torso sit high, the clouds hang below: the weight is slightly high",
-      "The wind god is pushed to the right edge: the weight sits near 80"
+      "The wind god keeps to the right edge: the weight sits right too"
     ],
     "obj": "右の風神",
     "obje": "wind god on the right",
@@ -4423,13 +4423,13 @@
     "notee": "A pair of two-panel screens by Tawaraya Sotatsu, painted in the early 17th century and handed down at Kennin-ji. The thunder god and the wind god are pushed to the far left and right of the gold ground, leaving the centre empty; the empty gold between them carries the tension. Korin and Hoitsu later copied it, and it stands for the Rinpa school.",
     "q": [
       "白い布の弧のいちばん高いところはどこだろう",
-      "黒い雲が始まるのは、左右のどこからだろう",
+      "黒い雲の左端はどこだろう",
       "風神の重さの中心は、どの高さだろう",
       "風神の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the highest point of the arc of white cloth?",
-      "From where, left to right, does the dark cloud begin?",
+      "Where is the left edge of the dark cloud?",
       "At what height is the centre of weight of the wind god?",
       "Where, left to right, is the centre of weight of the wind god?"
     ]
@@ -4452,16 +4452,16 @@
       "x3": 10
     },
     "why": [
-      "左の花群のいちばん高い花。",
-      "花群は左端に接する。",
+      "いちばん高く伸びた花の先。",
+      "左の花群の左端。画面の縁に接する。",
       "花は上半分、葉は下へ。重心は中ほど。",
-      "左端の群れの中心。"
+      "左の花群の中ほど。"
     ],
     "whye": [
-      "The highest flower of the left cluster",
-      "The cluster touches the left edge",
+      "The tip of the tallest iris",
+      "The left edge of the left cluster, touching the frame",
       "Flowers in the upper half, leaves running down: the weight sits mid-height",
-      "The centre of the leftmost cluster"
+      "Mid-way through the left cluster"
     ],
     "note": "尾形光琳が 1701 年ごろに描いた六曲一双の屏風（根津美術館）。伊勢物語の八橋の段を、橋も水も描かず、金地に群青と緑青の燕子花だけで表しました。花群を左から右へ、高さを変えながら並べる反復が主題で、同じ形の型を繰り返し使ったとも言われます。",
     "notee": "A pair of six-panel screens by Ogata Korin, c. 1701 (Nezu Museum). The Yatsuhashi episode of the Tales of Ise is shown with no bridge and no water: only irises in ultramarine and malachite green on gold. The subject is repetition, clusters set left to right at changing heights, possibly with reused stencils.",
@@ -4469,15 +4469,15 @@
     "obje": "left cluster",
     "q": [
       "いちばん高い花はどこだろう",
-      "花群が始まるのは、左右のどこからだろう",
-      "花群の重さの中心は、どの高さだろう",
-      "花群の重さの中心は、左右のどこだろう"
+      "左の花群の左端はどこだろう",
+      "左の花群の重さの中心は、どの高さだろう",
+      "左の花群の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "Where is the tallest flower?",
-      "From where, left to right, does the cluster begin?",
-      "At what height is the centre of weight of the cluster?",
-      "Where, left to right, is the centre of weight of the cluster?"
+      "Where is the left edge of the left cluster?",
+      "At what height is the centre of weight of the left cluster?",
+      "Where, left to right, is the centre of weight of the left cluster?"
     ]
   },
   {
@@ -4499,15 +4499,15 @@
     },
     "why": [
       "赤い面は上辺から始まる。",
-      "太い黒の縦線の右。赤はここから。",
+      "太い黒線と赤い面の境目。",
       "赤は上三分の二を占める。重心はその中ほど。",
-      "赤の左右の中心。右辺に接するぶん右寄り。"
+      "赤い面の幅の中ほど。画面では右寄り。"
     ],
     "whye": [
       "The red plane starts at the top edge",
-      "Right of the thick black vertical: red begins here",
+      "The boundary between the thick black line and the red plane",
       "Red fills the upper two thirds: the weight sits in its middle",
-      "The centre of the red, right of centre because it touches the right edge"
+      "Mid-way across the red plane, right of centre on the screen"
     ],
     "note": "ピート・モンドリアンが 1930 年に描いた油彩（チューリヒ美術館）。黒い直線で画面を割り、赤・青・黄の三原色と白だけで組む「新造形主義」の代表作です。大きな赤い面を右上に置き、小さな青と黄で釣り合いを取ります。",
     "notee": "Oil on canvas by Piet Mondrian, 1930 (Kunsthaus Zurich). Black straight lines divide the plane, and only the three primaries and white fill it: the emblem of Neoplasticism. A large red plane sits top right, balanced by a small blue and a small yellow.",
@@ -4515,13 +4515,13 @@
     "obje": "red plane",
     "q": [
       "赤い面が始まるのは、どの高さだろう",
-      "赤い面が始まるのは、左右のどこからだろう",
+      "赤い面の左端はどこだろう",
       "赤い面の重さの中心は、どの高さだろう",
       "赤い面の重さの中心は、左右のどこだろう"
     ],
     "qe": [
       "At what height does the red plane begin?",
-      "From where, left to right, does the red plane begin?",
+      "Where is the left edge of the red plane?",
       "At what height is the centre of weight of the red plane?",
       "Where, left to right, is the centre of weight of the red plane?"
     ]
