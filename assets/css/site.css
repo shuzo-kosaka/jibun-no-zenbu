@@ -5193,3 +5193,7 @@
 
   /* v772: 段の本文の中に入れ子になった包み（数字のアキなど）は、行の中に戻す */
   #seq .steps li span .nq{display:inline; height:auto; overflow:visible; opacity:1; transition:none}
+
+  /* v776: 枚数の断り。本文より小さく、凡例と同じ大きさで */
+  .gm-jwcap{font-size:11.5px; line-height:1.85; opacity:.62; margin:1.1em 0 0}
+  @media (max-height:640px){ .gm-jwcap{font-size:11px; line-height:1.8} }
