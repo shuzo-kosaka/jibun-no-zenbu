@@ -5165,3 +5165,16 @@
   .hd > *{transition:opacity .9s var(--ease)}
 
   .p a.xl[href*="bokurano"]{white-space:nowrap}
+
+  .gm-stool .gm-sdisp{margin-left:8px; padding-left:10px; border-left:1px solid var(--line)}
+  html.handheld .gm-stool .gm-sdisp{margin-left:5px; padding-left:6px}
+  .gm-sheet .gm-stool .gm-sdisp{margin-left:6px; padding-left:7px}
+  .gm-scap small:empty{display:none}
+
+  .gm-sheet .gm-stool{transition:left .38s var(--ease), top .38s var(--ease),
+    width .3s var(--ease), height .3s var(--ease), border-radius .3s var(--ease), padding .3s var(--ease)}
+  .gm-sheet .gm-stool.grab{transition:none}
+  .gm-stool > *:not(.gm-sfold){transition:opacity .16s var(--ease)}
+  .gm-stool.folding > *:not(.gm-sfold),.gm-stool.unfolding > *:not(.gm-sfold){opacity:0}
+  .gm-stool.folding{pointer-events:none}
+  html.rm .gm-sheet .gm-stool,html.rm .gm-stool > *:not(.gm-sfold){transition:none}

@@ -4829,7 +4829,7 @@
         '<div class="gm-sheet" aria-hidden="true"><div class="gm-sgrid"></div><div class="gm-mock"><div class="gm-mk1"></div><div class="gm-mk3"></div><div class="gm-mk2"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>' +
           '<div class="gm-shd"><div class="gm-swk" role="group"><button type="button" data-g="you" aria-pressed="true"></button><button type="button" data-g="mine" aria-pressed="false"></button></div><button class="gm-sx" type="button"></button></div>' +
           /* v601 自分の引いた線の上で、実際に置いて試せる道具（本人） */
-          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><button type="button" data-act="grid" aria-pressed="true"></button><button type="button" data-act="num" aria-pressed="true"></button>' +
+          '<div class="gm-stool" role="group"><button class="gm-sfold" type="button" data-act="fold" aria-expanded="true"></button><b></b><button type="button" data-add="mk1"></button><button type="button" data-add="mk3"></button><button type="button" data-add="mk2"></button><button type="button" data-act="dup" disabled></button><button type="button" data-act="del" disabled></button><button type="button" data-act="undo" disabled></button><button type="button" data-act="redo" disabled></button><button type="button" data-act="rst"></button><span class="gm-sar gm-sdisp"><em></em><button type="button" data-act="grid" aria-pressed="true"></button><button type="button" data-act="num" aria-pressed="true"></button></span>' +
             /* v627 紙面の枠を替える（本人：A4 と正方形を足す） */
             '<span class="gm-sar"><em></em><button type="button" data-sar="screen" aria-pressed="true"></button><button type="button" data-sar="0.707">A4</button><button type="button" data-sar="1"></button></span></div>' +
           '<p class="gm-scap"><b></b><span></span><small></small></p></div>';   /* v394: 切替の二つと戻るを一列に（小坂さん：戻るの下に並ぶのは不自然） */
@@ -7108,9 +7108,12 @@
       var t = sheetEl && sheetEl.querySelector('.gm-stool'); if(!t) return;
       var mini = t.classList.contains('mini'), w0 = t.getBoundingClientRect().width;
       if(mini){
-        t.classList.remove('mini'); mockText();
+        /* v768 開く：まず中身を薄いままにして、幅が伸び始めてから浮かび上がらせる（本人：滑らかでない）。
+           いきなり `display` を戻すと、丸のままの箱に十三個の釦が現れてから箱が伸びるので、段差に見えていた */
+        t.classList.remove('mini'); t.classList.add('unfolding'); mockText();
         t.style.width = w0 + 'px'; void t.offsetWidth;
         t.style.width = t.scrollWidth + 'px';
+        setTimeout(function(){ t.classList.remove('unfolding'); }, 130);
         setTimeout(function(){ if(!t.classList.contains('mini')) t.style.width = ''; }, 340);
         /* v652B 丸のまま端へ運んでから開くと、伸びた列が画面の外へ出て押せなくなっていた（再検査係：
            右へ運ぶと 1050px はみ出し、十三個中十二個が画面外）。**開き終わった実寸で**はみ出しを測り、
@@ -7124,8 +7127,13 @@
           if(dy) t.style.top = ((parseFloat(t.style.top) || (r.top - sh.top)) + dy).toFixed(0) + 'px';
         }, 380);
       } else {
+        /* v768 畳む：先に中身を薄くしてから丸へ縮める。順番が逆だと、釦が消えた空の箱が縮んで見える */
+        t.classList.add('folding');
         t.style.width = w0 + 'px'; void t.offsetWidth;
-        t.classList.add('mini'); mockText(); t.style.width = '';
+        setTimeout(function(){
+          if(!t.classList.contains('folding')) return;
+          t.classList.remove('folding'); t.classList.add('mini'); mockText(); t.style.width = '';
+        }, 150);
       }
     }
     function mockText(){
@@ -7142,7 +7150,8 @@
         fd.innerHTML = mockIcon(mini ? 'open' : 'fold');
         fd.setAttribute('aria-label', mini ? L('置いて試す道具を開く', 'Open the layout tools') : L('道具を畳む', 'Fold the tools'));
         fd.setAttribute('aria-expanded', mini ? 'false' : 'true'); }
-      var sar = t.querySelector('.gm-sar'); if(sar){
+      var dsp = t.querySelector('.gm-sdisp'); if(dsp) dsp.querySelector('em').textContent = L('表示', 'display');   /* v767 グリッドと数値は「表示」の括りに（本人） */
+      var sar = t.querySelector('.gm-sar:not(.gm-sdisp)'); if(sar){
         sar.querySelector('em').textContent = L('枠', 'frame');
         sar.querySelector('[data-sar="screen"]').textContent = L('この画面', 'screen');
         sar.querySelector('[data-sar="1"]').textContent = L('正方形', 'square'); }
@@ -7192,7 +7201,8 @@
       /* v600 「あなたの四本／このサイトのグリッド」の数値と、その下の長い説明は、この画面には要らない（本人）。
          代わりに、つまんで動かせることだけを一行で伝える */
       sheetEl.querySelector('.gm-scap span').innerHTML = '';
-      sheetEl.querySelector('.gm-scap small').textContent = L('見出し・図版・本文はつまんで動かせます。右下をつまむと大きさが変わります。押して選ぶと複製や削除ができます。', 'Drag the title, the figure and the text. Pull the corner to resize. Select one to duplicate or delete it.');
+      /* v767 三枚の手引き（STUTS）で同じことを案内するようになったので、ここの説明は重複。消す（本人） */
+      sheetEl.querySelector('.gm-scap small').textContent = '';
       mockText();
     }
     /* v610 紙面の段の幅。中身が載っているグリッドのぶんだけ出す。
