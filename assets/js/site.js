@@ -3710,7 +3710,7 @@
     "cat": "主塊と余白面",
     "cate": "Mass and void",
     "a": {
-      "y1": 14,
+      "y1": 16,
       "x1": 30,
       "y2": 55,
       "x3": 68
@@ -3802,7 +3802,7 @@
     "cat": "前景フレームと奥行き",
     "cate": "Foreground frame and depth",
     "a": {
-      "y1": 12,
+      "y1": 29,
       "x1": 4,
       "y2": 70,
       "x3": 50
@@ -3855,13 +3855,13 @@
     },
     "why": [
       "右の人の頭。三人でいちばん高い。",
-      "左の人の帽子の縁。ここが三人の左端。",
+      "左の人が伸ばした手の先。ここが三人の左端。",
       "かがんだ姿は下が重い。重心は中ほどより下。",
       "三人のちょうど真ん中。"
     ],
     "whye": [
       "The head on the right, the highest of the three",
-      "The rim of the left figure's cap: the left edge of the three",
+      "The reaching hand of the left figure: the left edge of the three",
       "Stooping figures are heavy below: the weight sits under the middle",
       "Right in the middle of the three"
     ],
@@ -3894,7 +3894,7 @@
     "cat": "前景フレームと奥行き",
     "cate": "Foreground frame and depth",
     "a": {
-      "y1": 20,
+      "y1": 21,
       "x1": 28,
       "y2": 57,
       "x3": 52
@@ -3902,13 +3902,13 @@
     "why": [
       "桶のいちばん上。輪の頂点。",
       "桶の左の端。",
-      "輪の下半分に厚みが寄る。重心はやや下。",
+      "桶は画面の下寄りに大きく座る。重心はやや下。",
       "輪は左右に偏らない。重心はほぼ中央。"
     ],
     "whye": [
       "The top of the barrel, the crown of the ring",
       "The left of the barrel",
-      "The lower half of the ring carries the bulk: the weight sits a little low",
+      "The barrel sits low and large in the frame: the weight sits a little low",
       "The ring leans neither way: the weight sits near the middle"
     ],
     "obj": "桶",
@@ -3986,7 +3986,7 @@
     "cat": "対置と中間領域",
     "cate": "Opposition and the space between",
     "a": {
-      "y1": 6,
+      "y1": 7,
       "x1": 1,
       "y2": 45,
       "x3": 30
@@ -4032,7 +4032,7 @@
     "cat": "水平分節と上下構成",
     "cate": "Horizontal division, upper and lower",
     "a": {
-      "y1": 50,
+      "y1": 53,
       "x1": 1,
       "y2": 70,
       "x3": 52
@@ -4124,8 +4124,8 @@
     "cat": "密度差と空間の抜け",
     "cate": "Density contrast and open space",
     "a": {
-      "y1": 20,
-      "x1": 14,
+      "y1": 21,
+      "x1": 12,
       "y2": 58,
       "x3": 29
     },
@@ -4171,19 +4171,19 @@
     "cate": "Vertical repetition and height",
     "a": {
       "y1": 12,
-      "x1": 36,
+      "x1": 37,
       "y2": 55,
       "x3": 55
     },
     "why": [
       "崖のいちばん上。一本の線から始まっているように見える。",
-      "崖の左端。あの一本の線がそのまま境目。",
+      "崖の左端。先ほどの一本の線がそのまま境目。",
       "崖は下が厚く見える。重心はやや下。",
-      "右へ張り出す岩のぶん、重心は中ほどよりわずかに右。"
+      "右へ張り出す岩の分、重心は中ほどよりわずかに右。"
     ],
     "whye": [
       "The top of the cliff: it looks as though a single line starts here",
-      "The left edge of the cliff: that single line is the boundary",
+      "The left edge of the cliff: the line we just saw is the boundary",
       "The cliff looks thicker below: the weight sits a little low",
       "The rock juts to the right: the weight sits just right of the middle"
     ],
@@ -4216,8 +4216,8 @@
     "cat": "水平分節と上下構成",
     "cate": "Horizontal division, upper and lower",
     "a": {
-      "y1": 38,
-      "x1": 20,
+      "y1": 43,
+      "x1": 14,
       "y2": 58,
       "x3": 55
     },
@@ -4262,8 +4262,8 @@
     "cat": "主塊と余白面",
     "cate": "Mass and void",
     "a": {
-      "y1": 10,
-      "x1": 20,
+      "y1": 14,
+      "x1": 19,
       "y2": 58,
       "x3": 60
     },
@@ -4308,20 +4308,20 @@
     "cat": "対置と中間領域",
     "cate": "Opposition and the space between",
     "a": {
-      "y1": 16,
-      "x1": 34,
+      "y1": 12,
+      "x1": 25,
       "y2": 62,
       "x3": 62
     },
     "why": [
       "白い頭巾の上端。",
-      "裾の左端。足台より右。",
+      "裾の左端。足台の上まで流れる。",
       "黒い服は下に広がる。重心は下寄り。",
       "上体は右、裾は左。重心は右寄り。"
     ],
     "whye": [
       "Top of the white cap",
-      "Left end of the skirt, right of the footstool",
+      "The left end of the hem, sweeping over the footstool",
       "The black dress spreads below: the weight sits low",
       "The upper body sits right, the hem runs left: the weight sits right"
     ],
@@ -4354,20 +4354,20 @@
     "cat": "前景フレームと奥行き",
     "cate": "Foreground frame and depth",
     "a": {
-      "y1": 56,
-      "x1": 32,
+      "y1": 46,
+      "x1": 30,
       "y2": 80,
       "x3": 46
     },
     "why": [
       "両手で挟んだ頭の上端。",
-      "身体の左端（手すりの手前）。",
+      "外套がいちばん左へ出るところ。",
       "頭は小さく、身体は下へ広がる。重心は下。",
       "重心は中央よりわずかに左。"
     ],
     "whye": [
       "The top of the head, held between both hands",
-      "Left edge of the body, in front of the railing",
+      "Where the cloak reaches furthest to the left",
       "Small head, body widening downward: the weight sits low",
       "The weight sits slightly left of centre"
     ],
@@ -4400,8 +4400,8 @@
     "cat": "対置と中間領域",
     "cate": "Opposition and the space between",
     "a": {
-      "y1": 8,
-      "x1": 63,
+      "y1": 3,
+      "x1": 62,
       "y2": 45,
       "x3": 80
     },
@@ -4446,7 +4446,7 @@
     "cat": "反復と変奏",
     "cate": "Repetition and variation",
     "a": {
-      "y1": 8,
+      "y1": 3,
       "x1": 1,
       "y2": 48,
       "x3": 10
