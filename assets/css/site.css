@@ -5178,3 +5178,12 @@
   .gm-stool.folding > *:not(.gm-sfold),.gm-stool.unfolding > *:not(.gm-sfold){opacity:0}
   .gm-stool.folding{pointer-events:none}
   html.rm .gm-sheet .gm-stool,html.rm .gm-stool > *:not(.gm-sfold){transition:none}
+
+  .gm-once.gm-onceb.gm-once-dn.on{transform:translate(-50%,0)}
+  .gm-once.gm-onceb.gm-once-up.on{transform:translate(-50%,-100%)}
+  .gm-once.gm-onceb.gm-once-rt.on{transform:translate(0,-50%)}
+  .gm-once.gm-onceb.gm-once-lf.on{transform:translate(-100%,-50%)}
+  .gm-once.gm-onceb.gm-once-dn.bye{transform:translate(-50%,0) translateY(-6px)}
+  .gm-once.gm-onceb.gm-once-up.bye{transform:translate(-50%,-100%) translateY(-6px)}
+  .gm-once.gm-onceb.gm-once-rt.bye{transform:translate(0,-50%) translateY(-6px)}
+  .gm-once.gm-onceb.gm-once-lf.bye{transform:translate(-100%,-50%) translateY(-6px)}

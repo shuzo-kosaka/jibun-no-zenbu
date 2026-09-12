@@ -5955,21 +5955,33 @@
           if(!you || !mine){ once.style.left = '50%'; once.style.top = '62%'; return; }
           var yr = you.getBoundingClientRect(), mr = mine.getBoundingClientRect();
           var horiz = you.classList.contains('h');
+          /* v769 これまでは**二本のちょうど真ん中**に置いていたので、札が「比べている当の二本」を隠していた（本人）。
+             引き出しはそのままに、札だけを**間合いの外**（よこ線なら下、たて線なら右）へ寄せる。
+             はみ出しそうなときは反対側へ回す。 */
+          var PAD = 16;
           if(horiz){
             var y1 = yr.top - hr.top, y2 = mr.top - hr.top, x = sr.left - hr.left + sr.width * .62;
             tie.className = 'gm-oncetie v';
             tie.style.left = x + 'px'; tie.style.top = Math.min(y1, y2) + 'px'; tie.style.height = Math.max(6, Math.abs(y2 - y1)) + 'px';
-            once.style.left = x + 'px'; once.style.top = ((y1 + y2) / 2) + 'px';
+            var oh = once.offsetHeight || 96, lowY = Math.max(y1, y2), upY = Math.min(y1, y2);
+            var below = (lowY + PAD + oh) <= (sr.bottom - hr.top - 6);
+            once.className = 'gm-once gm-onceb ' + (below ? 'gm-once-dn' : 'gm-once-up');
+            once.style.left = x + 'px'; once.style.top = (below ? lowY + PAD : upY - PAD) + 'px';
           } else {
             var x1 = yr.left - hr.left, x2 = mr.left - hr.left, y = sr.top - hr.top + sr.height * .62;
             tie.className = 'gm-oncetie h';
             tie.style.left = Math.min(x1, x2) + 'px'; tie.style.top = y + 'px'; tie.style.width = Math.max(6, Math.abs(x2 - x1)) + 'px';
-            once.style.left = ((x1 + x2) / 2) + 'px'; once.style.top = y + 'px';
+            var ow = once.offsetWidth || 300, rgX = Math.max(x1, x2), lfX = Math.min(x1, x2);
+            var right = (rgX + PAD + ow) <= (sr.right - hr.left - 6);
+            once.className = 'gm-once gm-onceb ' + (right ? 'gm-once-rt' : 'gm-once-lf');
+            once.style.left = (right ? rgX + PAD : lfX - PAD) + 'px'; once.style.top = y + 'px';
           }
         })();
         requestAnimationFrame(function(){ requestAnimationFrame(function(){ once.classList.add('on'); tie.classList.add('on'); }); });
-        setTimeout(function(){ once.classList.add('bye'); tie.classList.add('bye'); }, 7000);
-        setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); if(tie.parentNode) tie.parentNode.removeChild(tie); }, 8200); }
+        /* v769 出ている時間を 7.0 → 5.2 秒に（本人：もう少し短めに。ただし極端に短くしない）。
+           二文・約 60 字なので、読み切るのに要るのはおおよそ 4〜5 秒。薄れるのに 0.8 秒かかるぶんを足して 5.2 秒。 */
+        setTimeout(function(){ once.classList.add('bye'); tie.classList.add('bye'); }, 5200);
+        setTimeout(function(){ if(once.parentNode) once.parentNode.removeChild(once); if(tie.parentNode) tie.parentNode.removeChild(tie); }, 6400); }
       first = false; setTimeout(reveal, 80);
     }
     /* v639 比べる欄の数値を、枠からはみ出さない範囲でできるだけ大きく（本人：PC のみ）。
