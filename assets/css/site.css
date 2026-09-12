@@ -5163,3 +5163,5 @@
   body.opening .hd::before,body.opening .hd::after,body.opening .hd > *{opacity:0}
   .hd::before,.hd::after{transition:opacity .9s var(--ease)}
   .hd > *{transition:opacity .9s var(--ease)}
+
+  .p a.xl[href*="bokurano"]{white-space:nowrap}
