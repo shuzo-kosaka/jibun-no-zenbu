@@ -1940,7 +1940,7 @@
     var phone = document.documentElement.classList.contains('pcview') && document.documentElement.classList.contains('phone');
     var ja = !(typeof curLang !== 'undefined' && curLang === 'en');
     var dy1 = phone ? 42 : (ja ? 40 : 34), dy2 = phone ? 44 : (ja ? 36 : 32);
-    var BIG = ['些細な差', '細部', '人', '場', '専門の外', 'デザイン'];   /* 見せたい語（v245） */
+    var BIG = ['些細な点', '細部', '人', '場', '専門の外', 'デザイン'];   /* 見せたい語（v245） */
     var ns = 'http://www.w3.org/2000/svg';
     svg.querySelectorAll('.dg-cap text').forEach(function(t, ci){
       if(t.__mixed && t.__mixedLang === curLang) return;
