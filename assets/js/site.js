@@ -5602,7 +5602,10 @@
     ];
     var tutList = null, tutKind = '';
     var TUTS = [
-      {k:['stage'], ja:'この絵に、《4本の線》を引きます。',
+      /* v765: 穴を盤面だけにすると、**目盛りが穴のふちで切られ**、切れ端が暗い幕の上に
+         白い棒のように取り残される（本人：明るく見えるところの白い異物）。
+         左右の目盛りごと穴に入れて、切れ端が出ないようにする。 */
+      {k:['stage','rl','rt'], ja:'この絵に、《4本の線》を引きます。',
                                 en:'You will draw 《four lines》 on this picture.'},
       {k:['step'],              ja:'%sの帯に、《いま何本目か》が出ます。',
                                 en:'The band %s shows 《which line you are on》.'},
