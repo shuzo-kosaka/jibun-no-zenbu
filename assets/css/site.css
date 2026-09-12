@@ -5194,11 +5194,12 @@
   /* v772: 段の本文の中に入れ子になった包み（数字のアキなど）は、行の中に戻す */
   #seq .steps li span .nq{display:inline; height:auto; overflow:visible; opacity:1; transition:none}
 
-  /* v776: 枚数の断り。本文より小さく、凡例と同じ大きさで */
-  .gm-jwcap{font-size:11.5px; line-height:1.85; opacity:.62; margin:1.1em 0 0}
-  @media (max-height:640px){ .gm-jwcap{font-size:11px; line-height:1.8} }
-
   /* v777 ①：混植で組み直した見出しでも、数字と かな のあいだに同じ空きを */
   .nqi{margin-right:.07em}
   /* v777 ②：英語の横軸の名を、ものさしの左端側へ（モードの札と重ならないように） */
   html[lang="en"] .gm-stage:not(.rot) .gm-axl.h{left:76px; right:auto}
+
+  /* v779 ①：寸法を追いかけている間は、判の遷移を切って盤面と同じ速さで動かす */
+  .gm-seal.center.snap{transition:none}
+  /* v779 ②：保存の判にも、盤面の判と同じ紙色の下敷きを */
+  .gm-takeseal::before{content:""; position:absolute; inset:-3%; z-index:-1; background:var(--paper, #F2F1EC); border-radius:12%}

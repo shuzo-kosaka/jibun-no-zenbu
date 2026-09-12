@@ -4795,14 +4795,26 @@
         best.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
       }catch(e){} });
     }
-    function sealPark(sp){
+    /* v779 枠を「この画面／A4／正方形」と替えると盤面の寸法が変わるのに、寄せた判は置いたときの位置のまま
+       取り残されていた（本人：盤面の動きに合わせて一緒に動いてほしい）。
+       置き直しは px で書いているので、**盤面の寸法を見張って、変わるたびに measure し直す**。
+       追いかけている間は遷移を切る（`snap`）ので、判は盤面とまったく同じ速さで動く。 */
+    var sealRO = null, sealParked = null;
+    function sealPark(sp, snap){
       if(!sp || !sp.parentNode || !stage) return;
       var r = stage.getBoundingClientRect(), w = sp.offsetWidth, h = sp.offsetHeight, k = .5;
+      if(!(r.width > 4) || !(w > 4)) return;
       var dx = r.width / 2 - w * k / 2 - Math.max(8, r.width * .02), dy = r.height / 2 - h * k / 2 - Math.max(8, r.height * .03);
-      sp.classList.add('park'); sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(' + k + ')';
+      sp.classList.add('park'); sp.classList.toggle('snap', !!snap);
+      sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(' + k + ')';
+      sealParked = sp;
+      if(!sealRO && window.ResizeObserver){
+        sealRO = new ResizeObserver(function(){ if(sealParked && sealParked.parentNode) sealPark(sealParked, true); });
+        try{ sealRO.observe(stage); }catch(x){}
+      }
     }
     function sealOff(now){
-      clearTimeout(sealT); if(!gm) return;
+      clearTimeout(sealT); sealParked = null; if(!gm) return;
       gm.querySelectorAll('.gm-seal').forEach(function(x){
         if(now || rm || x.classList.contains('bye')){ if(now || rm){ if(x.parentNode) x.parentNode.removeChild(x); } return; }
         x.classList.add('bye'); setTimeout(function(){ if(x.parentNode) x.parentNode.removeChild(x); }, 420);
@@ -6232,13 +6244,9 @@
           '<p class="gm-note">' + body(L('表の「差」は西洋の平均から日本の平均を引いた値で、《あなたと私の解釈の違いとは別のもの》です。' + (cat === 'jp' ? '西洋の絵の平均を、青い破線で盤面に重ねられます。日本の絵の平均は、表で見比べてください。' : '日本の絵の平均を、緑の破線で盤面に重ねられます。西洋の絵の平均は、表で見比べてください。'),
             'The “diff” column is the Japanese average subtracted from the Western one, and 《is not the difference between your reading and mine》. ' + (cat === 'jp' ? 'You can overlay the Western average on the board as blue dashed lines; for the Japanese average, read the table.' : 'You can overlay the Japanese average on the board as green dashed lines; for the Western average, read the table.'))) + '</p>' +
           '<button type="button" class="gm-b gm-jwb" aria-pressed="false">' + L(cat === 'jp' ? '西洋の絵の平均と重ねる' : '日本の絵の平均と重ねる', cat === 'jp' ? 'Overlay the Western average' : 'Overlay the Japanese average') + '</button>' +
-          '<p class="gm-note gm-jwend">' + body(L('《あなたの平均が日本と西洋のどちらに近いかは、正解を示すものではありません》。測る3枚や線の引き方によって、結果は変わります。',
-            '《Whether your average lands nearer the Japanese or the Western one does not make it right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
-          /* v776 枚数が揃っていないことの断り（本人）。統計としての平均ではなく、ここに集めた絵のあいだに出た差だと明かす。
-             大きさは本文より小さく、凡例（薄い破線：サイトのグリッド）と同じ 11.5px に */
-          '<p class="gm-jwcap">' + (function(){ var nj = BOARDS.filter(function(x){ return !!x.jp; }).length, nw = BOARDS.length - nj;
-            return body(L('日本 ' + nj + ' 点・西洋 ' + nw + ' 点と枚数が揃っていないので、これは統計としての平均ではありません。ここで採り上げた ' + (nj + nw) + ' 点の絵のあいだに出た、日本と西洋の差です。',
-              'With ' + nj + ' Japanese and ' + nw + ' Western pictures the counts are not matched, so these are not averages in a statistical sense: they are the Japan–West difference found among the ' + (nj + nw) + ' pictures used here.')); })() + '</p>' +
+          /* v778 枚数の断りは、独立した小さな段落をやめて**この本文の頭へ軽く**（本人） */
+          '<p class="gm-note gm-jwend">' + body(L('日本と西洋で枚数が揃っていないので、統計としては不十分です。《あなたの平均がどちらに近いかは、正解を示すものではありません》。測る3枚や線の引き方によって、結果は変わります。',
+            'The counts on each side are not matched, so this falls short of a proper statistical comparison. 《Whether your average lands nearer one or the other does not make it right》. The result changes with which three pictures you measure and where you draw the lines.')) + '</p>' +
           '</div>' + '</div>' +
         '<div class="gm-sev">' + sec(L('研究で引く7本と、7つの見方', 'The seven lines and the seven views')) + '<div class="gm-catx gm-secx" hidden>' +
           '<p class="gm-note">' + body(L('私の研究ではどの測定対象にも同じ7種類の線を引き、同じ7つの見方で構図を捉えます。このゲームで引いていただいたのは、《そのうち2種類》 ── 縦横で1本ずつ、合わせて4本です。',
