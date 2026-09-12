@@ -24,6 +24,11 @@
      同じ描き分けが要る。navigator.vendor が Apple になるのは WebKit だけ（Mac の Chrome は Google Inc.、
      Firefox は空）。UA の判定はそれが取れない場合の控え。 */
   if(/apple/i.test(navigator.vendor || '') || /^((?!chrome|android|crios|edg).)*safari/i.test(navigator.userAgent)) document.documentElement.classList.add('is-webkit');   /* NOT 'wk' — that class already belongs to the works band, and on <html> it dressed every link on the page as a works frame */
+  /* v751: 字の輪郭を測るための小さな canvas は、描いたあと必ず読み返す（getImageData）。
+     Chrome はこれを見つけると「willReadFrequently にしては？」という助言を**コンソールに出す**ので、その指定を足す。
+     ただし WebKit では指定の有無で**ラスタライズがわずかに変わり**、52px の字で測り値が 0.25px ずれることを実測した。
+     見た目を一切変えないため、**助言を出す側（Chrome 系）にだけ**指定する。 */
+  function cx2d(cv){ return document.documentElement.classList.contains('is-webkit') ? cv.getContext('2d') : cv.getContext('2d', {willReadFrequently: true}); }
   var I18N_SEL = 'p, h3, figcaption, li, dd, .toc a, .sr .t, .sr .p2, .sr .a, #mseals .t, em.tag, .lab, .mlab, .tip, .msg, .lg-k, .lg-t, .legend strong, .legend span, .mp-cap b, .mp-cap span, .mp-key span, .gridbtn span, .mmsg .mx, #mlinks .txt, .menu .ml span, .wrap, .cap, .note, .br-cap, .again, .pdf, .cta, .x, footer span, footer a, footer a span, .cta span, .ft-name, .cp-ttl .w, .wk-vt .w, .cp-form label span, .cp-send b, .wk-side span, text, tspan, textPath, .ttl .split, .ttl small, #top .vt .split, #top .rb, #top .rot span, #top .tag span, .sub .w, .vid .t, .vid .s, .vid .badge, .wk em, .lines s, .page s, #ch5pin .wm span, #top .mean';
   var i18nEls = Array.prototype.slice.call(document.querySelectorAll(I18N_SEL)); i18nEls.forEach(function(el){ el.__ja = el.innerHTML; });
   /* split text into characters */
@@ -108,7 +113,7 @@
         words.forEach(function(wd){ var k = txt.indexOf(wd); while(k >= 0){ for(var q = 0; q < wd.length; q++) if(chs[k + q]) chs[k + q].classList.add('big'); k = txt.indexOf(wd, k + wd.length); } });
       }
       /* each line's first glyph pulled left by its side bearing, like the titles */
-      var cv = document.createElement('canvas'), cx = cv.getContext('2d'), rows = [], first = true;
+      var cv = document.createElement('canvas'), cx = cx2d(cv), rows = [], first = true;   /* v751: 読み返す canvas */
       Array.prototype.slice.call(w.childNodes).forEach(function(nd){ if(nd.nodeName === 'BR'){ first = true; return; } if(first && nd.classList && nd.classList.contains('ch') && nd.__t.trim()){ first = false; if(cx){ var cs = getComputedStyle(nd); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily; rows.push({el:nd, lsb:-cx.measureText(nd.__t).actualBoundingBoxLeft}); } } });
       var vertical = getComputedStyle(sub).writingMode !== 'horizontal-tb';
       if(rows.length > 1 && !vertical && getComputedStyle(sub).textAlign !== 'center'){ var mn = Math.min.apply(null, rows.map(function(r){ return r.lsb; })); rows.forEach(function(r){ r.el.style.marginLeft = (-(r.lsb - mn) * .8).toFixed(2) + 'px'; }); }
@@ -124,7 +129,7 @@
   mixedSubs(true);
   /* optical alignment of heading lines: the first glyph of each line is measured on a canvas (its own face, weight and size) and the difference in left side-bearing between the lines is cancelled, so the ink edges — not the boxes — stand on one vertical. Kana carry far more bearing than kanji, which is what made「デザインで人を」look inset. */
   function opticalAlign(){
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cx2d(cv); if(!cx) return;   /* v751 同上 */
     document.querySelectorAll('.ttl:not(.vert)').forEach(function(h){
       var rows = [];
       h.querySelectorAll('.split').forEach(function(sp){ var c = sp.querySelector('.ch'); if(!c || !c.textContent.trim()) return; var cs = getComputedStyle(c); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily; var m = cx.measureText(c.textContent); rows.push({el:c, lsb:-m.actualBoundingBoxLeft}); });
@@ -135,7 +140,7 @@
   }
   /* the lines on the top page are a ruler: the small left-aligned texts are pulled left by their first glyph's side bearing, so the ink itself sits on X1 */
   function hugLine(){
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cx2d(cv); if(!cx) return;   /* v751 同上 */
     var probe = document.createElement('span'); probe.style.cssText = 'position:absolute; left:-9999px; top:0; white-space:pre; visibility:hidden'; document.body.appendChild(probe);
     /* the blank before a glyph's ink: drawn large on a canvas and scanned (canvas ignores palt, so its trim is estimated from the advance it takes away, half on each side) */
     function inkLeft(ch, cs){ var px = parseFloat(cs.fontSize), S = 4; if(!(px > 0)) return 0; cv.width = Math.max(1, Math.ceil(px * S * 2.2)); cv.height = Math.max(1, Math.ceil(px * S * 1.8)); cx.clearRect(0, 0, cv.width, cv.height); cx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + (px * S) + 'px ' + cs.fontFamily; cx.textBaseline = 'middle'; cx.fillStyle = '#000'; var x0 = Math.round(px * S * .6); cx.fillText(ch, x0, cv.height / 2); var d = cx.getImageData(0, 0, cv.width, cv.height).data; for(var x = 0; x < cv.width; x++){ for(var y = 0; y < cv.height; y++){ if(d[(y * cv.width + x) * 4 + 3] > 40) return (x - x0) / S; } } return 0; }
@@ -154,7 +159,7 @@
   /* the katakana tag at the right starts at the same height as JIBUN no ZENBU wo: the ink tops are measured and the tag (rules and all) moves by the difference */
   function tagAlign(){
     var tag = top.querySelector('.tag'), rj = top.querySelector('.lbl b.rj .ln'), sp = tag && tag.querySelector('span'); if(!tag || !rj || !sp) return;
-    var cv = document.createElement('canvas'), cx = cv.getContext('2d'); if(!cx) return;
+    var cv = document.createElement('canvas'), cx = cx2d(cv); if(!cx) return;   /* v751 同上 */
     var rc = getComputedStyle(rj), F = parseFloat(rc.fontSize), LH = parseFloat(rc.lineHeight) || F * 1.12;
     cx.font = rc.fontStyle + ' ' + rc.fontWeight + ' ' + F + 'px ' + rc.fontFamily; var m = cx.measureText(rj.textContent.trim().charAt(0) || 'J');
     var A = m.fontBoundingBoxAscent || F * .9, D = m.fontBoundingBoxDescent || F * .2, cap = m.actualBoundingBoxAscent || F * .7;
@@ -1907,7 +1912,7 @@
      hugLine と同じく、大きく描いて画素を走査する。measureText の actualBoundingBoxRight は
      WebKit だと和字で送り幅をそのまま返してきて、「。」の右の空きが 0 に見えた（見張り係）。
      canvas は palt を効かせないが、この図の説明には palt を掛けていないので、そのまま使える */
-  var capCv = document.createElement('canvas'), capCx = capCv.getContext('2d');
+  var capCv = document.createElement('canvas'), capCx = cx2d(capCv);   /* v751 同上 */
   function capTrail(el, ch){
     if(!capCx || !ch) return 0;
     var cs = getComputedStyle(el), px = parseFloat(cs.fontSize), S = 4;
@@ -3294,6 +3299,10 @@
     /* v274: 自前の絵が 1280 幅で用意されている（公開版の srcset）なら YouTube には取りに行かない。
        この動画の YouTube 側の最大は 640 で、自前の方が細かい。無い場合だけ 1280 の maxresdefault を一度だけ試す */
     var ss = th.getAttribute('srcset') || ''; if(/\b1[2-9]\d\dw\b/.test(ss)) return;
+    /* v751: この動画には YouTube 側の 1280 の絵（maxresdefault）が無く、取りに行くと 404 になって
+       コンソールに赤い印が出る（公開版では自前の 1280 の絵があるので、そもそも取りに行かない）。
+       手元のファイルで開いたときにも印が出ないよう、名指しで見送る。自前の絵のままなので**見た目は変わらない**。 */
+    if(/^(YqVtNthG36s)$/.test(m[1])) return;
     var id = m[1], tries = ['maxresdefault'];
     (function next(){
       var name = tries.shift(); if(!name) return;
