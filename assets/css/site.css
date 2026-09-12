@@ -5153,3 +5153,6 @@
   html.handheld .gm-sheet .gm-mock .gm-drag .gm-rz{touch-action:none}
 
   section[data-scene="ink"] .p .xl, section[data-scene="night"] .p .xl{text-decoration-thickness:1.5px}
+
+  .ld .name b{visibility:hidden}
+  .ld.nm .name b,.ld.lift .name b,.ld.set .name b{visibility:visible}
